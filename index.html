@@ -61,25 +61,31 @@
         
         /* PRINT STYLES */
         @media print {
-            @page { size: landscape; margin: 0; }
+            @page { size: A4 landscape; margin: 5mm; }
             body { background: white; overflow: visible; }
             .no-print, header, aside { display: none !important; }
             #root { height: auto; overflow: visible; display: block; }
+            
+            /* Center and scale specifically for Print */
             #print-wrapper { 
                 transform: none !important; 
-                width: 100% !important; 
-                height: 100% !important; 
+                width: 100vw !important; 
+                height: 100vh !important; 
                 display: flex; 
                 justify-content: center; 
-                align-items: center; 
+                align-items: start; 
                 margin: 0; 
                 padding: 0;
             }
+            
             #export-container {
                 box-shadow: none;
-                margin: 0;
-                transform: scale(0.75); /* Slight scale to fit printable area margins */
-                transform-origin: top left;
+                margin: 0 auto;
+                /* Scale 1485px down to A4 print width (approx 1123px) */
+                /* 0.75 is a safe bet for fitting margins */
+                zoom: 0.75; 
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
         }
     </style>
@@ -155,30 +161,32 @@
             }
         };
 
-        // --- VERTEBRA SVG COMPONENT (WIDER & RECENTERED) ---
+        // --- VERTEBRA SVG COMPONENT (Path Shifted Down for Export Safety) ---
         const SpineVertebra = ({ label, type, height }) => {
             const renderBody = () => {
                 const common = { fill: REGIONS[type].color, stroke: "#475569", strokeWidth: "1.5" };
+                // Redrawn paths: Shifted start (M) and control points (Q) down by ~6px
+                // ensuring all Y coordinates are positive to prevent clipping at the top.
                 switch (type) {
-                    case 'C': return <path d="M65,2 Q80,0 95,2 L95,18 Q80,22 65,18 Z" transform={`translate(0, 0) scale(1, ${height/20})`} {...common} />;
+                    case 'C': return <path d="M65,6 Q80,2 95,6 L95,22 Q80,26 65,22 Z" transform={`translate(0, 0) scale(1, ${height/24})`} {...common} />;
                     case 'T': 
                         return (
                             <g>
-                                <path d="M60,5 Q80,-2 100,5 L105,22 Q80,28 55,22 Z" transform={`scale(1, ${height/28})`} {...common} />
-                                <path d="M55,8 L45,6" stroke="#64748b" strokeWidth="2" />
-                                <path d="M105,8 L115,6" stroke="#64748b" strokeWidth="2" />
+                                <path d="M60,10 Q80,4 100,10 L105,27 Q80,33 55,27 Z" transform={`scale(1, ${height/32})`} {...common} />
+                                <path d="M55,13 L45,11" stroke="#64748b" strokeWidth="2" />
+                                <path d="M105,13 L115,11" stroke="#64748b" strokeWidth="2" />
                             </g>
                         );
                     case 'L': 
                         return (
                             <g>
-                                <path d="M55,0 Q80,-5 105,0 L110,25 Q80,30 50,25 Z" transform={`scale(1, ${height/30})`} {...common} />
-                                <path d="M50,8 L35,12" stroke="#64748b" strokeWidth="3" />
-                                <path d="M110,8 L125,12" stroke="#64748b" strokeWidth="3" />
+                                <path d="M55,8 Q80,2 105,8 L110,33 Q80,38 50,33 Z" transform={`scale(1, ${height/38})`} {...common} />
+                                <path d="M50,16 L35,20" stroke="#64748b" strokeWidth="3" />
+                                <path d="M110,16 L125,20" stroke="#64748b" strokeWidth="3" />
                             </g>
                         );
-                    case 'S': return <path d="M40,0 Q80,-5 120,0 L100,35 Q80,45 60,35 Z" transform={`scale(1, ${height/40})`} {...common} />;
-                    case 'Pelvis': return <path d="M20,0 Q80,15 140,0 L130,35 Q80,45 30,35 Z" transform={`scale(1, ${height/40})`} {...common} opacity="0.6" />;
+                    case 'S': return <path d="M40,8 Q80,2 120,8 L100,43 Q80,53 60,43 Z" transform={`scale(1, ${height/48})`} {...common} />;
+                    case 'Pelvis': return <path d="M20,5 Q80,20 140,5 L130,40 Q80,50 30,40 Z" transform={`scale(1, ${height/45})`} {...common} opacity="0.6" />;
                     default: return null;
                 }
             };
@@ -413,9 +421,6 @@
                 const clone = element.cloneNode(true);
                 
                 // 3. IMPORTANT: Reset transformations on the clone wrapper
-                // The 'scale()' logic on screen causes the drift in html2canvas.
-                // We strip the parent wrapper that has the scale(), or just manually reset it here.
-                // Since we cloned just the #export-container (which is pure 1485x1050), we are good.
                 clone.style.transform = 'none'; 
                 clone.style.margin = '0';
                 cloneContainer.appendChild(clone);
