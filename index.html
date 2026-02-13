@@ -91,22 +91,62 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v0.5.4-alpha";
+        const CURRENT_VERSION = "v0.5.6-alpha";
         
         const CHANGE_LOG = [
+            { version: "v0.5.6-alpha", date: "2025-12-04", changes: [
+                "FIXED Aspect Ratio: Spine scaling is now isotropic (width scales with height). No more 'thin/stretched' vertebrae.",
+                "Restored full version history log.",
+                "Optimized Occiput-T4 layout for better screw placement visibility."
+            ]},
+            { version: "v0.5.5-alpha", date: "2025-12-04", changes: [
+                "Refined View Scaling: Whole Spine reduced by 15%.",
+                "Refined View Scaling: Cervical View magnified by 1.75x.",
+            ]},
             { version: "v0.5.4-alpha", date: "2025-12-04", changes: [
-                "Redesigned Occiput icon: Curve is now caudal (pointing down) to match anatomy.",
-                "Sidebar: Widened (4 columns) with smaller buttons for better density.",
-                "Whole Spine View: Automatically compacts row height by 35% to fit on page."
+                "Redesigned Occiput icon: Curve is now caudal.",
+                "Sidebar: Widened (4 columns) with smaller buttons.",
+                "Whole Spine View: Automatically compacts row height."
             ]},
             { version: "v0.5.3-alpha", date: "2025-12-04", changes: [
                 "Added 'Occiput' level for C0-C1-C2 planning.",
-                "Implemented 3-way View Selector: Thoracolumbar, Cervical (Occ-T4), Whole Spine.",
-                "Inventory now filters to show only implants for the visible spinal region."
+                "Implemented 3-way View Selector.",
+                "Inventory now filters by visible region."
             ]},
             { version: "v0.5.2-alpha", date: "2025-12-04", changes: [
                 "Removed Force Columns from Post-Op (Construct) view.",
-                "Expanded Implant Column width in Construct view to accommodate future GS1/Lot data.",
+                "Expanded Implant Column width in Construct view."
+            ]},
+            { version: "v0.5.1-alpha", date: "2025-12-04", changes: [
+                "Replaced static logo with editable 'Clinic Location' field.",
+                "Moved Version Number to subtitle line.",
+                "Refined text alignment and spacing in sidebar.",
+            ]},
+            { version: "v0.5.0-alpha", date: "2025-12-04", changes: [
+                "Implemented Semantic Versioning.",
+                "Changed License to GNU GPLv3.",
+                "Restored vertical centering for Thoracolumbar view."
+            ]},
+            { version: "V38-V41", date: "2025-12-04", changes: [
+                "Added specialized Deformity Forces (Derotation, Translation).",
+                "Updated force icons.",
+                "Implemented Keyboard Shortcuts (Del/Enter).",
+                "Added PDF direct export."
+            ]},
+            { version: "V33-V37", date: "2025-12-03", changes: [
+                "Added logical constraints (One screw per side).",
+                "Added 'Ghost Targets'.",
+                "Implemented ResizeObserver."
+            ]},
+            { version: "V28-V32", date: "2025-12-03", changes: [
+                "New Fonts: 'Istok Web'.",
+                "Compacted demographics layout.",
+                "Added automated Implant Inventory table."
+            ]},
+            { version: "V0-V27", date: "2025-12-03", changes: [
+                "Initial prototype development.",
+                "Added Incognito Mode.",
+                "Added JSON Save/Load functionality."
             ]}
         ];
 
@@ -370,7 +410,7 @@
         const SpineVertebra = ({ label, type, height }) => {
             const common = { fill: REGIONS[type].color, stroke: "#475569", strokeWidth: "1.5" };
             return (
-                <svg viewBox={`0 0 160 ${height}`} className="w-[160px] block" style={{height: `${height}px`}} overflow="visible">
+                <svg viewBox={`0 0 160 ${height}`} className="w-full h-full block" overflow="visible">
                     <line x1="80" y1="-2" x2="80" y2={height + 2} stroke="#cbd5e1" strokeDasharray="3 3" />
                     <g>
                         {type === 'Occiput' && <path d="M20,2 Q80,45 140,2 Z" transform={`scale(1, ${height/30})`} {...common} />}
@@ -388,8 +428,11 @@
         const LevelRow = ({ level, placements, onZoneClick, tools, onPlacementClick, readOnly, showForces, heightScale }) => {
             const getItems = (z) => placements.filter(p => p.levelId === level.id && p.zone === z);
             
-            // Apply compact scaling to the row height
-            const rowHeight = REGIONS[level.type].height * heightScale;
+            // --- FIX: ISOTROPIC SCALING ---
+            // We scale height AND width together so the vertebra doesn't look "thin" or "squashed".
+            const baseHeight = REGIONS[level.type].height;
+            const scaledHeight = baseHeight * heightScale;
+            const scaledWidth = 160 * heightScale;
 
             // --- GHOST TARGET: CARDINAL FOR FORCES ---
             const GhostTarget = ({ type }) => {
@@ -410,7 +453,7 @@
             };
 
             return (
-                <div className="flex w-full relative" style={{ height: `${rowHeight}px` }}>
+                <div className="flex w-full relative" style={{ height: `${scaledHeight}px` }}>
                     <div className="absolute bottom-0 left-0 right-0 border-b border-slate-100 w-full z-0 pointer-events-none"></div>
                     
                     {/* VISUAL TINT FOR FORCE COLUMNS (CONDITIONAL) */}
@@ -419,7 +462,14 @@
                     )}
 
                     <div className={`flex-1 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><ZoneContent zone="left" align="left"/></div>
-                    <div className={`w-[160px] relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}><SpineVertebra label={level.id} type={level.type} height={rowHeight} /><div className="absolute inset-0 flex items-center justify-center pointer-events-none">{getItems('mid').map(p => { const tool = tools.find(t => t.id === p.tool); let displayLabel = ''; let angle = ''; if (p.tool === 'osteotomy' && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } return (<div key={p.id} className="pointer-events-auto relative group" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><InstrumentIcon type={tool?.icon} className={`${p.tool==='connector'?'w-24 h-6':'w-10 h-10'} drop-shadow-md text-slate-900`} />{p.tool === 'osteotomy' && p.data && (<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 text-[18px] px-1 rounded shadow-sm whitespace-nowrap z-20">{displayLabel} {angle}°</div>)}</div>); })}</div></div>
+                    
+                    {/* CENTRAL COLUMN - SCALES ISOTROPICALLY NOW */}
+                    <div style={{ width: `${scaledWidth}px` }} className={`relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}>
+                        {/* We pass the BASE height to the SVG to preserve the coordinate system, but the container scales it up/down */}
+                        <SpineVertebra label={level.id} type={level.type} height={baseHeight} />
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">{getItems('mid').map(p => { const tool = tools.find(t => t.id === p.tool); let displayLabel = ''; let angle = ''; if (p.tool === 'osteotomy' && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } return (<div key={p.id} className="pointer-events-auto relative group" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><InstrumentIcon type={tool?.icon} className={`${p.tool==='connector'?'w-24 h-6':'w-10 h-10'} drop-shadow-md text-slate-900`} />{p.tool === 'osteotomy' && p.data && (<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 text-[18px] px-1 rounded shadow-sm whitespace-nowrap z-20">{displayLabel} {angle}°</div>)}</div>); })}</div>
+                    </div>
+                    
                     <div className={`flex-1 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'right')}><ZoneContent zone="right" align="right"/></div>
                     
                     {showForces && (
@@ -436,7 +486,8 @@
                 <div className="flex w-full absolute top-1 left-0 right-0 px-2 text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-center pointer-events-none z-10">
                     {showForces && <div className="w-10 text-emerald-600/50">Force</div>}
                     <div className="flex-1 text-right pr-4">Left</div>
-                    <div className="w-[160px]"></div>
+                    {/* Dynamic Spacer for scaled spine column */}
+                    <div style={{ width: `${160 * heightScale}px` }}></div>
                     <div className="flex-1 text-left pl-4">Right</div>
                     {showForces && <div className="w-10 text-emerald-600/50">Force</div>}
                 </div>
@@ -656,6 +707,12 @@
                 setActiveChart('completed');
             };
 
+            const getViewScale = () => {
+                if (viewMode === 'whole') return 0.85; // 15% reduction
+                if (viewMode === 'cervical') return 1.75; // 75% magnification
+                return 1.0;
+            };
+
             return (
                 <div className="h-full flex flex-col overflow-hidden">
                     <ScrewModal isOpen={screwModalOpen} onClose={() => setScrewModalOpen(false)} onConfirm={handleScrewConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} initialTool={editingTool} defaultDiameter={defaultDiameter} defaultLength={defaultLength} />
@@ -744,8 +801,8 @@
                                         </div>
                                         <CreditsFooter />
                                     </div>
-                                    <ChartPaper title="Pre-Operative Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={viewMode === 'whole' ? 0.65 : 1.0} />
-                                    <ChartPaper title="Surgical Construct" placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} heightScale={viewMode === 'whole' ? 0.65 : 1.0} />
+                                    <ChartPaper title="Pre-Operative Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={getViewScale()} />
+                                    <ChartPaper title="Surgical Construct" placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} heightScale={getViewScale()} />
                                 </div>
                             </div>
                         </div>
