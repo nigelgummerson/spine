@@ -1,0 +1,53 @@
+spine_planner_v0.5.6-alpha
+
+System / Context Reset: I am Nigel Gummerson, a Spinal Surgeon at Leeds Teaching Hospitals NHS Trust. We are developing the "Leeds Spinal Planner" (currently v0.5.1-alpha).
+Project Overview: This is a single-file, browser-based surgical planning tool (HTML + React + Babel + Tailwind) designed to run offline on hospital computers without installation. It allows surgeons to visualize spinal instrumentation (screws, hooks) and plan deformity correction forces.
+Key Technical Constraints & Rules:
+
+Single File: The app must remain a single .html file for easy distribution via USB/Intranet.
+Privacy: It features a "Session Mode" (Incognito) that wipes LocalStorage to ensure GDPR compliance on shared machines.
+Licensing: The project uses GNU GPLv3 to allow free open-source use while forcing commercial entities (like implant companies) to negotiate a paid "Commercial License" if they want to brand/close the code.
+Tech Stack: React 18 (CDN), Tailwind (CDN), html2canvas, jsPDF. Future goal: Bundle these offline.
+Development History (Reconstructed):
+
+Early Dev (Dec 2025): Basic drag-and-drop, JSON save/load, basic export.
+V28-V32 (03 Dec 2025): Added "Istok Web" font, compact demographics, and an automated "Implant Inventory" table.
+V33-V37: Implemented logic constraints (one screw per side), "Ghost" click targets, and ResizeObserverfor auto-scaling the chart.
+V38-V41 (Current): Added keyboard shortcuts (Enter/Esc/Del), specialized Deformity Force icons (vertical compression/distraction, rotation), and PDF export.
+Current Status & Immediate To-Do: I am about to upload the latest index.html (v0.5.1-alpha). 
+Future Roadmap:
+
+Barcode Scanning: We plan to implement html5-qrcode to scan GS1 DataMatrix barcodes from implant packages.
+Offline Bundling: We need to eventually embed the JS libraries directly into the file to bypass hospital firewalls.
+Please acknowledge you understand this context and wait for me to upload the file.
+
+
+spine_planner_v0.7.0-alpha
+
+Project: Leeds Spinal Planner (v0.7.0-alpha) Developer: Nigel Gummerson (Spinal Surgeon, Leeds Teaching Hospitals NHS Trust). Overview: A single-file, offline, browser-based surgical planning tool (HTML + React + Tailwind) designed for spinal deformity correction planning and implant inventory management.
+
+Current Status (v0.7.0-alpha):
+
+Visuals: "Schematic" anatomical vector graphics with isotropic scaling (width scales with height). Features 4 view modes: Cervical (Oc-T4), Thoracic (T1-Pelvis), Lumbar (T10-Pelvis), and Whole Spine.
+
+Implants: Fully functional placement for Screws (Mono/Poly/Uni), Hooks, and Interbody Cages (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF).
+
+Logic:
+
+Cage Permissibility Engine: Prevents placing specific cages at anatomically impossible levels (e.g., no ALIF at T10).
+
+Zone Isolation: Cages only go in disc spaces; Screws only go in bone zones.
+
+Data: Automated "Implant Inventory" table that exports to PDF as a legal record.
+
+Key Constraints & Rules:
+
+Single File: Must remain a single .html file for USB/Intranet distribution.
+
+Privacy: "Session Mode" (Incognito) must wipe LocalStorage to ensure GDPR compliance on shared computers.
+
+Licensing: Strict GNU GPLv3 to force commercial negotiation for closed-source use.
+
+Visual Style: "Railway Map" schematic focus (not photo-realistic) to maintain clarity and small file size.
+
+Immediate Next Step: I will upload the v0.7.0-alpha code. We need to begin the Barcode Scanning Roadmap: integrating html5-qrcode to scan GS1 DataMatrix barcodes from implant packaging to populate the inventory table automatically.
