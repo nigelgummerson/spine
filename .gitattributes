@@ -1,0 +1,15 @@
+# Excel files — track as binary
+*.xlsx binary
+*.xls binary
+*.xlsm binary
+
+# PDF files — track as binary
+*.pdf binary
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.avif binary
+*.svg text
