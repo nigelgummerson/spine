@@ -91,40 +91,27 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v0.6.3-alpha";
+        const CURRENT_VERSION = "v0.7.0-alpha";
         
         const CHANGE_LOG = [
-            { version: "v0.6.3-alpha", date: "2025-12-05", changes: [
-                "HOTFIX: Fixed 'defaultAngle' ReferenceError in Osteotomy Modal.",
+            { version: "v0.7.0-alpha", date: "2025-12-05", changes: [
+                "Implemented Strict Cage Permissibility Logic (e.g., ALIF only at L4-S1).",
+                "Added T10-Pelvis View Mode.",
+                "Replaced radio buttons with 4-way visual toggle for views.",
+                "Removed transverse processes from schematics for cleaner look.",
+                "Standardized 'Oc' abbreviation.",
+                "Enhanced Cage Modal with Length/Width parameters."
             ]},
             { version: "v0.6.2-alpha", date: "2025-12-05", changes: [
-                "HOTFIX: Restored missing ImplantInventory and CreditsFooter components.",
-                "Updated Inventory engine to correctly display Cage sizes (Height/Lordosis)."
-            ]},
-            { version: "v0.6.1-alpha", date: "2025-12-05", changes: [
-                "HOTFIX: Restored missing 'formatDate' utility function causing crash.",
+                "HOTFIX: Restored missing components.",
             ]},
             { version: "v0.6.0-alpha", date: "2025-12-05", changes: [
-                "MAJOR: Added Interbody (Cage) support (ACDF, PLIF, TLIF, XLIF, ALIF).",
-                "MAJOR: New 'Schematic' Vertebrae visuals (Anatomical outlines with pedicles).",
-                "Added 'Disc Zones' - clickable spaces between levels.",
-                "Added 'Corpectomy' tool - removes vertebral body visual for VBR planning."
+                "Added Interbody (Cage) support.",
+                "Added 'Disc Zones' - clickable spaces.",
+                "Added 'Corpectomy' tool."
             ]},
             { version: "v0.5.6-alpha", date: "2025-12-04", changes: [
-                "FIXED Aspect Ratio: Spine scaling is now isotropic.",
-                "Optimized Occiput-T4 layout."
-            ]},
-            { version: "v0.5.5-alpha", date: "2025-12-04", changes: [
-                "Refined View Scaling: Whole Spine reduced by 15%.",
-                "Refined View Scaling: Cervical View magnified by 1.75x.",
-            ]},
-            { version: "v0.5.4-alpha", date: "2025-12-04", changes: [
-                "Redesigned Occiput icon.",
-                "Sidebar: Widened (4 columns).",
-            ]},
-            { version: "v0.5.3-alpha", date: "2025-12-04", changes: [
-                "Added 'Occiput' level.",
-                "Implemented 3-way View Selector.",
+                "FIXED Aspect Ratio: Isotropic scaling.",
             ]}
         ];
 
@@ -228,32 +215,60 @@
             );
         };
 
+        // --- UPDATED CAGE MODAL ---
         const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData }) => {
             if (!isOpen) return null;
             const [type, setType] = useState(initialData?.tool || 'tlif');
             const [height, setHeight] = useState(initialData?.data?.height || '10');
+            const [width, setWidth] = useState(initialData?.data?.width || '10');
+            const [length, setLength] = useState(initialData?.data?.length || '25');
             const [lordosis, setLordosis] = useState(initialData?.data?.lordosis || '0');
             
+            useEffect(() => {
+                if (isOpen) {
+                    // Update defaults based on type switch or initial load
+                    if (initialData) {
+                        setType(initialData.tool);
+                        setHeight(initialData.data.height || '10');
+                        setWidth(initialData.data.width || '10');
+                        setLength(initialData.data.length || '25');
+                        setLordosis(initialData.data.lordosis || '0');
+                    }
+                }
+            }, [isOpen, initialData]);
+
+            // Smart Defaults on Type Change
+            const handleTypeChange = (newType) => {
+                setType(newType);
+                if (newType === 'plif') { setLength('25'); setWidth('10'); }
+                if (newType === 'tlif') { setLength('30'); setWidth('10'); }
+                if (newType === 'alif') { setLength('25'); setWidth('35'); }
+                if (newType === 'acdf') { setLength('14'); setWidth('16'); setHeight('6'); }
+            };
+
             const CAGE_TYPES = [
                 { id: 'acdf', label: 'ACDF', desc: 'Anterior Cervical' },
                 { id: 'plif', label: 'PLIF', desc: 'Posterior Lumbar' },
                 { id: 'tlif', label: 'TLIF', desc: 'Transforaminal' },
                 { id: 'xlif', label: 'XLIF/LLIF', desc: 'Lateral' },
+                { id: 'olif', label: 'OLIF', desc: 'Oblique' },
                 { id: 'alif', label: 'ALIF', desc: 'Anterior Lumbar' },
                 { id: 'corpectomy', label: 'VBR', desc: 'Vertebral Body Replacement' }
             ];
 
-            const handleSubmit = () => { onConfirm({ type, height, lordosis }); onClose(); };
+            const handleSubmit = () => { onConfirm({ type, height, width, length, lordosis }); onClose(); };
 
             return (
                 <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
                         <div className="bg-sky-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{initialData ? 'Edit Cage' : 'Select Interbody'}</h3><button onClick={onClose} className="hover:text-sky-200"><IconX /></button></div>
                         <div className="p-6 space-y-4">
-                            <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Cage Type</label><select value={type} onChange={e => setType(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-sky-500 outline-none">{CAGE_TYPES.map(t => <option key={t.id} value={t.id}>{t.label} - {t.desc}</option>)}</select></div>
-                            <div className="flex gap-4">
-                                <div className="flex-1"><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Height (mm)</label><input type="number" value={height} onChange={e => setHeight(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono text-center focus:border-sky-500 outline-none"/></div>
-                                <div className="flex-1"><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Lordosis (°)</label><input type="number" value={lordosis} onChange={e => setLordosis(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono text-center focus:border-sky-500 outline-none"/></div>
+                            <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Cage Type</label><select value={type} onChange={e => handleTypeChange(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-sky-500 outline-none">{CAGE_TYPES.map(t => <option key={t.id} value={t.id}>{t.label} - {t.desc}</option>)}</select></div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Height (mm)</label><input type="number" value={height} onChange={e => setHeight(e.target.value)} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
+                                <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Lordosis (°)</label><input type="number" value={lordosis} onChange={e => setLordosis(e.target.value)} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
+                                <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Length (A-P)</label><input type="number" value={length} onChange={e => setLength(e.target.value)} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
+                                <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Width (M-L)</label><input type="number" value={width} onChange={e => setWidth(e.target.value)} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
                             </div>
                         </div>
                         <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{initialData ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center"><IconTrash/> Remove</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">Cancel</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-sky-800 text-white hover:bg-sky-700 text-sm font-bold shadow-lg">Confirm</button></div></div>
@@ -323,7 +338,10 @@
                     if (p.data) {
                         if (typeof p.data === 'string' && tool.needsSize) { key = `${tool.label} (${p.data})`; } 
                         else if (p.tool === 'osteotomy' && typeof p.data === 'object') { key = `${p.data.shortLabel} (${p.data.angle}°)`; } 
-                        else if (typeof p.data === 'object' && p.data.height) { key = `${tool.label} ${p.data.height}mm ${p.data.lordosis}°`; } // Cage
+                        else if (typeof p.data === 'object' && p.data.height) { 
+                            // Enhanced Cage Label
+                            key = `${tool.label} ${p.data.height}H ${p.data.lordosis}° ${p.data.width}W ${p.data.length}L`; 
+                        } 
                         else if (p.data !== 'Custom' && typeof p.data !== 'object') { key = `${tool.label} ${p.data}`; }
                     }
                     counts[key] = (counts[key] || 0) + 1;
@@ -357,7 +375,7 @@
         // ==========================================
         
         const REGIONS = { 
-            Occiput: { height: 40, color: '#f8fafc' }, 
+            Oc: { height: 40, color: '#f8fafc' }, 
             C: { height: 28, color: '#f1f5f9' }, 
             T: { height: 36, color: '#e2e8f0' }, 
             L: { height: 46, color: '#cbd5e1' }, 
@@ -382,10 +400,12 @@
                 
                 // --- Cages ---
                 case 'cage': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><rect x="4" y="8" width="16" height="8" rx="2" /></svg>;
-                case 'acdf': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><path d="M6 8h12v8H6z" /></svg>; // Simple box
-                case 'plif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><rect x="3" y="8" width="7" height="8" /><rect x="14" y="8" width="7" height="8" /></svg>; // Dual bullets
-                case 'tlif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><path d="M4 12c0-4 8-8 8-8s8 4 8 8-8 8-8 8-8-4-8-8z" /></svg>; // Banana
-                case 'xlif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><rect x="2" y="10" width="20" height="4" rx="1" /></svg>; // Long shim
+                case 'acdf': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><path d="M6 8h12v8H6z" /></svg>; 
+                case 'plif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><rect x="3" y="8" width="7" height="8" /><rect x="14" y="8" width="7" height="8" /></svg>;
+                case 'tlif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><path d="M4 12c0-4 8-8 8-8s8 4 8 8-8 8-8 8-8-4-8-8z" /></svg>;
+                case 'xlif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><rect x="2" y="10" width="20" height="4" rx="1" /></svg>;
+                case 'olif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><ellipse cx="12" cy="12" rx="10" ry="6" transform="rotate(-15 12 12)"/></svg>;
+                case 'alif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><ellipse cx="12" cy="12" rx="10" ry="6" /></svg>;
                 
                 // --- Forces ---
                 case 'translate_left': return <svg viewBox="0 0 24 24" className={className} fill="#059669" stroke="none"><path d="M20 12H4M4 12l8-8M4 12l8 8" stroke="#059669" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>; 
@@ -415,13 +435,11 @@
                 <svg viewBox={`0 0 160 ${height}`} className="w-full h-full block" overflow="visible">
                     <line x1="80" y1="-2" x2="80" y2={height + 2} stroke="#cbd5e1" strokeDasharray="3 3" />
                     <g>
-                        {type === 'Occiput' && <path d="M30,2 Q80,45 130,2 L130,10 Q80,50 30,10 Z" transform={`scale(1, ${height/30})`} {...common} fill="#f1f5f9" />}
+                        {type === 'Oc' && <path d="M30,2 Q80,45 130,2 L130,10 Q80,50 30,10 Z" transform={`scale(1, ${height/30})`} {...common} fill="#f1f5f9" />}
                         
                         {type === 'C' && (
                             <g transform={`translate(0, 0) scale(1, ${height/24})`}>
                                 <path d="M45,4 Q80,-2 115,4 L120,18 Q80,24 40,18 Z" {...common} /> {/* Body */}
-                                <path d="M30,10 L45,4 L45,18 L30,12 Z" {...common} /> {/* Left Transverse */}
-                                <path d="M130,10 L115,4 L115,18 L130,12 Z" {...common} /> {/* Right Transverse */}
                             </g>
                         )}
                         
@@ -430,8 +448,6 @@
                                 <path d="M50,6 Q80,0 110,6 L115,26 Q80,32 45,26 Z" {...common} /> {/* Heart Shape Body */}
                                 <circle cx="60" cy="12" r="3" fill="none" stroke="#94a3b8" strokeWidth="1"/> {/* L Pedicle */}
                                 <circle cx="100" cy="12" r="3" fill="none" stroke="#94a3b8" strokeWidth="1"/> {/* R Pedicle */}
-                                <path d="M35,8 L50,6 L50,18 Z" {...common} /> {/* L Transverse */}
-                                <path d="M125,8 L110,6 L110,18 Z" {...common} /> {/* R Transverse */}
                             </g>
                         )}
                         
@@ -440,8 +456,6 @@
                                 <path d="M45,5 Q80,-2 115,5 L120,30 Q80,38 40,30 Z" {...common} /> {/* Kidney Shape Body */}
                                 <ellipse cx="60" cy="12" rx="4" ry="6" fill="none" stroke="#64748b" strokeWidth="1.5"/> {/* L Pedicle (Eye) */}
                                 <ellipse cx="100" cy="12" rx="4" ry="6" fill="none" stroke="#64748b" strokeWidth="1.5"/> {/* R Pedicle (Eye) */}
-                                <path d="M25,12 L45,8 L45,20 Z" {...common} /> {/* L Transverse */}
-                                <path d="M135,12 L115,8 L115,20 Z" {...common} /> {/* R Transverse */}
                             </g>
                         )}
                         
@@ -462,6 +476,7 @@
                 case 'tlif': return <path d={`M60,2 Q80,${h+5} 100,2`} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" />;
                 case 'acdf': return <rect x="70" y="2" width="20" height={h} rx="2" fill={color} opacity="0.9" />;
                 case 'xlif': return <rect x="50" y="2" width="60" height={h} rx="2" fill={color} opacity="0.6" />;
+                case 'olif': return <rect x="55" y="2" width="50" height={h} rx="2" fill={color} opacity="0.7" transform="rotate(-5 80 8)" />;
                 case 'alif': return <ellipse cx="80" cy={h/2 + 2} rx="25" ry={h/1.5} fill={color} opacity="0.7" />;
                 default: return <rect x="70" y="2" width="20" height={h} fill={color} />;
             }
@@ -511,17 +526,17 @@
                         {showForces && <div className={`w-10 border-l border-slate-100/50 bg-emerald-50/20 ${!readOnly ? 'hover:bg-emerald-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'force_right')}><ZoneContent zone="force_right" align="center"/></div>}
                     </div>
 
-                    {/* INTERBODY DISC ZONE (Except after Pelvis) */}
-                    {level.type !== 'Pelvis' && (
-                        <div className="w-full flex justify-center relative -mt-1 z-0">
-                            <div className={`h-4 w-[160px] flex items-center justify-center cursor-pointer transition-all ${!readOnly ? 'hover:bg-sky-100/50' : ''}`} onClick={() => !readOnly && onDiscClick(level.id)}>
+                    {/* INTERBODY DISC ZONE (Except after Pelvis or C1) */}
+                    {level.type !== 'Pelvis' && level.id !== 'Oc' && level.id !== 'C1' && (
+                        <div className="w-full flex justify-center relative -mt-1 z-20">
+                            <div style={{ width: `${scaledWidth}px` }} className={`h-4 flex items-center justify-center cursor-pointer transition-all ${!readOnly ? 'hover:bg-sky-100/50' : ''}`} onClick={() => !readOnly && onDiscClick(level.id)}>
                                 {cageBelow ? (
                                     <div className="relative group w-full h-full flex justify-center">
                                         <svg viewBox="0 0 160 20" className="w-full h-full overflow-visible"><CageVisualization cageType={cageBelow.tool} heightScale={1} /></svg>
-                                        <span className="absolute left-full ml-2 text-[9px] bg-sky-100 text-sky-800 px-1 rounded whitespace-nowrap top-0">{cageBelow.tool.toUpperCase()} {cageBelow.data.height}mm {cageBelow.data.lordosis}°</span>
+                                        <span className="absolute left-full ml-2 text-xl font-bold font-leeds text-sky-700 bg-white/80 px-1 rounded whitespace-nowrap -top-1 shadow-sm border border-sky-100">{cageBelow.tool.toUpperCase()} {cageBelow.data.height}H {cageBelow.data.lordosis}°</span>
                                     </div>
                                 ) : (
-                                    !readOnly && <div className="h-1 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>
+                                    !readOnly && <div className="h-2 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>
                                 )}
                             </div>
                         </div>
@@ -550,7 +565,7 @@
             const [activeChart, setActiveChart] = useState('planned'); 
             const [plannedPlacements, setPlannedPlacements] = useState([]);
             const [completedPlacements, setCompletedPlacements] = useState([]);
-            const [plannedCages, setPlannedCages] = useState([]); // NEW: State for cages
+            const [plannedCages, setPlannedCages] = useState([]);
             const [completedCages, setCompletedCages] = useState([]);
             
             const [patientData, setPatientData] = useState({ name: '', id: '', surgeon: '', location: 'Leeds Teaching Hospitals NHS Trust', date: new Date().toISOString().split('T')[0] });
@@ -563,7 +578,7 @@
             // MODALS
             const [screwModalOpen, setScrewModalOpen] = useState(false);
             const [osteoModalOpen, setOsteoModalOpen] = useState(false);
-            const [cageModalOpen, setCageModalOpen] = useState(false); // NEW
+            const [cageModalOpen, setCageModalOpen] = useState(false); 
             const [helpModalOpen, setHelpModalOpen] = useState(false);
             const [changeLogOpen, setChangeLogOpen] = useState(false);
             
@@ -572,7 +587,7 @@
             const [editingPlacementId, setEditingPlacementId] = useState(null);
             const [editingData, setEditingData] = useState(null);
             const [editingTool, setEditingTool] = useState(null);
-            const [editingCageLevel, setEditingCageLevel] = useState(null); // NEW
+            const [editingCageLevel, setEditingCageLevel] = useState(null); 
 
             const [defaultDiameter, setDefaultDiameter] = useState('6.5');
             const [defaultLength, setDefaultLength] = useState('45');
@@ -585,8 +600,13 @@
 
             const levels = useMemo(() => {
                 const lvls = [];
-                if (viewMode === 'cervical' || viewMode === 'whole') { lvls.push({ id: 'Occiput', type: 'Occiput' }); ['C1','C2','C3','C4','C5','C6','C7'].forEach(l => lvls.push({ id:l, type:'C' })); }
-                if (viewMode === 'cervical') { ['T1','T2','T3','T4'].forEach(l => lvls.push({ id:l, type:'T' })); } else { ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'].forEach(l => lvls.push({ id:l, type:'T' })); }
+                // VIEW LOGIC
+                if (viewMode === 'whole' || viewMode === 'cervical') { lvls.push({ id: 'Oc', type: 'Oc' }); ['C1','C2','C3','C4','C5','C6','C7'].forEach(l => lvls.push({ id:l, type:'C' })); }
+                
+                if (viewMode === 'cervical') { ['T1','T2','T3','T4'].forEach(l => lvls.push({ id:l, type:'T' })); }
+                else if (viewMode === 't10_pelvis') { ['T10','T11','T12'].forEach(l => lvls.push({ id:l, type:'T' })); }
+                else { ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'].forEach(l => lvls.push({ id:l, type:'T' })); }
+
                 if (viewMode !== 'cervical') { ['L1','L2','L3','L4','L5'].forEach(l => lvls.push({ id:l, type:'L' })); lvls.push({ id:'S1', type:'S' }); lvls.push({ id:'Pelvis', type:'Pelvis' }); }
                 return lvls;
             }, [viewMode]);
@@ -599,11 +619,10 @@
                         const parsed = JSON.parse(saved); 
                         if (parsed.planned) setPlannedPlacements(parsed.planned); 
                         if (parsed.completed) setCompletedPlacements(parsed.completed);
-                        if (parsed.plannedCages) setPlannedCages(parsed.plannedCages); // NEW
-                        if (parsed.completedCages) setCompletedCages(parsed.completedCages); // NEW
+                        if (parsed.plannedCages) setPlannedCages(parsed.plannedCages); 
+                        if (parsed.completedCages) setCompletedCages(parsed.completedCages); 
                         if (parsed.patient) setPatientData(parsed.patient); 
                         if (parsed.viewMode) { setViewMode(parsed.viewMode); }
-                        else if (parsed.showCervical === true) { setViewMode('whole'); }
                     } catch (e) { console.error("Data load error"); }
                 }
                 setHasLoaded(true);
@@ -633,7 +652,7 @@
             const tools = [
                 { category: 'Screws', items: [ { id: 'monoaxial', label: 'Monoaxial', icon: 'monoaxial', needsSize: true, type: 'implant' }, { id: 'polyaxial', label: 'Polyaxial', icon: 'polyaxial', needsSize: true, type: 'implant' }, { id: 'uniplanar', label: 'Uniplanar', icon: 'uniplanar', needsSize: true, type: 'implant' }, ]},
                 { category: 'Hooks', items: [ { id: 'pedicle_hook', label: 'Pedicle', icon: 'pedicle_hook', type: 'implant' }, { id: 'tp_hook', label: 'TP Hook', icon: 'tp_hook', type: 'implant' }, { id: 'sl_hook', label: 'Supra-laminar', icon: 'sl_hook', type: 'implant' }, { id: 'il_hook', label: 'Infra-laminar', icon: 'il_hook', type: 'implant' }, ]},
-                { category: 'Removal/Mid', items: [ { id: 'connector', label: 'Crosslink', icon: 'connector', type: 'mid' }, { id: 'unstable', label: 'Unstable', icon: 'unstable', type: 'mid' }, { id: 'osteotomy', label: 'Osteotomy', icon: 'osteotomy', isOsteotomy: true, type: 'mid' }, { id: 'Corpectomy', label: 'Corpectomy', icon: 'cage', isOsteotomy: true, type: 'mid' } ]}, // Added Corpectomy
+                { category: 'Removal/Mid', items: [ { id: 'connector', label: 'Crosslink', icon: 'connector', type: 'mid' }, { id: 'unstable', label: 'Unstable', icon: 'unstable', type: 'mid' }, { id: 'osteotomy', label: 'Osteotomy', icon: 'osteotomy', isOsteotomy: true, type: 'mid' }, { id: 'Corpectomy', label: 'Corpectomy', icon: 'cage', isOsteotomy: true, type: 'mid' } ]}, 
                 { category: 'Forces', items: [ 
                     { id: 'translate_left', label: 'Trans Left', icon: 'translate_left', type: 'force' },
                     { id: 'translate_right', label: 'Trans Right', icon: 'translate_right', type: 'force' },
@@ -642,7 +661,6 @@
                     { id: 'derotate_cw', label: 'Derotate', icon: 'derotate_cw', type: 'force' },
                     { id: 'derotate_ccw', label: 'Derotate', icon: 'derotate_ccw', type: 'force' },
                 ]},
-                { category: 'Interbody', items: [ { id: 'cage_plif', label: 'Cages', icon: 'plif', type: 'force' } ]} // Just visual label, actual logic in Disc Click
             ];
             const allTools = tools.flatMap(g => g.items);
 
@@ -650,7 +668,7 @@
             const handleZoneClick = (levelId, zone) => {
                 const tool = allTools.find(t => t.id === selectedTool);
                 if (tool.type === 'implant' && zone.startsWith('force')) return alert("Implants cannot be placed in force columns.");
-                if (tool.type === 'force' && !zone.startsWith('force') && tool.id !== 'cage_plif') return alert("Forces must be placed in outer columns.");
+                if (tool.type === 'force' && !zone.startsWith('force')) return alert("Forces must be placed in outer columns.");
                 if (tool.type === 'implant' && zone === 'mid') return;
                 if (tool.type === 'mid' && zone !== 'mid') return;
                 
@@ -660,11 +678,41 @@
             };
 
             const handleDiscClick = (levelId) => {
+                // LOGIC: Permissibility Check
+                const levelIndex = levels.findIndex(l => l.id === levelId);
+                const isCervical = levelId.startsWith('C') || levelId === 'T1'; // Simplified cervical check
+                const isLumbar = levelId.startsWith('L') || levelId.startsWith('T1') || levelId === 'S1'; // Simplified lumbar range
+
+                if (levelId === 'Oc' || levelId === 'C1' || levelId === 'S1') return alert("Cages cannot be placed at this level.");
+
                 const currentCages = activeChart === 'planned' ? plannedCages : completedCages;
                 const existing = currentCages.find(c => c.levelId === levelId);
                 setEditingCageLevel(levelId);
                 setEditingData(existing);
                 setCageModalOpen(true);
+            };
+
+            const handleCageConfirm = (data) => {
+                // Strict Logic Validation
+                const lvl = editingCageLevel;
+                const type = data.type;
+                
+                if (type === 'alif' && (lvl !== 'L4' && lvl !== 'L5')) return alert("ALIF is only permitted at L4/L5 and L5/S1.");
+                if (type === 'acdf' && (!lvl.startsWith('C') && lvl !== 'T1')) return alert("ACDF is only permitted in Cervical/High Thoracic.");
+                if ((type === 'plif' || type === 'tlif' || type === 'olif') && lvl.startsWith('C')) return alert(`${type.toUpperCase()} is not permitted in Cervical spine.`);
+
+                const newCage = { levelId: editingCageLevel, tool: data.type, data: { height: data.height, width: data.width, length: data.length, lordosis: data.lordosis } };
+                const setter = activeChart === 'planned' ? setPlannedCages : setCompletedCages;
+                setter(prev => {
+                    const filtered = prev.filter(c => c.levelId !== editingCageLevel);
+                    return [...filtered, newCage];
+                });
+            };
+
+            const handleDeleteCage = () => {
+                const setter = activeChart === 'planned' ? setPlannedCages : setCompletedCages;
+                setter(prev => prev.filter(c => c.levelId !== editingCageLevel));
+                setCageModalOpen(false);
             };
 
             const handlePlacementClick = (p) => {
@@ -686,42 +734,16 @@
                 else if (pendingPlacement) { addPlacement(pendingPlacement.levelId, pendingPlacement.zone, 'osteotomy', data); setPendingPlacement(null); }
             };
 
-            const handleCageConfirm = (data) => {
-                const newCage = { levelId: editingCageLevel, tool: data.type, data: { height: data.height, lordosis: data.lordosis } };
-                const setter = activeChart === 'planned' ? setPlannedCages : setCompletedCages;
-                setter(prev => {
-                    const filtered = prev.filter(c => c.levelId !== editingCageLevel);
-                    return [...filtered, newCage];
-                });
-            };
-
-            const handleDeleteCage = () => {
-                const setter = activeChart === 'planned' ? setPlannedCages : setCompletedCages;
-                setter(prev => prev.filter(c => c.levelId !== editingCageLevel));
-                setCageModalOpen(false);
-            };
-
             const addPlacement = (levelId, zone, tool, data) => { const newP = { id: Date.now(), levelId, zone, tool, data }; const setter = activeChart === 'planned' ? setPlannedPlacements : setCompletedPlacements; setter(prev => [...prev, newP]); };
             const updatePlacement = (id, tool, data) => { const updater = (prev) => prev.map(p => p.id === id ? { ...p, tool, data } : p); if (activeChart === 'planned') setPlannedPlacements(updater); else setCompletedPlacements(updater); };
             const removePlacement = (id) => { const filter = prev => prev.filter(p => p.id !== id); if (activeChart === 'planned') setPlannedPlacements(filter); else setCompletedPlacements(filter); setScrewModalOpen(false); setOsteoModalOpen(false); };
 
-            // EXPORT FUNCTIONS (Redacted for brevity - standard html2canvas)
-            const prepareExportCanvas = async () => {
-                const element = exportRef.current;
-                const cloneContainer = document.createElement('div');
-                cloneContainer.style.position = 'absolute'; cloneContainer.style.top = '0'; cloneContainer.style.left = '0'; cloneContainer.style.zIndex = '-9999';
-                document.body.appendChild(cloneContainer);
-                const clone = element.cloneNode(true);
-                clone.style.transform = 'none'; clone.style.margin = '0';
-                cloneContainer.appendChild(clone);
-                const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: 1485, height: 1050, logging: false });
-                document.body.removeChild(cloneContainer);
-                return canvas;
-            };
+            // EXPORT
+            const prepareExportCanvas = async () => { const element = exportRef.current; const cloneContainer = document.createElement('div'); cloneContainer.style.position = 'absolute'; cloneContainer.style.top = '0'; cloneContainer.style.left = '0'; cloneContainer.style.zIndex = '-9999'; document.body.appendChild(cloneContainer); const clone = element.cloneNode(true); clone.style.transform = 'none'; clone.style.margin = '0'; cloneContainer.appendChild(clone); const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: 1485, height: 1050, logging: false }); document.body.removeChild(cloneContainer); return canvas; };
             const runExportJPG = async () => { const canvas = await prepareExportCanvas(); const link = document.createElement('a'); link.download = `SpinePlan_${patientData.name || 'Patient'}.jpg`; link.href = canvas.toDataURL('image/jpeg', 0.9); link.click(); if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28'); };
             const runExportPDF = async () => { const canvas = await prepareExportCanvas(); const imgData = canvas.toDataURL('image/jpeg', 1.0); const { jsPDF } = window.jspdf; const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1485, 1050] }); pdf.addImage(imgData, 'JPEG', 0, 0, 1485, 1050); pdf.save(`SpinePlan_${patientData.name || 'Patient'}.pdf`); if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28'); };
-            const saveProjectJSON = () => { const data = { version: "0.6.0", patient: patientData, planned: plannedPlacements, completed: completedPlacements, plannedCages, completedCages, viewMode, timestamp: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `SpineProject_${patientData.name || 'Unnamed'}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28'); };
-            const loadProjectJSON = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (ev) => { try { const json = JSON.parse(ev.target.result); if(json.patient) setPatientData(json.patient); if(json.planned) setPlannedPlacements(json.planned); if(json.completed) setCompletedPlacements(json.completed); if(json.plannedCages) setPlannedCages(json.plannedCages); if(json.completedCages) setCompletedCages(json.completedCages); if(json.viewMode) setViewMode(json.viewMode); else if(json.showCervical) setViewMode('whole'); alert("Project Loaded Successfully."); } catch(err) { alert("Invalid File"); } }; reader.readAsText(file); e.target.value = null; };
+            const saveProjectJSON = () => { const data = { version: "0.7.0", patient: patientData, planned: plannedPlacements, completed: completedPlacements, plannedCages, completedCages, viewMode, timestamp: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `SpineProject_${patientData.name || 'Unnamed'}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28'); };
+            const loadProjectJSON = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (ev) => { try { const json = JSON.parse(ev.target.result); if(json.patient) setPatientData(json.patient); if(json.planned) setPlannedPlacements(json.planned); if(json.completed) setCompletedPlacements(json.completed); if(json.plannedCages) setPlannedCages(json.plannedCages); if(json.completedCages) setCompletedCages(json.completedCages); if(json.viewMode) setViewMode(json.viewMode); alert("Project Loaded Successfully."); } catch(err) { alert("Invalid File"); } }; reader.readAsText(file); e.target.value = null; };
 
             const copyPlanToCompleted = () => {
                 if (plannedPlacements.length === 0) return alert("No Pre-Op plan to copy.");
@@ -773,10 +795,11 @@
                         <aside className="w-80 bg-slate-800 text-white flex flex-col border-r border-slate-700 z-20 overflow-y-auto no-print shadow-xl">
                             <div className="p-4 border-b border-slate-700 bg-slate-900">
                                 <h3 className="text-[10px] uppercase font-bold text-slate-500 mb-2 tracking-widest">Region View</h3>
-                                <div className="space-y-2">
-                                    <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-300 hover:text-white"><input type="radio" name="viewMode" checked={viewMode === 'thoracolumbar'} onChange={() => setViewMode('thoracolumbar')} className="text-amber-500 focus:ring-amber-500"/> Thoracolumbar (T1-Pelvis)</label>
-                                    <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-300 hover:text-white"><input type="radio" name="viewMode" checked={viewMode === 'cervical'} onChange={() => setViewMode('cervical')} className="text-amber-500 focus:ring-amber-500"/> Cervical (Occiput-T4)</label>
-                                    <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-300 hover:text-white"><input type="radio" name="viewMode" checked={viewMode === 'whole'} onChange={() => setViewMode('whole')} className="text-amber-500 focus:ring-amber-500"/> Whole Spine (Occ-Pelvis)</label>
+                                <div className="grid grid-cols-2 gap-1">
+                                    <button onClick={() => setViewMode('cervical')} className={`py-2 px-1 text-[10px] rounded border ${viewMode === 'cervical' ? 'bg-amber-500 text-slate-900 font-bold border-amber-600' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}>Cervical (Oc-T4)</button>
+                                    <button onClick={() => setViewMode('thoracolumbar')} className={`py-2 px-1 text-[10px] rounded border ${viewMode === 'thoracolumbar' ? 'bg-amber-500 text-slate-900 font-bold border-amber-600' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}>Thoracic (T1-Pel)</button>
+                                    <button onClick={() => setViewMode('t10_pelvis')} className={`py-2 px-1 text-[10px] rounded border ${viewMode === 't10_pelvis' ? 'bg-amber-500 text-slate-900 font-bold border-amber-600' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}>Lumbar (T10-Pel)</button>
+                                    <button onClick={() => setViewMode('whole')} className={`py-2 px-1 text-[10px] rounded border ${viewMode === 'whole' ? 'bg-amber-500 text-slate-900 font-bold border-amber-600' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}>Whole Spine</button>
                                 </div>
                             </div>
                             <div className="p-4 space-y-6">
@@ -796,7 +819,7 @@
                                                 <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Surgeon</label><div className="editable-field w-full text-base" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, surgeon: e.target.innerText})} placeholder="Click to enter...">{patientData.surgeon}</div></div>
                                                 <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Date</label><div className="editable-field w-full text-base cursor-pointer" onClick={() => setIsEditingDate(true)}>{isEditingDate ? <input type="date" className="w-full text-sm border-b border-slate-800 bg-transparent outline-none py-0" value={patientData.date} autoFocus onBlur={()=>setIsEditingDate(false)} onChange={e=>setPatientData({...patientData, date:e.target.value})} /> : formatDate(patientData.date)}</div></div>
                                             </div>
-                                            <ImplantInventory placements={[...(activeChart === 'planned' ? plannedPlacements : completedPlacements), ...(activeChart === 'planned' ? plannedCages : completedCages).map(c => ({...c, tool: c.tool}))]} tools={[...allTools, {id: 'tlif', label: 'TLIF Cage'}, {id: 'plif', label: 'PLIF Cage'}, {id: 'acdf', label: 'ACDF Cage'}, {id: 'xlif', label: 'XLIF Cage'}, {id: 'alif', label: 'ALIF Cage'}]} title={activeChart === 'planned' ? 'Plan' : 'Construct'} visibleLevelIds={levels.map(l => l.id)} />
+                                            <ImplantInventory placements={[...(activeChart === 'planned' ? plannedPlacements : completedPlacements), ...(activeChart === 'planned' ? plannedCages : completedCages).map(c => ({...c, tool: c.tool}))]} tools={[...allTools, {id: 'tlif', label: 'TLIF Cage'}, {id: 'plif', label: 'PLIF Cage'}, {id: 'acdf', label: 'ACDF Cage'}, {id: 'xlif', label: 'XLIF Cage'}, {id: 'olif', label: 'OLIF Cage'}, {id: 'alif', label: 'ALIF Cage'}]} title={activeChart === 'planned' ? 'Plan' : 'Construct'} visibleLevelIds={levels.map(l => l.id)} />
                                         </div>
                                         <CreditsFooter />
                                     </div>
