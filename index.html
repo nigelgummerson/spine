@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spinal Surgical Planner V36 - Leeds Teaching Hospitals</title>
+    <title>Spinal Surgical Planner V38 - Leeds Teaching Hospitals</title>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -120,16 +120,9 @@
         const IconPDF = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>);
         const IconHelp = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>);
         
-        // --- NEW (V34): CARDINAL ARROW GHOST FORCES ---
+        // --- NEW (V37/38): CARDINAL ARROW GHOST ---
         const IconCardinal = () => (
-            <svg viewBox="0 0 24 24" className="w-5 h-5 opacity-40 hover:opacity-100 transition-opacity text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 3v18"/>
-                <path d="M3 12h18"/>
-                <path d="M8 7l4-4 4 4"/>
-                <path d="M8 17l4 4 4-4"/>
-                <path d="M17 8l4 4-4 4"/>
-                <path d="M7 8l-4 4 4 4"/>
-            </svg>
+            <svg viewBox="0 0 24 24" className="w-5 h-5 opacity-40 hover:opacity-100 transition-opacity text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/><path d="M8 7l4-4 4 4"/><path d="M8 17l4 4 4-4"/><path d="M17 8l4 4-4 4"/><path d="M7 8l-4 4 4 4"/></svg>
         );
 
         // ==========================================
@@ -150,9 +143,10 @@
             <div className="mt-auto pt-4 border-t border-slate-200 shrink-0">
                 <div className="flex flex-col gap-2">
                     <p className="text-[10px] text-slate-500 leading-tight">
-                        <span className="font-bold text-slate-800 block mb-1 text-[11px]">Leeds Spinal Surgery Planner V36</span>
+                        <span className="font-bold text-slate-800 block mb-1 text-[11px]">Leeds Spinal Surgery Planner V38</span>
                         Developed by:<br/>
                         <span className="font-bold text-slate-700">Nigel Gummerson FRCS (Tr & Orth)</span><br/>
+                        and <span className="font-bold text-slate-700">Google Gemini</span>,<br/>
                         December 2025
                     </p>
                     <div className="flex items-start gap-1 text-[9px] text-slate-400 leading-tight">
@@ -163,7 +157,6 @@
             </div>
         );
 
-        // --- IMPLANT INVENTORY TABLE (V32 Fixed Spacing) ---
         const ImplantInventory = ({ placements, tools, title }) => {
             const inventory = useMemo(() => {
                 const counts = {};
@@ -189,17 +182,11 @@
                     <div className="overflow-hidden rounded border border-slate-200">
                         <table className="w-full text-[9px]">
                             <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
-                                <tr>
-                                    <th className="text-left px-2 py-1.5">Item / Correction</th>
-                                    <th className="text-right px-2 py-1.5 w-8">Qty</th>
-                                </tr>
+                                <tr><th className="text-left px-2 py-1.5">Item / Correction</th><th className="text-right px-2 py-1.5 w-8">Qty</th></tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {Object.entries(inventory).sort().map(([name, count]) => (
-                                    <tr key={name} className="even:bg-slate-50/50">
-                                        <td className="px-2 py-1 text-slate-700 font-medium">{name}</td>
-                                        <td className="px-2 py-1 text-right font-bold text-slate-900">{count}</td>
-                                    </tr>
+                                    <tr key={name} className="even:bg-slate-50/50"><td className="px-2 py-1 text-slate-700 font-medium">{name}</td><td className="px-2 py-1 text-right font-bold text-slate-900">{count}</td></tr>
                                 ))}
                             </tbody>
                         </table>
@@ -208,6 +195,7 @@
             );
         };
 
+        // --- MODAL 1: SCREW SIZE (V38: KEYBOARD SHORTCUTS) ---
         const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, initialTool, defaultDiameter, defaultLength }) => {
             if (!isOpen) return null;
             const [mode, setMode] = useState('standard');
@@ -228,6 +216,28 @@
                 }
             }, [isOpen, initialData, initialTool, defaultDiameter, defaultLength]);
 
+            // KEYBOARD LISTENER
+            useEffect(() => {
+                if (!isOpen) return;
+                const handleKeyDown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSubmit();
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        onClose();
+                    } else if ((e.key === 'Delete' || e.key === 'Backspace') && initialData !== undefined) {
+                        // Safety: Only delete if not typing in text box (checking active element)
+                        if (document.activeElement.tagName !== 'INPUT') {
+                            e.preventDefault();
+                            onDelete();
+                        }
+                    }
+                };
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, [isOpen, mode, diameter, length, customText, selectedType, initialData]); // Dependencies for submit
+
             const handleSubmit = () => { let finalSize = null; if (mode === 'custom') finalSize = customText || "Custom"; else if (mode === 'standard') finalSize = `${diameter} x ${length}`; onConfirm(finalSize, { diameter, length }, selectedType); onClose(); };
             const isEditing = initialData !== undefined;
 
@@ -242,7 +252,7 @@
                             {mode === 'custom' && <input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} placeholder="e.g. 8.0 x 110" className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg focus:border-amber-500 outline-none" autoFocus />}
                             {mode === 'none' && <div className="text-center py-6 text-slate-400 text-sm italic">Icon only. No label.</div>}
                         </div>
-                        <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center"><IconTrash/> Remove</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">Cancel</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg">Confirm</button></div></div>
+                        <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center" title="Shortcut: Delete"><IconTrash/> Remove</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title="Shortcut: Esc">Cancel</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg" title="Shortcut: Enter">Confirm</button></div></div>
                     </div>
                 </div>
             );
@@ -253,53 +263,33 @@
             const [type, setType] = useState(defaultType || 'PSO');
             const [angle, setAngle] = useState(defaultAngle || '25');
             useEffect(() => {
-                if (isOpen) {
-                    if (initialData && typeof initialData === 'object') { setType(initialData.type); setAngle(initialData.angle); } 
-                    else { setType(defaultType || 'PSO'); setAngle(defaultAngle || '25'); }
-                }
+                if (isOpen) { if (initialData && typeof initialData === 'object') { setType(initialData.type); setAngle(initialData.angle); } else { setType(defaultType || 'PSO'); setAngle(defaultAngle || '25'); } }
             }, [isOpen, initialData, defaultType, defaultAngle]);
+            
+            // KEYBOARD LISTENER
+            useEffect(() => {
+                if (!isOpen) return;
+                const handleKeyDown = (e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); handleSubmit(); }
+                    else if (e.key === 'Escape') { e.preventDefault(); onClose(); }
+                    else if ((e.key === 'Delete' || e.key === 'Backspace') && initialData) { if(document.activeElement.tagName !== 'INPUT') { e.preventDefault(); onDelete(); } }
+                };
+                window.addEventListener('keydown', handleKeyDown); return () => window.removeEventListener('keydown', handleKeyDown);
+            }, [isOpen, type, angle, initialData]);
+
             const selectedDef = OSTEOTOMY_TYPES.find(t => t.id === type) || OSTEOTOMY_TYPES[0];
             const handleTypeChange = (e) => { const newTypeID = e.target.value; setType(newTypeID); const newDef = OSTEOTOMY_TYPES.find(t => t.id === newTypeID); if (newDef) setAngle(newDef.defaultAngle); };
             const handleSubmit = () => { onConfirm({ type, angle, shortLabel: selectedDef.shortLabel }); onClose(); };
             const isEditing = !!initialData;
             return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
-                        <div className="bg-red-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{isEditing ? 'Edit Osteotomy' : 'Plan Osteotomy'}</h3><button onClick={onClose} className="hover:text-red-200"><IconX /></button></div>
-                        <div className="p-6 space-y-4">
-                            <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Osteotomy Type</label><select value={type} onChange={handleTypeChange} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-red-500 outline-none">{OSTEOTOMY_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}</select></div>
-                            <div className="bg-red-50 border border-red-100 rounded p-3 text-xs"><div className="font-bold text-red-800 uppercase tracking-wider mb-1">{selectedDef.schwab}</div><div className="text-red-600 mb-2">{selectedDef.desc}</div></div>
-                            <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Correction Angle (°)</label><div className="flex items-center gap-2"><input type="number" value={angle} onChange={(e) => setAngle(e.target.value)} className="w-24 p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-red-500 outline-none text-center" /><span className="font-serif italic text-slate-400 text-sm">degrees</span></div></div>
-                        </div>
-                        <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center"><IconTrash/> Remove</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">Cancel</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-red-800 text-white hover:bg-red-700 text-sm font-bold shadow-lg">Confirm</button></div></div>
-                    </div>
-                </div>
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]"><div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden"><div className="bg-red-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{isEditing ? 'Edit Osteotomy' : 'Plan Osteotomy'}</h3><button onClick={onClose} className="hover:text-red-200"><IconX /></button></div><div className="p-6 space-y-4"><div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Osteotomy Type</label><select value={type} onChange={handleTypeChange} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-red-500 outline-none">{OSTEOTOMY_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}</select></div><div className="bg-red-50 border border-red-100 rounded p-3 text-xs"><div className="font-bold text-red-800 uppercase tracking-wider mb-1">{selectedDef.schwab}</div><div className="text-red-600 mb-2">{selectedDef.desc}</div></div><div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Correction Angle (°)</label><div className="flex items-center gap-2"><input type="number" value={angle} onChange={(e) => setAngle(e.target.value)} className="w-24 p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-red-500 outline-none text-center" /><span className="font-serif italic text-slate-400 text-sm">degrees</span></div></div></div><div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center" title="Shortcut: Delete"><IconTrash/> Remove</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title="Shortcut: Esc">Cancel</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-red-800 text-white hover:bg-red-700 text-sm font-bold shadow-lg" title="Shortcut: Enter">Confirm</button></div></div></div></div>
             );
         };
 
         const HelpModal = ({ isOpen, onClose }) => {
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" onClick={onClose}>
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-lg overflow-hidden" onClick={e => e.stopPropagation()}>
-                        <div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">Spinal Planner Help Guide</h3><button onClick={onClose} className="hover:text-slate-300"><IconX /></button></div>
-                        <div className="p-6 space-y-6 overflow-y-auto max-h-[80vh]">
-                            <div className="flex gap-4">
-                                <div className="min-w-[40px] pt-1"><div className="w-8 h-4 rounded-full border border-red-500 bg-white relative"><div className="absolute right-0 top-0 w-3.5 h-3.5 bg-red-500 rounded-full"></div></div></div>
-                                <div><h4 className="font-bold text-slate-800 text-sm mb-1">Session Mode (Incognito)</h4><p className="text-xs text-slate-600 leading-relaxed">When enabled (Red), your data is <strong>NOT saved</strong> to this computer's browser storage. Use this on shared or public NHS computers to ensure patient data is cleared when you close the tab. <br/><br/>When disabled (Grey), your work auto-saves locally so you can resume later.</p></div>
-                            </div>
-                            <div className="flex gap-4">
-                                <div className="min-w-[40px] pt-1"><div className="bg-slate-700 text-white px-2 py-1 rounded text-[10px] font-bold inline-block"><IconCopy /></div></div>
-                                <div><h4 className="font-bold text-slate-800 text-sm mb-1">Copy Plan</h4><p className="text-xs text-slate-600 leading-relaxed">Copies everything from your "Pre-Op" plan to the "Post-Op" chart. Use this after surgery to start your record with what you planned, then just adjust what changed.</p></div>
-                            </div>
-                             <div className="flex gap-4">
-                                <div className="min-w-[40px] pt-1"><div className="bg-white text-slate-800 border border-slate-300 px-2 py-1 rounded text-[10px] font-bold inline-block"><IconPDF /></div></div>
-                                <div><h4 className="font-bold text-slate-800 text-sm mb-1">Export PDF vs Image</h4><p className="text-xs text-slate-600 leading-relaxed"><strong>Export Image:</strong> Downloads a JPG file. Good for PowerPoint or email.<br/><strong>Export PDF:</strong> Downloads a high-quality PDF document. Good for uploading to PPM/EHR or printing.</p></div>
-                            </div>
-                        </div>
-                        <div className="bg-slate-50 px-4 py-3 text-right"><button onClick={onClose} className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold">Close</button></div>
-                    </div>
-                </div>
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" onClick={onClose}><div className="bg-white rounded-lg shadow-2xl w-full max-w-lg overflow-hidden" onClick={e => e.stopPropagation()}><div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">Spinal Planner Help Guide</h3><button onClick={onClose} className="hover:text-slate-300"><IconX /></button></div><div className="p-6 space-y-6 overflow-y-auto max-h-[80vh]"><div className="flex gap-4"><div className="min-w-[40px] pt-1"><div className="w-8 h-4 rounded-full border border-red-500 bg-white relative"><div className="absolute right-0 top-0 w-3.5 h-3.5 bg-red-500 rounded-full"></div></div></div><div><h4 className="font-bold text-slate-800 text-sm mb-1">Session Mode (Incognito)</h4><p className="text-xs text-slate-600 leading-relaxed">When enabled (Red), your data is <strong>NOT saved</strong> to this computer's browser storage. Use this on shared or public NHS computers to ensure patient data is cleared when you close the tab. <br/><br/>When disabled (Grey), your work auto-saves locally so you can resume later.</p></div></div><div className="flex gap-4"><div className="min-w-[40px] pt-1"><div className="bg-slate-700 text-white px-2 py-1 rounded text-[10px] font-bold inline-block"><IconCopy /></div></div><div><h4 className="font-bold text-slate-800 text-sm mb-1">Copy Plan</h4><p className="text-xs text-slate-600 leading-relaxed">Copies everything from your "Pre-Op" plan to the "Post-Op" chart. Use this after surgery to start your record with what you planned, then just adjust what changed.</p></div></div><div className="flex gap-4"><div className="min-w-[40px] pt-1"><div className="bg-white text-slate-800 border border-slate-300 px-2 py-1 rounded text-[10px] font-bold inline-block"><IconPDF /></div></div><div><h4 className="font-bold text-slate-800 text-sm mb-1">Export PDF vs Image</h4><p className="text-xs text-slate-600 leading-relaxed"><strong>Export Image:</strong> Downloads a JPG file. Good for PowerPoint or email.<br/><strong>Export PDF:</strong> Downloads a high-quality PDF document. Good for uploading to PPM/EHR or printing.</p></div></div></div><div className="bg-slate-50 px-4 py-3 text-right"><button onClick={onClose} className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold">Close</button></div></div></div>
             );
         };
 
@@ -312,9 +302,11 @@
 
         const REGIONS = { C: { height: 28, color: '#f1f5f9' }, T: { height: 36, color: '#e2e8f0' }, L: { height: 46, color: '#cbd5e1' }, S: { height: 52, color: '#94a3b8' }, Pelvis: { height: 54, color: '#94a3b8' } };
         
+        // --- V38: NEW FORCE ICONS (VERTICAL/ROTATIONAL) ---
         const InstrumentIcon = ({ type, className = "w-5 h-5", color = "black" }) => {
             const strokeWidth = 2.5; const HookBase = ({ direction, label }) => (<svg viewBox="0 0 40 24" className="w-full h-full">{direction === 'up' ? <path d="M12 18V6m0 0l-4 4m4-4l4 4m-8 12h8" stroke={color} fill="none" strokeWidth={strokeWidth} /> : <path d="M12 6v12m0 0l-4-4m4 4l4-4m-8-12h8" stroke={color} fill="none" strokeWidth={strokeWidth} />}<text x="22" y="17" fontSize="14" fontWeight="bold" fontFamily="serif" fill={color}>{label}</text></svg>);
             switch (type) {
+                // ... Implants ...
                 case 'monoaxial': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /></svg>;
                 case 'polyaxial': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /><path d="M7 7l10 10M17 7l-10 10" /></svg>;
                 case 'uniplanar': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /><path d="M12 3v18" /></svg>;
@@ -325,12 +317,14 @@
                 case 'connector': return <svg viewBox="0 0 40 10" className={className} stroke={color} fill="none" strokeWidth="2"><line x1="2" y1="5" x2="38" y2="5" strokeWidth="3" /><circle cx="2" cy="5" r="2" fill={color} /><circle cx="38" cy="5" r="2" fill={color} /></svg>;
                 case 'unstable': return <svg viewBox="0 0 24 24" className={`${className} bg-white rounded border border-red-100 shadow-sm`} fill="none" stroke="#dc2626" strokeWidth="2.5"><path d="M2 12 L6 8 L10 16 L14 8 L18 16 L22 12" strokeLinecap="round" strokeLinejoin="round" /></svg>;
                 case 'osteotomy': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><path d="M2 12h20M12 2l10 10-10 10L2 12z" fill="#dc2626" opacity="0.8" /></svg>;
-                case 'force_right': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>;
-                case 'force_left': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="3"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>;
-                case 'force_cranial': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="3"><path d="M12 19V5M5 11l7-7 7 7"/></svg>;
-                case 'force_caudal': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="3"><path d="M12 5v14M19 13l-7 7-7-7"/></svg>;
-                case 'compression': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="3"><path d="M2 12h9m-3-3l3 3-3 3" /><path d="M22 12h-9m3-3l-3 3 3 3" /></svg>;
-                case 'distraction': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="3"><path d="M11 12H2m3-3l-3 3 3 3" /><path d="M13 12h9m-3-3l3 3-3 3" /></svg>;
+                
+                // --- V38 FORCES ---
+                case 'translate_left': return <svg viewBox="0 0 24 24" className={className} fill="#059669" stroke="none"><path d="M20 12H4M4 12l8-8M4 12l8 8" stroke="#059669" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>; 
+                case 'translate_right': return <svg viewBox="0 0 24 24" className={className} fill="#059669" stroke="none"><path d="M4 12h16M20 12l-8-8M20 12l-8 8" stroke="#059669" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>; 
+                case 'derotate_cw': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="2.5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>;
+                case 'derotate_ccw': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>;
+                case 'compression': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="3"><path d="M12 2v8m-4-4 4 4 4-4" /><path d="M12 22v-8m4 4-4-4-4 4" /></svg>; // V38: Vertical Converging
+                case 'distraction': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="3"><path d="M12 10V2m4 4-4-4-4 4" /><path d="M12 14v8m-4-4 4 4 4-4" /></svg>; // V38: Vertical Diverging
                 default: return null;
             }
         };
@@ -345,7 +339,7 @@
         const LevelRow = ({ level, placements, onZoneClick, tools, onPlacementClick, readOnly, showForces }) => {
             const getItems = (z) => placements.filter(p => p.levelId === level.id && p.zone === z);
             
-            // --- UPDATED GHOST LOGIC: 4-POINTED ARROW FOR FORCES, CIRCLE FOR IMPLANTS ---
+            // --- GHOST TARGET: CARDINAL FOR FORCES ---
             const GhostTarget = ({ type }) => {
                 if (type === 'force') return <div className="flex items-center justify-center h-full w-full"><IconCardinal /></div>;
                 return (<div className="w-6 h-6 rounded-full border-2 border-slate-300 border-dashed flex items-center justify-center opacity-40 hover:opacity-100 hover:border-amber-400 hover:bg-amber-50 transition-all"><div className="w-1 h-1 bg-slate-300 rounded-full"></div></div>);
@@ -355,23 +349,10 @@
                 const items = getItems(zone);
                 const hasItems = items.length > 0;
                 const justifyClass = align === 'right' ? 'justify-start pl-1' : (align === 'center' ? 'justify-center' : 'justify-end pr-1');
-                
-                // Determine if this is a force column
                 const isForceZone = zone.startsWith('force');
-
                 return (
-                    <div className={`flex items-center gap-1 h-full ${justifyClass} relative`}>
-                        {/* RENDER GHOST TARGET if empty and in edit mode */}
-                        {!hasItems && !readOnly && (zone === 'left' || zone === 'right' || isForceZone) && <GhostTarget type={isForceZone ? 'force' : 'screw'} />}
-                        
-                        {items.map(p => { 
-                            const tool = tools.find(t => t.id === p.tool); 
-                            const isOsteo = p.tool === 'osteotomy'; 
-                            let displayLabel = p.data; 
-                            let angle = null; 
-                            if (isOsteo && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } 
-                            return (<div key={p.id} className="relative group flex items-center gap-1">{align === 'left' && p.data && <span className="text-[18px] font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap">{isOsteo ? `${displayLabel} ${angle}°` : displayLabel}</span>}<div className={`${isOsteo ? 'w-8 h-8' : 'w-6 h-6'} ${!readOnly ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`} onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />{!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}</div>{align === 'right' && p.data && <span className="text-[18px] font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap">{isOsteo ? `${displayLabel} ${angle}°` : displayLabel}</span>}</div>); 
-                        })}
+                    <div className={`flex items-center gap-1 h-full ${justifyClass} relative`}>{!hasItems && !readOnly && (zone === 'left' || zone === 'right' || isForceZone) && <GhostTarget type={isForceZone ? 'force' : 'screw'} />}
+                        {items.map(p => { const tool = tools.find(t => t.id === p.tool); const isOsteo = p.tool === 'osteotomy'; let displayLabel = p.data; let angle = null; if (isOsteo && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } return (<div key={p.id} className="relative group flex items-center gap-1">{align === 'left' && p.data && <span className="text-[18px] font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap">{isOsteo ? `${displayLabel} ${angle}°` : displayLabel}</span>}<div className={`${isOsteo ? 'w-8 h-8' : 'w-6 h-6'} ${!readOnly ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`} onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />{!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}</div>{align === 'right' && p.data && <span className="text-[18px] font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap">{isOsteo ? `${displayLabel} ${angle}°` : displayLabel}</span>}</div>); })}
                     </div>
                 );
             };
@@ -448,12 +429,6 @@
                 if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28');
             }, [plannedPlacements, completedPlacements, patientData, showCervical, hasLoaded, incognitoMode]);
 
-            // RESIZE OBSERVER
-            useLayoutEffect(() => {
-                const handleResize = () => { if (containerWrapperRef.current && exportRef.current) { const wrapperH = containerWrapperRef.current.clientHeight; const wrapperW = containerWrapperRef.current.clientWidth; setScale(Math.min((wrapperW - 40) / 1485, (wrapperH - 40) / 1050)); } };
-                window.addEventListener('resize', handleResize); handleResize(); return () => window.removeEventListener('resize', handleResize);
-            }, []);
-
             // RESIZE OBSERVER (V33 Fix: Auto-Size on Load)
             useEffect(() => {
                 if (!containerWrapperRef.current) return;
@@ -468,28 +443,30 @@
                 return () => observer.disconnect();
             }, []);
 
+            // V38: NEW FORCE TOOLBAR
             const tools = [
                 { category: 'Screws', items: [ { id: 'monoaxial', label: 'Monoaxial', icon: 'monoaxial', needsSize: true, type: 'implant' }, { id: 'polyaxial', label: 'Polyaxial', icon: 'polyaxial', needsSize: true, type: 'implant' }, { id: 'uniplanar', label: 'Uniplanar', icon: 'uniplanar', needsSize: true, type: 'implant' }, ]},
                 { category: 'Hooks', items: [ { id: 'pedicle_hook', label: 'Pedicle', icon: 'pedicle_hook', type: 'implant' }, { id: 'tp_hook', label: 'TP Hook', icon: 'tp_hook', type: 'implant' }, { id: 'sl_hook', label: 'Supra-laminar', icon: 'sl_hook', type: 'implant' }, { id: 'il_hook', label: 'Infra-laminar', icon: 'il_hook', type: 'implant' }, ]},
                 { category: 'Midline', items: [ { id: 'connector', label: 'Crosslink', icon: 'connector', type: 'mid' }, { id: 'unstable', label: 'Unstable', icon: 'unstable', type: 'mid' }, { id: 'osteotomy', label: 'Osteotomy', icon: 'osteotomy', isOsteotomy: true, type: 'mid' }, ]},
-                { category: 'Forces', items: [ { id: 'force_cranial', label: 'Cranial', icon: 'force_cranial', type: 'force' }, { id: 'force_caudal', label: 'Caudal', icon: 'force_caudal', type: 'force' }, { id: 'compression', label: 'Compress', icon: 'compression', type: 'force' }, { id: 'distraction', label: 'Distract', icon: 'distraction', type: 'force' }, { id: 'force_left', label: 'Left', icon: 'force_left', type: 'force' }, { id: 'force_right', label: 'Right', icon: 'force_right', type: 'force' }, ]}
+                { category: 'Forces', items: [ 
+                    { id: 'translate_left', label: 'Translate Left', icon: 'translate_left', type: 'force' },
+                    { id: 'translate_right', label: 'Translate Right', icon: 'translate_right', type: 'force' },
+                    { id: 'compression', label: 'Compress', icon: 'compression', type: 'force' },
+                    { id: 'distraction', label: 'Distract', icon: 'distraction', type: 'force' },
+                    { id: 'derotate_cw', label: 'Derotate ↻', icon: 'derotate_cw', type: 'force' },
+                    { id: 'derotate_ccw', label: 'Derotate ↺', icon: 'derotate_ccw', type: 'force' },
+                ]}
             ];
             const allTools = tools.flatMap(g => g.items);
 
             const handleZoneClick = (levelId, zone) => {
                 const tool = allTools.find(t => t.id === selectedTool);
                 
-                // 1. Force Column Constraint: No screws in Force zones
                 if (tool.type === 'implant' && zone.startsWith('force')) return alert("Implants cannot be placed in force columns.");
-                
-                // 2. Implant Constraint: No forces in Screw zones
                 if (tool.type === 'force' && !zone.startsWith('force')) return alert("Forces must be placed in outer columns.");
-                
-                // 3. Middle Constraint
                 if (tool.type === 'implant' && zone === 'mid') return;
                 if (tool.type === 'mid' && zone !== 'mid') return;
 
-                // 4. Single Implant Constraint: Check if screw/hook already exists on this side
                 if (tool.type === 'implant' && (zone === 'left' || zone === 'right')) {
                     const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
                     const existing = currentPlacements.find(p => p.levelId === levelId && p.zone === zone);
@@ -526,7 +503,6 @@
             const updatePlacement = (id, tool, data) => { const updater = (prev) => prev.map(p => p.id === id ? { ...p, tool, data } : p); if (activeChart === 'planned') setPlannedPlacements(updater); else setCompletedPlacements(updater); };
             const removePlacement = (id) => { const filter = prev => prev.filter(p => p.id !== id); if (activeChart === 'planned') setPlannedPlacements(filter); else setCompletedPlacements(filter); setScrewModalOpen(false); setOsteoModalOpen(false); };
 
-            // --- EXPORT FUNCTIONS ---
             const prepareExportCanvas = async () => {
                 const element = exportRef.current;
                 const cloneContainer = document.createElement('div');
@@ -557,7 +533,7 @@
             };
 
             const saveProjectJSON = () => {
-                const data = { version: 36, patient: patientData, planned: plannedPlacements, completed: completedPlacements, showCervical, timestamp: new Date().toISOString() };
+                const data = { version: 38, patient: patientData, planned: plannedPlacements, completed: completedPlacements, showCervical, timestamp: new Date().toISOString() };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
                 const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `SpineProject_${patientData.name || 'Unnamed'}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link);
                 if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28');
@@ -587,7 +563,7 @@
 
                     <header className="bg-slate-900 text-white p-2 flex justify-between items-center shadow-md z-30 shrink-0 no-print h-14">
                         <div className="flex items-center gap-4">
-                            <h1 className="font-bold text-lg px-2">Leeds Spinal Planner V36</h1>
+                            <h1 className="font-bold text-lg px-2">Leeds Spinal Planner V38</h1>
                             <div className="flex bg-slate-800 rounded p-1 text-sm border border-slate-700">
                                 <button onClick={() => setActiveChart('planned')} className={`px-4 py-1 rounded transition-all ${activeChart==='planned'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400 hover:text-white'}`} title="View Pre-Operative Plan">Pre-Op</button>
                                 <button onClick={() => setActiveChart('completed')} className={`px-4 py-1 rounded transition-all ${activeChart==='completed'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400 hover:text-white'}`} title="View Post-Operative Construct">Post-Op</button>
