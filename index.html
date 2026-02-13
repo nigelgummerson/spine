@@ -91,62 +91,40 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v0.5.6-alpha";
+        const CURRENT_VERSION = "v0.6.3-alpha";
         
         const CHANGE_LOG = [
+            { version: "v0.6.3-alpha", date: "2025-12-05", changes: [
+                "HOTFIX: Fixed 'defaultAngle' ReferenceError in Osteotomy Modal.",
+            ]},
+            { version: "v0.6.2-alpha", date: "2025-12-05", changes: [
+                "HOTFIX: Restored missing ImplantInventory and CreditsFooter components.",
+                "Updated Inventory engine to correctly display Cage sizes (Height/Lordosis)."
+            ]},
+            { version: "v0.6.1-alpha", date: "2025-12-05", changes: [
+                "HOTFIX: Restored missing 'formatDate' utility function causing crash.",
+            ]},
+            { version: "v0.6.0-alpha", date: "2025-12-05", changes: [
+                "MAJOR: Added Interbody (Cage) support (ACDF, PLIF, TLIF, XLIF, ALIF).",
+                "MAJOR: New 'Schematic' Vertebrae visuals (Anatomical outlines with pedicles).",
+                "Added 'Disc Zones' - clickable spaces between levels.",
+                "Added 'Corpectomy' tool - removes vertebral body visual for VBR planning."
+            ]},
             { version: "v0.5.6-alpha", date: "2025-12-04", changes: [
-                "FIXED Aspect Ratio: Spine scaling is now isotropic (width scales with height). No more 'thin/stretched' vertebrae.",
-                "Restored full version history log.",
-                "Optimized Occiput-T4 layout for better screw placement visibility."
+                "FIXED Aspect Ratio: Spine scaling is now isotropic.",
+                "Optimized Occiput-T4 layout."
             ]},
             { version: "v0.5.5-alpha", date: "2025-12-04", changes: [
                 "Refined View Scaling: Whole Spine reduced by 15%.",
                 "Refined View Scaling: Cervical View magnified by 1.75x.",
             ]},
             { version: "v0.5.4-alpha", date: "2025-12-04", changes: [
-                "Redesigned Occiput icon: Curve is now caudal.",
-                "Sidebar: Widened (4 columns) with smaller buttons.",
-                "Whole Spine View: Automatically compacts row height."
+                "Redesigned Occiput icon.",
+                "Sidebar: Widened (4 columns).",
             ]},
             { version: "v0.5.3-alpha", date: "2025-12-04", changes: [
-                "Added 'Occiput' level for C0-C1-C2 planning.",
+                "Added 'Occiput' level.",
                 "Implemented 3-way View Selector.",
-                "Inventory now filters by visible region."
-            ]},
-            { version: "v0.5.2-alpha", date: "2025-12-04", changes: [
-                "Removed Force Columns from Post-Op (Construct) view.",
-                "Expanded Implant Column width in Construct view."
-            ]},
-            { version: "v0.5.1-alpha", date: "2025-12-04", changes: [
-                "Replaced static logo with editable 'Clinic Location' field.",
-                "Moved Version Number to subtitle line.",
-                "Refined text alignment and spacing in sidebar.",
-            ]},
-            { version: "v0.5.0-alpha", date: "2025-12-04", changes: [
-                "Implemented Semantic Versioning.",
-                "Changed License to GNU GPLv3.",
-                "Restored vertical centering for Thoracolumbar view."
-            ]},
-            { version: "V38-V41", date: "2025-12-04", changes: [
-                "Added specialized Deformity Forces (Derotation, Translation).",
-                "Updated force icons.",
-                "Implemented Keyboard Shortcuts (Del/Enter).",
-                "Added PDF direct export."
-            ]},
-            { version: "V33-V37", date: "2025-12-03", changes: [
-                "Added logical constraints (One screw per side).",
-                "Added 'Ghost Targets'.",
-                "Implemented ResizeObserver."
-            ]},
-            { version: "V28-V32", date: "2025-12-03", changes: [
-                "New Fonts: 'Istok Web'.",
-                "Compacted demographics layout.",
-                "Added automated Implant Inventory table."
-            ]},
-            { version: "V0-V27", date: "2025-12-03", changes: [
-                "Initial prototype development.",
-                "Added Incognito Mode.",
-                "Added JSON Save/Load functionality."
             ]}
         ];
 
@@ -157,17 +135,8 @@
         for (let i = 10; i <= 35; i++) LENGTH_OPTIONS.push(i);
         for (let i = 40; i <= 100; i += 5) LENGTH_OPTIONS.push(i);
 
-        const OSTEOTOMY_TYPES = [
-            { id: 'Facet', label: 'Facet Joint release', shortLabel: 'Facet', schwab: 'Schwab Grade 1', desc: 'Inferior facet resection; joint capsule removal.', defaultAngle: '5' },
-            { id: 'Ponte', label: 'Ponte / Smith Petersen', shortLabel: 'Ponte', schwab: 'Schwab Grade 2', desc: 'Complete facetectomy; ligamentum flavum + lamina.', defaultAngle: '10' },
-            { id: 'PSO', label: 'Standard PSO', shortLabel: 'PSO', schwab: 'Schwab Grade 3', desc: 'Pedicle subtraction; partial body wedge.', defaultAngle: '25' },
-            { id: 'ExtPSO', label: 'Extended PSO', shortLabel: 'Ext PSO', schwab: 'Schwab Grade 4', desc: 'PSO + resection of adjacent disc.', defaultAngle: '35' },
-            { id: 'VCR', label: 'VCR', shortLabel: 'VCR', schwab: 'Schwab Grade 5', desc: 'Complete vertebral column resection.', defaultAngle: '40' },
-            { id: 'ML-VCR', label: 'Multi-level VCR', shortLabel: 'ML VCR', schwab: 'Schwab Grade 6', desc: 'Resection of multiple vertebrae and discs.', defaultAngle: '0' }
-        ];
-
         // ==========================================
-        // SECTION 1: ICONS
+        // SECTION 1: ICONS & ASSETS
         // ==========================================
         const IconTrash = () => (<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>);
         const IconDownload = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>);
@@ -179,46 +148,147 @@
         const IconPDF = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>);
         const IconHelp = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>);
         const IconHistory = () => (<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>);
-
-        const IconCardinal = () => (
-            <svg viewBox="0 0 24 24" className="w-5 h-5 opacity-40 hover:opacity-100 transition-opacity text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/><path d="M8 7l4-4 4 4"/><path d="M8 17l4 4 4-4"/><path d="M17 8l4 4-4 4"/><path d="M7 8l-4 4 4 4"/></svg>
-        );
+        const IconCardinal = () => (<svg viewBox="0 0 24 24" className="w-5 h-5 opacity-40 hover:opacity-100 transition-opacity text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/><path d="M8 7l4-4 4 4"/><path d="M8 17l4 4 4-4"/><path d="M17 8l4 4-4 4"/><path d="M7 8l-4 4 4 4"/></svg>);
 
         // ==========================================
-        // SECTION 2: UI COMPONENTS
+        // SECTION 2: UI COMPONENTS & MODALS
         // ==========================================
         
-        // --- CHANGE LOG MODAL ---
+        const formatDate = (isoString) => {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            if (isNaN(date.getTime())) return isoString;
+            return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        };
+
         const ChangeLogModal = ({ isOpen, onClose }) => {
             if (!isOpen) return null;
             return (
                 <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" onClick={onClose}>
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[80vh]" onClick={e => e.stopPropagation()}>
-                        <div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center">
-                            <h3 className="font-bold text-sm flex items-center gap-2"><IconHistory/> Version History</h3>
-                            <button onClick={onClose} className="hover:text-slate-300"><IconX /></button>
-                        </div>
+                        <div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm flex items-center gap-2"><IconHistory/> Version History</h3><button onClick={onClose} className="hover:text-slate-300"><IconX /></button></div>
                         <div className="p-0 overflow-y-auto flex-1">
                             {CHANGE_LOG.map((log, i) => (
                                 <div key={i} className={`p-4 border-b border-slate-100 ${i===0 ? 'bg-amber-50/50' : ''}`}>
-                                    <div className="flex justify-between items-baseline mb-2">
-                                        <span className="font-bold text-slate-800 text-sm">{log.version}</span>
-                                        <span className="text-[10px] text-slate-400 font-mono">{log.date}</span>
-                                    </div>
-                                    <ul className="list-disc list-inside text-xs text-slate-600 space-y-1">
-                                        {log.changes.map((c, j) => <li key={j}>{c}</li>)}
-                                    </ul>
+                                    <div className="flex justify-between items-baseline mb-2"><span className="font-bold text-slate-800 text-sm">{log.version}</span><span className="text-[10px] text-slate-400 font-mono">{log.date}</span></div>
+                                    <ul className="list-disc list-inside text-xs text-slate-600 space-y-1">{log.changes.map((c, j) => <li key={j}>{c}</li>)}</ul>
                                 </div>
                             ))}
                         </div>
-                        <div className="bg-slate-50 px-4 py-3 text-right border-t border-slate-200">
-                            <button onClick={onClose} className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold">Close</button>
-                        </div>
+                        <div className="bg-slate-50 px-4 py-3 text-right border-t border-slate-200"><button onClick={onClose} className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold">Close</button></div>
                     </div>
                 </div>
             );
         };
 
+        const HelpModal = ({ isOpen, onClose }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" onClick={onClose}><div className="bg-white rounded-lg shadow-2xl w-full max-w-lg overflow-hidden" onClick={e => e.stopPropagation()}><div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">Spinal Planner Help Guide</h3><button onClick={onClose} className="hover:text-slate-300"><IconX /></button></div><div className="p-6 space-y-6 overflow-y-auto max-h-[80vh]"><div className="flex gap-4"><div className="min-w-[40px] pt-1"><div className="w-8 h-4 rounded-full border border-red-500 bg-white relative"><div className="absolute right-0 top-0 w-3.5 h-3.5 bg-red-500 rounded-full"></div></div></div><div><h4 className="font-bold text-slate-800 text-sm mb-1">Session Mode (Incognito)</h4><p className="text-xs text-slate-600 leading-relaxed">Red = Data NOT saved (Public PC). Grey = Data Auto-saved.</p></div></div><div className="flex gap-4"><div className="min-w-[40px] pt-1"><div className="bg-slate-700 text-white px-2 py-1 rounded text-[10px] font-bold inline-block"><IconCopy /></div></div><div><h4 className="font-bold text-slate-800 text-sm mb-1">Copy Plan</h4><p className="text-xs text-slate-600 leading-relaxed">Duplicates Pre-Op to Post-Op.</p></div></div><div className="flex gap-4"><div className="min-w-[40px] pt-1"><span className="text-2xl">🦴</span></div><div><h4 className="font-bold text-slate-800 text-sm mb-1">Interbody Cages</h4><p className="text-xs text-slate-600 leading-relaxed">Click the empty space <strong>between</strong> vertebrae to place a cage (PLIF, TLIF, ACDF, etc.).</p></div></div></div><div className="bg-slate-50 px-4 py-3 text-right"><button onClick={onClose} className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold">Close</button></div></div></div>
+            );
+        };
+
+        const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, initialTool, defaultDiameter, defaultLength }) => {
+            if (!isOpen) return null;
+            const [mode, setMode] = useState('standard');
+            const [diameter, setDiameter] = useState(defaultDiameter);
+            const [length, setLength] = useState(defaultLength);
+            const [customText, setCustomText] = useState('');
+            const [selectedType, setSelectedType] = useState(initialTool || 'polyaxial');
+
+            useEffect(() => {
+                if (isOpen) {
+                    if (initialTool) setSelectedType(initialTool);
+                    if (initialData && typeof initialData === 'string') {
+                         if (initialData === "Custom") { setMode('custom'); } 
+                         else if (initialData.includes('x')) { const parts = initialData.split(' x '); if (parts.length === 2) { setMode('standard'); setDiameter(parts[0]); setLength(parts[1]); } else { setMode('custom'); setCustomText(initialData); } } 
+                         else { setMode('standard'); }
+                    } else if (initialData === null && initialData !== undefined) { setMode('none'); } 
+                    else { setMode('standard'); setDiameter(defaultDiameter); setLength(defaultLength); setCustomText(''); }
+                }
+            }, [isOpen, initialData, initialTool, defaultDiameter, defaultLength]);
+
+            const handleSubmit = () => { let finalSize = null; if (mode === 'custom') finalSize = customText || "Custom"; else if (mode === 'standard') finalSize = `${diameter} x ${length}`; onConfirm(finalSize, { diameter, length }, selectedType); onClose(); };
+            const isEditing = initialData !== undefined;
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
+                        <div className="bg-slate-900 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{isEditing ? 'Edit Screw' : 'Select Screw'}</h3><button onClick={onClose} className="hover:text-red-400"><IconX /></button></div>
+                        <div className="p-6">
+                            <div className="flex bg-slate-100 p-1 rounded mb-6">{['monoaxial', 'polyaxial', 'uniplanar'].map(t => (<button key={t} onClick={() => setSelectedType(t)} className={`flex-1 py-1 text-[10px] font-bold uppercase rounded transition-all ${selectedType === t ? 'bg-white shadow text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}>{t.replace('axial','')}</button>))}</div>
+                            <div className="flex gap-2 mb-4"><button onClick={() => setMode('standard')} className={`flex-1 py-1 text-xs font-bold rounded border ${mode === 'standard' ? 'bg-amber-500 text-slate-900 border-amber-600' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>Standard</button><button onClick={() => setMode('custom')} className={`flex-1 py-1 text-xs font-bold rounded border ${mode === 'custom' ? 'bg-amber-500 text-slate-900 border-amber-600' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>Custom</button><button onClick={() => setMode('none')} className={`flex-1 py-1 text-xs font-bold rounded border ${mode === 'none' ? 'bg-amber-500 text-slate-900 border-amber-600' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>No Size</button></div>
+                            {mode === 'standard' && (<div className="space-y-4"><div className="grid grid-cols-4 gap-2"><select value={diameter} onChange={(e) => setDiameter(e.target.value)} className="col-span-4 w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{DIAMETER_OPTIONS.map(d => <option key={d} value={d}>{d} mm</option>)}</select></div><select value={length} onChange={(e) => setLength(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{LENGTH_OPTIONS.map(l => <option key={l} value={l}>{l} mm</option>)}</select></div>)}
+                            {mode === 'custom' && <input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} placeholder="e.g. 8.0 x 110" className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg focus:border-amber-500 outline-none" autoFocus />}
+                            {mode === 'none' && <div className="text-center py-6 text-slate-400 text-sm italic">Icon only. No label.</div>}
+                        </div>
+                        <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center" title="Shortcut: Delete"><IconTrash/> Remove</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title="Shortcut: Esc">Cancel</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg" title="Shortcut: Enter">Confirm</button></div></div>
+                    </div>
+                </div>
+            );
+        };
+
+        const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData }) => {
+            if (!isOpen) return null;
+            const [type, setType] = useState(initialData?.tool || 'tlif');
+            const [height, setHeight] = useState(initialData?.data?.height || '10');
+            const [lordosis, setLordosis] = useState(initialData?.data?.lordosis || '0');
+            
+            const CAGE_TYPES = [
+                { id: 'acdf', label: 'ACDF', desc: 'Anterior Cervical' },
+                { id: 'plif', label: 'PLIF', desc: 'Posterior Lumbar' },
+                { id: 'tlif', label: 'TLIF', desc: 'Transforaminal' },
+                { id: 'xlif', label: 'XLIF/LLIF', desc: 'Lateral' },
+                { id: 'alif', label: 'ALIF', desc: 'Anterior Lumbar' },
+                { id: 'corpectomy', label: 'VBR', desc: 'Vertebral Body Replacement' }
+            ];
+
+            const handleSubmit = () => { onConfirm({ type, height, lordosis }); onClose(); };
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
+                        <div className="bg-sky-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{initialData ? 'Edit Cage' : 'Select Interbody'}</h3><button onClick={onClose} className="hover:text-sky-200"><IconX /></button></div>
+                        <div className="p-6 space-y-4">
+                            <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Cage Type</label><select value={type} onChange={e => setType(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-sky-500 outline-none">{CAGE_TYPES.map(t => <option key={t.id} value={t.id}>{t.label} - {t.desc}</option>)}</select></div>
+                            <div className="flex gap-4">
+                                <div className="flex-1"><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Height (mm)</label><input type="number" value={height} onChange={e => setHeight(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono text-center focus:border-sky-500 outline-none"/></div>
+                                <div className="flex-1"><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Lordosis (°)</label><input type="number" value={lordosis} onChange={e => setLordosis(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono text-center focus:border-sky-500 outline-none"/></div>
+                            </div>
+                        </div>
+                        <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{initialData ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center"><IconTrash/> Remove</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">Cancel</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-sky-800 text-white hover:bg-sky-700 text-sm font-bold shadow-lg">Confirm</button></div></div>
+                    </div>
+                </div>
+            );
+        };
+
+        const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, defaultType, defaultAngle }) => {
+            if (!isOpen) return null;
+            const [type, setType] = useState(defaultType || 'PSO');
+            const [angle, setAngle] = useState(defaultAngle || '25');
+            
+            const OSTEOTOMY_TYPES = [
+                { id: 'Facet', label: 'Facet Joint release', shortLabel: 'Facet', schwab: 'Schwab Grade 1', desc: 'Inferior facet resection; joint capsule removal.', defaultAngle: '5' },
+                { id: 'Ponte', label: 'Ponte / Smith Petersen', shortLabel: 'Ponte', schwab: 'Schwab Grade 2', desc: 'Complete facetectomy; ligamentum flavum + lamina.', defaultAngle: '10' },
+                { id: 'PSO', label: 'Standard PSO', shortLabel: 'PSO', schwab: 'Schwab Grade 3', desc: 'Pedicle subtraction; partial body wedge.', defaultAngle: '25' },
+                { id: 'ExtPSO', label: 'Extended PSO', shortLabel: 'Ext PSO', schwab: 'Schwab Grade 4', desc: 'PSO + resection of adjacent disc.', defaultAngle: '35' },
+                { id: 'VCR', label: 'VCR', shortLabel: 'VCR', schwab: 'Schwab Grade 5', desc: 'Complete vertebral column resection.', defaultAngle: '40' },
+                { id: 'ML-VCR', label: 'Multi-level VCR', shortLabel: 'ML VCR', schwab: 'Schwab Grade 6', desc: 'Resection of multiple vertebrae and discs.', defaultAngle: '0' },
+                { id: 'Corpectomy', label: 'Corpectomy (Anterior)', shortLabel: 'Corpectomy', schwab: 'Anterior', desc: 'Vertebral body removal.', defaultAngle: '0' }
+            ];
+
+            useEffect(() => { if (isOpen) { if (initialData && typeof initialData === 'object') { setType(initialData.type); setAngle(initialData.angle); } else { setType(defaultType || 'PSO'); setAngle(defaultAngle || '25'); } } }, [isOpen, initialData, defaultType, defaultAngle]);
+            
+            const selectedDef = OSTEOTOMY_TYPES.find(t => t.id === type) || OSTEOTOMY_TYPES[0];
+            const handleTypeChange = (e) => { const newTypeID = e.target.value; setType(newTypeID); const newDef = OSTEOTOMY_TYPES.find(t => t.id === newTypeID); if (newDef) setAngle(newDef.defaultAngle); };
+            const handleSubmit = () => { onConfirm({ type, angle, shortLabel: selectedDef.shortLabel }); onClose(); };
+            const isEditing = !!initialData;
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]"><div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden"><div className="bg-red-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{isEditing ? 'Edit Osteotomy' : 'Plan Osteotomy'}</h3><button onClick={onClose} className="hover:text-red-200"><IconX /></button></div><div className="p-6 space-y-4"><div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Osteotomy Type</label><select value={type} onChange={handleTypeChange} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-red-500 outline-none">{OSTEOTOMY_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}</select></div><div className="bg-red-50 border border-red-100 rounded p-3 text-xs"><div className="font-bold text-red-800 uppercase tracking-wider mb-1">{selectedDef.schwab}</div><div className="text-red-600 mb-2">{selectedDef.desc}</div></div><div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Correction Angle (°)</label><div className="flex items-center gap-2"><input type="number" value={angle} onChange={(e) => setAngle(e.target.value)} className="w-24 p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-red-500 outline-none text-center" /><span className="font-serif italic text-slate-400 text-sm">degrees</span></div></div></div><div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center"><IconTrash/> Remove</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">Cancel</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-red-800 text-white hover:bg-red-700 text-sm font-bold shadow-lg">Confirm</button></div></div></div></div>
+            );
+        };
+
+        // --- RESTORED CREDITS FOOTER ---
         const CreditsFooter = () => (
             <div className="mt-auto pt-4 border-t border-slate-200 shrink-0">
                 <div className="flex flex-col gap-2">
@@ -240,11 +310,11 @@
             </div>
         );
 
+        // --- RESTORED IMPLANT INVENTORY ---
         const ImplantInventory = ({ placements, tools, title, visibleLevelIds }) => {
             const inventory = useMemo(() => {
                 const counts = {};
                 placements.forEach(p => {
-                    // FILTER: Only count items if their level is currently visible
                     if (!visibleLevelIds.includes(p.levelId)) return;
 
                     const tool = tools.find(t => t.id === p.tool);
@@ -253,7 +323,8 @@
                     if (p.data) {
                         if (typeof p.data === 'string' && tool.needsSize) { key = `${tool.label} (${p.data})`; } 
                         else if (p.tool === 'osteotomy' && typeof p.data === 'object') { key = `${p.data.shortLabel} (${p.data.angle}°)`; } 
-                        else if (p.data !== 'Custom') { key = `${tool.label} ${p.data}`; }
+                        else if (typeof p.data === 'object' && p.data.height) { key = `${tool.label} ${p.data.height}mm ${p.data.lordosis}°`; } // Cage
+                        else if (p.data !== 'Custom' && typeof p.data !== 'object') { key = `${tool.label} ${p.data}`; }
                     }
                     counts[key] = (counts[key] || 0) + 1;
                 });
@@ -281,97 +352,10 @@
             );
         };
 
-        const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, initialTool, defaultDiameter, defaultLength }) => {
-            if (!isOpen) return null;
-            const [mode, setMode] = useState('standard');
-            const [diameter, setDiameter] = useState(defaultDiameter);
-            const [length, setLength] = useState(defaultLength);
-            const [customText, setCustomText] = useState('');
-            const [selectedType, setSelectedType] = useState(initialTool || 'polyaxial');
-
-            useEffect(() => {
-                if (isOpen) {
-                    if (initialTool) setSelectedType(initialTool);
-                    if (initialData && typeof initialData === 'string') {
-                         if (initialData === "Custom") { setMode('custom'); } 
-                         else if (initialData.includes('x')) { const parts = initialData.split(' x '); if (parts.length === 2) { setMode('standard'); setDiameter(parts[0]); setLength(parts[1]); } else { setMode('custom'); setCustomText(initialData); } } 
-                         else { setMode('standard'); }
-                    } else if (initialData === null && initialData !== undefined) { setMode('none'); } 
-                    else { setMode('standard'); setDiameter(defaultDiameter); setLength(defaultLength); setCustomText(''); }
-                }
-            }, [isOpen, initialData, initialTool, defaultDiameter, defaultLength]);
-
-            useEffect(() => {
-                if (!isOpen) return;
-                const handleKeyDown = (e) => {
-                    if (e.key === 'Enter') { e.preventDefault(); handleSubmit(); }
-                    else if (e.key === 'Escape') { e.preventDefault(); onClose(); }
-                    else if ((e.key === 'Delete' || e.key === 'Backspace') && initialData !== undefined) { if(document.activeElement.tagName !== 'INPUT') { e.preventDefault(); onDelete(); } }
-                };
-                window.addEventListener('keydown', handleKeyDown); return () => window.removeEventListener('keydown', handleKeyDown);
-            }, [isOpen, mode, diameter, length, customText, selectedType, initialData]);
-
-            const handleSubmit = () => { let finalSize = null; if (mode === 'custom') finalSize = customText || "Custom"; else if (mode === 'standard') finalSize = `${diameter} x ${length}`; onConfirm(finalSize, { diameter, length }, selectedType); onClose(); };
-            const isEditing = initialData !== undefined;
-
-            return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
-                        <div className="bg-slate-900 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{isEditing ? 'Edit Screw' : 'Select Screw'}</h3><button onClick={onClose} className="hover:text-red-400"><IconX /></button></div>
-                        <div className="p-6">
-                            <div className="flex bg-slate-100 p-1 rounded mb-6">{['monoaxial', 'polyaxial', 'uniplanar'].map(t => (<button key={t} onClick={() => setSelectedType(t)} className={`flex-1 py-1 text-[10px] font-bold uppercase rounded transition-all ${selectedType === t ? 'bg-white shadow text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}>{t.replace('axial','')}</button>))}</div>
-                            <div className="flex gap-2 mb-4"><button onClick={() => setMode('standard')} className={`flex-1 py-1 text-xs font-bold rounded border ${mode === 'standard' ? 'bg-amber-500 text-slate-900 border-amber-600' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>Standard</button><button onClick={() => setMode('custom')} className={`flex-1 py-1 text-xs font-bold rounded border ${mode === 'custom' ? 'bg-amber-500 text-slate-900 border-amber-600' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>Custom</button><button onClick={() => setMode('none')} className={`flex-1 py-1 text-xs font-bold rounded border ${mode === 'none' ? 'bg-amber-500 text-slate-900 border-amber-600' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>No Size</button></div>
-                            {mode === 'standard' && (<div className="space-y-4"><div className="grid grid-cols-4 gap-2"><select value={diameter} onChange={(e) => setDiameter(e.target.value)} className="col-span-4 w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{DIAMETER_OPTIONS.map(d => <option key={d} value={d}>{d} mm</option>)}</select></div><select value={length} onChange={(e) => setLength(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{LENGTH_OPTIONS.map(l => <option key={l} value={l}>{l} mm</option>)}</select></div>)}
-                            {mode === 'custom' && <input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} placeholder="e.g. 8.0 x 110" className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg focus:border-amber-500 outline-none" autoFocus />}
-                            {mode === 'none' && <div className="text-center py-6 text-slate-400 text-sm italic">Icon only. No label.</div>}
-                        </div>
-                        <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center" title="Shortcut: Delete"><IconTrash/> Remove</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title="Shortcut: Esc">Cancel</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg" title="Shortcut: Enter">Confirm</button></div></div>
-                    </div>
-                </div>
-            );
-        };
-
-        const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, defaultType, defaultAngle }) => {
-            if (!isOpen) return null;
-            const [type, setType] = useState(defaultType || 'PSO');
-            const [angle, setAngle] = useState(defaultAngle || '25');
-            useEffect(() => {
-                if (isOpen) { if (initialData && typeof initialData === 'object') { setType(initialData.type); setAngle(initialData.angle); } else { setType(defaultType || 'PSO'); setAngle(defaultAngle || '25'); } }
-            }, [isOpen, initialData, defaultType, defaultAngle]);
-            
-            useEffect(() => {
-                if (!isOpen) return;
-                const handleKeyDown = (e) => {
-                    if (e.key === 'Enter') { e.preventDefault(); handleSubmit(); }
-                    else if (e.key === 'Escape') { e.preventDefault(); onClose(); }
-                    else if ((e.key === 'Delete' || e.key === 'Backspace') && initialData) { if(document.activeElement.tagName !== 'INPUT') { e.preventDefault(); onDelete(); } }
-                };
-                window.addEventListener('keydown', handleKeyDown); return () => window.removeEventListener('keydown', handleKeyDown);
-            }, [isOpen, type, angle, initialData]);
-
-            const selectedDef = OSTEOTOMY_TYPES.find(t => t.id === type) || OSTEOTOMY_TYPES[0];
-            const handleTypeChange = (e) => { const newTypeID = e.target.value; setType(newTypeID); const newDef = OSTEOTOMY_TYPES.find(t => t.id === newTypeID); if (newDef) setAngle(newDef.defaultAngle); };
-            const handleSubmit = () => { onConfirm({ type, angle, shortLabel: selectedDef.shortLabel }); onClose(); };
-            const isEditing = !!initialData;
-            return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]"><div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden"><div className="bg-red-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{isEditing ? 'Edit Osteotomy' : 'Plan Osteotomy'}</h3><button onClick={onClose} className="hover:text-red-200"><IconX /></button></div><div className="p-6 space-y-4"><div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Osteotomy Type</label><select value={type} onChange={handleTypeChange} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-red-500 outline-none">{OSTEOTOMY_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}</select></div><div className="bg-red-50 border border-red-100 rounded p-3 text-xs"><div className="font-bold text-red-800 uppercase tracking-wider mb-1">{selectedDef.schwab}</div><div className="text-red-600 mb-2">{selectedDef.desc}</div></div><div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Correction Angle (°)</label><div className="flex items-center gap-2"><input type="number" value={angle} onChange={(e) => setAngle(e.target.value)} className="w-24 p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-red-500 outline-none text-center" /><span className="font-serif italic text-slate-400 text-sm">degrees</span></div></div></div><div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center" title="Shortcut: Delete"><IconTrash/> Remove</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title="Shortcut: Esc">Cancel</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-red-800 text-white hover:bg-red-700 text-sm font-bold shadow-lg" title="Shortcut: Enter">Confirm</button></div></div></div></div>
-            );
-        };
-
-        const HelpModal = ({ isOpen, onClose }) => {
-            if (!isOpen) return null;
-            return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" onClick={onClose}><div className="bg-white rounded-lg shadow-2xl w-full max-w-lg overflow-hidden" onClick={e => e.stopPropagation()}><div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">Spinal Planner Help Guide</h3><button onClick={onClose} className="hover:text-slate-300"><IconX /></button></div><div className="p-6 space-y-6 overflow-y-auto max-h-[80vh]"><div className="flex gap-4"><div className="min-w-[40px] pt-1"><div className="w-8 h-4 rounded-full border border-red-500 bg-white relative"><div className="absolute right-0 top-0 w-3.5 h-3.5 bg-red-500 rounded-full"></div></div></div><div><h4 className="font-bold text-slate-800 text-sm mb-1">Session Mode (Incognito)</h4><p className="text-xs text-slate-600 leading-relaxed">When enabled (Red), your data is <strong>NOT saved</strong> to this computer's browser storage. Use this on shared or public NHS computers to ensure patient data is cleared when you close the tab. <br/><br/>When disabled (Grey), your work auto-saves locally so you can resume later.</p></div></div><div className="flex gap-4"><div className="min-w-[40px] pt-1"><div className="bg-slate-700 text-white px-2 py-1 rounded text-[10px] font-bold inline-block"><IconCopy /></div></div><div><h4 className="font-bold text-slate-800 text-sm mb-1">Copy Plan</h4><p className="text-xs text-slate-600 leading-relaxed">Copies everything from your "Pre-Op" plan to the "Post-Op" chart. Use this after surgery to start your record with what you planned, then just adjust what changed.</p></div></div><div className="flex gap-4"><div className="min-w-[40px] pt-1"><div className="bg-white text-slate-800 border border-slate-300 px-2 py-1 rounded text-[10px] font-bold inline-block"><IconPDF /></div></div><div><h4 className="font-bold text-slate-800 text-sm mb-1">Export PDF vs Image</h4><p className="text-xs text-slate-600 leading-relaxed"><strong>Export Image:</strong> Downloads a JPG file. Good for PowerPoint or email.<br/><strong>Export PDF:</strong> Downloads a high-quality PDF document. Good for uploading to PPM/EHR or printing.</p></div></div></div><div className="bg-slate-50 px-4 py-3 text-right"><button onClick={onClose} className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold">Close</button></div></div></div>
-            );
-        };
-
-        const formatDate = (isoString) => {
-            if (!isoString) return '';
-            const date = new Date(isoString);
-            if (isNaN(date.getTime())) return isoString;
-            return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-        };
-
+        // ==========================================
+        // SECTION 3: RENDERERS
+        // ==========================================
+        
         const REGIONS = { 
             Occiput: { height: 40, color: '#f8fafc' }, 
             C: { height: 28, color: '#f1f5f9' }, 
@@ -396,7 +380,14 @@
                 case 'unstable': return <svg viewBox="0 0 24 24" className={`${className} bg-white rounded border border-red-100 shadow-sm`} fill="none" stroke="#dc2626" strokeWidth="2.5"><path d="M2 12 L6 8 L10 16 L14 8 L18 16 L22 12" strokeLinecap="round" strokeLinejoin="round" /></svg>;
                 case 'osteotomy': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><path d="M2 12h20M12 2l10 10-10 10L2 12z" fill="#dc2626" opacity="0.8" /></svg>;
                 
-                // --- V38 FORCES ---
+                // --- Cages ---
+                case 'cage': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><rect x="4" y="8" width="16" height="8" rx="2" /></svg>;
+                case 'acdf': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><path d="M6 8h12v8H6z" /></svg>; // Simple box
+                case 'plif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><rect x="3" y="8" width="7" height="8" /><rect x="14" y="8" width="7" height="8" /></svg>; // Dual bullets
+                case 'tlif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><path d="M4 12c0-4 8-8 8-8s8 4 8 8-8 8-8 8-8-4-8-8z" /></svg>; // Banana
+                case 'xlif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><rect x="2" y="10" width="20" height="4" rx="1" /></svg>; // Long shim
+                
+                // --- Forces ---
                 case 'translate_left': return <svg viewBox="0 0 24 24" className={className} fill="#059669" stroke="none"><path d="M20 12H4M4 12l8-8M4 12l8 8" stroke="#059669" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>; 
                 case 'translate_right': return <svg viewBox="0 0 24 24" className={className} fill="#059669" stroke="none"><path d="M4 12h16M20 12l-8-8M20 12l-8 8" stroke="#059669" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>; 
                 case 'derotate_cw': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="2.5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>;
@@ -407,34 +398,86 @@
             }
         };
 
-        const SpineVertebra = ({ label, type, height }) => {
+        const SpineVertebra = ({ label, type, height, isCorpectomy }) => {
             const common = { fill: REGIONS[type].color, stroke: "#475569", strokeWidth: "1.5" };
+            
+            if (isCorpectomy) {
+                return (
+                    <svg viewBox={`0 0 160 ${height}`} className="w-full h-full block" overflow="visible">
+                        <line x1="80" y1="0" x2="80" y2={height} stroke="#cbd5e1" strokeDasharray="3 3" />
+                        <path d={`M40,5 L120,5 L120,${height-5} L40,${height-5} Z`} fill="none" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
+                        <text x="80" y={height/2} dominantBaseline="middle" textAnchor="middle" fontSize="10" fill="#94a3b8" className="font-sans italic">Corpectomy</text>
+                    </svg>
+                );
+            }
+
             return (
                 <svg viewBox={`0 0 160 ${height}`} className="w-full h-full block" overflow="visible">
                     <line x1="80" y1="-2" x2="80" y2={height + 2} stroke="#cbd5e1" strokeDasharray="3 3" />
                     <g>
-                        {type === 'Occiput' && <path d="M20,2 Q80,45 140,2 Z" transform={`scale(1, ${height/30})`} {...common} />}
-                        {type === 'C' && <path d="M65,6 Q80,2 95,6 L95,22 Q80,26 65,22 Z" transform={`translate(0, 0) scale(1, ${height/24})`} {...common} />}
-                        {type === 'T' && <g><path d="M60,10 Q80,4 100,10 L105,27 Q80,33 55,27 Z" transform={`scale(1, ${height/32})`} {...common} /><path d="M55,13 L45,11" stroke="#64748b" strokeWidth="2" /><path d="M105,13 L115,11" stroke="#64748b" strokeWidth="2" /></g>}
-                        {type === 'L' && <g><path d="M55,8 Q80,2 105,8 L110,33 Q80,38 50,33 Z" transform={`scale(1, ${height/38})`} {...common} /><path d="M50,16 L35,20" stroke="#64748b" strokeWidth="3" /><path d="M110,16 L125,20" stroke="#64748b" strokeWidth="3" /></g>}
-                        {type === 'S' && <path d="M40,8 Q80,2 120,8 L100,43 Q80,53 60,43 Z" transform={`scale(1, ${height/48})`} {...common} />}
-                        {type === 'Pelvis' && <path d="M20,5 Q80,20 140,5 L130,40 Q80,50 30,40 Z" transform={`scale(1, ${height/45})`} {...common} opacity="0.6" />}
+                        {type === 'Occiput' && <path d="M30,2 Q80,45 130,2 L130,10 Q80,50 30,10 Z" transform={`scale(1, ${height/30})`} {...common} fill="#f1f5f9" />}
+                        
+                        {type === 'C' && (
+                            <g transform={`translate(0, 0) scale(1, ${height/24})`}>
+                                <path d="M45,4 Q80,-2 115,4 L120,18 Q80,24 40,18 Z" {...common} /> {/* Body */}
+                                <path d="M30,10 L45,4 L45,18 L30,12 Z" {...common} /> {/* Left Transverse */}
+                                <path d="M130,10 L115,4 L115,18 L130,12 Z" {...common} /> {/* Right Transverse */}
+                            </g>
+                        )}
+                        
+                        {type === 'T' && (
+                            <g transform={`scale(1, ${height/32})`}>
+                                <path d="M50,6 Q80,0 110,6 L115,26 Q80,32 45,26 Z" {...common} /> {/* Heart Shape Body */}
+                                <circle cx="60" cy="12" r="3" fill="none" stroke="#94a3b8" strokeWidth="1"/> {/* L Pedicle */}
+                                <circle cx="100" cy="12" r="3" fill="none" stroke="#94a3b8" strokeWidth="1"/> {/* R Pedicle */}
+                                <path d="M35,8 L50,6 L50,18 Z" {...common} /> {/* L Transverse */}
+                                <path d="M125,8 L110,6 L110,18 Z" {...common} /> {/* R Transverse */}
+                            </g>
+                        )}
+                        
+                        {type === 'L' && (
+                            <g transform={`scale(1, ${height/38})`}>
+                                <path d="M45,5 Q80,-2 115,5 L120,30 Q80,38 40,30 Z" {...common} /> {/* Kidney Shape Body */}
+                                <ellipse cx="60" cy="12" rx="4" ry="6" fill="none" stroke="#64748b" strokeWidth="1.5"/> {/* L Pedicle (Eye) */}
+                                <ellipse cx="100" cy="12" rx="4" ry="6" fill="none" stroke="#64748b" strokeWidth="1.5"/> {/* R Pedicle (Eye) */}
+                                <path d="M25,12 L45,8 L45,20 Z" {...common} /> {/* L Transverse */}
+                                <path d="M135,12 L115,8 L115,20 Z" {...common} /> {/* R Transverse */}
+                            </g>
+                        )}
+                        
+                        {type === 'S' && <path d="M40,5 Q80,-2 120,5 L100,45 Q80,55 60,45 Z" transform={`scale(1, ${height/48})`} {...common} />}
+                        {type === 'Pelvis' && <path d="M20,5 Q80,25 140,5 L130,40 Q80,50 30,40 Z" transform={`scale(1, ${height/45})`} {...common} opacity="0.6" />}
                     </g>
                     <text x="80" y={height/2} dominantBaseline="middle" textAnchor="middle" fontSize="10" fontWeight="bold" fill="#334155" className="font-sans pointer-events-none select-none">{label}</text>
                 </svg>
             );
         };
 
-        const LevelRow = ({ level, placements, onZoneClick, tools, onPlacementClick, readOnly, showForces, heightScale }) => {
-            const getItems = (z) => placements.filter(p => p.levelId === level.id && p.zone === z);
+        const CageVisualization = ({ cageType, heightScale }) => {
+            const h = 12 * heightScale; // Approximate rendered height
+            const color = "#0ea5e9";
             
-            // --- FIX: ISOTROPIC SCALING ---
-            // We scale height AND width together so the vertebra doesn't look "thin" or "squashed".
-            const baseHeight = REGIONS[level.type].height;
-            const scaledHeight = baseHeight * heightScale;
+            switch (cageType) {
+                case 'plif': return <g><rect x="65" y="2" width="10" height={h} rx="1" fill={color} opacity="0.8" /><rect x="85" y="2" width="10" height={h} rx="1" fill={color} opacity="0.8" /></g>;
+                case 'tlif': return <path d={`M60,2 Q80,${h+5} 100,2`} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" />;
+                case 'acdf': return <rect x="70" y="2" width="20" height={h} rx="2" fill={color} opacity="0.9" />;
+                case 'xlif': return <rect x="50" y="2" width="60" height={h} rx="2" fill={color} opacity="0.6" />;
+                case 'alif': return <ellipse cx="80" cy={h/2 + 2} rx="25" ry={h/1.5} fill={color} opacity="0.7" />;
+                default: return <rect x="70" y="2" width="20" height={h} fill={color} />;
+            }
+        };
+
+        const LevelRow = ({ level, placements, onZoneClick, tools, onPlacementClick, readOnly, showForces, heightScale, onDiscClick, cages }) => {
+            const getItems = (z) => placements.filter(p => p.levelId === level.id && p.zone === z);
+            const rowHeight = REGIONS[level.type].height * heightScale;
             const scaledWidth = 160 * heightScale;
 
-            // --- GHOST TARGET: CARDINAL FOR FORCES ---
+            // Check if Corpectomy
+            const isCorpectomy = placements.some(p => p.levelId === level.id && p.tool === 'Corpectomy'); // Use uppercase C to match ID in modal logic if needed, but actually standard osteo types
+
+            // Check for Cage below this level
+            const cageBelow = cages.find(c => c.levelId === level.id);
+
             const GhostTarget = ({ type }) => {
                 if (type === 'force') return <div className="flex items-center justify-center h-full w-full"><IconCardinal /></div>;
                 return (<div className="w-6 h-6 rounded-full border-2 border-slate-300 border-dashed flex items-center justify-center opacity-40 hover:opacity-100 hover:border-amber-400 hover:bg-amber-50 transition-all"><div className="w-1 h-1 bg-slate-300 rounded-full"></div></div>);
@@ -453,46 +496,50 @@
             };
 
             return (
-                <div className="flex w-full relative" style={{ height: `${scaledHeight}px` }}>
-                    <div className="absolute bottom-0 left-0 right-0 border-b border-slate-100 w-full z-0 pointer-events-none"></div>
-                    
-                    {/* VISUAL TINT FOR FORCE COLUMNS (CONDITIONAL) */}
-                    {showForces && (
-                        <div className={`w-10 border-r border-slate-100/50 bg-emerald-50/20 ${!readOnly ? 'hover:bg-emerald-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'force_left')}><ZoneContent zone="force_left" align="center"/></div>
-                    )}
-
-                    <div className={`flex-1 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><ZoneContent zone="left" align="left"/></div>
-                    
-                    {/* CENTRAL COLUMN - SCALES ISOTROPICALLY NOW */}
-                    <div style={{ width: `${scaledWidth}px` }} className={`relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}>
-                        {/* We pass the BASE height to the SVG to preserve the coordinate system, but the container scales it up/down */}
-                        <SpineVertebra label={level.id} type={level.type} height={baseHeight} />
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">{getItems('mid').map(p => { const tool = tools.find(t => t.id === p.tool); let displayLabel = ''; let angle = ''; if (p.tool === 'osteotomy' && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } return (<div key={p.id} className="pointer-events-auto relative group" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><InstrumentIcon type={tool?.icon} className={`${p.tool==='connector'?'w-24 h-6':'w-10 h-10'} drop-shadow-md text-slate-900`} />{p.tool === 'osteotomy' && p.data && (<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 text-[18px] px-1 rounded shadow-sm whitespace-nowrap z-20">{displayLabel} {angle}°</div>)}</div>); })}</div>
+                <div className="flex flex-col w-full relative">
+                    <div className="flex w-full relative" style={{ height: `${rowHeight}px` }}>
+                        <div className="absolute bottom-0 left-0 right-0 border-b border-slate-100 w-full z-0 pointer-events-none"></div>
+                        {showForces && <div className={`w-10 border-r border-slate-100/50 bg-emerald-50/20 ${!readOnly ? 'hover:bg-emerald-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'force_left')}><ZoneContent zone="force_left" align="center"/></div>}
+                        <div className={`flex-1 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><ZoneContent zone="left" align="left"/></div>
+                        
+                        <div style={{ width: `${scaledWidth}px` }} className={`relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}>
+                            <SpineVertebra label={level.id} type={level.type} height={REGIONS[level.type].height} isCorpectomy={isCorpectomy} />
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">{getItems('mid').map(p => { const tool = tools.find(t => t.id === p.tool); let displayLabel = ''; let angle = ''; if (p.tool === 'osteotomy' && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } return (<div key={p.id} className="pointer-events-auto relative group" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><InstrumentIcon type={tool?.icon} className={`${p.tool==='connector'?'w-24 h-6':'w-10 h-10'} drop-shadow-md text-slate-900`} />{p.tool === 'osteotomy' && p.data && (<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 text-[18px] px-1 rounded shadow-sm whitespace-nowrap z-20">{displayLabel} {angle}°</div>)}</div>); })}</div>
+                        </div>
+                        
+                        <div className={`flex-1 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'right')}><ZoneContent zone="right" align="right"/></div>
+                        {showForces && <div className={`w-10 border-l border-slate-100/50 bg-emerald-50/20 ${!readOnly ? 'hover:bg-emerald-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'force_right')}><ZoneContent zone="force_right" align="center"/></div>}
                     </div>
-                    
-                    <div className={`flex-1 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'right')}><ZoneContent zone="right" align="right"/></div>
-                    
-                    {showForces && (
-                        <div className={`w-10 border-l border-slate-100/50 bg-emerald-50/20 ${!readOnly ? 'hover:bg-emerald-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'force_right')}><ZoneContent zone="force_right" align="center"/></div>
+
+                    {/* INTERBODY DISC ZONE (Except after Pelvis) */}
+                    {level.type !== 'Pelvis' && (
+                        <div className="w-full flex justify-center relative -mt-1 z-0">
+                            <div className={`h-4 w-[160px] flex items-center justify-center cursor-pointer transition-all ${!readOnly ? 'hover:bg-sky-100/50' : ''}`} onClick={() => !readOnly && onDiscClick(level.id)}>
+                                {cageBelow ? (
+                                    <div className="relative group w-full h-full flex justify-center">
+                                        <svg viewBox="0 0 160 20" className="w-full h-full overflow-visible"><CageVisualization cageType={cageBelow.tool} heightScale={1} /></svg>
+                                        <span className="absolute left-full ml-2 text-[9px] bg-sky-100 text-sky-800 px-1 rounded whitespace-nowrap top-0">{cageBelow.tool.toUpperCase()} {cageBelow.data.height}mm {cageBelow.data.lordosis}°</span>
+                                    </div>
+                                ) : (
+                                    !readOnly && <div className="h-1 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>
+                                )}
+                            </div>
+                        </div>
                     )}
                 </div>
             );
         };
 
-        const ChartPaper = ({ title, placements, onZoneClick, onPlacementClick, tools, readOnly, levels, showForces, heightScale }) => (
+        const ChartPaper = ({ title, placements, onZoneClick, onPlacementClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick }) => (
             <div className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative"><div className="p-2 bg-slate-50 border-b border-slate-200 text-center font-bold text-sm text-slate-800 font-leeds uppercase tracking-wider">{title}</div><div className="flex-1 relative flex flex-col pt-8 px-2 justify-center">
-                
-                {/* CONDITIONAL HEADER */}
                 <div className="flex w-full absolute top-1 left-0 right-0 px-2 text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-center pointer-events-none z-10">
                     {showForces && <div className="w-10 text-emerald-600/50">Force</div>}
                     <div className="flex-1 text-right pr-4">Left</div>
-                    {/* Dynamic Spacer for scaled spine column */}
                     <div style={{ width: `${160 * heightScale}px` }}></div>
                     <div className="flex-1 text-left pl-4">Right</div>
                     {showForces && <div className="w-10 text-emerald-600/50">Force</div>}
                 </div>
-
-                <div className="flex flex-col w-full relative">{levels.map(lvl => <LevelRow key={lvl.id} level={lvl} placements={placements} onZoneClick={onZoneClick} onPlacementClick={onPlacementClick} tools={tools} readOnly={readOnly} showForces={showForces} heightScale={heightScale} />)}</div></div></div>
+                <div className="flex flex-col w-full relative">{levels.map(lvl => <LevelRow key={lvl.id} level={lvl} placements={placements} onZoneClick={onZoneClick} onPlacementClick={onPlacementClick} tools={tools} readOnly={readOnly} showForces={showForces} heightScale={heightScale} cages={cages} onDiscClick={onDiscClick} />)}</div></div></div>
         );
 
         // ==========================================
@@ -503,20 +550,30 @@
             const [activeChart, setActiveChart] = useState('planned'); 
             const [plannedPlacements, setPlannedPlacements] = useState([]);
             const [completedPlacements, setCompletedPlacements] = useState([]);
+            const [plannedCages, setPlannedCages] = useState([]); // NEW: State for cages
+            const [completedCages, setCompletedCages] = useState([]);
+            
             const [patientData, setPatientData] = useState({ name: '', id: '', surgeon: '', location: 'Leeds Teaching Hospitals NHS Trust', date: new Date().toISOString().split('T')[0] });
-            const [viewMode, setViewMode] = useState('thoracolumbar'); // 'thoracolumbar', 'cervical', 'whole'
+            const [viewMode, setViewMode] = useState('thoracolumbar'); 
             const [scale, setScale] = useState(1);
             const [incognitoMode, setIncognitoMode] = useState(false);
             const [isEditingDate, setIsEditingDate] = useState(false);
             const [hasLoaded, setHasLoaded] = useState(false);
+            
+            // MODALS
             const [screwModalOpen, setScrewModalOpen] = useState(false);
             const [osteoModalOpen, setOsteoModalOpen] = useState(false);
+            const [cageModalOpen, setCageModalOpen] = useState(false); // NEW
             const [helpModalOpen, setHelpModalOpen] = useState(false);
             const [changeLogOpen, setChangeLogOpen] = useState(false);
+            
+            // EDITING STATE
             const [pendingPlacement, setPendingPlacement] = useState(null);
             const [editingPlacementId, setEditingPlacementId] = useState(null);
             const [editingData, setEditingData] = useState(null);
             const [editingTool, setEditingTool] = useState(null);
+            const [editingCageLevel, setEditingCageLevel] = useState(null); // NEW
+
             const [defaultDiameter, setDefaultDiameter] = useState('6.5');
             const [defaultLength, setDefaultLength] = useState('45');
             const [defaultOsteoType, setDefaultOsteoType] = useState('PSO');
@@ -528,28 +585,9 @@
 
             const levels = useMemo(() => {
                 const lvls = [];
-                // ADD OCCIPUT & CERVICAL
-                if (viewMode === 'cervical' || viewMode === 'whole') {
-                    lvls.push({ id: 'Occiput', type: 'Occiput' });
-                    ['C1','C2','C3','C4','C5','C6','C7'].forEach(l => lvls.push({ id:l, type:'C' }));
-                }
-
-                // ADD THORACIC
-                if (viewMode === 'cervical') {
-                    // Only upper thoracic for Cervical view
-                    ['T1','T2','T3','T4'].forEach(l => lvls.push({ id:l, type:'T' }));
-                } else {
-                    // All Thoracic for others
-                    ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'].forEach(l => lvls.push({ id:l, type:'T' }));
-                }
-
-                // ADD LUMBAR/PELVIS
-                if (viewMode !== 'cervical') {
-                    ['L1','L2','L3','L4','L5'].forEach(l => lvls.push({ id:l, type:'L' }));
-                    lvls.push({ id:'S1', type:'S' });
-                    lvls.push({ id:'Pelvis', type:'Pelvis' });
-                }
-                
+                if (viewMode === 'cervical' || viewMode === 'whole') { lvls.push({ id: 'Occiput', type: 'Occiput' }); ['C1','C2','C3','C4','C5','C6','C7'].forEach(l => lvls.push({ id:l, type:'C' })); }
+                if (viewMode === 'cervical') { ['T1','T2','T3','T4'].forEach(l => lvls.push({ id:l, type:'T' })); } else { ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'].forEach(l => lvls.push({ id:l, type:'T' })); }
+                if (viewMode !== 'cervical') { ['L1','L2','L3','L4','L5'].forEach(l => lvls.push({ id:l, type:'L' })); lvls.push({ id:'S1', type:'S' }); lvls.push({ id:'Pelvis', type:'Pelvis' }); }
                 return lvls;
             }, [viewMode]);
 
@@ -560,9 +598,10 @@
                     try { 
                         const parsed = JSON.parse(saved); 
                         if (parsed.planned) setPlannedPlacements(parsed.planned); 
-                        if (parsed.completed) setCompletedPlacements(parsed.completed); 
+                        if (parsed.completed) setCompletedPlacements(parsed.completed);
+                        if (parsed.plannedCages) setPlannedCages(parsed.plannedCages); // NEW
+                        if (parsed.completedCages) setCompletedCages(parsed.completedCages); // NEW
                         if (parsed.patient) setPatientData(parsed.patient); 
-                        // Migration logic for old "Show Cervical" boolean
                         if (parsed.viewMode) { setViewMode(parsed.viewMode); }
                         else if (parsed.showCervical === true) { setViewMode('whole'); }
                     } catch (e) { console.error("Data load error"); }
@@ -572,9 +611,9 @@
 
             // AUTO-SAVE
             useEffect(() => {
-                if (hasLoaded && !incognitoMode) { localStorage.setItem('leeds_spine_planner_data_v28', JSON.stringify({ planned: plannedPlacements, completed: completedPlacements, patient: patientData, viewMode })); }
+                if (hasLoaded && !incognitoMode) { localStorage.setItem('leeds_spine_planner_data_v28', JSON.stringify({ planned: plannedPlacements, completed: completedPlacements, plannedCages, completedCages, patient: patientData, viewMode })); }
                 if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28');
-            }, [plannedPlacements, completedPlacements, patientData, viewMode, hasLoaded, incognitoMode]);
+            }, [plannedPlacements, completedPlacements, plannedCages, completedCages, patientData, viewMode, hasLoaded, incognitoMode]);
 
             // RESIZE OBSERVER
             useEffect(() => {
@@ -594,7 +633,7 @@
             const tools = [
                 { category: 'Screws', items: [ { id: 'monoaxial', label: 'Monoaxial', icon: 'monoaxial', needsSize: true, type: 'implant' }, { id: 'polyaxial', label: 'Polyaxial', icon: 'polyaxial', needsSize: true, type: 'implant' }, { id: 'uniplanar', label: 'Uniplanar', icon: 'uniplanar', needsSize: true, type: 'implant' }, ]},
                 { category: 'Hooks', items: [ { id: 'pedicle_hook', label: 'Pedicle', icon: 'pedicle_hook', type: 'implant' }, { id: 'tp_hook', label: 'TP Hook', icon: 'tp_hook', type: 'implant' }, { id: 'sl_hook', label: 'Supra-laminar', icon: 'sl_hook', type: 'implant' }, { id: 'il_hook', label: 'Infra-laminar', icon: 'il_hook', type: 'implant' }, ]},
-                { category: 'Midline', items: [ { id: 'connector', label: 'Crosslink', icon: 'connector', type: 'mid' }, { id: 'unstable', label: 'Unstable', icon: 'unstable', type: 'mid' }, { id: 'osteotomy', label: 'Osteotomy', icon: 'osteotomy', isOsteotomy: true, type: 'mid' }, ]},
+                { category: 'Removal/Mid', items: [ { id: 'connector', label: 'Crosslink', icon: 'connector', type: 'mid' }, { id: 'unstable', label: 'Unstable', icon: 'unstable', type: 'mid' }, { id: 'osteotomy', label: 'Osteotomy', icon: 'osteotomy', isOsteotomy: true, type: 'mid' }, { id: 'Corpectomy', label: 'Corpectomy', icon: 'cage', isOsteotomy: true, type: 'mid' } ]}, // Added Corpectomy
                 { category: 'Forces', items: [ 
                     { id: 'translate_left', label: 'Trans Left', icon: 'translate_left', type: 'force' },
                     { id: 'translate_right', label: 'Trans Right', icon: 'translate_right', type: 'force' },
@@ -602,24 +641,30 @@
                     { id: 'distraction', label: 'Distract', icon: 'distraction', type: 'force' },
                     { id: 'derotate_cw', label: 'Derotate', icon: 'derotate_cw', type: 'force' },
                     { id: 'derotate_ccw', label: 'Derotate', icon: 'derotate_ccw', type: 'force' },
-                ]}
+                ]},
+                { category: 'Interbody', items: [ { id: 'cage_plif', label: 'Cages', icon: 'plif', type: 'force' } ]} // Just visual label, actual logic in Disc Click
             ];
             const allTools = tools.flatMap(g => g.items);
 
+            // LOGIC HANDLERS
             const handleZoneClick = (levelId, zone) => {
                 const tool = allTools.find(t => t.id === selectedTool);
                 if (tool.type === 'implant' && zone.startsWith('force')) return alert("Implants cannot be placed in force columns.");
-                if (tool.type === 'force' && !zone.startsWith('force')) return alert("Forces must be placed in outer columns.");
+                if (tool.type === 'force' && !zone.startsWith('force') && tool.id !== 'cage_plif') return alert("Forces must be placed in outer columns.");
                 if (tool.type === 'implant' && zone === 'mid') return;
                 if (tool.type === 'mid' && zone !== 'mid') return;
-                if (tool.type === 'implant' && (zone === 'left' || zone === 'right')) {
-                    const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
-                    const existing = currentPlacements.find(p => p.levelId === levelId && p.zone === zone);
-                    if (existing) { return alert("Only one implant allowed per side. Please remove the existing one first."); }
-                }
+                
                 if (tool.needsSize) { setPendingPlacement({ levelId, zone, tool: selectedTool }); setEditingPlacementId(null); setEditingData(undefined); setEditingTool(selectedTool); setScrewModalOpen(true); } 
                 else if (tool.isOsteotomy) { setPendingPlacement({ levelId, zone, tool: selectedTool }); setEditingPlacementId(null); setEditingData(undefined); setOsteoModalOpen(true); } 
                 else { addPlacement(levelId, zone, selectedTool, null); }
+            };
+
+            const handleDiscClick = (levelId) => {
+                const currentCages = activeChart === 'planned' ? plannedCages : completedCages;
+                const existing = currentCages.find(c => c.levelId === levelId);
+                setEditingCageLevel(levelId);
+                setEditingData(existing);
+                setCageModalOpen(true);
             };
 
             const handlePlacementClick = (p) => {
@@ -641,11 +686,26 @@
                 else if (pendingPlacement) { addPlacement(pendingPlacement.levelId, pendingPlacement.zone, 'osteotomy', data); setPendingPlacement(null); }
             };
 
+            const handleCageConfirm = (data) => {
+                const newCage = { levelId: editingCageLevel, tool: data.type, data: { height: data.height, lordosis: data.lordosis } };
+                const setter = activeChart === 'planned' ? setPlannedCages : setCompletedCages;
+                setter(prev => {
+                    const filtered = prev.filter(c => c.levelId !== editingCageLevel);
+                    return [...filtered, newCage];
+                });
+            };
+
+            const handleDeleteCage = () => {
+                const setter = activeChart === 'planned' ? setPlannedCages : setCompletedCages;
+                setter(prev => prev.filter(c => c.levelId !== editingCageLevel));
+                setCageModalOpen(false);
+            };
+
             const addPlacement = (levelId, zone, tool, data) => { const newP = { id: Date.now(), levelId, zone, tool, data }; const setter = activeChart === 'planned' ? setPlannedPlacements : setCompletedPlacements; setter(prev => [...prev, newP]); };
             const updatePlacement = (id, tool, data) => { const updater = (prev) => prev.map(p => p.id === id ? { ...p, tool, data } : p); if (activeChart === 'planned') setPlannedPlacements(updater); else setCompletedPlacements(updater); };
             const removePlacement = (id) => { const filter = prev => prev.filter(p => p.id !== id); if (activeChart === 'planned') setPlannedPlacements(filter); else setCompletedPlacements(filter); setScrewModalOpen(false); setOsteoModalOpen(false); };
 
-            // EXPORT FUNCTIONS
+            // EXPORT FUNCTIONS (Redacted for brevity - standard html2canvas)
             const prepareExportCanvas = async () => {
                 const element = exportRef.current;
                 const cloneContainer = document.createElement('div');
@@ -658,105 +718,54 @@
                 document.body.removeChild(cloneContainer);
                 return canvas;
             };
-
-            const runExportJPG = async () => {
-                const canvas = await prepareExportCanvas();
-                const link = document.createElement('a'); link.download = `SpinePlan_${patientData.name || 'Patient'}.jpg`; link.href = canvas.toDataURL('image/jpeg', 0.9); link.click();
-                if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28');
-            };
-
-            const runExportPDF = async () => {
-                const canvas = await prepareExportCanvas();
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1485, 1050] });
-                pdf.addImage(imgData, 'JPEG', 0, 0, 1485, 1050);
-                pdf.save(`SpinePlan_${patientData.name || 'Patient'}.pdf`);
-                if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28');
-            };
-
-            const saveProjectJSON = () => {
-                const data = { version: "0.5.1", patient: patientData, planned: plannedPlacements, completed: completedPlacements, viewMode, timestamp: new Date().toISOString() };
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-                const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `SpineProject_${patientData.name || 'Unnamed'}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link);
-                if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28');
-            };
-
-            const loadProjectJSON = (e) => {
-                const file = e.target.files[0]; if(!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    try { 
-                        const json = JSON.parse(ev.target.result); 
-                        if(json.patient) setPatientData(json.patient); 
-                        if(json.planned) setPlannedPlacements(json.planned); 
-                        if(json.completed) setCompletedPlacements(json.completed); 
-                        if(json.viewMode) setViewMode(json.viewMode);
-                        else if(json.showCervical) setViewMode('whole');
-                        alert("Project Loaded Successfully."); 
-                    } catch(err) { alert("Invalid File"); }
-                };
-                reader.readAsText(file); e.target.value = null;
-            };
+            const runExportJPG = async () => { const canvas = await prepareExportCanvas(); const link = document.createElement('a'); link.download = `SpinePlan_${patientData.name || 'Patient'}.jpg`; link.href = canvas.toDataURL('image/jpeg', 0.9); link.click(); if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28'); };
+            const runExportPDF = async () => { const canvas = await prepareExportCanvas(); const imgData = canvas.toDataURL('image/jpeg', 1.0); const { jsPDF } = window.jspdf; const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1485, 1050] }); pdf.addImage(imgData, 'JPEG', 0, 0, 1485, 1050); pdf.save(`SpinePlan_${patientData.name || 'Patient'}.pdf`); if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28'); };
+            const saveProjectJSON = () => { const data = { version: "0.6.0", patient: patientData, planned: plannedPlacements, completed: completedPlacements, plannedCages, completedCages, viewMode, timestamp: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `SpineProject_${patientData.name || 'Unnamed'}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28'); };
+            const loadProjectJSON = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (ev) => { try { const json = JSON.parse(ev.target.result); if(json.patient) setPatientData(json.patient); if(json.planned) setPlannedPlacements(json.planned); if(json.completed) setCompletedPlacements(json.completed); if(json.plannedCages) setPlannedCages(json.plannedCages); if(json.completedCages) setCompletedCages(json.completedCages); if(json.viewMode) setViewMode(json.viewMode); else if(json.showCervical) setViewMode('whole'); alert("Project Loaded Successfully."); } catch(err) { alert("Invalid File"); } }; reader.readAsText(file); e.target.value = null; };
 
             const copyPlanToCompleted = () => {
                 if (plannedPlacements.length === 0) return alert("No Pre-Op plan to copy.");
                 if (completedPlacements.length > 0 && !confirm("Overwrite existing Post-Op construct?")) return;
-                const copied = plannedPlacements.map((p,i) => ({...p, id: Date.now()+i}));
-                setCompletedPlacements(copied);
+                setCompletedPlacements(plannedPlacements.map((p,i) => ({...p, id: Date.now()+i})));
+                setCompletedCages(plannedCages.map((c) => ({...c})));
                 setActiveChart('completed');
             };
 
-            const getViewScale = () => {
-                if (viewMode === 'whole') return 0.85; // 15% reduction
-                if (viewMode === 'cervical') return 1.75; // 75% magnification
-                return 1.0;
-            };
+            const getViewScale = () => { if (viewMode === 'whole') return 0.85; if (viewMode === 'cervical') return 1.75; return 1.0; };
 
             return (
                 <div className="h-full flex flex-col overflow-hidden">
                     <ScrewModal isOpen={screwModalOpen} onClose={() => setScrewModalOpen(false)} onConfirm={handleScrewConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} initialTool={editingTool} defaultDiameter={defaultDiameter} defaultLength={defaultLength} />
                     <OsteotomyModal isOpen={osteoModalOpen} onClose={() => setOsteoModalOpen(false)} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} />
+                    <CageModal isOpen={cageModalOpen} onClose={() => setCageModalOpen(false)} onConfirm={handleCageConfirm} onDelete={handleDeleteCage} initialData={editingData} />
                     <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
                     <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
 
                     <header className="bg-slate-900 text-white p-2 flex justify-between items-center shadow-md z-30 shrink-0 no-print h-14">
                         <div className="flex items-center gap-4">
-                            <div className="flex flex-col leading-none">
-                                <h1 className="font-bold text-lg px-2">Leeds Spinal Planner</h1>
-                                <button onClick={() => setChangeLogOpen(true)} className="text-[10px] text-slate-400 font-mono hover:text-white text-left px-2">{CURRENT_VERSION}</button>
-                            </div>
+                            <div className="flex flex-col leading-none"><h1 className="font-bold text-lg px-2">Leeds Spinal Planner</h1><button onClick={() => setChangeLogOpen(true)} className="text-[10px] text-slate-400 font-mono hover:text-white text-left px-2">{CURRENT_VERSION}</button></div>
                             <div className="flex bg-slate-800 rounded p-1 text-sm border border-slate-700">
-                                <button onClick={() => setActiveChart('planned')} className={`px-4 py-1 rounded transition-all ${activeChart==='planned'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400 hover:text-white'}`} title="View Pre-Operative Plan">Pre-Op</button>
-                                <button onClick={() => setActiveChart('completed')} className={`px-4 py-1 rounded transition-all ${activeChart==='completed'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400 hover:text-white'}`} title="View Post-Operative Construct">Post-Op</button>
+                                <button onClick={() => setActiveChart('planned')} className={`px-4 py-1 rounded transition-all ${activeChart==='planned'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400 hover:text-white'}`}>Pre-Op</button>
+                                <button onClick={() => setActiveChart('completed')} className={`px-4 py-1 rounded transition-all ${activeChart==='completed'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400 hover:text-white'}`}>Post-Op</button>
                             </div>
-                            <button onClick={copyPlanToCompleted} className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded text-xs font-bold border border-slate-600 transition-colors" title="Copy all Pre-Op screws to Post-Op view"><IconCopy /> Copy Plan</button>
+                            <button onClick={copyPlanToCompleted} className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded text-xs font-bold border border-slate-600 transition-colors"><IconCopy /> Copy Plan</button>
                         </div>
                         <div className="flex gap-4 items-center">
-                            <button onClick={() => setHelpModalOpen(true)} className="text-slate-400 hover:text-white flex items-center justify-center transition-colors" title="Help Guide"><IconHelp /></button>
+                            <button onClick={() => setHelpModalOpen(true)} className="text-slate-400 hover:text-white"><IconHelp /></button>
                             <div className="h-8 w-px bg-slate-700 mx-1"></div>
-                            
-                            <div className={`flex items-center gap-2 px-3 py-1 rounded border transition-colors ${incognitoMode ? 'bg-red-900/30 border-red-500/50' : 'bg-transparent border-transparent'}`} title="Enable to prevent saving data to this computer (for shared/public computers)">
-                                <div className="relative inline-block w-8 h-4 align-middle select-none transition duration-200 ease-in">
-                                    <input type="checkbox" name="toggle" id="incognito-toggle" className="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300" style={{ top: 0, left: 0 }} checked={incognitoMode} onChange={(e) => setIncognitoMode(e.target.checked)}/>
-                                    <label htmlFor="incognito-toggle" className={`toggle-label block overflow-hidden h-4 rounded-full cursor-pointer border ${incognitoMode ? 'bg-red-600 border-red-600' : 'bg-slate-600 border-slate-600'}`}></label>
-                                </div>
-                                <div className="flex flex-col leading-none">
-                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${incognitoMode ? 'text-red-400' : 'text-slate-500'}`}>Session Mode</span>
-                                </div>
+                            <div className={`flex items-center gap-2 px-3 py-1 rounded border transition-colors ${incognitoMode ? 'bg-red-900/30 border-red-500/50' : 'bg-transparent border-transparent'}`}>
+                                <div className="relative inline-block w-8 h-4 align-middle select-none"><input type="checkbox" className="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300" style={{ top: 0, left: 0 }} checked={incognitoMode} onChange={(e) => setIncognitoMode(e.target.checked)}/><label className={`toggle-label block overflow-hidden h-4 rounded-full cursor-pointer border ${incognitoMode ? 'bg-red-600 border-red-600' : 'bg-slate-600 border-slate-600'}`}></label></div>
+                                <span className={`text-[10px] font-bold uppercase tracking-wider ${incognitoMode ? 'text-red-400' : 'text-slate-500'}`}>Session Mode</span>
                             </div>
                             <div className="h-8 w-px bg-slate-700 mx-1"></div>
-                            
                             <input type="file" ref={fileInputRef} onChange={loadProjectJSON} className="hidden" accept=".json" />
-                            <button onClick={() => fileInputRef.current.click()} className="text-slate-300 hover:text-white px-2 py-1.5 rounded flex gap-2 items-center text-xs font-bold transition-colors" title="Load saved .json project"><IconUpload /> Load</button>
-                            <button onClick={saveProjectJSON} className="text-slate-300 hover:text-white px-2 py-1.5 rounded flex gap-2 items-center text-xs font-bold transition-colors" title="Save editable .json project"><IconSave /> Save</button>
-                            
+                            <button onClick={() => fileInputRef.current.click()} className="text-slate-300 hover:text-white px-2 py-1.5 rounded flex gap-2 items-center text-xs font-bold transition-colors"><IconUpload /> Load</button>
+                            <button onClick={saveProjectJSON} className="text-slate-300 hover:text-white px-2 py-1.5 rounded flex gap-2 items-center text-xs font-bold transition-colors"><IconSave /> Save</button>
                             <div className="flex bg-white rounded overflow-hidden">
-                                <button onClick={runExportJPG} className="text-slate-900 px-3 py-1.5 hover:bg-slate-200 text-sm border-r border-slate-200 flex items-center gap-1" title="Download Image (JPG)"><IconDownload /> JPG</button>
-                                <button onClick={runExportPDF} className="text-slate-900 px-3 py-1.5 hover:bg-slate-200 text-sm flex items-center gap-1" title="Download PDF Document"><IconPDF /> PDF</button>
+                                <button onClick={runExportJPG} className="text-slate-900 px-3 py-1.5 hover:bg-slate-200 text-sm border-r border-slate-200 flex items-center gap-1"><IconDownload /> JPG</button>
+                                <button onClick={runExportPDF} className="text-slate-900 px-3 py-1.5 hover:bg-slate-200 text-sm flex items-center gap-1"><IconPDF /> PDF</button>
                             </div>
-
-                            <button onClick={() => { if(confirm("Start New Patient? This will clear the current plan.")) { setPlannedPlacements([]); setCompletedPlacements([]); setPatientData({ name: '', id: '', surgeon: '', location: 'Leeds Teaching Hospitals NHS Trust', date: new Date().toISOString().split('T')[0] }); setActiveChart('planned'); } }} className="ml-2 text-red-400 hover:text-red-200 p-2" title="Clear All / New Patient"><IconTrash /></button>
+                            <button onClick={() => { if(confirm("Start New Patient? This will clear the current plan.")) { setPlannedPlacements([]); setCompletedPlacements([]); setPlannedCages([]); setCompletedCages([]); setPatientData({ name: '', id: '', surgeon: '', location: 'Leeds Teaching Hospitals NHS Trust', date: new Date().toISOString().split('T')[0] }); setActiveChart('planned'); } }} className="ml-2 text-red-400 hover:text-red-200 p-2"><IconTrash /></button>
                         </div>
                     </header>
 
@@ -765,15 +774,9 @@
                             <div className="p-4 border-b border-slate-700 bg-slate-900">
                                 <h3 className="text-[10px] uppercase font-bold text-slate-500 mb-2 tracking-widest">Region View</h3>
                                 <div className="space-y-2">
-                                    <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-300 hover:text-white">
-                                        <input type="radio" name="viewMode" checked={viewMode === 'thoracolumbar'} onChange={() => setViewMode('thoracolumbar')} className="text-amber-500 focus:ring-amber-500"/> Thoracolumbar (T1-Pelvis)
-                                    </label>
-                                    <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-300 hover:text-white">
-                                        <input type="radio" name="viewMode" checked={viewMode === 'cervical'} onChange={() => setViewMode('cervical')} className="text-amber-500 focus:ring-amber-500"/> Cervical (Occiput-T4)
-                                    </label>
-                                    <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-300 hover:text-white">
-                                        <input type="radio" name="viewMode" checked={viewMode === 'whole'} onChange={() => setViewMode('whole')} className="text-amber-500 focus:ring-amber-500"/> Whole Spine (Occ-Pelvis)
-                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-300 hover:text-white"><input type="radio" name="viewMode" checked={viewMode === 'thoracolumbar'} onChange={() => setViewMode('thoracolumbar')} className="text-amber-500 focus:ring-amber-500"/> Thoracolumbar (T1-Pelvis)</label>
+                                    <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-300 hover:text-white"><input type="radio" name="viewMode" checked={viewMode === 'cervical'} onChange={() => setViewMode('cervical')} className="text-amber-500 focus:ring-amber-500"/> Cervical (Occiput-T4)</label>
+                                    <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-300 hover:text-white"><input type="radio" name="viewMode" checked={viewMode === 'whole'} onChange={() => setViewMode('whole')} className="text-amber-500 focus:ring-amber-500"/> Whole Spine (Occ-Pelvis)</label>
                                 </div>
                             </div>
                             <div className="p-4 space-y-6">
@@ -786,23 +789,19 @@
                                 <div id="export-container" ref={exportRef}>
                                     <div className="w-[300px] bg-white border-r border-slate-300 flex flex-col p-8">
                                         <h2 className="font-leeds font-bold text-3xl text-slate-900 mb-4 border-b-4 border-slate-900 pb-2">Spinal Surgery</h2>
-                                        
-                                        {/* COMPACTED DEMOGRAPHICS & SCROLLABLE INVENTORY CONTAINER (V32: Increased Spacing) */}
                                         <div className="flex-1 flex flex-col overflow-y-auto min-h-0">
                                             <div className="space-y-3 text-sm shrink-0">
                                                 <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Patient Name</label><div className="editable-field w-full text-base font-serif" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, name: e.target.innerText})} placeholder="Click to enter...">{patientData.name}</div></div>
                                                 <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Patient ID</label><div className="editable-field w-full text-base font-mono" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, id: e.target.innerText})} placeholder="Click to enter...">{patientData.id}</div></div>
                                                 <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Surgeon</label><div className="editable-field w-full text-base" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, surgeon: e.target.innerText})} placeholder="Click to enter...">{patientData.surgeon}</div></div>
-                                                <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Clinic Location</label><div className="editable-field w-full text-base" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, location: e.target.innerText})} placeholder="Click to enter...">{patientData.location}</div></div>
                                                 <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Date</label><div className="editable-field w-full text-base cursor-pointer" onClick={() => setIsEditingDate(true)}>{isEditingDate ? <input type="date" className="w-full text-sm border-b border-slate-800 bg-transparent outline-none py-0" value={patientData.date} autoFocus onBlur={()=>setIsEditingDate(false)} onChange={e=>setPatientData({...patientData, date:e.target.value})} /> : formatDate(patientData.date)}</div></div>
                                             </div>
-                                            <ImplantInventory placements={activeChart === 'planned' ? plannedPlacements : completedPlacements} tools={allTools} title={activeChart === 'planned' ? 'Plan' : 'Construct'} visibleLevelIds={levels.map(l => l.id)} />
-                                            
+                                            <ImplantInventory placements={[...(activeChart === 'planned' ? plannedPlacements : completedPlacements), ...(activeChart === 'planned' ? plannedCages : completedCages).map(c => ({...c, tool: c.tool}))]} tools={[...allTools, {id: 'tlif', label: 'TLIF Cage'}, {id: 'plif', label: 'PLIF Cage'}, {id: 'acdf', label: 'ACDF Cage'}, {id: 'xlif', label: 'XLIF Cage'}, {id: 'alif', label: 'ALIF Cage'}]} title={activeChart === 'planned' ? 'Plan' : 'Construct'} visibleLevelIds={levels.map(l => l.id)} />
                                         </div>
                                         <CreditsFooter />
                                     </div>
-                                    <ChartPaper title="Pre-Operative Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={getViewScale()} />
-                                    <ChartPaper title="Surgical Construct" placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} heightScale={getViewScale()} />
+                                    <ChartPaper title="Pre-Operative Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={getViewScale()} cages={plannedCages} onDiscClick={handleDiscClick} />
+                                    <ChartPaper title="Surgical Construct" placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} heightScale={getViewScale()} cages={completedCages} onDiscClick={handleDiscClick} />
                                 </div>
                             </div>
                         </div>
