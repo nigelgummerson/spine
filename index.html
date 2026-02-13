@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spinal Surgical Planner V31 - Leeds Teaching Hospitals</title>
+    <title>Spinal Surgical Planner V32 - Leeds Teaching Hospitals</title>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -39,10 +39,10 @@
             min-width: 100px;
             display: inline-block;
             color: #334155;
-            padding: 0 0;
+            padding: 2px 0; /* V32: Restored slight padding for breathing room */
             outline: none;
             cursor: text;
-            line-height: 1.2;
+            line-height: 1.4; /* V32: Increased line height slightly */
         }
         .editable-field:focus {
             border-bottom: 1px solid #0f172a;
@@ -91,7 +91,6 @@
         // SECTION 0: DATA DEFINITIONS
         // ==========================================
         
-        // 1. SCREW SIZES
         const DIAMETER_OPTIONS = [];
         for (let i = 3.5; i <= 10.5; i += 0.5) DIAMETER_OPTIONS.push(i.toFixed(1));
 
@@ -99,7 +98,6 @@
         for (let i = 10; i <= 35; i++) LENGTH_OPTIONS.push(i);
         for (let i = 40; i <= 100; i += 5) LENGTH_OPTIONS.push(i);
 
-        // 2. OSTEOTOMY DEFINITIONS
         const OSTEOTOMY_TYPES = [
             { id: 'Facet', label: 'Facet Joint release', shortLabel: 'Facet', schwab: 'Schwab Grade 1', desc: 'Inferior facet resection; joint capsule removal.', defaultAngle: '5' },
             { id: 'Ponte', label: 'Ponte / Smith Petersen', shortLabel: 'Ponte', schwab: 'Schwab Grade 2', desc: 'Complete facetectomy; ligamentum flavum + lamina.', defaultAngle: '10' },
@@ -140,7 +138,7 @@
             <div className="mt-auto pt-4 border-t border-slate-200 shrink-0">
                 <div className="flex flex-col gap-2">
                     <p className="text-[10px] text-slate-500 leading-tight">
-                        <span className="font-bold text-slate-800 block mb-1 text-[11px]">Leeds Spinal Surgery Planner V31</span>
+                        <span className="font-bold text-slate-800 block mb-1 text-[11px]">Leeds Spinal Surgery Planner V32</span>
                         Developed by:<br/>
                         <span className="font-bold text-slate-700">Nigel Gummerson FRCS (Tr & Orth)</span><br/>
                         and <span className="font-bold text-slate-700">Google Gemini</span>,<br/>
@@ -154,7 +152,7 @@
             </div>
         );
 
-        // --- IMPLANT INVENTORY TABLE ---
+        // --- IMPLANT INVENTORY TABLE (V32: Increased Padding) ---
         const ImplantInventory = ({ placements, tools, title }) => {
             const inventory = useMemo(() => {
                 const counts = {};
@@ -176,16 +174,22 @@
             if (Object.keys(inventory).length === 0) return null;
 
             return (
-                <div className="mt-4 border-t border-slate-200 pt-2 shrink-0">
-                    <h3 className="text-[10px] font-bold text-slate-900 uppercase tracking-widest mb-2 border-b border-slate-100 pb-1">{title} Inventory</h3>
+                <div className="mt-6 border-t border-slate-200 pt-3 shrink-0">
+                    <h3 className="text-[10px] font-bold text-slate-900 uppercase tracking-widest mb-3 border-b border-slate-100 pb-1">{title} Inventory</h3>
                     <div className="overflow-hidden rounded border border-slate-200">
                         <table className="w-full text-[9px]">
                             <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
-                                <tr><th className="text-left px-2 py-0.5">Item / Correction</th><th className="text-right px-2 py-0.5 w-8">Qty</th></tr>
+                                <tr>
+                                    <th className="text-left px-2 py-1.5">Item / Correction</th>
+                                    <th className="text-right px-2 py-1.5 w-8">Qty</th>
+                                </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {Object.entries(inventory).sort().map(([name, count]) => (
-                                    <tr key={name} className="even:bg-slate-50/50"><td className="px-2 py-0.5 text-slate-700 font-medium">{name}</td><td className="px-2 py-0.5 text-right font-bold text-slate-900">{count}</td></tr>
+                                    <tr key={name} className="even:bg-slate-50/50">
+                                        <td className="px-2 py-1 text-slate-700 font-medium">{name}</td>
+                                        <td className="px-2 py-1 text-right font-bold text-slate-900">{count}</td>
+                                    </tr>
                                 ))}
                             </tbody>
                         </table>
@@ -265,7 +269,7 @@
             );
         };
 
-        // --- NEW: HELP MODAL ---
+        // --- HELP MODAL ---
         const HelpModal = ({ isOpen, onClose }) => {
             if (!isOpen) return null;
             return (
@@ -483,7 +487,7 @@
             };
 
             const saveProjectJSON = () => {
-                const data = { version: 31, patient: patientData, planned: plannedPlacements, completed: completedPlacements, showCervical, timestamp: new Date().toISOString() };
+                const data = { version: 32, patient: patientData, planned: plannedPlacements, completed: completedPlacements, showCervical, timestamp: new Date().toISOString() };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
                 const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `SpineProject_${patientData.name || 'Unnamed'}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link);
                 if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28');
@@ -514,7 +518,7 @@
 
                     <header className="bg-slate-900 text-white p-2 flex justify-between items-center shadow-md z-30 shrink-0 no-print h-14">
                         <div className="flex items-center gap-4">
-                            <h1 className="font-bold text-lg px-2">Leeds Spinal Planner V31</h1>
+                            <h1 className="font-bold text-lg px-2">Leeds Spinal Planner V32</h1>
                             <div className="flex bg-slate-800 rounded p-1 text-sm border border-slate-700">
                                 <button onClick={() => setActiveChart('planned')} className={`px-4 py-1 rounded transition-all ${activeChart==='planned'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400 hover:text-white'}`} title="View Pre-Operative Plan">Pre-Op</button>
                                 <button onClick={() => setActiveChart('completed')} className={`px-4 py-1 rounded transition-all ${activeChart==='completed'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400 hover:text-white'}`} title="View Post-Operative Construct">Post-Op</button>
@@ -562,12 +566,14 @@
                                 <div id="export-container" ref={exportRef}>
                                     <div className="w-[300px] bg-white border-r border-slate-300 flex flex-col p-8">
                                         <h2 className="font-leeds font-bold text-3xl text-slate-900 mb-4 border-b-4 border-slate-900 pb-2">Spinal Surgery</h2>
+                                        
+                                        {/* COMPACTED DEMOGRAPHICS & SCROLLABLE INVENTORY CONTAINER (V32: Increased Spacing) */}
                                         <div className="flex-1 flex flex-col overflow-y-auto min-h-0">
-                                            <div className="space-y-2 text-sm shrink-0">
-                                                <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">Patient Name</label><div className="editable-field w-full text-base font-serif" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, name: e.target.innerText})} placeholder="Click to enter...">{patientData.name}</div></div>
-                                                <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">Patient ID</label><div className="editable-field w-full text-base font-mono" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, id: e.target.innerText})} placeholder="Click to enter...">{patientData.id}</div></div>
-                                                <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">Surgeon</label><div className="editable-field w-full text-base" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, surgeon: e.target.innerText})} placeholder="Click to enter...">{patientData.surgeon}</div></div>
-                                                <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">Date</label><div className="editable-field w-full text-base cursor-pointer" onClick={() => setIsEditingDate(true)}>{isEditingDate ? <input type="date" className="w-full text-sm border-b border-slate-800 bg-transparent outline-none py-0" value={patientData.date} autoFocus onBlur={()=>setIsEditingDate(false)} onChange={e=>setPatientData({...patientData, date:e.target.value})} /> : formatDate(patientData.date)}</div></div>
+                                            <div className="space-y-3 text-sm shrink-0">
+                                                <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Patient Name</label><div className="editable-field w-full text-base font-serif" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, name: e.target.innerText})} placeholder="Click to enter...">{patientData.name}</div></div>
+                                                <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Patient ID</label><div className="editable-field w-full text-base font-mono" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, id: e.target.innerText})} placeholder="Click to enter...">{patientData.id}</div></div>
+                                                <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Surgeon</label><div className="editable-field w-full text-base" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, surgeon: e.target.innerText})} placeholder="Click to enter...">{patientData.surgeon}</div></div>
+                                                <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Date</label><div className="editable-field w-full text-base cursor-pointer" onClick={() => setIsEditingDate(true)}>{isEditingDate ? <input type="date" className="w-full text-sm border-b border-slate-800 bg-transparent outline-none py-0" value={patientData.date} autoFocus onBlur={()=>setIsEditingDate(false)} onChange={e=>setPatientData({...patientData, date:e.target.value})} /> : formatDate(patientData.date)}</div></div>
                                             </div>
                                             <ImplantInventory placements={activeChart === 'planned' ? plannedPlacements : completedPlacements} tools={allTools} title={activeChart === 'planned' ? 'Plan' : 'Construct'} />
                                             <LeedsTrustLogo />
