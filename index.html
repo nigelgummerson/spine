@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spinal Surgical Planner V25 - Leeds Teaching Hospitals</title>
+    <title>Spinal Surgical Planner V28 - Leeds Teaching Hospitals</title>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -71,6 +71,11 @@
             background-color: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(2px);
         }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body class="text-slate-800">
@@ -81,10 +86,10 @@
         const { useState, useRef, useEffect, useLayoutEffect, useMemo } = React;
 
         // ==========================================
-        // SECTION 0: CONFIGURATION & DATA
+        // SECTION 0: DATA DEFINITIONS
         // ==========================================
         
-        // Screw Sizes
+        // 1. SCREW SIZES
         const DIAMETER_OPTIONS = [];
         for (let i = 3.5; i <= 10.5; i += 0.5) DIAMETER_OPTIONS.push(i.toFixed(1));
 
@@ -92,18 +97,60 @@
         for (let i = 10; i <= 35; i++) LENGTH_OPTIONS.push(i);
         for (let i = 40; i <= 100; i += 5) LENGTH_OPTIONS.push(i);
 
-        // Osteotomy Definitions (Derived from user CSV)
+        // 2. OSTEOTOMY DEFINITIONS (From corrected CSV)
         const OSTEOTOMY_TYPES = [
-            { id: 'SPO', label: 'Smith-Petersen (SPO)', schwab: 'Schwab Grade 1', desc: 'Partial facet joint resection', defaultAngle: '10' },
-            { id: 'Ponte', label: 'Ponte Osteotomy', schwab: 'Schwab Grade 2', desc: 'Complete facet joint resection', defaultAngle: '15' },
-            { id: 'PSO', label: 'Pedicle Subtraction (PSO)', schwab: 'Schwab Grade 3', desc: 'Pedicle and partial body resection', defaultAngle: '30' },
-            { id: 'Bdr-Wdg', label: 'Bone-Disc-Bone (BDB)', schwab: 'Schwab Grade 4', desc: 'Resection of disc and endplates', defaultAngle: '35' },
-            { id: 'VCR', label: 'Vertebral Column Resection', schwab: 'Schwab Grade 5', desc: 'Complete vertebra and discs', defaultAngle: '45' },
-            { id: 'VCR-Ext', label: 'VCR (Extended)', schwab: 'Schwab Grade 6', desc: 'Multiple vertebrae resection', defaultAngle: '50' }
+            { 
+                id: 'Facet', 
+                label: 'Facet Joint release', 
+                shortLabel: 'Facet',
+                schwab: 'Schwab Grade 1', 
+                desc: 'Inferior facet resection; joint capsule removal.', 
+                defaultAngle: '5' 
+            },
+            { 
+                id: 'Ponte', 
+                label: 'Ponte / Smith Petersen / Chevron', 
+                shortLabel: 'Ponte',
+                schwab: 'Schwab Grade 2', 
+                desc: 'Complete facetectomy (superior & inferior); ligamentum flavum + lamina.', 
+                defaultAngle: '10' 
+            },
+            { 
+                id: 'PSO', 
+                label: 'Standard PSO', 
+                shortLabel: 'PSO',
+                schwab: 'Schwab Grade 3', 
+                desc: 'Pedicle subtraction; partial body wedge; posterior element resection.', 
+                defaultAngle: '25' 
+            },
+            { 
+                id: 'ExtPSO', 
+                label: 'Extended PSO', 
+                shortLabel: 'Ext PSO',
+                schwab: 'Schwab Grade 4', 
+                desc: 'PSO + resection of adjacent disc (usually cephalad).', 
+                defaultAngle: '35' 
+            },
+            { 
+                id: 'VCR', 
+                label: 'VCR', 
+                shortLabel: 'VCR',
+                schwab: 'Schwab Grade 5', 
+                desc: 'Complete vertebral column resection (body + adjacent discs).', 
+                defaultAngle: '40' 
+            },
+            { 
+                id: 'ML-VCR', 
+                label: 'Multi-level VCR', 
+                shortLabel: 'ML VCR',
+                schwab: 'Schwab Grade 6', 
+                desc: 'Resection of multiple vertebrae and discs.', 
+                defaultAngle: '0' 
+            }
         ];
 
         // ==========================================
-        // SECTION 1: ICONS
+        // SECTION 1: ICONS & ASSETS
         // ==========================================
         const IconTrash = () => (<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>);
         const IconDownload = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>);
@@ -114,7 +161,7 @@
         const IconX = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>);
 
         // ==========================================
-        // SECTION 2: UI COMPONENTS
+        // SECTION 2: UI COMPONENTS (MODALS & LAYOUT)
         // ==========================================
         
         const LeedsTrustLogo = () => (
@@ -202,8 +249,8 @@
             const isEditing = initialData !== undefined;
 
             return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4">
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
                         <div className="bg-slate-900 text-white px-4 py-3 flex justify-between items-center">
                             <h3 className="font-bold text-sm">{isEditing ? 'Edit Screw' : 'Select Screw'}</h3>
                             <button onClick={onClose} className="hover:text-red-400"><IconX /></button>
@@ -266,32 +313,45 @@
             if (!isOpen) return null;
 
             const [type, setType] = useState(defaultType || 'PSO');
-            const [angle, setAngle] = useState(defaultAngle || '30');
+            const [angle, setAngle] = useState(defaultAngle || '25');
 
+            // Reset or Load state
             useEffect(() => {
                 if (isOpen) {
-                    if (initialData) {
+                    if (initialData && typeof initialData === 'object') {
+                        // Safe check for object data
                         setType(initialData.type);
                         setAngle(initialData.angle);
                     } else {
+                        // Defaults
                         setType(defaultType || 'PSO');
-                        setAngle(defaultAngle || '30');
+                        setAngle(defaultAngle || '25');
                     }
                 }
             }, [isOpen, initialData, defaultType, defaultAngle]);
 
             const selectedDef = OSTEOTOMY_TYPES.find(t => t.id === type) || OSTEOTOMY_TYPES[0];
 
+            // Auto-update angle when Type changes
+            const handleTypeChange = (e) => {
+                const newTypeID = e.target.value;
+                setType(newTypeID);
+                const newDef = OSTEOTOMY_TYPES.find(t => t.id === newTypeID);
+                if (newDef) {
+                    setAngle(newDef.defaultAngle);
+                }
+            };
+
             const handleSubmit = () => {
-                onConfirm({ type, angle });
+                onConfirm({ type, angle, shortLabel: selectedDef.shortLabel });
                 onClose();
             };
 
             const isEditing = !!initialData;
 
             return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4">
-                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
                         <div className="bg-red-800 text-white px-4 py-3 flex justify-between items-center">
                             <h3 className="font-bold text-sm">{isEditing ? 'Edit Osteotomy' : 'Plan Osteotomy'}</h3>
                             <button onClick={onClose} className="hover:text-red-200"><IconX /></button>
@@ -300,7 +360,7 @@
                         <div className="p-6 space-y-4">
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Osteotomy Type</label>
-                                <select value={type} onChange={(e) => setType(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-red-500 outline-none">
+                                <select value={type} onChange={handleTypeChange} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-red-500 outline-none">
                                     {OSTEOTOMY_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
                                 </select>
                             </div>
@@ -308,7 +368,7 @@
                             {/* Schwab Display */}
                             <div className="bg-red-50 border border-red-100 rounded p-3 text-xs">
                                 <div className="font-bold text-red-800 uppercase tracking-wider mb-1">{selectedDef.schwab}</div>
-                                <div className="text-red-600">{selectedDef.desc}</div>
+                                <div className="text-red-600 mb-2">{selectedDef.desc}</div>
                             </div>
 
                             <div>
@@ -333,7 +393,7 @@
         };
 
         // ==========================================
-        // SECTION 3: UTILITIES & GRAPHICS
+        // SECTION 3: GRAPHICS & HELPERS
         // ==========================================
         const formatDate = (isoString) => {
             if (!isoString) return '';
@@ -405,14 +465,24 @@
                     {getItems(zone).map(p => {
                         const tool = tools.find(t => t.id === p.tool);
                         const isOsteo = p.tool === 'osteotomy';
+                        
+                        // SAFETY: Handle String vs Object Data gracefully
+                        let displayLabel = p.data;
+                        let angle = null;
+                        
+                        if (isOsteo && typeof p.data === 'object') {
+                            displayLabel = p.data.shortLabel || p.data.type;
+                            angle = p.data.angle;
+                        }
+
                         return (
                             <div key={p.id} className="relative group flex items-center gap-1">
-                                {align === 'left' && p.data && <span className="text-[18px] font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap">{isOsteo ? `${p.data.type} ${p.data.angle}°` : p.data}</span>}
+                                {align === 'left' && p.data && <span className="text-[18px] font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap">{isOsteo ? `${displayLabel} ${angle}°` : displayLabel}</span>}
                                 <div className={`${isOsteo ? 'w-8 h-8' : 'w-6 h-6'} ${!readOnly ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`} onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}>
                                     <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />
                                     {!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}
                                 </div>
-                                {align === 'right' && p.data && <span className="text-[18px] font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap">{isOsteo ? `${p.data.type} ${p.data.angle}°` : p.data}</span>}
+                                {align === 'right' && p.data && <span className="text-[18px] font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap">{isOsteo ? `${displayLabel} ${angle}°` : displayLabel}</span>}
                             </div>
                         );
                     })}
@@ -429,12 +499,20 @@
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                             {getItems('mid').map(p => {
                                 const tool = tools.find(t => t.id === p.tool);
+                                
+                                let displayLabel = '';
+                                let angle = '';
+                                if (p.tool === 'osteotomy' && typeof p.data === 'object') {
+                                    displayLabel = p.data.shortLabel || p.data.type;
+                                    angle = p.data.angle;
+                                }
+
                                 return (
                                     <div key={p.id} className="pointer-events-auto relative group" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}>
                                         <InstrumentIcon type={tool?.icon} className={`${p.tool==='connector'?'w-24 h-6':'w-10 h-10'} drop-shadow-md text-slate-900`} />
                                         {p.tool === 'osteotomy' && p.data && (
                                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 text-[18px] px-1 rounded shadow-sm whitespace-nowrap z-20">
-                                                {p.data.type} {p.data.angle}°
+                                                {displayLabel} {angle}°
                                             </div>
                                         )}
                                     </div>
@@ -465,7 +543,7 @@
         );
 
         // ==========================================
-        // SECTION 4: MAIN APP
+        // SECTION 4: MAIN APP CONTROLLER
         // ==========================================
         const App = () => {
             const [selectedTool, setSelectedTool] = useState('polyaxial');
@@ -492,15 +570,26 @@
             const [defaultDiameter, setDefaultDiameter] = useState('6.5');
             const [defaultLength, setDefaultLength] = useState('45');
             const [defaultOsteoType, setDefaultOsteoType] = useState('PSO');
-            const [defaultOsteoAngle, setDefaultOsteoAngle] = useState('30');
+            const [defaultOsteoAngle, setDefaultOsteoAngle] = useState('25');
 
             const exportRef = useRef(null);
             const containerWrapperRef = useRef(null);
             const fileInputRef = useRef(null);
 
-            // Storage & Resize Effects
+            // LEVELS (Missing in V27 - Restored Here)
+            const levels = useMemo(() => {
+                const lvls = [];
+                if (showCervical) ['C1','C2','C3','C4','C5','C6','C7'].forEach(l => lvls.push({ id:l, type:'C' }));
+                ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'].forEach(l => lvls.push({ id:l, type:'T' }));
+                ['L1','L2','L3','L4','L5'].forEach(l => lvls.push({ id:l, type:'L' }));
+                lvls.push({ id:'S1', type:'S' });
+                lvls.push({ id:'Pelvis', type:'Pelvis' });
+                return lvls;
+            }, [showCervical]);
+
+            // AUTO-LOAD
             useEffect(() => {
-                const saved = localStorage.getItem('leeds_spine_planner_data_v25');
+                const saved = localStorage.getItem('leeds_spine_planner_data_v28');
                 if (saved) {
                     try {
                         const parsed = JSON.parse(saved);
@@ -508,20 +597,22 @@
                         if (parsed.completed) setCompletedPlacements(parsed.completed);
                         if (parsed.patient) setPatientData(parsed.patient);
                         if (parsed.showCervical !== undefined) setShowCervical(parsed.showCervical);
-                    } catch (e) {}
+                    } catch (e) { console.error("Data load error"); }
                 }
                 setHasLoaded(true);
             }, []);
 
+            // AUTO-SAVE
             useEffect(() => {
                 if (hasLoaded && !incognitoMode) {
-                    localStorage.setItem('leeds_spine_planner_data_v25', JSON.stringify({
+                    localStorage.setItem('leeds_spine_planner_data_v28', JSON.stringify({
                         planned: plannedPlacements, completed: completedPlacements, patient: patientData, showCervical
                     }));
                 }
-                if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v25');
+                if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28');
             }, [plannedPlacements, completedPlacements, patientData, showCervical, hasLoaded, incognitoMode]);
 
+            // RESIZE OBSERVER
             useLayoutEffect(() => {
                 const handleResize = () => {
                     if (containerWrapperRef.current && exportRef.current) {
@@ -650,30 +741,63 @@
                 setOsteoModalOpen(false);
             };
 
-            const levels = useMemo(() => {
-                const lvls = [];
-                if (showCervical) ['C1','C2','C3','C4','C5','C6','C7'].forEach(l => lvls.push({ id:l, type:'C' }));
-                ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'].forEach(l => lvls.push({ id:l, type:'T' }));
-                ['L1','L2','L3','L4','L5'].forEach(l => lvls.push({ id:l, type:'L' }));
-                lvls.push({ id:'S1', type:'S' });
-                lvls.push({ id:'Pelvis', type:'Pelvis' });
-                return lvls;
-            }, [showCervical]);
-
-            // EXPORT (Simplified for brevity)
+            // EXPORT & IO FUNCTIONS
             const runExport = () => {
-                const clone = exportRef.current.cloneNode(true);
-                clone.style.transform = 'none'; clone.style.margin = '0';
-                const div = document.createElement('div');
-                div.style.cssText = "position:absolute;top:0;left:0;z-index:-9999;";
-                div.appendChild(clone); document.body.appendChild(div);
-                html2canvas(clone, { scale: 2, width: 1485, height: 1050 }).then(cvs => {
+                const element = exportRef.current;
+                const cloneContainer = document.createElement('div');
+                cloneContainer.style.position = 'absolute';
+                cloneContainer.style.top = '0';
+                cloneContainer.style.left = '0';
+                cloneContainer.style.zIndex = '-9999';
+                document.body.appendChild(cloneContainer);
+
+                const clone = element.cloneNode(true);
+                clone.style.transform = 'none'; 
+                clone.style.margin = '0';
+                cloneContainer.appendChild(clone);
+
+                html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: 1485, height: 1050, logging: false }).then(canvas => {
+                    document.body.removeChild(cloneContainer);
                     const link = document.createElement('a');
-                    link.download = `SpinePlan_${patientData.name}.jpg`;
-                    link.href = cvs.toDataURL('image/jpeg', 0.9);
+                    link.download = `SpinePlan_${patientData.name || 'Patient'}.jpg`;
+                    link.href = canvas.toDataURL('image/jpeg', 0.9);
                     link.click();
-                    document.body.removeChild(div);
+                    if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28');
                 });
+            };
+
+            const saveProjectJSON = () => {
+                const data = { version: 28, patient: patientData, planned: plannedPlacements, completed: completedPlacements, showCervical, timestamp: new Date().toISOString() };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `SpineProject_${patientData.name || 'Unnamed'}.json`;
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28');
+            };
+
+            const loadProjectJSON = (e) => {
+                const file = e.target.files[0]; if(!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const json = JSON.parse(ev.target.result);
+                        if(json.patient) setPatientData(json.patient);
+                        if(json.planned) setPlannedPlacements(json.planned);
+                        if(json.completed) setCompletedPlacements(json.completed);
+                        if(json.showCervical !== undefined) setShowCervical(json.showCervical);
+                        alert("Project Loaded Successfully.");
+                    } catch(err) { alert("Invalid File"); }
+                };
+                reader.readAsText(file); e.target.value = null;
+            };
+
+            const copyPlanToCompleted = () => {
+                if (plannedPlacements.length === 0) return alert("No Pre-Op plan to copy.");
+                if (completedPlacements.length > 0 && !confirm("Overwrite existing Post-Op construct?")) return;
+                const copied = plannedPlacements.map((p,i) => ({...p, id: Date.now()+i}));
+                setCompletedPlacements(copied);
+                setActiveChart('completed');
             };
 
             return (
@@ -689,27 +813,44 @@
 
                     <header className="bg-slate-900 text-white p-2 flex justify-between items-center shadow-md z-30 shrink-0 no-print h-14">
                         <div className="flex items-center gap-4">
-                            <h1 className="font-bold text-lg px-2">Leeds Spinal Planner V25</h1>
+                            <h1 className="font-bold text-lg px-2">Leeds Spinal Planner V28</h1>
                             <div className="flex bg-slate-800 rounded p-1 text-sm border border-slate-700">
-                                <button onClick={() => setActiveChart('planned')} className={`px-4 py-1 rounded ${activeChart==='planned'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400'}`}>Pre-Op</button>
-                                <button onClick={() => setActiveChart('completed')} className={`px-4 py-1 rounded ${activeChart==='completed'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400'}`}>Post-Op</button>
+                                <button onClick={() => setActiveChart('planned')} className={`px-4 py-1 rounded transition-all ${activeChart==='planned'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400 hover:text-white'}`}>Pre-Op</button>
+                                <button onClick={() => setActiveChart('completed')} className={`px-4 py-1 rounded transition-all ${activeChart==='completed'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400 hover:text-white'}`}>Post-Op</button>
                             </div>
+                            <button onClick={copyPlanToCompleted} className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded text-xs font-bold border border-slate-600 transition-colors" title="Copy Pre-Op Plan to Post-Op View"><IconCopy /> Copy Plan</button>
                         </div>
-                        <div className="flex gap-2 items-center">
-                            <button onClick={runExport} className="bg-white text-slate-900 px-4 py-1.5 rounded font-bold flex gap-2 items-center hover:bg-slate-200 text-sm"><IconDownload /> Export</button>
-                            <button onClick={() => { if(confirm("Clear?")) { setPlannedPlacements([]); setCompletedPlacements([]); } }} className="text-red-400 p-2"><IconTrash /></button>
+                        <div className="flex gap-4 items-center">
+                             {/* SESSION MODE */}
+                            <div className={`flex items-center gap-2 px-3 py-1 rounded border transition-colors ${incognitoMode ? 'bg-red-900/30 border-red-500/50' : 'bg-transparent border-transparent'}`}>
+                                <div className="relative inline-block w-8 h-4 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" name="toggle" id="incognito-toggle" className="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300" style={{ top: 0, left: 0 }} checked={incognitoMode} onChange={(e) => setIncognitoMode(e.target.checked)}/>
+                                    <label htmlFor="incognito-toggle" className={`toggle-label block overflow-hidden h-4 rounded-full cursor-pointer border ${incognitoMode ? 'bg-red-600 border-red-600' : 'bg-slate-600 border-slate-600'}`}></label>
+                                </div>
+                                <div className="flex flex-col leading-none">
+                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${incognitoMode ? 'text-red-400' : 'text-slate-500'}`}>Session Mode</span>
+                                </div>
+                            </div>
+                            <div className="h-8 w-px bg-slate-700 mx-1"></div>
+                            
+                            <input type="file" ref={fileInputRef} onChange={loadProjectJSON} className="hidden" accept=".json" />
+                            <button onClick={() => fileInputRef.current.click()} className="text-slate-300 hover:text-white px-2 py-1.5 rounded flex gap-2 items-center text-xs font-bold transition-colors" title="Load saved .json project"><IconUpload /> Load</button>
+                            <button onClick={saveProjectJSON} className="text-slate-300 hover:text-white px-2 py-1.5 rounded flex gap-2 items-center text-xs font-bold transition-colors" title="Save editable .json project"><IconSave /> Save</button>
+
+                            <button onClick={runExport} className="bg-white text-slate-900 px-4 py-1.5 rounded font-bold flex gap-2 items-center hover:bg-slate-200 text-sm ml-2"><IconDownload /> Export</button>
+                            <button onClick={() => { if(confirm("Start New Patient? This will clear the current plan.")) { setPlannedPlacements([]); setCompletedPlacements([]); setPatientData({ name: '', id: '', surgeon: '', date: new Date().toISOString().split('T')[0] }); setActiveChart('planned'); } }} className="ml-2 text-red-400 hover:text-red-200 p-2" title="Clear All"><IconTrash /></button>
                         </div>
                     </header>
 
                     <div className="flex-1 overflow-hidden bg-slate-200 flex relative">
                         <aside className="w-64 bg-slate-800 text-white flex flex-col border-r border-slate-700 z-20 overflow-y-auto no-print shadow-xl">
-                            <div className="p-4 border-b border-slate-700"><label className="flex gap-2 text-sm text-slate-300"><input type="checkbox" checked={showCervical} onChange={e=>setShowCervical(e.target.checked)}/> Show Cervical</label></div>
+                            <div className="p-4 border-b border-slate-700 bg-slate-900"><label className="flex items-center gap-2 cursor-pointer select-none text-sm text-slate-300 hover:text-white"><input type="checkbox" checked={showCervical} onChange={e=>setShowCervical(e.target.checked)} className="w-4 h-4 rounded text-amber-500 focus:ring-amber-500"/> Show Cervical</label></div>
                             <div className="p-4 space-y-6">
                                 {tools.map((g,i) => (
                                     <div key={i}><h3 className="text-[10px] uppercase font-bold text-slate-500 mb-2 tracking-widest">{g.category}</h3>
                                     <div className="grid grid-cols-2 gap-2">
                                         {g.items.map(t => (
-                                            <button key={t.id} onClick={() => setSelectedTool(t.id)} className={`p-2 rounded border flex flex-col items-center justify-center gap-1 transition-all text-xs ${selectedTool === t.id ? 'bg-amber-500 border-amber-600 text-slate-900 font-bold' : 'bg-slate-700 border-slate-600 text-slate-200'}`}>
+                                            <button key={t.id} onClick={() => setSelectedTool(t.id)} className={`p-2 rounded border flex flex-col items-center justify-center gap-1 transition-all text-xs ${selectedTool === t.id ? 'bg-amber-500 border-amber-600 text-slate-900 font-bold' : 'bg-slate-700 border-slate-600 hover:bg-slate-600 text-slate-200'}`}>
                                                 <InstrumentIcon type={t.icon} className="w-6 h-6 mb-1" color={selectedTool === t.id ? 'black' : 'white'} /><span className="text-center text-[10px]">{t.label}</span>
                                             </button>
                                         ))}
@@ -718,16 +859,16 @@
                             </div>
                         </aside>
 
-                        <div ref={containerWrapperRef} className="flex-1 flex items-center justify-center p-8 bg-slate-300 overflow-hidden relative">
+                        <div ref={containerWrapperRef} id="print-wrapper" className="flex-1 flex items-center justify-center p-8 bg-slate-300 overflow-hidden relative">
                             <div style={{ transform: `scale(${scale})` }}>
                                 <div id="export-container" ref={exportRef}>
                                     <div className="w-[300px] bg-white border-r border-slate-300 flex flex-col p-8">
                                         <h2 className="font-serif font-bold text-3xl text-slate-900 mb-8 border-b-4 border-slate-900 pb-2">Spinal Surgery</h2>
                                         <div className="space-y-6 text-base flex-1">
-                                            <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Patient Name</label><div className="editable-field w-full text-lg font-serif" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, name: e.target.innerText})}>{patientData.name}</div></div>
-                                            <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Patient ID</label><div className="editable-field w-full text-lg font-mono" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, id: e.target.innerText})}>{patientData.id}</div></div>
-                                            <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Surgeon</label><div className="editable-field w-full text-lg" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, surgeon: e.target.innerText})}>{patientData.surgeon}</div></div>
-                                            <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Date</label><div className="editable-field w-full text-lg cursor-pointer" onClick={() => setIsEditingDate(true)}>{isEditingDate ? <input type="date" value={patientData.date} autoFocus onBlur={()=>setIsEditingDate(false)} onChange={e=>setPatientData({...patientData, date:e.target.value})} /> : formatDate(patientData.date)}</div></div>
+                                            <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Patient Name</label><div className="editable-field w-full text-lg font-serif" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, name: e.target.innerText})} placeholder="Click to enter...">{patientData.name}</div></div>
+                                            <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Patient ID</label><div className="editable-field w-full text-lg font-mono" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, id: e.target.innerText})} placeholder="Click to enter...">{patientData.id}</div></div>
+                                            <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Surgeon</label><div className="editable-field w-full text-lg" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, surgeon: e.target.innerText})} placeholder="Click to enter...">{patientData.surgeon}</div></div>
+                                            <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Date</label><div className="editable-field w-full text-lg cursor-pointer" onClick={() => setIsEditingDate(true)}>{isEditingDate ? <input type="date" className="w-full text-lg border-b border-slate-800 bg-transparent outline-none py-1" value={patientData.date} autoFocus onBlur={()=>setIsEditingDate(false)} onChange={e=>setPatientData({...patientData, date:e.target.value})} /> : formatDate(patientData.date)}</div></div>
                                         </div>
                                         <LeedsTrustLogo />
                                         <CreditsFooter />
