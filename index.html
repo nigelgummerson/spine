@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spinal Surgical Planner V34 - Leeds Teaching Hospitals</title>
+    <title>Spinal Surgical Planner V36 - Leeds Teaching Hospitals</title>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -39,7 +39,7 @@
             min-width: 100px;
             display: inline-block;
             color: #334155;
-            padding: 2px 0;
+            padding: 2px 0; 
             outline: none;
             cursor: text;
             line-height: 1.4;
@@ -120,7 +120,7 @@
         const IconPDF = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>);
         const IconHelp = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>);
         
-        // --- NEW: CARDINAL ARROW (4-POINTED) FOR FORCE COLUMNS ---
+        // --- NEW (V34): CARDINAL ARROW GHOST FORCES ---
         const IconCardinal = () => (
             <svg viewBox="0 0 24 24" className="w-5 h-5 opacity-40 hover:opacity-100 transition-opacity text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 3v18"/>
@@ -150,7 +150,7 @@
             <div className="mt-auto pt-4 border-t border-slate-200 shrink-0">
                 <div className="flex flex-col gap-2">
                     <p className="text-[10px] text-slate-500 leading-tight">
-                        <span className="font-bold text-slate-800 block mb-1 text-[11px]">Leeds Spinal Surgery Planner V34</span>
+                        <span className="font-bold text-slate-800 block mb-1 text-[11px]">Leeds Spinal Surgery Planner V36</span>
                         Developed by:<br/>
                         <span className="font-bold text-slate-700">Nigel Gummerson FRCS (Tr & Orth)</span><br/>
                         and <span className="font-bold text-slate-700">Google Gemini</span>,<br/>
@@ -164,7 +164,7 @@
             </div>
         );
 
-        // --- IMPLANT INVENTORY TABLE ---
+        // --- IMPLANT INVENTORY TABLE (V32 Fixed Spacing) ---
         const ImplantInventory = ({ placements, tools, title }) => {
             const inventory = useMemo(() => {
                 const counts = {};
@@ -172,10 +172,9 @@
                     const tool = tools.find(t => t.id === p.tool);
                     if (!tool || tool.type === 'force') return;
                     let key = tool.label;
-                    let sortKey = tool.label; 
                     if (p.data) {
-                        if (typeof p.data === 'string' && tool.needsSize) { key = `${tool.label} (${p.data})`; sortKey = `A_${p.data}`; } 
-                        else if (p.tool === 'osteotomy' && typeof p.data === 'object') { key = `${p.data.shortLabel} (${p.data.angle}°)`; sortKey = `Z_${key}`; } 
+                        if (typeof p.data === 'string' && tool.needsSize) { key = `${tool.label} (${p.data})`; } 
+                        else if (p.tool === 'osteotomy' && typeof p.data === 'object') { key = `${p.data.shortLabel} (${p.data.angle}°)`; } 
                         else if (p.data !== 'Custom') { key = `${tool.label} ${p.data}`; }
                     }
                     counts[key] = (counts[key] || 0) + 1;
@@ -358,11 +357,12 @@
                 const hasItems = items.length > 0;
                 const justifyClass = align === 'right' ? 'justify-start pl-1' : (align === 'center' ? 'justify-center' : 'justify-end pr-1');
                 
-                // Determine ghost type based on zone name
+                // Determine if this is a force column
                 const isForceZone = zone.startsWith('force');
 
                 return (
                     <div className={`flex items-center gap-1 h-full ${justifyClass} relative`}>
+                        {/* RENDER GHOST TARGET if empty and in edit mode */}
                         {!hasItems && !readOnly && (zone === 'left' || zone === 'right' || isForceZone) && <GhostTarget type={isForceZone ? 'force' : 'screw'} />}
                         
                         {items.map(p => { 
@@ -380,7 +380,7 @@
             return (
                 <div className="flex w-full relative" style={{ height: `${REGIONS[level.type].height}px` }}>
                     <div className="absolute bottom-0 left-0 right-0 border-b border-slate-100 w-full z-0 pointer-events-none"></div>
-                    {/* VISUAL TINT FOR FORCE COLUMNS (emerald-50/20) */}
+                    {/* VISUAL TINT FOR FORCE COLUMNS (V34) */}
                     <div className={`w-10 border-r border-slate-100/50 bg-emerald-50/20 ${!readOnly ? 'hover:bg-emerald-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'force_left')}><ZoneContent zone="force_left" align="center"/></div>
                     <div className={`flex-1 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><ZoneContent zone="left" align="left"/></div>
                     <div className={`w-[160px] relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}><SpineVertebra label={level.id} type={level.type} height={REGIONS[level.type].height} /><div className="absolute inset-0 flex items-center justify-center pointer-events-none">{getItems('mid').map(p => { const tool = tools.find(t => t.id === p.tool); let displayLabel = ''; let angle = ''; if (p.tool === 'osteotomy' && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } return (<div key={p.id} className="pointer-events-auto relative group" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><InstrumentIcon type={tool?.icon} className={`${p.tool==='connector'?'w-24 h-6':'w-10 h-10'} drop-shadow-md text-slate-900`} />{p.tool === 'osteotomy' && p.data && (<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 text-[18px] px-1 rounded shadow-sm whitespace-nowrap z-20">{displayLabel} {angle}°</div>)}</div>); })}</div></div>
@@ -453,6 +453,20 @@
             useLayoutEffect(() => {
                 const handleResize = () => { if (containerWrapperRef.current && exportRef.current) { const wrapperH = containerWrapperRef.current.clientHeight; const wrapperW = containerWrapperRef.current.clientWidth; setScale(Math.min((wrapperW - 40) / 1485, (wrapperH - 40) / 1050)); } };
                 window.addEventListener('resize', handleResize); handleResize(); return () => window.removeEventListener('resize', handleResize);
+            }, []);
+
+            // RESIZE OBSERVER (V33 Fix: Auto-Size on Load)
+            useEffect(() => {
+                if (!containerWrapperRef.current) return;
+                const observer = new ResizeObserver(() => {
+                    if (containerWrapperRef.current && exportRef.current) {
+                        const wrapperH = containerWrapperRef.current.clientHeight;
+                        const wrapperW = containerWrapperRef.current.clientWidth;
+                        setScale(Math.min((wrapperW - 40) / 1485, (wrapperH - 40) / 1050));
+                    }
+                });
+                observer.observe(containerWrapperRef.current);
+                return () => observer.disconnect();
             }, []);
 
             const tools = [
@@ -544,7 +558,7 @@
             };
 
             const saveProjectJSON = () => {
-                const data = { version: 34, patient: patientData, planned: plannedPlacements, completed: completedPlacements, showCervical, timestamp: new Date().toISOString() };
+                const data = { version: 36, patient: patientData, planned: plannedPlacements, completed: completedPlacements, showCervical, timestamp: new Date().toISOString() };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
                 const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `SpineProject_${patientData.name || 'Unnamed'}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link);
                 if (incognitoMode) localStorage.removeItem('leeds_spine_planner_data_v28');
@@ -570,12 +584,11 @@
             return (
                 <div className="h-full flex flex-col overflow-hidden">
                     <ScrewModal isOpen={screwModalOpen} onClose={() => setScrewModalOpen(false)} onConfirm={handleScrewConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} initialTool={editingTool} defaultDiameter={defaultDiameter} defaultLength={defaultLength} />
-                    <OsteotomyModal isOpen={osteoModalOpen} onClose={() => setOsteoModalOpen(false)} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} />
-                    <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
+                    <OsteotomyModal isOpen={osteoModalOpen} onClose={() => setOsteoModalOpen(false)} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} /> <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
 
                     <header className="bg-slate-900 text-white p-2 flex justify-between items-center shadow-md z-30 shrink-0 no-print h-14">
                         <div className="flex items-center gap-4">
-                            <h1 className="font-bold text-lg px-2">Leeds Spinal Planner V34</h1>
+                            <h1 className="font-bold text-lg px-2">Leeds Spinal Planner V36</h1>
                             <div className="flex bg-slate-800 rounded p-1 text-sm border border-slate-700">
                                 <button onClick={() => setActiveChart('planned')} className={`px-4 py-1 rounded transition-all ${activeChart==='planned'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400 hover:text-white'}`} title="View Pre-Operative Plan">Pre-Op</button>
                                 <button onClick={() => setActiveChart('completed')} className={`px-4 py-1 rounded transition-all ${activeChart==='completed'?'bg-amber-500 text-slate-900 font-bold':'text-slate-400 hover:text-white'}`} title="View Post-Operative Construct">Post-Op</button>
