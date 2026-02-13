@@ -91,9 +91,14 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v0.5.3-alpha";
+        const CURRENT_VERSION = "v0.5.4-alpha";
         
         const CHANGE_LOG = [
+            { version: "v0.5.4-alpha", date: "2025-12-04", changes: [
+                "Redesigned Occiput icon: Curve is now caudal (pointing down) to match anatomy.",
+                "Sidebar: Widened (4 columns) with smaller buttons for better density.",
+                "Whole Spine View: Automatically compacts row height by 35% to fit on page."
+            ]},
             { version: "v0.5.3-alpha", date: "2025-12-04", changes: [
                 "Added 'Occiput' level for C0-C1-C2 planning.",
                 "Implemented 3-way View Selector: Thoracolumbar, Cervical (Occ-T4), Whole Spine.",
@@ -102,12 +107,6 @@
             { version: "v0.5.2-alpha", date: "2025-12-04", changes: [
                 "Removed Force Columns from Post-Op (Construct) view.",
                 "Expanded Implant Column width in Construct view to accommodate future GS1/Lot data.",
-                "Optimized ChartPaper layout logic."
-            ]},
-            { version: "v0.5.1-alpha", date: "2025-12-04", changes: [
-                "Replaced static logo with editable 'Clinic Location' field.",
-                "Moved Version Number to subtitle line.",
-                "Refined text alignment and spacing in sidebar.",
             ]}
         ];
 
@@ -374,7 +373,7 @@
                 <svg viewBox={`0 0 160 ${height}`} className="w-[160px] block" style={{height: `${height}px`}} overflow="visible">
                     <line x1="80" y1="-2" x2="80" y2={height + 2} stroke="#cbd5e1" strokeDasharray="3 3" />
                     <g>
-                        {type === 'Occiput' && <path d="M40,30 Q80,0 120,30 Z" transform={`scale(1, ${height/30})`} {...common} />}
+                        {type === 'Occiput' && <path d="M20,2 Q80,45 140,2 Z" transform={`scale(1, ${height/30})`} {...common} />}
                         {type === 'C' && <path d="M65,6 Q80,2 95,6 L95,22 Q80,26 65,22 Z" transform={`translate(0, 0) scale(1, ${height/24})`} {...common} />}
                         {type === 'T' && <g><path d="M60,10 Q80,4 100,10 L105,27 Q80,33 55,27 Z" transform={`scale(1, ${height/32})`} {...common} /><path d="M55,13 L45,11" stroke="#64748b" strokeWidth="2" /><path d="M105,13 L115,11" stroke="#64748b" strokeWidth="2" /></g>}
                         {type === 'L' && <g><path d="M55,8 Q80,2 105,8 L110,33 Q80,38 50,33 Z" transform={`scale(1, ${height/38})`} {...common} /><path d="M50,16 L35,20" stroke="#64748b" strokeWidth="3" /><path d="M110,16 L125,20" stroke="#64748b" strokeWidth="3" /></g>}
@@ -386,9 +385,12 @@
             );
         };
 
-        const LevelRow = ({ level, placements, onZoneClick, tools, onPlacementClick, readOnly, showForces }) => {
+        const LevelRow = ({ level, placements, onZoneClick, tools, onPlacementClick, readOnly, showForces, heightScale }) => {
             const getItems = (z) => placements.filter(p => p.levelId === level.id && p.zone === z);
             
+            // Apply compact scaling to the row height
+            const rowHeight = REGIONS[level.type].height * heightScale;
+
             // --- GHOST TARGET: CARDINAL FOR FORCES ---
             const GhostTarget = ({ type }) => {
                 if (type === 'force') return <div className="flex items-center justify-center h-full w-full"><IconCardinal /></div>;
@@ -408,7 +410,7 @@
             };
 
             return (
-                <div className="flex w-full relative" style={{ height: `${REGIONS[level.type].height}px` }}>
+                <div className="flex w-full relative" style={{ height: `${rowHeight}px` }}>
                     <div className="absolute bottom-0 left-0 right-0 border-b border-slate-100 w-full z-0 pointer-events-none"></div>
                     
                     {/* VISUAL TINT FOR FORCE COLUMNS (CONDITIONAL) */}
@@ -417,7 +419,7 @@
                     )}
 
                     <div className={`flex-1 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><ZoneContent zone="left" align="left"/></div>
-                    <div className={`w-[160px] relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}><SpineVertebra label={level.id} type={level.type} height={REGIONS[level.type].height} /><div className="absolute inset-0 flex items-center justify-center pointer-events-none">{getItems('mid').map(p => { const tool = tools.find(t => t.id === p.tool); let displayLabel = ''; let angle = ''; if (p.tool === 'osteotomy' && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } return (<div key={p.id} className="pointer-events-auto relative group" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><InstrumentIcon type={tool?.icon} className={`${p.tool==='connector'?'w-24 h-6':'w-10 h-10'} drop-shadow-md text-slate-900`} />{p.tool === 'osteotomy' && p.data && (<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 text-[18px] px-1 rounded shadow-sm whitespace-nowrap z-20">{displayLabel} {angle}°</div>)}</div>); })}</div></div>
+                    <div className={`w-[160px] relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}><SpineVertebra label={level.id} type={level.type} height={rowHeight} /><div className="absolute inset-0 flex items-center justify-center pointer-events-none">{getItems('mid').map(p => { const tool = tools.find(t => t.id === p.tool); let displayLabel = ''; let angle = ''; if (p.tool === 'osteotomy' && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } return (<div key={p.id} className="pointer-events-auto relative group" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><InstrumentIcon type={tool?.icon} className={`${p.tool==='connector'?'w-24 h-6':'w-10 h-10'} drop-shadow-md text-slate-900`} />{p.tool === 'osteotomy' && p.data && (<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 text-[18px] px-1 rounded shadow-sm whitespace-nowrap z-20">{displayLabel} {angle}°</div>)}</div>); })}</div></div>
                     <div className={`flex-1 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'right')}><ZoneContent zone="right" align="right"/></div>
                     
                     {showForces && (
@@ -427,7 +429,7 @@
             );
         };
 
-        const ChartPaper = ({ title, placements, onZoneClick, onPlacementClick, tools, readOnly, levels, showForces }) => (
+        const ChartPaper = ({ title, placements, onZoneClick, onPlacementClick, tools, readOnly, levels, showForces, heightScale }) => (
             <div className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative"><div className="p-2 bg-slate-50 border-b border-slate-200 text-center font-bold text-sm text-slate-800 font-leeds uppercase tracking-wider">{title}</div><div className="flex-1 relative flex flex-col pt-8 px-2 justify-center">
                 
                 {/* CONDITIONAL HEADER */}
@@ -439,7 +441,7 @@
                     {showForces && <div className="w-10 text-emerald-600/50">Force</div>}
                 </div>
 
-                <div className="flex flex-col w-full relative">{levels.map(lvl => <LevelRow key={lvl.id} level={lvl} placements={placements} onZoneClick={onZoneClick} onPlacementClick={onPlacementClick} tools={tools} readOnly={readOnly} showForces={showForces} />)}</div></div></div>
+                <div className="flex flex-col w-full relative">{levels.map(lvl => <LevelRow key={lvl.id} level={lvl} placements={placements} onZoneClick={onZoneClick} onPlacementClick={onPlacementClick} tools={tools} readOnly={readOnly} showForces={showForces} heightScale={heightScale} />)}</div></div></div>
         );
 
         // ==========================================
@@ -543,12 +545,12 @@
                 { category: 'Hooks', items: [ { id: 'pedicle_hook', label: 'Pedicle', icon: 'pedicle_hook', type: 'implant' }, { id: 'tp_hook', label: 'TP Hook', icon: 'tp_hook', type: 'implant' }, { id: 'sl_hook', label: 'Supra-laminar', icon: 'sl_hook', type: 'implant' }, { id: 'il_hook', label: 'Infra-laminar', icon: 'il_hook', type: 'implant' }, ]},
                 { category: 'Midline', items: [ { id: 'connector', label: 'Crosslink', icon: 'connector', type: 'mid' }, { id: 'unstable', label: 'Unstable', icon: 'unstable', type: 'mid' }, { id: 'osteotomy', label: 'Osteotomy', icon: 'osteotomy', isOsteotomy: true, type: 'mid' }, ]},
                 { category: 'Forces', items: [ 
-                    { id: 'translate_left', label: 'Translate Left', icon: 'translate_left', type: 'force' },
-                    { id: 'translate_right', label: 'Translate Right', icon: 'translate_right', type: 'force' },
+                    { id: 'translate_left', label: 'Trans Left', icon: 'translate_left', type: 'force' },
+                    { id: 'translate_right', label: 'Trans Right', icon: 'translate_right', type: 'force' },
                     { id: 'compression', label: 'Compress', icon: 'compression', type: 'force' },
                     { id: 'distraction', label: 'Distract', icon: 'distraction', type: 'force' },
-                    { id: 'derotate_cw', label: 'Derotate CW', icon: 'derotate_cw', type: 'force' },
-                    { id: 'derotate_ccw', label: 'Derotate CCW', icon: 'derotate_ccw', type: 'force' },
+                    { id: 'derotate_cw', label: 'Derotate', icon: 'derotate_cw', type: 'force' },
+                    { id: 'derotate_ccw', label: 'Derotate', icon: 'derotate_ccw', type: 'force' },
                 ]}
             ];
             const allTools = tools.flatMap(g => g.items);
@@ -702,7 +704,7 @@
                     </header>
 
                     <div className="flex-1 overflow-hidden bg-slate-200 flex relative">
-                        <aside className="w-64 bg-slate-800 text-white flex flex-col border-r border-slate-700 z-20 overflow-y-auto no-print shadow-xl">
+                        <aside className="w-80 bg-slate-800 text-white flex flex-col border-r border-slate-700 z-20 overflow-y-auto no-print shadow-xl">
                             <div className="p-4 border-b border-slate-700 bg-slate-900">
                                 <h3 className="text-[10px] uppercase font-bold text-slate-500 mb-2 tracking-widest">Region View</h3>
                                 <div className="space-y-2">
@@ -718,7 +720,7 @@
                                 </div>
                             </div>
                             <div className="p-4 space-y-6">
-                                {tools.map((g,i) => (<div key={i}><h3 className="text-[10px] uppercase font-bold text-slate-500 mb-2 tracking-widest">{g.category}</h3><div className="grid grid-cols-2 gap-2">{g.items.map(t => (<button key={t.id} onClick={() => setSelectedTool(t.id)} className={`p-2 rounded border flex flex-col items-center justify-center gap-1 transition-all text-xs ${selectedTool === t.id ? 'bg-amber-500 border-amber-600 text-slate-900 font-bold' : 'bg-slate-700 border-slate-600 hover:bg-slate-600 text-slate-200'}`}><InstrumentIcon type={t.icon} className="w-6 h-6 mb-1" color={selectedTool === t.id ? 'black' : 'white'} /><span className="text-center text-[10px]">{t.label}</span></button>))}</div></div>))}
+                                {tools.map((g,i) => (<div key={i}><h3 className="text-[10px] uppercase font-bold text-slate-500 mb-2 tracking-widest">{g.category}</h3><div className="grid grid-cols-4 gap-1">{g.items.map(t => (<button key={t.id} onClick={() => setSelectedTool(t.id)} className={`p-1 h-16 rounded border flex flex-col items-center justify-center gap-0.5 transition-all text-xs ${selectedTool === t.id ? 'bg-amber-500 border-amber-600 text-slate-900 font-bold' : 'bg-slate-700 border-slate-600 hover:bg-slate-600 text-slate-200'}`}><InstrumentIcon type={t.icon} className="w-4 h-4 mb-1" color={selectedTool === t.id ? 'black' : 'white'} /><span className="text-center text-[9px] leading-tight break-words w-full">{t.label}</span></button>))}</div></div>))}
                             </div>
                         </aside>
 
@@ -742,8 +744,8 @@
                                         </div>
                                         <CreditsFooter />
                                     </div>
-                                    <ChartPaper title="Pre-Operative Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} />
-                                    <ChartPaper title="Surgical Construct" placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} />
+                                    <ChartPaper title="Pre-Operative Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={viewMode === 'whole' ? 0.65 : 1.0} />
+                                    <ChartPaper title="Surgical Construct" placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} heightScale={viewMode === 'whole' ? 0.65 : 1.0} />
                                 </div>
                             </div>
                         </div>
