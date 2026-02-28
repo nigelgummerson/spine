@@ -51,3 +51,36 @@ Licensing: Strict GNU GPLv3 to force commercial negotiation for closed-source us
 Visual Style: "Railway Map" schematic focus (not photo-realistic) to maintain clarity and small file size.
 
 Immediate Next Step: I will upload the v0.7.0-alpha code. We need to begin the Barcode Scanning Roadmap: integrating html5-qrcode to scan GS1 DataMatrix barcodes from implant packaging to populate the inventory table automatically.
+
+
+spine_planner_v0.8.0-alpha
+
+Merged feature/cages into main. Major layout redesign:
+- Sidebar-only layout (w-64) with tool palette, export controls, colour themes
+- Auto-scaling spine height (calculateAutoScale) with ResizeObserver
+- Session mode toggle in sidebar
+- Export panel redesign with JPG/PDF/JSON buttons
+- Three-column export container: patient info (340px) + Plan (flex) + Construct (flex)
+
+spine_planner_v0.8.1-alpha
+
+- Sans-serif throughout (removed serif from chart titles)
+- Flex ratio: Plan flex-3, Construct flex-4 (construct gets more space)
+- Auto-scale cap lowered from 2.0 to 1.5
+- Draggable crosslinks with yNorm (0-1000) view-independent positioning
+- JSON v2 format: formatVersion 2, plan/construct separation, patient includes all fields
+- Colour scheme system: 7 sidebar themes (default, blue, navy, gold, red, purple, midnight)
+- Session cache key changed to spine_planner_v2
+- Two-column inventory layout
+
+spine_planner_v0.8.2-alpha
+
+- Company dropdown (16 implant manufacturers from implant-branding data)
+- Screw system combo box with company-specific suggestions shown first (bold)
+- Auto-theme from company: 5 mapped companies (Medtronic→navy, DePuy→red, Stryker→gold, VB Spine→purple, Globus→midnight)
+- AUTO_THEME_FROM_COMPANY flag for enabling/disabling
+- Left Rod / Right Rod free-text fields under LEFT/RIGHT headers in Final Surgical Construct
+- Screw size compact format (6.5x45 not 6.5 x 45)
+- Cage label repositioned to left-3/4
+- Session mode toggle enlarged and whole-row clickable
+- Patient info panel spacing tightened
