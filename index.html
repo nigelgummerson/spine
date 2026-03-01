@@ -880,9 +880,12 @@
             const map = [];
             lvls.forEach(level => {
                 const vertH = getLevelHeight(level) * hScale;
-                const discH = getDiscHeight(level) * hScale;
+                const rawDiscH = getDiscHeight(level) * hScale;
+                // Match actual DOM: disc zones have min DISC_MIN_PX, plus 1px border per level
+                const discH = rawDiscH > 0 ? Math.max(DISC_MIN_PX, rawDiscH) : 0;
+                const border = 1;
                 map.push({ levelId: level.id, startY: y, vertEnd: y + vertH, endY: y + vertH + discH });
-                y += vertH + discH;
+                y += vertH + discH + border;
             });
             return { map, totalHeight: y };
         };
@@ -1108,10 +1111,12 @@
             const hookH = Math.round(20 * iconScale);
             const osteoPx = Math.round(32 * iconScale);
             const midPx = Math.round(36 * iconScale);
-            const labelPx = Math.max(9, Math.min(16, Math.round(13 * iconScale)));
-            const cageLabelPx = Math.max(9, Math.min(15, Math.round(12 * iconScale)));
+            // Label font scaling: gentle reduction in compressed views (use hs^0.3 not linear)
+            const labelScale = Math.max(0.9, Math.min(1.2, Math.pow(heightScale, 0.3)));
+            const labelPx = Math.max(13, Math.min(16, Math.round(14 * labelScale)));
+            const cageLabelPx = Math.max(12, Math.min(15, Math.round(13 * labelScale)));
             const cageMaxW = Math.round(120 / Math.max(1, iconScale));
-            const osteoLabelPx = Math.max(10, Math.min(16, Math.round(14 * iconScale)));
+            const osteoLabelPx = Math.max(13, Math.min(16, Math.round(15 * labelScale)));
 
             // Check if Corpectomy
             const isCorpectomy = placements.some(p => p.levelId === level.id && p.data?.type === 'Corpectomy');
