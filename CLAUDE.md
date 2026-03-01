@@ -4,8 +4,7 @@
 A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export.
 
 ## Current Status
-- **Version:** v0.9.1-alpha (released on main branch)
-- **Branch:** `feature/anatomical-proportions` — data-driven vertebral proportions (WIP)
+- **Version:** v0.9.3-alpha
 - **Last Updated:** 2026-03-01
 - **License:** GNU GPLv3
 
@@ -24,7 +23,7 @@ spine-surgery/planning/spine-planner/
 ## GitHub & Deployment
 - **Repository:** github.com/nigelgummerson/spine-planner
 - **Live Site:** nigelgummerson.github.io/spine-planner (GitHub Pages)
-- **Branches:** `main` (v0.9.1-alpha), `feature/anatomical-proportions` (WIP)
+- **Branches:** `main` (v0.9.3-alpha)
 
 ## Tech Stack
 - React 18 (via CDN - unpkg)
@@ -34,6 +33,7 @@ spine-surgery/planning/spine-planner/
 - All dependencies loaded via CDN for offline hospital use
 
 ## Version History (Recent)
+- **v0.9.3-alpha** (2026-03-01): Anatomical proportions (T1-S1), pedicle data (Lien 2007), variable disc heights, auto-scale solver, level-anchored crosslinks, inline labels, cervical cage warning, export artefacts flagged
 - **v0.9.1-alpha** (2026-03-01): Session Privacy Mode rename, JSON v3 format with shared serialiser, help modal rewrite, theme renames
 - **v0.9.0-alpha** (2026-03-01): Up-going TP hook, bands/wires/cables, screw annotations, reconstruction cage text, bone graft section, left panel restructure, XLIF fix (T5-L4), corpectomy rendering fix
 - **v0.8.2-alpha** (2026-02-28): Company/screw system fields, auto-theme from company, rod text fields, screw size compact format, cage label repositioning, UI polish
@@ -82,8 +82,8 @@ spine-surgery/planning/spine-planner/
 ```
 
 ## Next Steps
-- [x] **Anatomical accuracy:** Data-driven vertebral proportions (on `feature/anatomical-proportions` branch, WIP)
-- [ ] **Anatomical proportions polish:** Crosslink drift between views, cage text vs screw label clashes in dense thoracic constructs
+- [x] **Anatomical accuracy:** Data-driven vertebral proportions (T1-S1), merged to main in v0.9.3
+- [ ] **Export artefacts:** Bone graft checkboxes and cage text white shadows in PDF/JPG export (html2canvas)
 - [ ] **Cervical spine proportions:** Extend VERTEBRA_ANATOMY to cervical levels (deferred)
 - [ ] **Barcode scanning:** Integrate html5-qrcode for GS1 DataMatrix scanning from implant packages
 - [ ] **Offline bundling:** Embed all JS libraries directly into HTML to bypass hospital firewalls

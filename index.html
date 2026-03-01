@@ -95,9 +95,23 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v0.9.1-alpha";
+        const CURRENT_VERSION = "v0.9.3-alpha";
 
         const CHANGE_LOG = [
+            { version: "v0.9.3-alpha", date: "2026-03-01", changes: [
+                "Data-driven vertebral body proportions (T1-S1) from X-ray calibration.",
+                "Pedicle dimensions from Lien et al. 2007, positioned in upper quarter of body.",
+                "Variable disc heights: 30% lumbar, 18% thoracic, 5mm cervical.",
+                "Auto-scale iterative solver accounts for borders and disc min-height clamping.",
+                "Level-anchored crosslinks ({levelId, fraction}) stable across view changes.",
+                "XLIF cages overhang vertebral body edges; OLIF rotation removed.",
+                "Inline implant labels (size + annotation horizontal) in compressed views.",
+                "Cervical cage warning in whole spine view — use Cervical view for detail.",
+                "Implant icons overflow visible in compressed cervical rows.",
+                "Pelvis simplified to rectangle; S1 disc zone removed.",
+                "Label font power scaling (heightScale^0.3) for readable compressed views.",
+                "Known issue: PDF/JPG export artefacts (bone graft checkboxes, cage text shadows).",
+            ]},
             { version: "v0.9.1-alpha", date: "2026-03-01", changes: [
                 "Session Mode renamed to Session Privacy Mode.",
                 "JSON format bumped to v3 with shared serialise/deserialise (loads v2 files).",
