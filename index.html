@@ -386,12 +386,14 @@
         };
 
         // Shared keyboard handler factory for modals (used via onKeyDown on overlay div)
+        // Enter/Escape work from anywhere (including text fields); Delete/Backspace only trigger
+        // implant deletion when NOT in a text field (so typing in annotation fields works normally)
         const modalKeyHandler = ({ onSubmit, onClose, onDelete, isEditing }) => (e) => {
             const tag = e.target.tagName;
-            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+            const inTextField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
             if (e.key === 'Enter') { e.preventDefault(); onSubmit(); }
             else if (e.key === 'Escape') { e.preventDefault(); onClose(); }
-            else if ((e.key === 'Delete' || e.key === 'Backspace') && isEditing && onDelete) { e.preventDefault(); onDelete(); }
+            else if (!inTextField && (e.key === 'Delete' || e.key === 'Backspace') && isEditing && onDelete) { e.preventDefault(); onDelete(); }
         };
 
         const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation }) => {
@@ -1109,9 +1111,8 @@
             };
 
             return (
-                <div className="flex flex-col w-full relative">
+                <div className="flex flex-col w-full relative border-b border-slate-100">
                     <div className="flex w-full relative" style={{ height: `${rowHeight}px` }}>
-                        <div className="absolute bottom-0 left-0 right-0 border-b border-slate-100 w-full z-0 pointer-events-none"></div>
                         {showForces && <div className={`w-10 border-r border-slate-100/50 bg-emerald-50/20 ${!readOnly ? 'hover:bg-emerald-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'force_left')}><ZoneContent zone="force_left" align="center"/></div>}
                         <div className={`flex-1 overflow-hidden min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><div className="flex items-center h-full">{reconCageText && <span className="font-bold text-sky-700 bg-sky-50 border border-sky-200 px-1 rounded shadow-sm whitespace-nowrap ml-1 shrink-0" style={{ fontSize: Math.max(8, cageLabelPx) + 'px' }}>{reconCageText}</span>}<div className="flex-1 h-full"><ZoneContent zone="left" align="left"/></div></div></div>
 
@@ -1126,12 +1127,12 @@
 
                     {/* INTERBODY DISC ZONE (Except after Pelvis or C1) */}
                     {level.type !== 'Pelvis' && level.id !== 'Oc' && level.id !== 'C1' && (
-                        <div className="w-full flex justify-center relative -mt-1 z-20">
+                        <div className="w-full flex justify-center relative z-20">
                             <div style={{ width: `${scaledWidth}px`, height: `${Math.max(8, getDiscHeight(level) * heightScale)}px` }} className={`flex items-center justify-center cursor-pointer transition-all ${!readOnly ? 'hover:bg-sky-100/50' : ''}`} onClick={() => !readOnly && onDiscClick(level.id)}>
                                 {cageBelow ? (
                                     <div className="relative group w-full h-full flex justify-center">
                                         <svg viewBox="0 0 160 20" className="w-full h-full overflow-visible"><CageVisualization cageType={cageBelow.tool} heightScale={1} levelId={level.id} /></svg>
-                                        <span className="absolute left-3/4 font-bold text-sky-700 bg-white/80 px-0.5 rounded shadow-sm border border-sky-100 whitespace-nowrap z-20" style={{ top: '50%', transform: 'translateY(-50%)' }} style={{ fontSize: cageLabelPx + 'px' }}>{cageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {cageBelow.data.height}H {cageBelow.data.lordosis}°{cageBelow.data.side && cageBelow.data.side !== 'bilateral' && cageBelow.data.side !== 'midline' ? ` (${cageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
+                                        <span className="absolute left-3/4 font-bold text-sky-700 bg-white/80 px-0.5 rounded shadow-sm border border-sky-100 whitespace-nowrap z-20" style={{ top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{cageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {cageBelow.data.height}H {cageBelow.data.lordosis}°{cageBelow.data.side && cageBelow.data.side !== 'bilateral' && cageBelow.data.side !== 'midline' ? ` (${cageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
                                     </div>
                                 ) : (
                                     !readOnly && <div className="h-2 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>
