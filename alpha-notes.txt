@@ -84,3 +84,49 @@ spine_planner_v0.8.2-alpha
 - Cage label repositioned to left-3/4
 - Session mode toggle enlarged and whole-row clickable
 - Patient info panel spacing tightened
+
+spine_planner_v0.9.0-alpha
+
+Bug fixes:
+- XLIF permissibility corrected from T1-L4 to T5-L4 (per clinical experience with thoracolumbar XLIF)
+- Corpectomy visual (dashed vertebral body) now renders — was checking p.tool instead of p.data?.type
+- Corpectomy palette tool pre-selects Corpectomy type and 0-degree angle in osteotomy modal
+- Removed dead 'Corpectomy' entry from INVENTORY_CATEGORIES osteotomies toolIds
+
+New implant types:
+- Up-going TP hook (tp_hook_up) — 5 hook types now available in grid-cols-5 layout
+- Band, Wire, Cable fixation types with bold text SVG icons (wider viewBox to prevent clipping)
+- Three-tier ScrewModal: SCREWS (dominant, py-2.5), HOOKS (medium, py-1.5), BANDS & OTHERS (compact, py-1)
+- Section labels for each tier in modal
+
+Annotations:
+- Screw free-text annotation field (placeholder: "fenestrated, cortical, revision")
+- Annotations also available for hooks (not just screws)
+- Annotation displays below size on diagram in smaller, lighter font
+- Band/wire/cable have a free-text "Description" field instead of annotation
+
+Osteotomy enhancements:
+- Types grouped into Posterior (Schwab Classification) and Anterior optgroups
+- Reconstruction cage text field for VCR/ML-VCR/Corpectomy osteotomies
+- Reconstruction cage badge renders in left zone (sky-blue, same row as osteotomy)
+
+Bone graft:
+- BONE_GRAFT_OPTIONS: Local Bone, Autograft, Allograft, Synthetics, DBM, BMP
+- Multi-select checkboxes (3-column grid) with free-text notes field
+- Stored in patientData.boneGraft: { types: [], notes: '' }
+
+Left panel restructure:
+- Demographics tightened to text-xs fields, text-[9px] labels
+- Company renamed to "Implant Supplier" (data key unchanged)
+- Supplier/Screw System/Bone Graft sizing matches demographics
+- Dividers between sections; single divider before inventory
+
+Visual refinements:
+- Screws/hooks positioned in upper 1/3 of vertebral body (items-start pt-[2px])
+- Hook labels: TP (Down) and TP (Up) instead of just TP
+- Theme labels renamed: Default → "Slate & Amber", Blue → "NHS Blue"
+
+Constants extracted:
+- HOOK_TYPES: ['pedicle_hook','tp_hook','tp_hook_up','sl_hook','il_hook']
+- NO_SIZE_TYPES: [...HOOK_TYPES, 'band', 'wire', 'cable']
+- Used throughout to replace inline arrays
