@@ -811,12 +811,13 @@
             S1:  { bodyW: 66.0, bodyH: 34.0, pedW: 20.0, pedH: 14.0 },
         };
 
-        // Per-level SVG height: use anatomical bodyH where available, else REGIONS default
-        // Scale factor maps mm bodyH to SVG units (calibrated so L4 at 36mm ≈ 50 SVG units)
-        const BODY_H_SCALE = 50 / 36.0;
+        // Per-level SVG height: use same mm-to-SVG scale as width (130/66 ≈ 1.97) for correct aspect ratio
+        // Add padding (6 SVG units) so body path doesn't touch viewBox edges
+        const VERT_SVG_SCALE = 130 / 66.0; // same scale for width and height
+        const VERT_PAD = 3; // top/bottom padding in SVG units
         const getLevelHeight = (level) => {
             const a = VERTEBRA_ANATOMY[level.id];
-            if (a) return Math.round(a.bodyH * BODY_H_SCALE);
+            if (a) return Math.round(a.bodyH * VERT_SVG_SCALE) + VERT_PAD * 2;
             return REGIONS[level.type].height;
         };
 
@@ -958,7 +959,7 @@
                 case 'plif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><rect x="3" y="8" width="7" height="8" /><rect x="14" y="8" width="7" height="8" /></svg>;
                 case 'tlif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><path d="M4 12c0-4 8-8 8-8s8 4 8 8-8 8-8 8-8-4-8-8z" /></svg>;
                 case 'xlif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><rect x="2" y="10" width="20" height="4" rx="1" /></svg>;
-                case 'olif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><ellipse cx="12" cy="12" rx="10" ry="6" transform="rotate(-15 12 12)"/></svg>;
+                case 'olif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><ellipse cx="12" cy="12" rx="10" ry="6" /></svg>;
                 case 'alif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><ellipse cx="12" cy="12" rx="10" ry="6" /></svg>;
                 
                 // --- Forces ---
@@ -982,7 +983,7 @@
                 return (
                     <svg viewBox={`0 0 160 ${height}`} className="w-full h-full block" overflow="visible">
                         <line x1="80" y1="0" x2="80" y2={height} stroke="#cbd5e1" strokeDasharray="3 3" />
-                        <path d={`M${cl},5 L${cr},5 L${cr},${height-5} L${cl},${height-5} Z`} fill="none" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
+                        <path d={`M${cl},${VERT_PAD} L${cr},${VERT_PAD} L${cr},${height-VERT_PAD} L${cl},${height-VERT_PAD} Z`} fill="none" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
                         <text x="80" y={height/2} dominantBaseline="middle" textAnchor="middle" fontSize="10" fill="#94a3b8" className="font-sans italic">Corpectomy</text>
                     </svg>
                 );
@@ -1000,34 +1001,35 @@
                             </g>
                         )}
 
-                        {type === 'T' && geom && (() => {
-                            const l = geom.left, r = geom.right, w = 2, c = 3;
-                            // Rounded corners via arcs, biconcave endplates & sidewalls
-                            const bodyPath = `M${l},${3+c} Q${l},3 ${l+c},3 Q80,5 ${r-c},3 Q${r},3 ${r},${3+c} Q${r-w},16 ${r},${29-c} Q${r},29 ${r-c},29 Q80,27 ${l+c},29 Q${l},29 ${l},${29-c} Q${l+w},16 ${l},${3+c} Z`;
+                        {(type === 'T' || type === 'L') && geom && (() => {
+                            const l = geom.left, r = geom.right;
+                            const isT = type === 'T';
+                            const c = isT ? 3 : 4; // corner radius
+                            const w = isT ? 2 : 3; // waist indent
+                            const t = VERT_PAD; // top of body
+                            const b = height - VERT_PAD; // bottom of body
+                            const m = (t + b) / 2; // midpoint for waist
+                            const endCurve = isT ? 2 : 2; // endplate concavity
+                            // Rounded corners, biconcave endplates & waisted sidewalls
+                            const bodyPath = `M${l},${t+c} Q${l},${t} ${l+c},${t} Q80,${t+endCurve} ${r-c},${t} Q${r},${t} ${r},${t+c} Q${r-w},${m} ${r},${b-c} Q${r},${b} ${r-c},${b} Q80,${b-endCurve} ${l+c},${b} Q${l},${b} ${l},${b-c} Q${l+w},${m} ${l},${t+c} Z`;
+                            const pedCy = t + (b - t) * 0.35;
+                            const pedStroke = isT ? "#94a3b8" : "#64748b";
+                            const pedWidth = isT ? "1" : "1.5";
                             return (
-                                <g transform={`scale(1, ${height/32})`}>
+                                <g>
                                     <path d={bodyPath} {...common} />
-                                    <ellipse cx={geom.pedLeftCx} cy="12" rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke="#94a3b8" strokeWidth="1"/>
-                                    <ellipse cx={geom.pedRightCx} cy="12" rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke="#94a3b8" strokeWidth="1"/>
+                                    <ellipse cx={geom.pedLeftCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth}/>
+                                    <ellipse cx={geom.pedRightCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth}/>
                                 </g>
                             );
                         })()}
 
-                        {type === 'L' && geom && (() => {
-                            const l = geom.left, r = geom.right, w = 3, c = 4;
-                            const bodyPath = `M${l},${4+c} Q${l},4 ${l+c},4 Q80,6 ${r-c},4 Q${r},4 ${r},${4+c} Q${r-w},19 ${r},${34-c} Q${r},34 ${r-c},34 Q80,32 ${l+c},34 Q${l},34 ${l},${34-c} Q${l+w},19 ${l},${4+c} Z`;
-                            return (
-                                <g transform={`scale(1, ${height/38})`}>
-                                    <path d={bodyPath} {...common} />
-                                    <ellipse cx={geom.pedLeftCx} cy="14" rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke="#64748b" strokeWidth="1.5"/>
-                                    <ellipse cx={geom.pedRightCx} cy="14" rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke="#64748b" strokeWidth="1.5"/>
-                                </g>
-                            );
+                        {type === 'S' && geom && (() => {
+                            const t = VERT_PAD;
+                            const b = height - VERT_PAD;
+                            const narrowFrac = 0.6; // sacrum narrows to 60% at bottom
+                            return <path d={`M${geom.left},${t} Q80,${t-4} ${geom.right},${t} L${80 + (geom.right-80)*narrowFrac},${b} Q80,${b+4} ${80 - (80-geom.left)*narrowFrac},${b} Z`} {...common} />;
                         })()}
-
-                        {type === 'S' && geom && (
-                            <path d={`M${geom.left},5 Q80,-2 ${geom.right},5 L${80 + (geom.right-80)*0.6},45 Q80,55 ${80 - (80-geom.left)*0.6},45 Z`} transform={`scale(1, ${height/48})`} {...common} />
-                        )}
                         {type === 'Pelvis' && <path d="M20,5 Q80,25 140,5 L130,40 Q80,50 30,40 Z" transform={`scale(1, ${height/45})`} {...common} opacity="0.6" />}
                     </g>
                     <text x="80" y={height/2} dominantBaseline="middle" textAnchor="middle" fontSize="10" fontWeight="bold" fill="#334155" className="font-sans pointer-events-none select-none">{label}</text>
@@ -1055,8 +1057,8 @@
                 case 'plif': return <g><rect x={80 - plifGap/2 - plifW} y="2" width={plifW} height={h} rx="1" fill={color} opacity="0.8" /><rect x={80 + plifGap/2} y="2" width={plifW} height={h} rx="1" fill={color} opacity="0.8" /></g>;
                 case 'tlif': return <path d={`M${80 - tlifHalf},2 Q80,${h+5} ${80 + tlifHalf},2`} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" />;
                 case 'acdf': return <rect x={80 - acdfW/2} y="2" width={acdfW} height={h} rx="2" fill={color} opacity="0.9" />;
-                case 'xlif': return <rect x={l} y="2" width={bw} height={h} rx="2" fill={color} opacity="0.6" />;
-                case 'olif': return <rect x={l + ann} y="2" width={bw - ann*2} height={h} rx="2" fill={color} opacity="0.7" transform={`rotate(-3 80 ${h/2+2})`} />;
+                case 'xlif': { const oh = 4; return <rect x={l - oh} y="2" width={bw + oh*2} height={h} rx="2" fill={color} opacity="0.6" />; }
+                case 'olif': return <rect x={l + ann} y="2" width={bw - ann*2} height={h} rx="2" fill={color} opacity="0.7" />;
                 case 'alif': return <rect x={l + ann} y="2" width={bw - ann*2} height={h} rx="2" fill={color} opacity="0.7" />;
                 default: return <rect x={80 - acdfW/2} y="2" width={acdfW} height={h} fill={color} />;
             }
