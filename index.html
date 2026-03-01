@@ -791,25 +791,27 @@
         };
 
         // Anatomical dimensions (mm): bodyW/bodyH from X-ray measurements interpolated
-        // between anchors T2(36x20), T12(48x30), L4(60x36). Pedicle data from Panjabi 1992.
+        // between anchors T2(36x20), T12(48x30), L4(60x36).
+        // Pedicle data from Lien et al. 2007 (Eur Spine J, PMC2200778) — averaged L/R.
+        // Lumbar pedH cross-checked against Zindrick 1987 (Spine 12:160-166).
         const VERTEBRA_ANATOMY = {
-            T1:  { bodyW: 34.8, bodyH: 19.0, pedW: 8.1, pedH: 10.7 },
-            T2:  { bodyW: 36.0, bodyH: 20.0, pedW: 7.0, pedH: 10.4 },
-            T3:  { bodyW: 37.2, bodyH: 21.0, pedW: 5.7, pedH:  9.8 },
-            T4:  { bodyW: 38.4, bodyH: 22.0, pedW: 5.2, pedH:  9.4 },
-            T5:  { bodyW: 39.6, bodyH: 23.0, pedW: 5.4, pedH:  9.8 },
-            T6:  { bodyW: 40.8, bodyH: 24.0, pedW: 5.8, pedH: 10.6 },
-            T7:  { bodyW: 42.0, bodyH: 25.0, pedW: 6.3, pedH: 10.9 },
-            T8:  { bodyW: 43.2, bodyH: 26.0, pedW: 6.7, pedH: 11.4 },
-            T9:  { bodyW: 44.4, bodyH: 27.0, pedW: 7.6, pedH: 12.5 },
-            T10: { bodyW: 45.6, bodyH: 28.0, pedW: 8.9, pedH: 13.8 },
-            T11: { bodyW: 46.8, bodyH: 29.0, pedW: 10.5, pedH: 14.5 },
-            T12: { bodyW: 48.0, bodyH: 30.0, pedW: 12.0, pedH: 15.5 },
-            L1:  { bodyW: 51.0, bodyH: 31.5, pedW: 9.0, pedH: 15.4 },
-            L2:  { bodyW: 54.0, bodyH: 33.0, pedW: 9.5, pedH: 15.7 },
-            L3:  { bodyW: 57.0, bodyH: 34.5, pedW: 11.2, pedH: 15.3 },
-            L4:  { bodyW: 60.0, bodyH: 36.0, pedW: 13.1, pedH: 14.5 },
-            L5:  { bodyW: 63.0, bodyH: 35.0, pedW: 17.5, pedH: 14.2 },
+            T1:  { bodyW: 34.8, bodyH: 19.0, pedW: 7.7, pedH:  8.7 },
+            T2:  { bodyW: 36.0, bodyH: 20.0, pedW: 5.5, pedH: 10.3 },
+            T3:  { bodyW: 37.2, bodyH: 21.0, pedW: 4.0, pedH: 10.4 },
+            T4:  { bodyW: 38.4, bodyH: 22.0, pedW: 3.5, pedH: 10.3 },
+            T5:  { bodyW: 39.6, bodyH: 23.0, pedW: 3.8, pedH: 10.6 },
+            T6:  { bodyW: 40.8, bodyH: 24.0, pedW: 4.0, pedH: 10.2 },
+            T7:  { bodyW: 42.0, bodyH: 25.0, pedW: 4.4, pedH: 10.4 },
+            T8:  { bodyW: 43.2, bodyH: 26.0, pedW: 4.8, pedH: 10.9 },
+            T9:  { bodyW: 44.4, bodyH: 27.0, pedW: 5.3, pedH: 12.4 },
+            T10: { bodyW: 45.6, bodyH: 28.0, pedW: 5.7, pedH: 13.7 },
+            T11: { bodyW: 46.8, bodyH: 29.0, pedW: 7.2, pedH: 15.1 },
+            T12: { bodyW: 48.0, bodyH: 30.0, pedW: 7.6, pedH: 15.1 },
+            L1:  { bodyW: 51.0, bodyH: 31.5, pedW: 6.5, pedH: 13.7 },
+            L2:  { bodyW: 54.0, bodyH: 33.0, pedW: 7.2, pedH: 14.1 },
+            L3:  { bodyW: 57.0, bodyH: 34.5, pedW: 9.2, pedH: 13.9 },
+            L4:  { bodyW: 60.0, bodyH: 36.0, pedW: 11.9, pedH: 12.8 },
+            L5:  { bodyW: 63.0, bodyH: 35.0, pedW: 17.6, pedH: 12.5 },
             S1:  { bodyW: 66.0, bodyH: 34.0, pedW: 20.0, pedH: 14.0 },
         };
 
@@ -1014,7 +1016,9 @@
                             const endCurve = isT ? 2 : 2; // endplate concavity
                             // Rounded corners, biconcave endplates & waisted sidewalls
                             const bodyPath = `M${l},${t+c} Q${l},${t} ${l+c},${t} Q80,${t+endCurve} ${r-c},${t} Q${r},${t} ${r},${t+c} Q${r-w},${m} ${r},${b-c} Q${r},${b} ${r-c},${b} Q80,${b-endCurve} ${l+c},${b} Q${l},${b} ${l},${b-c} Q${l+w},${m} ${l},${t+c} Z`;
-                            const pedCy = t + (b - t) * 0.35;
+                            // Pedicles arise from superior part of body, just below upper endplate
+                            // (Gray's Anatomy; Lien 2007; Kim 2008: upper-third/lower-two-thirds junction)
+                            const pedCy = t + (b - t) * 0.22;
                             const pedStroke = isT ? "#94a3b8" : "#64748b";
                             const pedWidth = isT ? "1" : "1.5";
                             return (
