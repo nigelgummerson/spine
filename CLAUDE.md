@@ -4,14 +4,14 @@
 A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export.
 
 ## Current Status
-- **Version:** v0.9.3-alpha
+- **Version:** v0.9.4-alpha
 - **Last Updated:** 2026-03-01
 - **License:** GNU GPLv3
 
 ## Project Structure
 ```
 spine-surgery/planning/spine-planner/
-├── index.html          # Single-file app (React 18 + Tailwind via CDN), ~1574 lines
+├── index.html          # Single-file app (React 18 + Tailwind via CDN), ~1790 lines
 ├── alpha-notes.txt     # Development context and version notes
 ├── CLAUDE.md           # This file (Claude-specific collaboration tracking)
 ├── README.md           # GitHub README
@@ -23,16 +23,17 @@ spine-surgery/planning/spine-planner/
 ## GitHub & Deployment
 - **Repository:** github.com/nigelgummerson/spine-planner
 - **Live Site:** nigelgummerson.github.io/spine-planner (GitHub Pages)
-- **Branches:** `main` (v0.9.3-alpha)
+- **Branches:** `main` (v0.9.4-alpha)
 
 ## Tech Stack
-- React 18 (via CDN - unpkg)
+- React 18 production builds (via CDN - unpkg)
 - Tailwind CSS (via CDN)
-- html2canvas (screenshot/preview)
+- html-to-image (PDF/JPG export via SVG foreignObject — pixel-perfect browser-native rendering)
 - jsPDF (PDF export)
 - All dependencies loaded via CDN for offline hospital use
 
 ## Version History (Recent)
+- **v0.9.4-alpha** (2026-03-01): Replaced html2canvas with html-to-image for pixel-perfect export. Fixed text baseline shift, checkbox/select state, cage label artefacts, screen flash during export. React CDN switched to production builds. Cage label border/shadow removed.
 - **v0.9.3-alpha** (2026-03-01): Anatomical proportions (T1-S1), pedicle data (Lien 2007), variable disc heights, auto-scale solver, level-anchored crosslinks, inline labels, cervical cage warning, export artefacts flagged
 - **v0.9.1-alpha** (2026-03-01): Session Privacy Mode rename, JSON v3 format with shared serialiser, help modal rewrite, theme renames
 - **v0.9.0-alpha** (2026-03-01): Up-going TP hook, bands/wires/cables, screw annotations, reconstruction cage text, bone graft section, left panel restructure, XLIF fix (T5-L4), corpectomy rendering fix
@@ -42,7 +43,7 @@ spine-surgery/planning/spine-planner/
 - **v0.7.0-alpha**: Interbody cage support (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) with permissibility engine
 - **v0.5.6-alpha**: Last version before cage support
 
-## Key Architecture (v0.9.1 + anatomical-proportions branch)
+## Key Architecture (v0.9.4)
 - **Export container:** Fixed 1485x1050px, 3 columns: patient info (340px) + Plan (flex-4) + Construct (flex-3)
 - **Sidebar:** w-64, colour-themed per company (7 schemes), tool palette, export controls
 - **Colour schemes:** Sidebar only; printed form unaffected. `AUTO_THEME_FROM_COMPANY` flag controls auto-switching. Themes: Slate & Amber (default), NHS Blue, Deep Navy, Gold & Black, Red, Purple, Midnight
@@ -56,6 +57,7 @@ spine-surgery/planning/spine-planner/
 - **Connectors:** Level-anchored `{levelId, fraction}` (branch); legacy `{yNorm}` migrated on load
 - **Session cache:** localStorage key `spine_planner_v2`, formatVersion 3
 - **Save/load:** Shared `serializeState()` / `deserializeState()` functions; loads formatVersion >= 2
+- **Export:** html-to-image (SVG foreignObject) replaces html2canvas. `prepareExportCanvas()` syncs checkbox `checked` and select `selected` attributes before capture. No live DOM modification — no screen flash. jsPDF for PDF generation from canvas.
 
 ## Anatomical Proportions (feature branch)
 - **`VERTEBRA_ANATOMY`:** Per-level mm data (bodyW, bodyH, pedW, pedH) for T1-S1, calibrated from X-ray measurements
@@ -83,7 +85,7 @@ spine-surgery/planning/spine-planner/
 
 ## Next Steps
 - [x] **Anatomical accuracy:** Data-driven vertebral proportions (T1-S1), merged to main in v0.9.3
-- [ ] **Export artefacts:** Bone graft checkboxes and cage text white shadows in PDF/JPG export (html2canvas)
+- [x] **Export artefacts:** Fixed in v0.9.4 — replaced html2canvas with html-to-image
 - [ ] **Cervical spine proportions:** Extend VERTEBRA_ANATOMY to cervical levels (deferred)
 - [ ] **Barcode scanning:** Integrate html5-qrcode for GS1 DataMatrix scanning from implant packages
 - [ ] **Offline bundling:** Embed all JS libraries directly into HTML to bypass hospital firewalls
