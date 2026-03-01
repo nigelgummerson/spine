@@ -640,14 +640,17 @@
 
         const ScrewSystemCombo = ({ value, onChange, company, placeholder }) => {
             const [open, setOpen] = useState(false);
+            const [editing, setEditing] = useState(false);
             const [filter, setFilter] = useState('');
             const ref = useRef(null);
+            const inputRef = useRef(null);
 
             useEffect(() => {
-                const handleClickOutside = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+                const handleClickOutside = (e) => { if (ref.current && !ref.current.contains(e.target)) { setOpen(false); setEditing(false); } };
                 document.addEventListener('mousedown', handleClickOutside);
                 return () => document.removeEventListener('mousedown', handleClickOutside);
             }, []);
+            useEffect(() => { if (editing && inputRef.current) inputRef.current.focus(); }, [editing]);
 
             const companySystems = company && SCREW_SYSTEMS[company] ? SCREW_SYSTEMS[company] : [];
             const otherSystems = Object.entries(SCREW_SYSTEMS).filter(([k]) => k !== company).flatMap(([k, v]) => v.map(s => ({ name: s, company: k })));
@@ -660,7 +663,11 @@
 
             return (
                 <div ref={ref} className="relative">
-                    <input type="text" className="editable-field w-full text-sm" value={value} placeholder={placeholder} onChange={e => { onChange(e.target.value); setFilter(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} />
+                    {editing ? (
+                        <input ref={inputRef} type="text" className="editable-field w-full text-xs" value={value} placeholder={placeholder} onChange={e => { onChange(e.target.value); setFilter(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} />
+                    ) : (
+                        <div className="editable-field w-full text-xs cursor-pointer" style={{ whiteSpace: 'normal', wordBreak: 'break-word' }} onClick={() => { setEditing(true); setOpen(true); }}>{value || <span style={{ color: '#94a3b8' }}>{placeholder}</span>}</div>
+                    )}
                     {open && (matchedCompany.length > 0 || matchedOther.length > 0) && (
                         <div className="absolute z-50 left-0 right-0 top-full mt-0.5 bg-white border border-slate-300 rounded shadow-lg max-h-48 overflow-y-auto text-xs">
                             {matchedCompany.length > 0 && <div className="px-2 py-1 text-[9px] font-bold text-slate-400 uppercase bg-slate-50">{company}</div>}
@@ -754,8 +761,8 @@
             const useColumns = totalItems > 6;
 
             return (
-                <div className="mt-6 border-t border-slate-200 pt-3 shrink-0">
-                    <h3 className="text-[10px] font-bold text-slate-900 uppercase tracking-widest mb-3 border-b border-slate-100 pb-1">{title} Inventory</h3>
+                <div className="mt-2 border-t border-slate-200 pt-1 shrink-0">
+                    <h3 className="text-[10px] font-bold text-slate-900 uppercase tracking-widest mb-2 border-b border-slate-100 pb-1">{title} Inventory</h3>
                     <div style={useColumns ? { columns: 2, columnGap: '8px' } : undefined}>
                         {INVENTORY_CATEGORIES.map(cat => {
                             const items = grouped[cat.key];
@@ -861,8 +868,9 @@
         // Disc height varies by region: lumbar ~1/3 body height, thoracic ~1/5, cervical ~5-6mm
         const getDiscHeight = (level) => {
             if (level.type === 'Pelvis' || level.id === 'Oc' || level.id === 'C1') return 0;
+            if (level.type === 'S') return 4; // minimal gap — sacrum fused to pelvis
             const h = getLevelHeight(level);
-            if (level.type === 'L' || level.type === 'S') return Math.round(h / 3);
+            if (level.type === 'L') return Math.round(h / 3);
             if (level.type === 'T') return Math.round(h / 5);
             return 10; // cervical (~5-6mm scaled)
         };
@@ -1135,8 +1143,8 @@
                             <div style={{ width: `${scaledWidth}px`, height: `${Math.max(8, getDiscHeight(level) * heightScale)}px` }} className={`flex items-center justify-center cursor-pointer transition-all ${!readOnly ? 'hover:bg-sky-100/50' : ''}`} onClick={() => !readOnly && onDiscClick(level.id)}>
                                 {cageBelow ? (
                                     <div className="relative group w-full h-full flex justify-center">
-                                        <svg viewBox="0 0 160 20" className="w-full h-full overflow-visible"><CageVisualization cageType={cageBelow.tool} heightScale={1} levelId={level.id} /></svg>
-                                        <span className="absolute left-3/4 font-bold text-sky-700 bg-white/80 px-0.5 rounded shadow-sm border border-sky-100 whitespace-nowrap z-20" style={{ top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{cageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {cageBelow.data.height}H {cageBelow.data.lordosis}°{cageBelow.data.side && cageBelow.data.side !== 'bilateral' && cageBelow.data.side !== 'midline' ? ` (${cageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
+                                        <svg viewBox="0 0 160 20" preserveAspectRatio="none" className="w-full h-full overflow-visible"><CageVisualization cageType={cageBelow.tool} heightScale={1} levelId={level.id} /></svg>
+                                        <span className="absolute font-bold text-sky-700 bg-white/80 px-0.5 rounded shadow-sm border border-sky-100 whitespace-nowrap z-20" style={{ left: 'calc(75% + 2em)', top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{cageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {cageBelow.data.height}H {cageBelow.data.lordosis}°{cageBelow.data.side && cageBelow.data.side !== 'bilateral' && cageBelow.data.side !== 'midline' ? ` (${cageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
                                     </div>
                                 ) : (
                                     !readOnly && <div className="h-2 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>
