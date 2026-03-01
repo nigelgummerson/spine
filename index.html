@@ -1099,7 +1099,7 @@
             }
         };
 
-        const LevelRow = ({ level, placements, onZoneClick, tools, onPlacementClick, readOnly, showForces, heightScale, onDiscClick, cages, levels }) => {
+        const LevelRow = ({ level, placements, onZoneClick, tools, onPlacementClick, readOnly, showForces, heightScale, onDiscClick, cages, levels, viewMode }) => {
             const getItems = (z) => placements.filter(p => p.levelId === level.id && p.zone === z);
             const rowHeight = getLevelHeight(level) * heightScale;
             const scaledWidth = 160 * heightScale;
@@ -1140,35 +1140,40 @@
                 const verticalClass = isForceZone ? 'items-center' : 'items-start pt-[2px]';
                 return (
                     <div className={`flex ${verticalClass} gap-1 h-full ${justifyClass} relative`}>{!hasItems && !readOnly && (zone === 'left' || zone === 'right' || isForceZone) && <GhostTarget type={isForceZone ? 'force' : 'screw'} />}
-                        {items.map(p => { const tool = tools.find(t => t.id === p.tool); const isHookItem = HOOK_TYPES.includes(p.tool); const isOsteo = p.tool === 'osteotomy'; let displayLabel = p.data; let angle = null; if (isOsteo && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } const iW = isHookItem ? hookW : isOsteo ? osteoPx : screwPx; const iH = isHookItem ? hookH : isOsteo ? osteoPx : screwPx; const ann = p.annotation || ''; const showData = p.data && !isHookItem; const showAnn = !!ann; const labelBlock = (showData || showAnn) ? <div className="flex flex-col leading-none" style={{ alignItems: align === 'right' ? 'flex-start' : 'flex-end', gap: '0px' }}>{showData && <span className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight" style={{ fontSize: labelPx + 'px' }}>{isOsteo ? `${displayLabel} ${angle}°` : displayLabel}</span>}{showAnn && <span className="text-slate-400 italic whitespace-nowrap px-1 leading-tight" style={{ fontSize: Math.max(8, labelPx - 2) + 'px' }}>{ann}</span>}</div> : null; return (<div key={p.id} className={`relative group flex items-center gap-1 ${!readOnly ? 'cursor-pointer' : ''}`} onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}>{align === 'left' && labelBlock}<div style={{ width: iW, height: iH }} className={`${!readOnly ? 'hover:scale-110 transition-transform' : ''}`}><InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />{!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}</div>{align === 'right' && labelBlock}</div>); })}
+                        {items.map(p => { const tool = tools.find(t => t.id === p.tool); const isHookItem = HOOK_TYPES.includes(p.tool); const isOsteo = p.tool === 'osteotomy'; let displayLabel = p.data; let angle = null; if (isOsteo && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } const iW = isHookItem ? hookW : isOsteo ? osteoPx : screwPx; const iH = isHookItem ? hookH : isOsteo ? osteoPx : screwPx; const ann = p.annotation || ''; const showData = p.data && !isHookItem; const showAnn = !!ann; const isInline = heightScale < 0.85 && showData && showAnn; const labelBlock = (showData || showAnn) ? <div className={`flex ${isInline ? (align === 'left' ? 'flex-row-reverse' : 'flex-row') : 'flex-col'} leading-none`} style={{ alignItems: isInline ? 'center' : (align === 'right' ? 'flex-start' : 'flex-end'), gap: isInline ? '3px' : '0px' }}>{showData && <span className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight" style={{ fontSize: labelPx + 'px' }}>{isOsteo ? `${displayLabel} ${angle}°` : displayLabel}</span>}{showAnn && <span className="text-slate-400 italic whitespace-nowrap px-1 leading-tight" style={{ fontSize: Math.max(8, labelPx - 2) + 'px' }}>{ann}</span>}</div> : null; return (<div key={p.id} className={`relative group flex items-center gap-1 ${!readOnly ? 'cursor-pointer' : ''}`} onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}>{align === 'left' && labelBlock}<div style={{ width: iW, height: iH }} className={`${!readOnly ? 'hover:scale-110 transition-transform' : ''}`}><InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />{!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}</div>{align === 'right' && labelBlock}</div>); })}
                     </div>
                 );
             };
 
             return (
                 <div className="flex flex-col w-full relative border-b border-slate-100">
-                    <div className="flex w-full relative" style={{ height: `${rowHeight}px` }}>
+                    <div className="flex w-full relative z-20" style={{ height: `${rowHeight}px` }}>
                         {showForces && <div className={`w-10 border-r border-slate-100/50 bg-emerald-50/20 ${!readOnly ? 'hover:bg-emerald-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'force_left')}><ZoneContent zone="force_left" align="center"/></div>}
-                        <div className={`flex-1 overflow-hidden min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><div className="flex items-center h-full">{reconCageText && <span className="font-bold text-sky-700 bg-sky-50 border border-sky-200 px-1 rounded shadow-sm whitespace-nowrap ml-1 shrink-0" style={{ fontSize: Math.max(8, cageLabelPx) + 'px' }}>{reconCageText}</span>}<div className="flex-1 h-full"><ZoneContent zone="left" align="left"/></div></div></div>
+                        <div className={`flex-1 overflow-visible min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><div className="flex items-center h-full">{reconCageText && <span className="font-bold text-sky-700 bg-sky-50 border border-sky-200 px-1 rounded shadow-sm whitespace-nowrap ml-1 shrink-0" style={{ fontSize: Math.max(8, cageLabelPx) + 'px' }}>{reconCageText}</span>}<div className="flex-1 h-full"><ZoneContent zone="left" align="left"/></div></div></div>
 
                         <div style={{ width: `${scaledWidth}px` }} className={`relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}>
                             <SpineVertebra label={level.id} type={level.type} height={getLevelHeight(level)} isCorpectomy={isCorpectomy} heightScale={heightScale} />
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">{getItems('mid').filter(p => p.tool !== 'connector').map(p => { const tool = tools.find(t => t.id === p.tool); let displayLabel = ''; let angle = ''; if (p.tool === 'osteotomy' && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } return (<div key={p.id} className="pointer-events-auto relative group flex flex-col items-center" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><div style={{ width: midPx, height: midPx }}><InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-md text-slate-900" /></div>{p.tool === 'osteotomy' && p.data && (<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 px-1 rounded shadow-sm whitespace-nowrap z-20" style={{ fontSize: osteoLabelPx + 'px' }}>{displayLabel} {angle}°</div>)}</div>); })}</div>
                         </div>
 
-                        <div className={`flex-1 overflow-hidden min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'right')}><ZoneContent zone="right" align="right"/></div>
+                        <div className={`flex-1 overflow-visible min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'right')}><ZoneContent zone="right" align="right"/></div>
                         {showForces && <div className={`w-10 border-l border-slate-100/50 bg-emerald-50/20 ${!readOnly ? 'hover:bg-emerald-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'force_right')}><ZoneContent zone="force_right" align="center"/></div>}
                     </div>
 
                     {/* INTERBODY DISC ZONE (Except after Pelvis or C1) */}
-                    {level.type !== 'Pelvis' && level.id !== 'Oc' && level.id !== 'C1' && (
-                        <div className="w-full flex justify-center relative z-20">
+                    {level.type !== 'Pelvis' && level.type !== 'S' && level.id !== 'Oc' && level.id !== 'C1' && (
+                        <div className="w-full flex justify-center relative z-10">
                             <div style={{ width: `${scaledWidth}px`, height: `${Math.max(DISC_MIN_PX, getDiscHeight(level) * heightScale)}px` }} className={`flex items-center justify-center cursor-pointer transition-all ${!readOnly ? 'hover:bg-sky-100/50' : ''}`} onClick={() => !readOnly && onDiscClick(level.id)}>
                                 {cageBelow ? (
+                                    viewMode === 'whole' && level.type === 'C' ? (
+                                        <div className="relative w-full h-full flex items-center justify-center">
+                                            <span className="text-amber-600 italic whitespace-nowrap" style={{ fontSize: Math.max(9, cageLabelPx - 1) + 'px' }}>Cervical cage — use Cervical view</span>
+                                        </div>
+                                    ) : (
                                     <div className="relative group w-full h-full flex justify-center">
                                         <svg viewBox="0 0 160 20" preserveAspectRatio="none" className="w-full h-full overflow-visible"><CageVisualization cageType={cageBelow.tool} heightScale={1} levelId={level.id} /></svg>
                                         <span className="absolute font-bold text-sky-700 bg-white/80 px-0.5 rounded shadow-sm border border-sky-100 whitespace-nowrap z-20" style={{ left: 'calc(75% + 2em)', top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{cageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {cageBelow.data.height}H {cageBelow.data.lordosis}°{cageBelow.data.side && cageBelow.data.side !== 'bilateral' && cageBelow.data.side !== 'midline' ? ` (${cageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
-                                    </div>
+                                    </div>)
                                 ) : (
                                     !readOnly && <div className="h-2 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>
                                 )}
@@ -1179,7 +1184,7 @@
             );
         };
 
-        const ChartPaper = ({ title, placements, onZoneClick, onPlacementClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader }) => {
+        const ChartPaper = ({ title, placements, onZoneClick, onPlacementClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode }) => {
             const contentRef = useRef(null);
             const [draggingId, setDraggingId] = useState(null);
             const dragStartRef = useRef(null);
@@ -1196,13 +1201,20 @@
                 return entry.startY + conn.fraction * (entry.vertEnd - entry.startY);
             };
 
-            // Convert rendered Y to {levelId, fraction}, snapping to adjacent levels
+            // Convert rendered Y to {levelId, fraction}, snapping to nearest level
             const renderedYToConnector = (localY) => {
                 const viewMap = buildHeightMap(levels, heightScale);
-                let entry = viewMap.map.find(e => localY >= e.startY && localY < e.endY);
+                // Use <= endY to include the exact boundary pixel; also handles gap pixels between levels
+                let entry = viewMap.map.find(e => localY >= e.startY && localY <= e.endY);
                 if (!entry) {
-                    if (localY <= 0) entry = viewMap.map[0];
-                    else entry = viewMap.map[viewMap.map.length - 1];
+                    // Find nearest level by distance to midpoint (handles border gaps)
+                    let best = viewMap.map[0], bestDist = Infinity;
+                    viewMap.map.forEach(e => {
+                        const mid = (e.startY + e.endY) / 2;
+                        const dist = Math.abs(localY - mid);
+                        if (dist < bestDist) { bestDist = dist; best = e; }
+                    });
+                    entry = best;
                 }
                 const segLen = entry.vertEnd - entry.startY;
                 const fraction = segLen > 0 ? Math.max(0, Math.min(1, (localY - entry.startY) / segLen)) : 0.5;
@@ -1241,7 +1253,7 @@
                     {showForces && <div className="w-10"></div>}
                 </div>}
                 <div ref={contentRef} className="flex flex-col w-full relative">
-                    {levels.map(lvl => <LevelRow key={lvl.id} level={lvl} placements={placements} onZoneClick={onZoneClick} onPlacementClick={onPlacementClick} tools={tools} readOnly={readOnly} showForces={showForces} heightScale={heightScale} cages={cages} onDiscClick={onDiscClick} levels={levels} />)}
+                    {levels.map(lvl => <LevelRow key={lvl.id} level={lvl} placements={placements} onZoneClick={onZoneClick} onPlacementClick={onPlacementClick} tools={tools} readOnly={readOnly} showForces={showForces} heightScale={heightScale} cages={cages} onDiscClick={onDiscClick} levels={levels} viewMode={viewMode} />)}
                     {/* Connector overlay */}
                     {connectors && connectors.length > 0 && (
                         <div className="absolute inset-0 pointer-events-none z-30">
@@ -1734,8 +1746,8 @@
                                         </div>
                                         <CreditsFooter />
                                     </div>
-                                    <div className="flex-[4] flex flex-col h-full"><ChartPaper title="Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} /></div>
-                                    <div className="flex-[3] flex flex-col h-full"><ChartPaper title="Final Surgical Construct" placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder="e.g. 5.5mm CoCr Rod">{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder="e.g. 5.5mm TiAlV Rail">{patientData.rightRod}</div></div></React.Fragment>} /></div>
+                                    <div className="flex-[4] flex flex-col h-full"><ChartPaper title="Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} /></div>
+                                    <div className="flex-[3] flex flex-col h-full"><ChartPaper title="Final Surgical Construct" placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder="e.g. 5.5mm CoCr Rod">{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder="e.g. 5.5mm TiAlV Rail">{patientData.rightRod}</div></div></React.Fragment>} /></div>
                                 </div>
                             </div>
                         </div>
