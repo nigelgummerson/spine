@@ -9,7 +9,7 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
@@ -95,9 +95,17 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v0.9.31-alpha";
+        const CURRENT_VERSION = "v0.9.4-alpha";
 
         const CHANGE_LOG = [
+            { version: "v0.9.4-alpha", date: "2026-03-01", changes: [
+                "Replaced html2canvas with html-to-image for pixel-perfect PDF/JPG export.",
+                "Fixed text baseline positioning in exports (all text previously sat low).",
+                "Checkboxes and select dropdowns now export correctly.",
+                "Removed cage label border and shadow artefacts from export.",
+                "No screen flash during export — live DOM no longer modified.",
+                "React CDN switched to production builds (smaller, faster).",
+            ]},
             { version: "v0.9.3-alpha", date: "2026-03-01", changes: [
                 "Data-driven vertebral body proportions (T1-S1) from X-ray calibration.",
                 "Pedicle dimensions from Lien et al. 2007, positioned in upper quarter of body.",
@@ -110,7 +118,7 @@
                 "Implant icons overflow visible in compressed cervical rows.",
                 "Pelvis simplified to rectangle; S1 disc zone removed.",
                 "Label font power scaling (heightScale^0.3) for readable compressed views.",
-                "Known issue: PDF/JPG export artefacts (bone graft checkboxes, cage text shadows).",
+                "Known issue (fixed in v0.9.4): PDF/JPG export artefacts (bone graft checkboxes, cage text shadows).",
             ]},
             { version: "v0.9.1-alpha", date: "2026-03-01", changes: [
                 "Session Mode renamed to Session Privacy Mode.",
@@ -1186,7 +1194,7 @@
                                     ) : (
                                     <div className="relative group w-full h-full flex justify-center">
                                         <svg viewBox="0 0 160 20" preserveAspectRatio="none" className="w-full h-full overflow-visible"><CageVisualization cageType={cageBelow.tool} heightScale={1} levelId={level.id} /></svg>
-                                        <span className="absolute font-bold text-sky-700 bg-white/80 px-0.5 rounded shadow-sm border border-sky-100 whitespace-nowrap z-20" style={{ left: 'calc(75% + 2em)', top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{cageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {cageBelow.data.height}H {cageBelow.data.lordosis}°{cageBelow.data.side && cageBelow.data.side !== 'bilateral' && cageBelow.data.side !== 'midline' ? ` (${cageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
+                                        <span className="absolute font-bold text-sky-700 bg-white/80 px-0.5 rounded whitespace-nowrap z-20" style={{ left: 'calc(75% + 2em)', top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{cageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {cageBelow.data.height}H {cageBelow.data.lordosis}°{cageBelow.data.side && cageBelow.data.side !== 'bilateral' && cageBelow.data.side !== 'midline' ? ` (${cageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
                                     </div>)
                                 ) : (
                                     !readOnly && <div className="h-2 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>
@@ -1584,7 +1592,28 @@
             };
 
             // EXPORT
-            const prepareExportCanvas = async () => { const element = exportRef.current; const cloneContainer = document.createElement('div'); cloneContainer.style.position = 'absolute'; cloneContainer.style.top = '0'; cloneContainer.style.left = '0'; cloneContainer.style.zIndex = '-9999'; document.body.appendChild(cloneContainer); const clone = element.cloneNode(true); clone.style.transform = 'none'; clone.style.margin = '0'; cloneContainer.appendChild(clone); const canvas = await html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: 1485, height: 1050, logging: false }); document.body.removeChild(cloneContainer); return canvas; };
+            const prepareExportCanvas = async () => {
+                await document.fonts.ready;
+                const element = exportRef.current;
+                // Sync DOM properties to attributes so cloneNode preserves them
+                element.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                    if (cb.checked) cb.setAttribute('checked', 'checked');
+                    else cb.removeAttribute('checked');
+                });
+                element.querySelectorAll('select').forEach(sel => {
+                    Array.from(sel.options).forEach((opt, i) => {
+                        if (i === sel.selectedIndex) opt.setAttribute('selected', 'selected');
+                        else opt.removeAttribute('selected');
+                    });
+                });
+                const canvas = await htmlToImage.toCanvas(element, {
+                    pixelRatio: 2,
+                    backgroundColor: '#ffffff',
+                    width: 1485,
+                    height: 1050
+                });
+                return canvas;
+            };
             const runExportJPG = async () => { const canvas = await prepareExportCanvas(); const link = document.createElement('a'); link.download = `SpinePlan_${patientData.name || 'Patient'}.jpg`; link.href = canvas.toDataURL('image/jpeg', 0.9); link.click(); if (incognitoMode) localStorage.removeItem('spine_planner_v2'); };
             const runExportPDF = async () => { const canvas = await prepareExportCanvas(); const imgData = canvas.toDataURL('image/jpeg', 1.0); const { jsPDF } = window.jspdf; const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1485, 1050] }); pdf.addImage(imgData, 'JPEG', 0, 0, 1485, 1050); pdf.save(`SpinePlan_${patientData.name || 'Patient'}.pdf`); if (incognitoMode) localStorage.removeItem('spine_planner_v2'); };
             const saveProjectJSON = () => {
