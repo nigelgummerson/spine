@@ -2,7 +2,7 @@
 
 A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instrumentation diagrams with a visual, exportable chart that documents the pre-operative plan and post-operative construct.
 
-**Version:** v0.9.1-alpha | **License:** GNU GPLv3
+**Version:** v0.9.3-alpha | **License:** GNU GPLv3
 **Live:** [nigelgummerson.github.io/spine-planner](https://nigelgummerson.github.io/spine-planner)
 
 ## Features
