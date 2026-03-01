@@ -789,12 +789,12 @@
         // ==========================================
         
         const REGIONS = {
-            Oc: { height: 40, color: '#f8fafc' },
-            C: { height: 28, color: '#f1f5f9' },
+            Oc: { height: 25, color: '#f8fafc' },
+            C: { height: 24, color: '#f1f5f9' },
             T: { height: 36, color: '#e2e8f0' },
             L: { height: 46, color: '#cbd5e1' },
             S: { height: 52, color: '#94a3b8' },
-            Pelvis: { height: 54, color: '#94a3b8' }
+            Pelvis: { height: 35, color: '#94a3b8' }
         };
 
         // Anatomical dimensions (mm): bodyW/bodyH from X-ray measurements interpolated
@@ -865,14 +865,13 @@
             { id: 'Pelvis', type: 'Pelvis' },
         ];
 
-        // Disc height varies by region: lumbar ~1/3 body height, thoracic ~1/5, cervical ~5-6mm
+        // Disc height varies by region: lumbar ~1/3 body height, thoracic ~1/5, cervical ~3mm
         const getDiscHeight = (level) => {
-            if (level.type === 'Pelvis' || level.id === 'Oc' || level.id === 'C1') return 0;
-            if (level.type === 'S') return 4; // minimal gap — sacrum fused to pelvis
+            if (level.type === 'Pelvis' || level.type === 'S' || level.id === 'Oc' || level.id === 'C1') return 0;
             const h = getLevelHeight(level);
             if (level.type === 'L') return Math.round(h / 3);
             if (level.type === 'T') return Math.round(h / 5);
-            return 10; // cervical (~5-6mm scaled)
+            return 6; // cervical
         };
 
         const buildHeightMap = (lvls, hScale) => {
@@ -985,7 +984,7 @@
             }
         };
 
-        const SpineVertebra = ({ label, type, height, isCorpectomy }) => {
+        const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale = 1 }) => {
             const common = { fill: REGIONS[type].color, stroke: "#475569", strokeWidth: "1.5" };
             const geom = getVertSvgGeometry(label);
 
@@ -1046,7 +1045,7 @@
                         })()}
                         {type === 'Pelvis' && <path d="M20,5 Q80,25 140,5 L130,40 Q80,50 30,40 Z" transform={`scale(1, ${height/45})`} {...common} opacity="0.6" />}
                     </g>
-                    <text x="80" y={height/2} dominantBaseline="middle" textAnchor="middle" fontSize="10" fontWeight="bold" fill="#334155" className="font-sans pointer-events-none select-none">{label}</text>
+                    <text x="80" y={height/2} dominantBaseline="middle" textAnchor="middle" fontSize={Math.min(14, Math.max(10, 10 / Math.max(0.6, heightScale)))} fontWeight="bold" fill="#334155" className="font-sans pointer-events-none select-none">{label}</text>
                 </svg>
             );
         };
@@ -1129,7 +1128,7 @@
                         <div className={`flex-1 overflow-hidden min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><div className="flex items-center h-full">{reconCageText && <span className="font-bold text-sky-700 bg-sky-50 border border-sky-200 px-1 rounded shadow-sm whitespace-nowrap ml-1 shrink-0" style={{ fontSize: Math.max(8, cageLabelPx) + 'px' }}>{reconCageText}</span>}<div className="flex-1 h-full"><ZoneContent zone="left" align="left"/></div></div></div>
 
                         <div style={{ width: `${scaledWidth}px` }} className={`relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}>
-                            <SpineVertebra label={level.id} type={level.type} height={getLevelHeight(level)} isCorpectomy={isCorpectomy} />
+                            <SpineVertebra label={level.id} type={level.type} height={getLevelHeight(level)} isCorpectomy={isCorpectomy} heightScale={heightScale} />
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">{getItems('mid').filter(p => p.tool !== 'connector').map(p => { const tool = tools.find(t => t.id === p.tool); let displayLabel = ''; let angle = ''; if (p.tool === 'osteotomy' && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } return (<div key={p.id} className="pointer-events-auto relative group flex flex-col items-center" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><div style={{ width: midPx, height: midPx }}><InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-md text-slate-900" /></div>{p.tool === 'osteotomy' && p.data && (<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 px-1 rounded shadow-sm whitespace-nowrap z-20" style={{ fontSize: osteoLabelPx + 'px' }}>{displayLabel} {angle}°</div>)}</div>); })}</div>
                         </div>
 
