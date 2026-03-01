@@ -788,6 +788,62 @@
             Pelvis: { height: 54, color: '#94a3b8' }
         };
 
+        // Anatomical dimensions (mm): bodyW/bodyH from X-ray measurements interpolated
+        // between anchors T2(36x20), T12(48x30), L4(60x36). Pedicle data from Panjabi 1992.
+        const VERTEBRA_ANATOMY = {
+            T1:  { bodyW: 34.8, bodyH: 19.0, pedW: 8.1, pedH: 10.7 },
+            T2:  { bodyW: 36.0, bodyH: 20.0, pedW: 7.0, pedH: 10.4 },
+            T3:  { bodyW: 37.2, bodyH: 21.0, pedW: 5.7, pedH:  9.8 },
+            T4:  { bodyW: 38.4, bodyH: 22.0, pedW: 5.2, pedH:  9.4 },
+            T5:  { bodyW: 39.6, bodyH: 23.0, pedW: 5.4, pedH:  9.8 },
+            T6:  { bodyW: 40.8, bodyH: 24.0, pedW: 5.8, pedH: 10.6 },
+            T7:  { bodyW: 42.0, bodyH: 25.0, pedW: 6.3, pedH: 10.9 },
+            T8:  { bodyW: 43.2, bodyH: 26.0, pedW: 6.7, pedH: 11.4 },
+            T9:  { bodyW: 44.4, bodyH: 27.0, pedW: 7.6, pedH: 12.5 },
+            T10: { bodyW: 45.6, bodyH: 28.0, pedW: 8.9, pedH: 13.8 },
+            T11: { bodyW: 46.8, bodyH: 29.0, pedW: 10.5, pedH: 14.5 },
+            T12: { bodyW: 48.0, bodyH: 30.0, pedW: 12.0, pedH: 15.5 },
+            L1:  { bodyW: 51.0, bodyH: 31.5, pedW: 9.0, pedH: 15.4 },
+            L2:  { bodyW: 54.0, bodyH: 33.0, pedW: 9.5, pedH: 15.7 },
+            L3:  { bodyW: 57.0, bodyH: 34.5, pedW: 11.2, pedH: 15.3 },
+            L4:  { bodyW: 60.0, bodyH: 36.0, pedW: 13.1, pedH: 14.5 },
+            L5:  { bodyW: 63.0, bodyH: 35.0, pedW: 17.5, pedH: 14.2 },
+            S1:  { bodyW: 66.0, bodyH: 34.0, pedW: 20.0, pedH: 14.0 },
+        };
+
+        // Per-level SVG height: use anatomical bodyH where available, else REGIONS default
+        // Scale factor maps mm bodyH to SVG units (calibrated so L4 at 36mm ≈ 50 SVG units)
+        const BODY_H_SCALE = 50 / 36.0;
+        const getLevelHeight = (level) => {
+            const a = VERTEBRA_ANATOMY[level.id];
+            if (a) return Math.round(a.bodyH * BODY_H_SCALE);
+            return REGIONS[level.type].height;
+        };
+
+        // Convert mm anatomy data to SVG coordinates within the 160-unit viewBox
+        const getVertSvgGeometry = (levelId) => {
+            const a = VERTEBRA_ANATOMY[levelId];
+            if (!a) return null;
+            const maxBodySvg = 130;
+            const maxBodyMm = 66.0;
+            const scale = maxBodySvg / maxBodyMm;
+            const bw = a.bodyW * scale;
+            const cx = 80;
+            const left = cx - bw / 2;
+            const right = cx + bw / 2;
+            // Pedicle positions: inset from body edge
+            const pedInset = (a.pedW * scale) * 0.3;
+            const pedLeftCx = left + pedInset + 3;
+            const pedRightCx = right - pedInset - 3;
+            // Pedicle radii: scaled down for schematic (not anatomically literal)
+            // pedRx = transverse (width), pedRy = sagittal (height)
+            const pedScale = 0.5;
+            const pedRx = Math.max(1.5, (a.pedW * scale / 2) * pedScale);
+            const pedRy = Math.max(2, (a.pedH * scale / 2) * pedScale);
+            const isLumbar = levelId.startsWith('L') || levelId === 'S1';
+            return { left, right, cx, bw, pedLeftCx, pedRightCx, pedRx, pedRy, isLumbar };
+        };
+
         const ALL_LEVELS = [
             { id: 'Oc', type: 'Oc' },
             ...['C1','C2','C3','C4','C5','C6','C7'].map(id => ({ id, type: 'C' })),
@@ -797,15 +853,21 @@
             { id: 'Pelvis', type: 'Pelvis' },
         ];
 
-        const DISC_HEIGHT = 12;
+        // Disc height varies by region: lumbar ~1/3 body height, thoracic ~1/5, cervical ~5-6mm
+        const getDiscHeight = (level) => {
+            if (level.type === 'Pelvis' || level.id === 'Oc' || level.id === 'C1') return 0;
+            const h = getLevelHeight(level);
+            if (level.type === 'L' || level.type === 'S') return Math.round(h / 3);
+            if (level.type === 'T') return Math.round(h / 5);
+            return 10; // cervical (~5-6mm scaled)
+        };
 
         const buildHeightMap = (lvls, hScale) => {
             let y = 0;
             const map = [];
             lvls.forEach(level => {
-                const vertH = REGIONS[level.type].height * hScale;
-                const hasDisc = level.type !== 'Pelvis' && level.id !== 'Oc' && level.id !== 'C1';
-                const discH = hasDisc ? DISC_HEIGHT : 0;
+                const vertH = getLevelHeight(level) * hScale;
+                const discH = getDiscHeight(level) * hScale;
                 map.push({ levelId: level.id, startY: y, vertEnd: y + vertH, endY: y + vertH + discH });
                 y += vertH + discH;
             });
@@ -863,18 +925,12 @@
 
         const CHART_CONTENT_HEIGHT = 920;
         const calculateAutoScale = (levels) => {
-            let vertexHeight = 0;
-            let discCount = 0;
+            let totalUnscaled = 0;
             levels.forEach(level => {
-                vertexHeight += REGIONS[level.type].height;
-                if (level.type !== 'Pelvis' && level.id !== 'Oc' && level.id !== 'C1') {
-                    discCount++;
-                }
+                totalUnscaled += getLevelHeight(level) + getDiscHeight(level);
             });
-            const fixedHeight = discCount * 12;
-            const available = CHART_CONTENT_HEIGHT - fixedHeight;
-            if (available <= 0 || vertexHeight <= 0) return 0.5;
-            return Math.min(1.5, Math.max(0.5, available / vertexHeight));
+            if (totalUnscaled <= 0) return 0.5;
+            return Math.min(1.5, Math.max(0.5, CHART_CONTENT_HEIGHT / totalUnscaled));
         };
         
         const InstrumentIcon = ({ type, className = "w-5 h-5", color = "black" }) => {
@@ -918,12 +974,15 @@
 
         const SpineVertebra = ({ label, type, height, isCorpectomy }) => {
             const common = { fill: REGIONS[type].color, stroke: "#475569", strokeWidth: "1.5" };
+            const geom = getVertSvgGeometry(label);
 
             if (isCorpectomy) {
+                const cl = geom ? geom.left : 40;
+                const cr = geom ? geom.right : 120;
                 return (
                     <svg viewBox={`0 0 160 ${height}`} className="w-full h-full block" overflow="visible">
                         <line x1="80" y1="0" x2="80" y2={height} stroke="#cbd5e1" strokeDasharray="3 3" />
-                        <path d={`M40,5 L120,5 L120,${height-5} L40,${height-5} Z`} fill="none" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
+                        <path d={`M${cl},5 L${cr},5 L${cr},${height-5} L${cl},${height-5} Z`} fill="none" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
                         <text x="80" y={height/2} dominantBaseline="middle" textAnchor="middle" fontSize="10" fill="#94a3b8" className="font-sans italic">Corpectomy</text>
                     </svg>
                 );
@@ -937,27 +996,38 @@
 
                         {type === 'C' && (
                             <g transform={`scale(1, ${height/24})`}>
-                                <path d="M45,4 Q80,-2 115,4 L120,18 Q80,24 40,18 Z" {...common} /> {/* Body */}
+                                <path d="M45,4 Q80,-2 115,4 L120,18 Q80,24 40,18 Z" {...common} />
                             </g>
                         )}
 
-                        {type === 'T' && (
-                            <g transform={`scale(1, ${height/32})`}>
-                                <path d="M50,6 Q80,0 110,6 L115,26 Q80,32 45,26 Z" {...common} /> {/* Heart Shape Body */}
-                                <circle cx="60" cy="12" r="3" fill="none" stroke="#94a3b8" strokeWidth="1"/> {/* L Pedicle */}
-                                <circle cx="100" cy="12" r="3" fill="none" stroke="#94a3b8" strokeWidth="1"/> {/* R Pedicle */}
-                            </g>
-                        )}
+                        {type === 'T' && geom && (() => {
+                            const l = geom.left, r = geom.right, w = 2, c = 3;
+                            // Rounded corners via arcs, biconcave endplates & sidewalls
+                            const bodyPath = `M${l},${3+c} Q${l},3 ${l+c},3 Q80,5 ${r-c},3 Q${r},3 ${r},${3+c} Q${r-w},16 ${r},${29-c} Q${r},29 ${r-c},29 Q80,27 ${l+c},29 Q${l},29 ${l},${29-c} Q${l+w},16 ${l},${3+c} Z`;
+                            return (
+                                <g transform={`scale(1, ${height/32})`}>
+                                    <path d={bodyPath} {...common} />
+                                    <ellipse cx={geom.pedLeftCx} cy="12" rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke="#94a3b8" strokeWidth="1"/>
+                                    <ellipse cx={geom.pedRightCx} cy="12" rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke="#94a3b8" strokeWidth="1"/>
+                                </g>
+                            );
+                        })()}
 
-                        {type === 'L' && (
-                            <g transform={`scale(1, ${height/38})`}>
-                                <path d="M45,5 Q80,-2 115,5 L120,30 Q80,38 40,30 Z" {...common} /> {/* Kidney Shape Body */}
-                                <ellipse cx="60" cy="12" rx="4" ry="6" fill="none" stroke="#64748b" strokeWidth="1.5"/> {/* L Pedicle (Eye) */}
-                                <ellipse cx="100" cy="12" rx="4" ry="6" fill="none" stroke="#64748b" strokeWidth="1.5"/> {/* R Pedicle (Eye) */}
-                            </g>
-                        )}
+                        {type === 'L' && geom && (() => {
+                            const l = geom.left, r = geom.right, w = 3, c = 4;
+                            const bodyPath = `M${l},${4+c} Q${l},4 ${l+c},4 Q80,6 ${r-c},4 Q${r},4 ${r},${4+c} Q${r-w},19 ${r},${34-c} Q${r},34 ${r-c},34 Q80,32 ${l+c},34 Q${l},34 ${l},${34-c} Q${l+w},19 ${l},${4+c} Z`;
+                            return (
+                                <g transform={`scale(1, ${height/38})`}>
+                                    <path d={bodyPath} {...common} />
+                                    <ellipse cx={geom.pedLeftCx} cy="14" rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke="#64748b" strokeWidth="1.5"/>
+                                    <ellipse cx={geom.pedRightCx} cy="14" rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke="#64748b" strokeWidth="1.5"/>
+                                </g>
+                            );
+                        })()}
 
-                        {type === 'S' && <path d="M40,5 Q80,-2 120,5 L100,45 Q80,55 60,45 Z" transform={`scale(1, ${height/48})`} {...common} />}
+                        {type === 'S' && geom && (
+                            <path d={`M${geom.left},5 Q80,-2 ${geom.right},5 L${80 + (geom.right-80)*0.6},45 Q80,55 ${80 - (80-geom.left)*0.6},45 Z`} transform={`scale(1, ${height/48})`} {...common} />
+                        )}
                         {type === 'Pelvis' && <path d="M20,5 Q80,25 140,5 L130,40 Q80,50 30,40 Z" transform={`scale(1, ${height/45})`} {...common} opacity="0.6" />}
                     </g>
                     <text x="80" y={height/2} dominantBaseline="middle" textAnchor="middle" fontSize="10" fontWeight="bold" fill="#334155" className="font-sans pointer-events-none select-none">{label}</text>
@@ -965,24 +1035,36 @@
             );
         };
 
-        const CageVisualization = ({ cageType, heightScale }) => {
-            const h = 12 * heightScale; // Approximate rendered height
+        const CageVisualization = ({ cageType, heightScale, levelId }) => {
+            const h = 12 * heightScale;
             const color = "#0ea5e9";
-            
+            const geom = getVertSvgGeometry(levelId);
+            const l = geom ? geom.left : 30;
+            const r = geom ? geom.right : 130;
+            const bw = r - l;
+            const ann = 3; // annulus margin each side
+            // PLIF: ~10mm each cage ≈ 20 SVG units, bilateral
+            const plifW = Math.min(20, bw * 0.18);
+            const plifGap = bw * 0.08;
+            // ACDF: ~14mm ≈ 28 SVG units
+            const acdfW = Math.min(28, bw * 0.55);
+            // TLIF: banana curve ~60% of body width
+            const tlifHalf = bw * 0.3;
+
             switch (cageType) {
-                case 'plif': return <g><rect x="65" y="2" width="10" height={h} rx="1" fill={color} opacity="0.8" /><rect x="85" y="2" width="10" height={h} rx="1" fill={color} opacity="0.8" /></g>;
-                case 'tlif': return <path d={`M60,2 Q80,${h+5} 100,2`} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" />;
-                case 'acdf': return <rect x="70" y="2" width="20" height={h} rx="2" fill={color} opacity="0.9" />;
-                case 'xlif': return <rect x="50" y="2" width="60" height={h} rx="2" fill={color} opacity="0.6" />;
-                case 'olif': return <rect x="55" y="2" width="50" height={h} rx="2" fill={color} opacity="0.7" transform="rotate(-5 80 8)" />;
-                case 'alif': return <ellipse cx="80" cy={h/2 + 2} rx="25" ry={h/1.5} fill={color} opacity="0.7" />;
-                default: return <rect x="70" y="2" width="20" height={h} fill={color} />;
+                case 'plif': return <g><rect x={80 - plifGap/2 - plifW} y="2" width={plifW} height={h} rx="1" fill={color} opacity="0.8" /><rect x={80 + plifGap/2} y="2" width={plifW} height={h} rx="1" fill={color} opacity="0.8" /></g>;
+                case 'tlif': return <path d={`M${80 - tlifHalf},2 Q80,${h+5} ${80 + tlifHalf},2`} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" />;
+                case 'acdf': return <rect x={80 - acdfW/2} y="2" width={acdfW} height={h} rx="2" fill={color} opacity="0.9" />;
+                case 'xlif': return <rect x={l} y="2" width={bw} height={h} rx="2" fill={color} opacity="0.6" />;
+                case 'olif': return <rect x={l + ann} y="2" width={bw - ann*2} height={h} rx="2" fill={color} opacity="0.7" transform={`rotate(-3 80 ${h/2+2})`} />;
+                case 'alif': return <rect x={l + ann} y="2" width={bw - ann*2} height={h} rx="2" fill={color} opacity="0.7" />;
+                default: return <rect x={80 - acdfW/2} y="2" width={acdfW} height={h} fill={color} />;
             }
         };
 
         const LevelRow = ({ level, placements, onZoneClick, tools, onPlacementClick, readOnly, showForces, heightScale, onDiscClick, cages, levels }) => {
             const getItems = (z) => placements.filter(p => p.levelId === level.id && p.zone === z);
-            const rowHeight = REGIONS[level.type].height * heightScale;
+            const rowHeight = getLevelHeight(level) * heightScale;
             const scaledWidth = 160 * heightScale;
 
             // Scaled instrument sizes
@@ -1019,7 +1101,7 @@
                 const verticalClass = isForceZone ? 'items-center' : 'items-start pt-[2px]';
                 return (
                     <div className={`flex ${verticalClass} gap-1 h-full ${justifyClass} relative`}>{!hasItems && !readOnly && (zone === 'left' || zone === 'right' || isForceZone) && <GhostTarget type={isForceZone ? 'force' : 'screw'} />}
-                        {items.map(p => { const tool = tools.find(t => t.id === p.tool); const isHookItem = HOOK_TYPES.includes(p.tool); const isOsteo = p.tool === 'osteotomy'; let displayLabel = p.data; let angle = null; if (isOsteo && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } const iW = isHookItem ? hookW : isOsteo ? osteoPx : screwPx; const iH = isHookItem ? hookH : isOsteo ? osteoPx : screwPx; const ann = p.annotation || ''; const showData = p.data && !isHookItem; const showAnn = !!ann; const labelBlock = (showData || showAnn) ? <div className="flex flex-col" style={{ alignItems: align === 'right' ? 'flex-start' : 'flex-end' }}>{showData && <span className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap" style={{ fontSize: labelPx + 'px' }}>{isOsteo ? `${displayLabel} ${angle}°` : displayLabel}</span>}{showAnn && <span className="text-slate-400 italic whitespace-nowrap px-1" style={{ fontSize: Math.max(8, labelPx - 2) + 'px' }}>{ann}</span>}</div> : null; return (<div key={p.id} className="relative group flex items-center gap-1">{align === 'left' && labelBlock}<div style={{ width: iW, height: iH }} className={`${!readOnly ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`} onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />{!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}</div>{align === 'right' && labelBlock}</div>); })}
+                        {items.map(p => { const tool = tools.find(t => t.id === p.tool); const isHookItem = HOOK_TYPES.includes(p.tool); const isOsteo = p.tool === 'osteotomy'; let displayLabel = p.data; let angle = null; if (isOsteo && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } const iW = isHookItem ? hookW : isOsteo ? osteoPx : screwPx; const iH = isHookItem ? hookH : isOsteo ? osteoPx : screwPx; const ann = p.annotation || ''; const showData = p.data && !isHookItem; const showAnn = !!ann; const labelBlock = (showData || showAnn) ? <div className="flex flex-col leading-none" style={{ alignItems: align === 'right' ? 'flex-start' : 'flex-end', gap: '0px' }}>{showData && <span className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight" style={{ fontSize: labelPx + 'px' }}>{isOsteo ? `${displayLabel} ${angle}°` : displayLabel}</span>}{showAnn && <span className="text-slate-400 italic whitespace-nowrap px-1 leading-tight" style={{ fontSize: Math.max(8, labelPx - 2) + 'px' }}>{ann}</span>}</div> : null; return (<div key={p.id} className={`relative group flex items-center gap-1 ${!readOnly ? 'cursor-pointer' : ''}`} onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}>{align === 'left' && labelBlock}<div style={{ width: iW, height: iH }} className={`${!readOnly ? 'hover:scale-110 transition-transform' : ''}`}><InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />{!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}</div>{align === 'right' && labelBlock}</div>); })}
                     </div>
                 );
             };
@@ -1032,7 +1114,7 @@
                         <div className={`flex-1 overflow-hidden min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><div className="flex items-center h-full">{reconCageText && <span className="font-bold text-sky-700 bg-sky-50 border border-sky-200 px-1 rounded shadow-sm whitespace-nowrap ml-1 shrink-0" style={{ fontSize: Math.max(8, cageLabelPx) + 'px' }}>{reconCageText}</span>}<div className="flex-1 h-full"><ZoneContent zone="left" align="left"/></div></div></div>
 
                         <div style={{ width: `${scaledWidth}px` }} className={`relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}>
-                            <SpineVertebra label={level.id} type={level.type} height={REGIONS[level.type].height} isCorpectomy={isCorpectomy} />
+                            <SpineVertebra label={level.id} type={level.type} height={getLevelHeight(level)} isCorpectomy={isCorpectomy} />
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">{getItems('mid').filter(p => p.tool !== 'connector').map(p => { const tool = tools.find(t => t.id === p.tool); let displayLabel = ''; let angle = ''; if (p.tool === 'osteotomy' && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } return (<div key={p.id} className="pointer-events-auto relative group flex flex-col items-center" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><div style={{ width: midPx, height: midPx }}><InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-md text-slate-900" /></div>{p.tool === 'osteotomy' && p.data && (<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 px-1 rounded shadow-sm whitespace-nowrap z-20" style={{ fontSize: osteoLabelPx + 'px' }}>{displayLabel} {angle}°</div>)}</div>); })}</div>
                         </div>
 
@@ -1043,11 +1125,11 @@
                     {/* INTERBODY DISC ZONE (Except after Pelvis or C1) */}
                     {level.type !== 'Pelvis' && level.id !== 'Oc' && level.id !== 'C1' && (
                         <div className="w-full flex justify-center relative -mt-1 z-20">
-                            <div style={{ width: `${scaledWidth}px` }} className={`h-4 flex items-center justify-center cursor-pointer transition-all ${!readOnly ? 'hover:bg-sky-100/50' : ''}`} onClick={() => !readOnly && onDiscClick(level.id)}>
+                            <div style={{ width: `${scaledWidth}px`, height: `${Math.max(8, getDiscHeight(level) * heightScale)}px` }} className={`flex items-center justify-center cursor-pointer transition-all ${!readOnly ? 'hover:bg-sky-100/50' : ''}`} onClick={() => !readOnly && onDiscClick(level.id)}>
                                 {cageBelow ? (
                                     <div className="relative group w-full h-full flex justify-center">
-                                        <svg viewBox="0 0 160 20" className="w-full h-full overflow-visible"><CageVisualization cageType={cageBelow.tool} heightScale={1} /></svg>
-                                        <span className="absolute left-3/4 font-bold text-sky-700 bg-white/80 px-0.5 rounded -top-0.5 shadow-sm border border-sky-100 whitespace-nowrap z-20" style={{ fontSize: cageLabelPx + 'px' }}>{cageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {cageBelow.data.height}H {cageBelow.data.lordosis}°{cageBelow.data.side && cageBelow.data.side !== 'bilateral' && cageBelow.data.side !== 'midline' ? ` (${cageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
+                                        <svg viewBox="0 0 160 20" className="w-full h-full overflow-visible"><CageVisualization cageType={cageBelow.tool} heightScale={1} levelId={level.id} /></svg>
+                                        <span className="absolute left-3/4 font-bold text-sky-700 bg-white/80 px-0.5 rounded shadow-sm border border-sky-100 whitespace-nowrap z-20" style={{ top: '50%', transform: 'translateY(-50%)' }} style={{ fontSize: cageLabelPx + 'px' }}>{cageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {cageBelow.data.height}H {cageBelow.data.lordosis}°{cageBelow.data.side && cageBelow.data.side !== 'bilateral' && cageBelow.data.side !== 'midline' ? ` (${cageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
                                     </div>
                                 ) : (
                                     !readOnly && <div className="h-2 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>
@@ -1068,14 +1150,35 @@
             const connW = Math.round(80 * iconScale);
             const connH = Math.round(24 * iconScale);
 
+            // Convert connector {levelId, fraction} to rendered Y pixel position
+            const connectorToRenderedY = (conn) => {
+                const viewMap = buildHeightMap(levels, heightScale);
+                const entry = viewMap.map.find(e => e.levelId === conn.levelId);
+                if (!entry) return null;
+                return entry.startY + conn.fraction * (entry.vertEnd - entry.startY);
+            };
+
+            // Convert rendered Y to {levelId, fraction}, snapping to adjacent levels
+            const renderedYToConnector = (localY) => {
+                const viewMap = buildHeightMap(levels, heightScale);
+                let entry = viewMap.map.find(e => localY >= e.startY && localY < e.endY);
+                if (!entry) {
+                    if (localY <= 0) entry = viewMap.map[0];
+                    else entry = viewMap.map[viewMap.map.length - 1];
+                }
+                const segLen = entry.vertEnd - entry.startY;
+                const fraction = segLen > 0 ? Math.max(0, Math.min(1, (localY - entry.startY) / segLen)) : 0.5;
+                return { levelId: entry.levelId, fraction };
+            };
+
             useEffect(() => {
                 if (!draggingId || readOnly) return;
                 const handleMouseMove = (e) => {
                     if (!contentRef.current) return;
                     const rect = contentRef.current.getBoundingClientRect();
                     const localY = e.clientY - rect.top;
-                    const newYNorm = renderedYToYNorm(localY, levels, heightScale);
-                    onConnectorUpdate(draggingId, newYNorm);
+                    const { levelId, fraction } = renderedYToConnector(localY);
+                    onConnectorUpdate(draggingId, { levelId, fraction });
                 };
                 const handleMouseUp = () => setDraggingId(null);
                 document.addEventListener('mousemove', handleMouseMove);
@@ -1105,7 +1208,7 @@
                     {connectors && connectors.length > 0 && (
                         <div className="absolute inset-0 pointer-events-none z-30">
                             {connectors.map(conn => {
-                                const y = yNormToRenderedY(conn.yNorm, levels, heightScale);
+                                const y = connectorToRenderedY(conn);
                                 if (y === null) return null;
                                 return (
                                     <div key={conn.id}
@@ -1201,17 +1304,31 @@
                 plan: { implants: plannedPlacements, cages: plannedCages, connectors: plannedConnectors },
                 construct: { implants: completedPlacements, cages: completedCages, connectors: completedConnectors },
             });
+            // Migrate old yNorm connectors to {levelId, fraction} format
+            const migrateConnectors = (conns) => {
+                if (!conns) return conns;
+                return conns.map(c => {
+                    if (c.levelId) return c; // already migrated
+                    if (c.yNorm === undefined) return c;
+                    const anatomicalY = (c.yNorm / 1000) * WHOLE_SPINE_MAP.totalHeight;
+                    const entry = WHOLE_SPINE_MAP.map.find(e => anatomicalY >= e.startY && anatomicalY < e.endY)
+                        || WHOLE_SPINE_MAP.map[WHOLE_SPINE_MAP.map.length - 1];
+                    const segLen = entry.vertEnd - entry.startY;
+                    const fraction = segLen > 0 ? Math.max(0, Math.min(1, (anatomicalY - entry.startY) / segLen)) : 0.5;
+                    return { id: c.id, levelId: entry.levelId, fraction, tool: 'connector' };
+                });
+            };
             const deserializeState = (json) => {
                 if (json.patient) setPatientData(json.patient);
                 if (json.plan) {
                     if (json.plan.implants) setPlannedPlacements(json.plan.implants);
                     if (json.plan.cages) setPlannedCages(json.plan.cages);
-                    if (json.plan.connectors) setPlannedConnectors(json.plan.connectors);
+                    if (json.plan.connectors) setPlannedConnectors(migrateConnectors(json.plan.connectors));
                 }
                 if (json.construct) {
                     if (json.construct.implants) setCompletedPlacements(json.construct.implants);
                     if (json.construct.cages) setCompletedCages(json.construct.cages);
-                    if (json.construct.connectors) setCompletedConnectors(json.construct.connectors);
+                    if (json.construct.connectors) setCompletedConnectors(migrateConnectors(json.construct.connectors));
                 }
                 if (json.preferences?.viewMode) setViewMode(json.preferences.viewMode);
                 if (json.preferences?.colourScheme) setColourScheme(json.preferences.colourScheme);
@@ -1389,13 +1506,12 @@
 
             // CONNECTOR HANDLERS
             const addConnector = (levelId) => {
-                const yNorm = levelToYNorm(levelId);
-                const newConn = { id: Date.now(), yNorm, tool: 'connector' };
+                const newConn = { id: Date.now(), levelId, fraction: 0.5, tool: 'connector' };
                 const setter = activeChart === 'planned' ? setPlannedConnectors : setCompletedConnectors;
                 setter(prev => [...prev, newConn]);
             };
-            const updateConnectorYNorm = (connId, yNorm) => {
-                const updater = prev => prev.map(c => c.id === connId ? { ...c, yNorm } : c);
+            const updateConnector = (connId, { levelId, fraction }) => {
+                const updater = prev => prev.map(c => c.id === connId ? { ...c, levelId, fraction } : c);
                 if (activeChart === 'planned') setPlannedConnectors(updater); else setCompletedConnectors(updater);
             };
             const removeConnector = (connId) => {
@@ -1580,8 +1696,8 @@
                                         </div>
                                         <CreditsFooter />
                                     </div>
-                                    <div className="flex-[4] flex flex-col h-full"><ChartPaper title="Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnectorYNorm} onConnectorRemove={removeConnector} /></div>
-                                    <div className="flex-[3] flex flex-col h-full"><ChartPaper title="Final Surgical Construct" placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnectorYNorm} onConnectorRemove={removeConnector} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder="e.g. 5.5mm CoCr Rod">{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder="e.g. 5.5mm TiAlV Rail">{patientData.rightRod}</div></div></React.Fragment>} /></div>
+                                    <div className="flex-[4] flex flex-col h-full"><ChartPaper title="Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} /></div>
+                                    <div className="flex-[3] flex flex-col h-full"><ChartPaper title="Final Surgical Construct" placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder="e.g. 5.5mm CoCr Rod">{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder="e.g. 5.5mm TiAlV Rail">{patientData.rightRod}</div></div></React.Fragment>} /></div>
                                 </div>
                             </div>
                         </div>
