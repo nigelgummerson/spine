@@ -99,10 +99,11 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v0.9.5-alpha";
+        const CURRENT_VERSION = "v0.9.5-beta";
 
         const CHANGE_LOG = [
-            { version: "v0.9.5-alpha", date: "2026-03-03", changes: [
+            { version: "v0.9.5-beta", date: "2026-03-03", changes: [
+                "Increased branding text size for readability on small screens.",
                 "Fixed ID generation — replaced Date.now() with incrementing counter to prevent duplicate IDs.",
                 "Fixed hover jitter on implant icons — GPU layer promotion via will-change.",
                 "Code formatting cleanup throughout — compressed single-line logic expanded for readability.",
@@ -841,10 +842,10 @@
 
         const CreditsFooter = () => (
             <div className="mt-auto pt-3 pb-4 border-t border-slate-200 shrink-0">
-                <p className="text-[9px] text-slate-400 leading-tight text-center">
+                <p className="text-[11px] text-slate-400 leading-tight text-center">
                     Spinal Instrumentation Planner
                 </p>
-                <p className="text-[8px] text-slate-300 leading-tight text-center mt-0.5">
+                <p className="text-[10px] text-slate-300 leading-tight text-center mt-0.5">
                     Designed in Leeds · Yorkshire · England
                 </p>
             </div>

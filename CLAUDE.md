@@ -4,7 +4,7 @@
 A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export.
 
 ## Current Status
-- **Version:** v0.9.5-alpha
+- **Version:** v0.9.5-beta
 - **Last Updated:** 2026-03-03
 - **License:** GNU GPLv3
 
@@ -23,7 +23,7 @@ spine-surgery/planning/spine-planner/
 ## GitHub & Deployment
 - **Repository:** github.com/nigelgummerson/spine-planner
 - **Live Site:** nigelgummerson.github.io/spine-planner (GitHub Pages)
-- **Branches:** `main` (v0.9.5-alpha)
+- **Branches:** `main` (v0.9.5-beta)
 
 ## Tech Stack
 - React 18 production builds (via CDN - unpkg)
@@ -33,7 +33,7 @@ spine-surgery/planning/spine-planner/
 - All dependencies loaded via CDN for offline hospital use
 
 ## Version History (Recent)
-- **v0.9.5-alpha** (2026-03-03): Fixed duplicate ID generation (Date.now() replaced with incrementing counter). Fixed hover jitter on implant icons (GPU layer promotion via will-change). Code formatting cleanup — compressed single-line logic expanded for readability.
+- **v0.9.5-beta** (2026-03-03): Fixed duplicate ID generation (Date.now() replaced with incrementing counter). Fixed hover jitter on implant icons (GPU layer promotion via will-change). Code formatting cleanup — compressed single-line logic expanded for readability.
 - **v0.9.4-alpha** (2026-03-01): Replaced html2canvas with html-to-image for pixel-perfect export. Fixed text baseline shift, checkbox/select state, cage label artefacts, screen flash during export. React CDN switched to production builds. Cage label border/shadow removed.
 - **v0.9.3-alpha** (2026-03-01): Anatomical proportions (T1-S1), pedicle data (Lien 2007), variable disc heights, auto-scale solver, level-anchored crosslinks, inline labels, cervical cage warning, export artefacts flagged
 - **v0.9.1-alpha** (2026-03-01): Session Privacy Mode rename, JSON v3 format with shared serialiser, help modal rewrite, theme renames
