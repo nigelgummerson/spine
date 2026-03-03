@@ -91,13 +91,21 @@
     <script type="text/babel">
         const { useState, useRef, useEffect, useLayoutEffect, useMemo } = React;
 
+        // Unique ID generator — counter starts from timestamp to avoid collisions with saved data
+        let _nextId = Date.now();
+        const genId = () => ++_nextId;
+
         // ==========================================
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v0.9.4-alpha";
+        const CURRENT_VERSION = "v0.9.5-alpha";
 
         const CHANGE_LOG = [
+            { version: "v0.9.5-alpha", date: "2026-03-03", changes: [
+                "Fixed ID generation — replaced Date.now() with incrementing counter to prevent duplicate IDs.",
+                "Code formatting cleanup throughout — compressed single-line logic expanded for readability.",
+            ]},
             { version: "v0.9.4-alpha", date: "2026-03-01", changes: [
                 "Replaced html2canvas with html-to-image for pixel-perfect PDF/JPG export.",
                 "Fixed text baseline positioning in exports (all text previously sat low).",
@@ -445,7 +453,20 @@
                 }
             }, [isOpen, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation]);
 
-            const handleSubmit = () => { let finalSize = null; if (isHookOnly) { finalSize = null; } else if (isFixation) { finalSize = fixationText || null; } else if (mode === 'custom') finalSize = customText || "Custom"; else if (mode === 'standard') finalSize = `${diameter}x${length}`; onConfirm(finalSize, (isHookOnly || isFixation) ? null : { diameter, length, mode, customText }, selectedType, annotation); onClose(); };
+            const handleSubmit = () => {
+                let finalSize = null;
+                if (isHookOnly) { finalSize = null; }
+                else if (isFixation) { finalSize = fixationText || null; }
+                else if (mode === 'custom') finalSize = customText || "Custom";
+                else if (mode === 'standard') finalSize = `${diameter}x${length}`;
+                onConfirm(
+                    finalSize,
+                    (isHookOnly || isFixation) ? null : { diameter, length, mode, customText },
+                    selectedType,
+                    annotation
+                );
+                onClose();
+            };
             const isScrew = ['monoaxial','polyaxial','uniplanar'].includes(selectedType);
             const isEditing = initialData !== undefined;
             const hookLabels = { pedicle_hook: 'Pedicle', tp_hook: 'TP (Down)', tp_hook_up: 'TP (Up)', sl_hook: 'Supra-lam', il_hook: 'Infra-lam' };
@@ -554,7 +575,10 @@
             const selectedDef = CAGE_TYPES.find(t => t.id === type);
             const discLabel = levels ? getDiscLabel(levelId, levels) : levelId;
 
-            const handleSubmit = () => { onConfirm({ type, height, width, length, lordosis, side }); onClose(); };
+            const handleSubmit = () => {
+                onConfirm({ type, height, width, length, lordosis, side });
+                onClose();
+            };
             const cageRef = useRef(null);
             useEffect(() => { if (cageRef.current) cageRef.current.focus(); }, []);
 
@@ -638,16 +662,100 @@
 
             const needsReconCage = ['VCR','ML-VCR','Corpectomy'].includes(type);
 
-            useEffect(() => { if (isOpen) { if (initialData && typeof initialData === 'object') { setType(initialData.type); setAngle(initialData.angle); setReconstructionCage(initialData.reconstructionCage || ''); } else { setType(defaultType || 'PSO'); setAngle(defaultAngle || '25'); setReconstructionCage(''); } } }, [isOpen, initialData, defaultType, defaultAngle]);
+            useEffect(() => {
+                if (isOpen) {
+                    if (initialData && typeof initialData === 'object') {
+                        setType(initialData.type);
+                        setAngle(initialData.angle);
+                        setReconstructionCage(initialData.reconstructionCage || '');
+                    } else {
+                        setType(defaultType || 'PSO');
+                        setAngle(defaultAngle || '25');
+                        setReconstructionCage('');
+                    }
+                }
+            }, [isOpen, initialData, defaultType, defaultAngle]);
 
             const selectedDef = OSTEOTOMY_TYPES.find(t => t.id === type) || OSTEOTOMY_TYPES[0];
-            const handleTypeChange = (e) => { const newTypeID = e.target.value; setType(newTypeID); const newDef = OSTEOTOMY_TYPES.find(t => t.id === newTypeID); if (newDef) setAngle(newDef.defaultAngle); if (!['VCR','ML-VCR','Corpectomy'].includes(newTypeID)) setReconstructionCage(''); };
-            const handleSubmit = () => { onConfirm({ type, angle, shortLabel: selectedDef.shortLabel, reconstructionCage: needsReconCage ? reconstructionCage : '' }); onClose(); };
+            const handleTypeChange = (e) => {
+                const newTypeID = e.target.value;
+                setType(newTypeID);
+                const newDef = OSTEOTOMY_TYPES.find(t => t.id === newTypeID);
+                if (newDef) setAngle(newDef.defaultAngle);
+                if (!['VCR','ML-VCR','Corpectomy'].includes(newTypeID)) setReconstructionCage('');
+            };
+            const handleSubmit = () => {
+                onConfirm({
+                    type, angle,
+                    shortLabel: selectedDef.shortLabel,
+                    reconstructionCage: needsReconCage ? reconstructionCage : ''
+                });
+                onClose();
+            };
             const isEditing = !!initialData;
             const osteoRef = useRef(null);
             useEffect(() => { if (osteoRef.current) osteoRef.current.focus(); }, []);
             return (
-                <div ref={osteoRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]"><div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden"><div className="bg-red-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{isEditing ? 'Edit Osteotomy' : 'Plan Osteotomy'}</h3><button onClick={onClose} className="hover:text-red-200"><IconX /></button></div><div className="p-6 space-y-4"><div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Osteotomy Type</label><select value={type} onChange={handleTypeChange} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-red-500 outline-none"><optgroup label="Posterior (Schwab Classification)">{OSTEOTOMY_TYPES.filter(t => t.group === 'posterior').map(t => <option key={t.id} value={t.id}>{t.label}</option>)}</optgroup><optgroup label="Anterior">{OSTEOTOMY_TYPES.filter(t => t.group === 'anterior').map(t => <option key={t.id} value={t.id}>{t.label}</option>)}</optgroup></select></div><div className="bg-red-50 border border-red-100 rounded p-3 text-xs"><div className="font-bold text-red-800 uppercase tracking-wider mb-1">{selectedDef.schwab}</div><div className="text-red-600 mb-2">{selectedDef.desc}</div></div><div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Correction Angle (°)</label><div className="flex items-center gap-2"><input type="number" value={angle} onChange={(e) => setAngle(e.target.value)} className="w-24 p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-red-500 outline-none text-center" /><span className="italic text-slate-400 text-sm">degrees</span></div></div>{needsReconCage && <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Reconstruction Cage</label><input type="text" value={reconstructionCage} onChange={(e) => setReconstructionCage(e.target.value)} placeholder="e.g. expandable mesh 18x50mm" className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-red-500 outline-none" /></div>}</div><div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center"><IconTrash/> Remove</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">Cancel</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-red-800 text-white hover:bg-red-700 text-sm font-bold shadow-lg">Confirm</button></div></div></div></div>
+                <div ref={osteoRef} tabIndex={-1} style={{outline:'none'}}
+                    onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })}
+                    className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
+                        <div className="bg-red-800 text-white px-4 py-3 flex justify-between items-center">
+                            <h3 className="font-bold text-sm">{isEditing ? 'Edit Osteotomy' : 'Plan Osteotomy'}</h3>
+                            <button onClick={onClose} className="hover:text-red-200"><IconX /></button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Osteotomy Type</label>
+                                <select value={type} onChange={handleTypeChange}
+                                    className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-red-500 outline-none">
+                                    <optgroup label="Posterior (Schwab Classification)">
+                                        {OSTEOTOMY_TYPES.filter(t => t.group === 'posterior').map(t =>
+                                            <option key={t.id} value={t.id}>{t.label}</option>
+                                        )}
+                                    </optgroup>
+                                    <optgroup label="Anterior">
+                                        {OSTEOTOMY_TYPES.filter(t => t.group === 'anterior').map(t =>
+                                            <option key={t.id} value={t.id}>{t.label}</option>
+                                        )}
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div className="bg-red-50 border border-red-100 rounded p-3 text-xs">
+                                <div className="font-bold text-red-800 uppercase tracking-wider mb-1">{selectedDef.schwab}</div>
+                                <div className="text-red-600 mb-2">{selectedDef.desc}</div>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Correction Angle (°)</label>
+                                <div className="flex items-center gap-2">
+                                    <input type="number" value={angle} onChange={(e) => setAngle(e.target.value)}
+                                        className="w-24 p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-red-500 outline-none text-center" />
+                                    <span className="italic text-slate-400 text-sm">degrees</span>
+                                </div>
+                            </div>
+                            {needsReconCage && (
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Reconstruction Cage</label>
+                                    <input type="text" value={reconstructionCage}
+                                        onChange={(e) => setReconstructionCage(e.target.value)}
+                                        placeholder="e.g. expandable mesh 18x50mm"
+                                        className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-red-500 outline-none" />
+                                </div>
+                            )}
+                        </div>
+                        <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">
+                            {isEditing ? (
+                                <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center">
+                                    <IconTrash/> Remove
+                                </button>
+                            ) : <div></div>}
+                            <div className="flex gap-2">
+                                <button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">Cancel</button>
+                                <button onClick={handleSubmit} className="px-6 py-2 rounded bg-red-800 text-white hover:bg-red-700 text-sm font-bold shadow-lg">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             );
         };
 
@@ -1161,8 +1269,63 @@
                 const isForceZone = zone.startsWith('force');
                 const verticalClass = isForceZone ? 'items-center' : 'items-start pt-[2px]';
                 return (
-                    <div className={`flex ${verticalClass} gap-1 h-full ${justifyClass} relative`}>{!hasItems && !readOnly && (zone === 'left' || zone === 'right' || isForceZone) && <GhostTarget type={isForceZone ? 'force' : 'screw'} />}
-                        {items.map(p => { const tool = tools.find(t => t.id === p.tool); const isHookItem = HOOK_TYPES.includes(p.tool); const isOsteo = p.tool === 'osteotomy'; let displayLabel = p.data; let angle = null; if (isOsteo && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } const iW = isHookItem ? hookW : isOsteo ? osteoPx : screwPx; const iH = isHookItem ? hookH : isOsteo ? osteoPx : screwPx; const ann = p.annotation || ''; const showData = p.data && !isHookItem; const showAnn = !!ann; const isInline = heightScale < 0.85 && showData && showAnn; const labelBlock = (showData || showAnn) ? <div className={`flex ${isInline ? (align === 'left' ? 'flex-row-reverse' : 'flex-row') : 'flex-col'} leading-none`} style={{ alignItems: isInline ? 'center' : (align === 'right' ? 'flex-start' : 'flex-end'), gap: isInline ? '3px' : '0px' }}>{showData && <span className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight" style={{ fontSize: labelPx + 'px' }}>{isOsteo ? `${displayLabel} ${angle}°` : displayLabel}</span>}{showAnn && <span className="text-slate-400 italic whitespace-nowrap px-1 leading-tight" style={{ fontSize: Math.max(8, labelPx - 2) + 'px' }}>{ann}</span>}</div> : null; return (<div key={p.id} className={`relative group flex items-center gap-1 ${!readOnly ? 'cursor-pointer' : ''}`} onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}>{align === 'left' && labelBlock}<div style={{ width: iW, height: iH }} className={`${!readOnly ? 'hover:scale-110 transition-transform' : ''}`}><InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />{!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}</div>{align === 'right' && labelBlock}</div>); })}
+                    <div className={`flex ${verticalClass} gap-1 h-full ${justifyClass} relative`}>
+                        {!hasItems && !readOnly && (zone === 'left' || zone === 'right' || isForceZone) && (
+                            <GhostTarget type={isForceZone ? 'force' : 'screw'} />
+                        )}
+                        {items.map(p => {
+                            const tool = tools.find(t => t.id === p.tool);
+                            const isHookItem = HOOK_TYPES.includes(p.tool);
+                            const isOsteo = p.tool === 'osteotomy';
+                            let displayLabel = p.data;
+                            let angle = null;
+                            if (isOsteo && typeof p.data === 'object') {
+                                displayLabel = p.data.shortLabel || p.data.type;
+                                angle = p.data.angle;
+                            }
+                            const iW = isHookItem ? hookW : isOsteo ? osteoPx : screwPx;
+                            const iH = isHookItem ? hookH : isOsteo ? osteoPx : screwPx;
+                            const ann = p.annotation || '';
+                            const showData = p.data && !isHookItem;
+                            const showAnn = !!ann;
+                            const isInline = heightScale < 0.85 && showData && showAnn;
+                            const labelBlock = (showData || showAnn) ? (
+                                <div
+                                    className={`flex ${isInline ? (align === 'left' ? 'flex-row-reverse' : 'flex-row') : 'flex-col'} leading-none`}
+                                    style={{
+                                        alignItems: isInline ? 'center' : (align === 'right' ? 'flex-start' : 'flex-end'),
+                                        gap: isInline ? '3px' : '0px'
+                                    }}
+                                >
+                                    {showData && (
+                                        <span className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight"
+                                            style={{ fontSize: labelPx + 'px' }}>
+                                            {isOsteo ? `${displayLabel} ${angle}°` : displayLabel}
+                                        </span>
+                                    )}
+                                    {showAnn && (
+                                        <span className="text-slate-400 italic whitespace-nowrap px-1 leading-tight"
+                                            style={{ fontSize: Math.max(8, labelPx - 2) + 'px' }}>
+                                            {ann}
+                                        </span>
+                                    )}
+                                </div>
+                            ) : null;
+                            return (
+                                <div key={p.id}
+                                    className={`relative group flex items-center gap-1 ${!readOnly ? 'cursor-pointer' : ''}`}
+                                    onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}
+                                >
+                                    {align === 'left' && labelBlock}
+                                    <div style={{ width: iW, height: iH }}
+                                        className={`${!readOnly ? 'hover:scale-110 transition-transform' : ''}`}>
+                                        <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />
+                                        {!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}
+                                    </div>
+                                    {align === 'right' && labelBlock}
+                                </div>
+                            );
+                        })}
                     </div>
                 );
             };
@@ -1175,7 +1338,33 @@
 
                         <div style={{ width: `${scaledWidth}px` }} className={`relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}>
                             <SpineVertebra label={level.id} type={level.type} height={getLevelHeight(level)} isCorpectomy={isCorpectomy} heightScale={heightScale} />
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">{getItems('mid').filter(p => p.tool !== 'connector').map(p => { const tool = tools.find(t => t.id === p.tool); let displayLabel = ''; let angle = ''; if (p.tool === 'osteotomy' && typeof p.data === 'object') { displayLabel = p.data.shortLabel || p.data.type; angle = p.data.angle; } return (<div key={p.id} className="pointer-events-auto relative group flex flex-col items-center" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}><div style={{ width: midPx, height: midPx }}><InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-md text-slate-900" /></div>{p.tool === 'osteotomy' && p.data && (<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 px-1 rounded shadow-sm whitespace-nowrap z-20" style={{ fontSize: osteoLabelPx + 'px' }}>{displayLabel} {angle}°</div>)}</div>); })}</div>
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                {getItems('mid').filter(p => p.tool !== 'connector').map(p => {
+                                    const tool = tools.find(t => t.id === p.tool);
+                                    let displayLabel = '';
+                                    let angle = '';
+                                    if (p.tool === 'osteotomy' && typeof p.data === 'object') {
+                                        displayLabel = p.data.shortLabel || p.data.type;
+                                        angle = p.data.angle;
+                                    }
+                                    return (
+                                        <div key={p.id}
+                                            className="pointer-events-auto relative group flex flex-col items-center"
+                                            onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}
+                                        >
+                                            <div style={{ width: midPx, height: midPx }}>
+                                                <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-md text-slate-900" />
+                                            </div>
+                                            {p.tool === 'osteotomy' && p.data && (
+                                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 px-1 rounded shadow-sm whitespace-nowrap z-20"
+                                                    style={{ fontSize: osteoLabelPx + 'px' }}>
+                                                    {displayLabel} {angle}°
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
 
                         <div className={`flex-1 overflow-visible min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'right')}><ZoneContent zone="right" align="right"/></div>
@@ -1572,13 +1761,29 @@
                 else if (pendingPlacement) { addPlacement(pendingPlacement.levelId, pendingPlacement.zone, 'osteotomy', data); setPendingPlacement(null); }
             };
 
-            const addPlacement = (levelId, zone, tool, data, annotation) => { const newP = { id: Date.now(), levelId, zone, tool, data, annotation: annotation || '' }; const setter = activeChart === 'planned' ? setPlannedPlacements : setCompletedPlacements; setter(prev => [...prev, newP]); };
-            const updatePlacement = (id, tool, data, annotation) => { const updater = (prev) => prev.map(p => p.id === id ? { ...p, tool, data, annotation: annotation !== undefined ? annotation : (p.annotation || '') } : p); if (activeChart === 'planned') setPlannedPlacements(updater); else setCompletedPlacements(updater); };
-            const removePlacement = (id) => { const filter = prev => prev.filter(p => p.id !== id); if (activeChart === 'planned') setPlannedPlacements(filter); else setCompletedPlacements(filter); setScrewModalOpen(false); setOsteoModalOpen(false); };
+            const addPlacement = (levelId, zone, tool, data, annotation) => {
+                const newP = { id: genId(), levelId, zone, tool, data, annotation: annotation || '' };
+                const setter = activeChart === 'planned' ? setPlannedPlacements : setCompletedPlacements;
+                setter(prev => [...prev, newP]);
+            };
+            const updatePlacement = (id, tool, data, annotation) => {
+                const updater = (prev) => prev.map(p =>
+                    p.id === id ? { ...p, tool, data, annotation: annotation !== undefined ? annotation : (p.annotation || '') } : p
+                );
+                if (activeChart === 'planned') setPlannedPlacements(updater);
+                else setCompletedPlacements(updater);
+            };
+            const removePlacement = (id) => {
+                const filter = prev => prev.filter(p => p.id !== id);
+                if (activeChart === 'planned') setPlannedPlacements(filter);
+                else setCompletedPlacements(filter);
+                setScrewModalOpen(false);
+                setOsteoModalOpen(false);
+            };
 
             // CONNECTOR HANDLERS
             const addConnector = (levelId) => {
-                const newConn = { id: Date.now(), levelId, fraction: 0.5, tool: 'connector' };
+                const newConn = { id: genId(), levelId, fraction: 0.5, tool: 'connector' };
                 const setter = activeChart === 'planned' ? setPlannedConnectors : setCompletedConnectors;
                 setter(prev => [...prev, newConn]);
             };
@@ -1614,12 +1819,32 @@
                 });
                 return canvas;
             };
-            const runExportJPG = async () => { const canvas = await prepareExportCanvas(); const link = document.createElement('a'); link.download = `SpinePlan_${patientData.name || 'Patient'}.jpg`; link.href = canvas.toDataURL('image/jpeg', 0.9); link.click(); if (incognitoMode) localStorage.removeItem('spine_planner_v2'); };
-            const runExportPDF = async () => { const canvas = await prepareExportCanvas(); const imgData = canvas.toDataURL('image/jpeg', 1.0); const { jsPDF } = window.jspdf; const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1485, 1050] }); pdf.addImage(imgData, 'JPEG', 0, 0, 1485, 1050); pdf.save(`SpinePlan_${patientData.name || 'Patient'}.pdf`); if (incognitoMode) localStorage.removeItem('spine_planner_v2'); };
+            const runExportJPG = async () => {
+                const canvas = await prepareExportCanvas();
+                const link = document.createElement('a');
+                link.download = `SpinePlan_${patientData.name || 'Patient'}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+                if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+            };
+            const runExportPDF = async () => {
+                const canvas = await prepareExportCanvas();
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1485, 1050] });
+                pdf.addImage(imgData, 'JPEG', 0, 0, 1485, 1050);
+                pdf.save(`SpinePlan_${patientData.name || 'Patient'}.pdf`);
+                if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+            };
             const saveProjectJSON = () => {
                 const data = serializeState();
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-                const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `SpineProject_${patientData.name || 'Unnamed'}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `SpineProject_${patientData.name || 'Unnamed'}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
                 if (incognitoMode) localStorage.removeItem('spine_planner_v2');
             };
             const loadProjectJSON = (e) => {
@@ -1643,9 +1868,9 @@
             const copyPlanToCompleted = () => {
                 if (plannedPlacements.length === 0 && plannedConnectors.length === 0) return alert("No plan to copy.");
                 if ((completedPlacements.length > 0 || completedConnectors.length > 0) && !confirm("Overwrite existing construct?")) return;
-                setCompletedPlacements(plannedPlacements.map((p,i) => ({...p, id: Date.now()+i})));
-                setCompletedCages(plannedCages.map((c) => ({...c})));
-                setCompletedConnectors(plannedConnectors.map((c,i) => ({...c, id: Date.now()+1000+i})));
+                setCompletedPlacements(plannedPlacements.map(p => ({...p, id: genId()})));
+                setCompletedCages(plannedCages.map(c => ({...c})));
+                setCompletedConnectors(plannedConnectors.map(c => ({...c, id: genId()})));
                 setActiveChart('completed');
             };
 
@@ -1748,7 +1973,25 @@
                                 </div>
                                 <div className="pt-2 mt-2 flex gap-1" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
                                     <button onClick={() => setHelpModalOpen(true)} className="flex-1 flex items-center justify-center gap-1 text-white/50 hover:text-white px-2 py-1.5 rounded text-[10px] font-bold hover:bg-white/10"><IconHelp /> Help</button>
-                                    <button onClick={() => { if(confirm("Start New Patient? This will clear the current plan.")) { setPlannedPlacements([]); setCompletedPlacements([]); setPlannedCages([]); setCompletedCages([]); setPlannedConnectors([]); setCompletedConnectors([]); setPatientData({ name: '', id: '', surgeon: '', location: '', date: new Date().toISOString().split('T')[0], company: '', screwSystem: '', leftRod: '', rightRod: '', boneGraft: { types: [], notes: '' } }); setActiveChart('planned'); } }} className="flex-1 flex items-center justify-center gap-1 text-red-400 hover:text-red-200 px-2 py-1.5 rounded text-[10px] font-bold hover:bg-white/10"><IconTrash /> New Patient</button>
+                                    <button onClick={() => {
+                                        if (confirm("Start New Patient? This will clear the current plan.")) {
+                                            setPlannedPlacements([]);
+                                            setCompletedPlacements([]);
+                                            setPlannedCages([]);
+                                            setCompletedCages([]);
+                                            setPlannedConnectors([]);
+                                            setCompletedConnectors([]);
+                                            setPatientData({
+                                                name: '', id: '', surgeon: '', location: '',
+                                                date: new Date().toISOString().split('T')[0],
+                                                company: '', screwSystem: '', leftRod: '', rightRod: '',
+                                                boneGraft: { types: [], notes: '' }
+                                            });
+                                            setActiveChart('planned');
+                                        }
+                                    }} className="flex-1 flex items-center justify-center gap-1 text-red-400 hover:text-red-200 px-2 py-1.5 rounded text-[10px] font-bold hover:bg-white/10">
+                                        <IconTrash /> New Patient
+                                    </button>
                                 </div>
                             </div>
 
