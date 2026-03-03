@@ -104,6 +104,7 @@
         const CHANGE_LOG = [
             { version: "v0.9.5-alpha", date: "2026-03-03", changes: [
                 "Fixed ID generation — replaced Date.now() with incrementing counter to prevent duplicate IDs.",
+                "Fixed hover jitter on implant icons — GPU layer promotion via will-change.",
                 "Code formatting cleanup throughout — compressed single-line logic expanded for readability.",
             ]},
             { version: "v0.9.4-alpha", date: "2026-03-01", changes: [
@@ -1269,10 +1270,7 @@
                 const isForceZone = zone.startsWith('force');
                 const verticalClass = isForceZone ? 'items-center' : 'items-start pt-[2px]';
                 return (
-                    <div className={`flex ${verticalClass} gap-1 h-full ${justifyClass} relative`}>
-                        {!hasItems && !readOnly && (zone === 'left' || zone === 'right' || isForceZone) && (
-                            <GhostTarget type={isForceZone ? 'force' : 'screw'} />
-                        )}
+                    <div className={`flex ${verticalClass} gap-1 h-full ${justifyClass} relative`}>{!hasItems && !readOnly && (zone === 'left' || zone === 'right' || isForceZone) && <GhostTarget type={isForceZone ? 'force' : 'screw'} />}
                         {items.map(p => {
                             const tool = tools.find(t => t.id === p.tool);
                             const isHookItem = HOOK_TYPES.includes(p.tool);
@@ -1298,27 +1296,34 @@
                                     }}
                                 >
                                     {showData && (
-                                        <span className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight"
-                                            style={{ fontSize: labelPx + 'px' }}>
-                                            {isOsteo ? `${displayLabel} ${angle}°` : displayLabel}
+                                        <span
+                                            className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight"
+                                            style={{ fontSize: labelPx + 'px' }}
+                                        >
+                                            {isOsteo ? `${displayLabel} ${angle}\u00B0` : displayLabel}
                                         </span>
                                     )}
                                     {showAnn && (
-                                        <span className="text-slate-400 italic whitespace-nowrap px-1 leading-tight"
-                                            style={{ fontSize: Math.max(8, labelPx - 2) + 'px' }}>
+                                        <span
+                                            className="text-slate-400 italic whitespace-nowrap px-1 leading-tight"
+                                            style={{ fontSize: Math.max(8, labelPx - 2) + 'px' }}
+                                        >
                                             {ann}
                                         </span>
                                     )}
                                 </div>
                             ) : null;
                             return (
-                                <div key={p.id}
+                                <div
+                                    key={p.id}
                                     className={`relative group flex items-center gap-1 ${!readOnly ? 'cursor-pointer' : ''}`}
                                     onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}
                                 >
                                     {align === 'left' && labelBlock}
-                                    <div style={{ width: iW, height: iH }}
-                                        className={`${!readOnly ? 'hover:scale-110 transition-transform' : ''}`}>
+                                    <div
+                                        style={{ width: iW, height: iH, willChange: 'transform' }}
+                                        className={`${!readOnly ? 'hover:scale-110 transition-transform' : ''}`}
+                                    >
                                         <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />
                                         {!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}
                                     </div>
@@ -1348,7 +1353,8 @@
                                         angle = p.data.angle;
                                     }
                                     return (
-                                        <div key={p.id}
+                                        <div
+                                            key={p.id}
                                             className="pointer-events-auto relative group flex flex-col items-center"
                                             onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}
                                         >
@@ -1356,9 +1362,11 @@
                                                 <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-md text-slate-900" />
                                             </div>
                                             {p.tool === 'osteotomy' && p.data && (
-                                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 px-1 rounded shadow-sm whitespace-nowrap z-20"
-                                                    style={{ fontSize: osteoLabelPx + 'px' }}>
-                                                    {displayLabel} {angle}°
+                                                <div
+                                                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 px-1 rounded shadow-sm whitespace-nowrap z-20"
+                                                    style={{ fontSize: osteoLabelPx + 'px' }}
+                                                >
+                                                    {displayLabel} {angle}&deg;
                                                 </div>
                                             )}
                                         </div>
