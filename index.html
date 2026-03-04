@@ -99,9 +99,18 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v0.9.5-beta";
+        const CURRENT_VERSION = "v0.9.6-beta";
 
         const CHANGE_LOG = [
+            { version: "v0.9.6-beta", date: "2026-03-04", changes: [
+                "Header text (Force/Left/Right) increased from 9px to 11px for readability.",
+                "New Note tool — level-anchored text annotations with optional arrow, draggable positioning.",
+                "Preset label chips: last visible rib, end-vertebra, apex, transitional level, stable/neutral vertebra.",
+                "Notes included in save/load, copy-to-construct, and session persistence.",
+                "Sidebar reorganised: Implants (implant + crosslink) and Annotations (unstable, osteotomy, corpectomy, note).",
+                "Explicit Implant mode button — default tool, clear return path from annotation tools.",
+                "Shadow screws darkened for visibility. Hover jitter fix (group-hover).",
+            ]},
             { version: "v0.9.5-beta", date: "2026-03-03", changes: [
                 "Increased branding text size for readability on small screens.",
                 "Fixed ID generation — replaced Date.now() with incrementing counter to prevent duplicate IDs.",
@@ -279,6 +288,8 @@
 
         const HOOK_TYPES = ['pedicle_hook','tp_hook','tp_hook_up','sl_hook','il_hook'];
         const NO_SIZE_TYPES = [...HOOK_TYPES, 'band', 'wire', 'cable'];
+
+        const NOTE_PRESETS = ['last visible rib', 'end-vertebra', 'apex', 'transitional level', 'stable vertebra', 'neutral vertebra'];
 
         const CAGE_TYPES = [
           { id: 'acdf', label: 'ACDF', desc: 'Anterior Cervical Discectomy & Fusion', approach: 'anterior', defaultSide: 'left', sideOptions: ['left','right'], defaults: { height:'6', width:'16', length:'14', lordosis:'0' } },
@@ -840,6 +851,61 @@
             );
         };
 
+        const NoteModal = ({ isOpen, onClose, onConfirm, onDelete, initialText, initialShowArrow, isEditing }) => {
+            if (!isOpen) return null;
+            const [text, setText] = useState(initialText || '');
+            const [showArrow, setShowArrow] = useState(initialShowArrow || false);
+            const noteRef = useRef(null);
+
+            useEffect(() => {
+                if (isOpen) {
+                    setText(initialText || '');
+                    setShowArrow(initialShowArrow || false);
+                }
+            }, [isOpen, initialText, initialShowArrow]);
+
+            useEffect(() => { if (noteRef.current) noteRef.current.focus(); }, []);
+
+            const handleSubmit = () => {
+                if (!text.trim()) return;
+                onConfirm(text.trim(), showArrow);
+                onClose();
+            };
+
+            return (
+                <div ref={noteRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
+                    <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
+                        <div className="bg-violet-800 text-white px-4 py-3 flex justify-between items-center">
+                            <h3 className="font-bold text-sm">{isEditing ? 'Edit Note' : 'Add Note'}</h3>
+                            <button onClick={onClose} className="hover:text-violet-200"><IconX /></button>
+                        </div>
+                        <div className="p-5 space-y-3">
+                            <div>
+                                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Text</label>
+                                <input type="text" value={text} onChange={e => setText(e.target.value)} placeholder="e.g. apex, end-vertebra" className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-violet-500 outline-none" autoFocus />
+                            </div>
+                            <div className="flex flex-wrap gap-1">
+                                {NOTE_PRESETS.map(preset => (
+                                    <button key={preset} onClick={() => setText(preset)} className={`px-2 py-1 rounded text-[10px] font-medium border transition-all ${text === preset ? 'bg-violet-100 border-violet-300 text-violet-800' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-violet-50 hover:border-violet-200'}`}>{preset}</button>
+                                ))}
+                            </div>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" checked={showArrow} onChange={e => setShowArrow(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
+                                <span className="text-xs text-slate-600">Show arrow</span>
+                            </label>
+                        </div>
+                        <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">
+                            {isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center"><IconTrash/> Remove</button> : <div></div>}
+                            <div className="flex gap-2">
+                                <button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">Cancel</button>
+                                <button onClick={handleSubmit} className="px-6 py-2 rounded bg-violet-800 text-white hover:bg-violet-700 text-sm font-bold shadow-lg">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         const CreditsFooter = () => (
             <div className="mt-auto pt-3 pb-4 border-t border-slate-200 shrink-0">
                 <p className="text-[11px] text-slate-500 leading-tight text-center">
@@ -1134,6 +1200,12 @@
                 case 'derotate_ccw': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>;
                 case 'compression': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="3"><path d="M12 2v8m-4-4 4 4 4-4" /><path d="M12 22v-8m4 4-4-4-4 4" /></svg>; 
                 case 'distraction': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="3"><path d="M12 10V2m4 4-4-4-4 4" /><path d="M12 14v8m-4-4 4 4 4-4" /></svg>;
+
+                // --- Mode ---
+                case 'implant': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="3" /></svg>;
+
+                // --- Annotations ---
+                case 'note': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>;
                 default: return null;
             }
         };
@@ -1261,7 +1333,7 @@
 
             const GhostTarget = ({ type }) => {
                 if (type === 'force') return <div className="flex items-center justify-center h-full w-full"><IconCardinal /></div>;
-                return (<div style={{ width: screwPx, height: screwPx }} className="rounded-full border-2 border-slate-300 border-dashed flex items-center justify-center opacity-40 hover:opacity-100 hover:border-amber-400 hover:bg-amber-50 transition-all"><div className="w-1 h-1 bg-slate-300 rounded-full"></div></div>);
+                return (<div style={{ width: screwPx, height: screwPx }} className="rounded-full border-2 border-slate-400 border-dashed flex items-center justify-center opacity-60 hover:opacity-100 hover:border-amber-400 hover:bg-amber-50 transition-all"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full"></div></div>);
             };
 
             const ZoneContent = ({ zone, align }) => {
@@ -1323,7 +1395,7 @@
                                     {align === 'left' && labelBlock}
                                     <div
                                         style={{ width: iW, height: iH, willChange: 'transform' }}
-                                        className={`${!readOnly ? 'hover:scale-110 transition-transform' : ''}`}
+                                        className={`${!readOnly ? 'group-hover:scale-110 transition-transform' : ''}`}
                                     >
                                         <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />
                                         {!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}
@@ -1337,7 +1409,7 @@
             };
 
             return (
-                <div className="flex flex-col w-full relative border-b border-slate-100">
+                <div data-zone-click="true" className="flex flex-col w-full relative border-b border-slate-100">
                     <div className="flex w-full relative z-20" style={{ height: `${rowHeight}px` }}>
                         {showForces && <div className={`w-10 border-r border-slate-100/50 bg-emerald-50/20 ${!readOnly ? 'hover:bg-emerald-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'force_left')}><ZoneContent zone="force_left" align="center"/></div>}
                         <div className={`flex-1 overflow-visible min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><div className="flex items-center h-full">{reconCageText && <span className="font-bold text-sky-700 bg-sky-50 border border-sky-200 px-1 rounded shadow-sm whitespace-nowrap ml-1 shrink-0" style={{ fontSize: Math.max(8, cageLabelPx) + 'px' }}>{reconCageText}</span>}<div className="flex-1 h-full"><ZoneContent zone="left" align="left"/></div></div></div>
@@ -1404,10 +1476,12 @@
             );
         };
 
-        const ChartPaper = ({ title, placements, onZoneClick, onPlacementClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode }) => {
+        const ChartPaper = ({ title, placements, onZoneClick, onPlacementClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick }) => {
             const contentRef = useRef(null);
             const [draggingId, setDraggingId] = useState(null);
             const dragStartRef = useRef(null);
+            const [draggingNoteId, setDraggingNoteId] = useState(null);
+            const noteDragStartRef = useRef(null);
             const scaledWidth = 160 * heightScale;
             const iconScale = Math.max(0.65, Math.min(1.3, heightScale));
             const connW = Math.round(80 * iconScale);
@@ -1456,9 +1530,38 @@
                 return () => { document.removeEventListener('mousemove', handleMouseMove); document.removeEventListener('mouseup', handleMouseUp); };
             }, [draggingId, levels, heightScale, readOnly, onConnectorUpdate]);
 
+            // Note position: convert note to pixel coords within contentRef
+            const getNotePixelPos = (note) => {
+                const viewMap = buildHeightMap(levels, heightScale);
+                const entry = viewMap.map.find(e => e.levelId === note.levelId);
+                if (!entry) return null;
+                const anchorY = (entry.startY + entry.vertEnd) / 2;
+                const x = note.offsetX || 80;
+                const y = anchorY + (note.offsetY || 0);
+                return { x, y, anchorY };
+            };
+
+            // Note drag handler
+            useEffect(() => {
+                if (!draggingNoteId || readOnly) return;
+                const handleMouseMove = (e) => {
+                    if (!contentRef.current || !noteDragStartRef.current) return;
+                    const dx = e.clientX - noteDragStartRef.current.clientX;
+                    const dy = e.clientY - noteDragStartRef.current.clientY;
+                    const startOX = noteDragStartRef.current.offsetX;
+                    const startOY = noteDragStartRef.current.offsetY;
+                    onNoteUpdate(draggingNoteId, { offsetX: startOX + dx, offsetY: startOY + dy });
+                };
+                const handleMouseUp = () => setDraggingNoteId(null);
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+                return () => { document.removeEventListener('mousemove', handleMouseMove); document.removeEventListener('mouseup', handleMouseUp); };
+            }, [draggingNoteId, readOnly, onNoteUpdate]);
+
+
             return (
             <div className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative"><div className="p-2 bg-slate-50 border-b border-slate-200 text-center font-bold text-sm text-slate-800 uppercase tracking-wider">{title}</div><div className="flex-1 relative flex flex-col pt-8 px-2 justify-center">
-                <div className="flex w-full absolute top-1 left-0 right-0 px-2 text-[9px] font-bold uppercase tracking-tighter text-center pointer-events-none z-10">
+                <div className="flex w-full absolute top-1 left-0 right-0 px-2 text-[11px] font-bold uppercase tracking-tighter text-center pointer-events-none z-10">
                     {showForces && <div className="w-10 text-emerald-600/50">Force</div>}
                     <div className="flex-1 text-right pr-4 text-slate-400">Left</div>
                     <div style={{ width: `${scaledWidth}px` }}></div>
@@ -1495,6 +1598,65 @@
                             })}
                         </div>
                     )}
+                    {/* Notes overlay */}
+                    {notes && notes.length > 0 && (
+                        <React.Fragment>
+                            {/* Arrow SVG layer */}
+                            <svg className="absolute inset-0 pointer-events-none z-31 w-full h-full" style={{ overflow: 'visible' }}>
+                                <defs>
+                                    <marker id={`arrowhead-${title.replace(/\s+/g,'')}`} markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                        <polygon points="0 0, 8 3, 0 6" fill="#7c3aed" />
+                                    </marker>
+                                </defs>
+                                {notes.filter(n => n.showArrow).map(n => {
+                                    const pos = getNotePixelPos(n);
+                                    if (!pos) return null;
+                                    const contentW = contentRef.current?.clientWidth || 600;
+                                    const noteX = contentW / 2 + pos.x;
+                                    const noteY = pos.y;
+                                    const anchorX = contentW / 2;
+                                    const anchorY = pos.anchorY;
+                                    // Arrow from note label toward anchor, shortened so it doesn't overlap the label
+                                    const dx = anchorX - noteX;
+                                    const dy = anchorY - noteY;
+                                    const dist = Math.sqrt(dx * dx + dy * dy);
+                                    if (dist < 10) return null;
+                                    const startX = noteX + (dx / dist) * 8;
+                                    const startY = noteY + (dy / dist) * 8;
+                                    const endX = anchorX - (dx / dist) * 4;
+                                    const endY = anchorY - (dy / dist) * 4;
+                                    return <line key={n.id} x1={startX} y1={startY} x2={endX} y2={endY} stroke="#7c3aed" strokeWidth="1" markerEnd={`url(#arrowhead-${title.replace(/\s+/g,'')})`} />;
+                                })}
+                            </svg>
+                            {/* Note label layer */}
+                            <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 32 }}>
+                                {notes.map(n => {
+                                    const pos = getNotePixelPos(n);
+                                    if (!pos) return null;
+                                    return (
+                                        <div key={n.id} data-note-click="true"
+                                            className={`absolute pointer-events-auto group select-none ${!readOnly ? 'cursor-grab' : ''} ${draggingNoteId === n.id ? 'cursor-grabbing' : ''}`}
+                                            style={{ left: `calc(50% + ${pos.x}px)`, top: `${pos.y}px`, transform: 'translate(-50%, -50%)' }}
+                                            onMouseDown={(e) => {
+                                                if (readOnly) return;
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                noteDragStartRef.current = { clientX: e.clientX, clientY: e.clientY, offsetX: n.offsetX || 80, offsetY: n.offsetY || 0 };
+                                                setDraggingNoteId(n.id);
+                                            }}
+                                            onClick={(e) => { e.stopPropagation(); if (!readOnly && !draggingNoteId) onNoteClick(n); }}
+                                        >
+                                            <span className="text-[10px] font-bold text-violet-700 bg-white/90 border border-violet-200 px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">{n.text}</span>
+                                            {!readOnly && <button
+                                                className="hidden group-hover:flex absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 items-center justify-center text-[8px] font-bold shadow hover:bg-red-600 z-50"
+                                                onClick={(e) => { e.stopPropagation(); onNoteRemove(n.id); }}
+                                                onMouseDown={(e) => e.stopPropagation()}>x</button>}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </React.Fragment>
+                    )}
                 </div></div></div>
             );
         };
@@ -1503,7 +1665,7 @@
         // SECTION 4: MAIN APP CONTROLLER
         // ==========================================
         const App = () => {
-            const [selectedTool, setSelectedTool] = useState('connector');
+            const [selectedTool, setSelectedTool] = useState('implant');
             const [lastUsedScrewType, setLastUsedScrewType] = useState('polyaxial');
             const [activeChart, setActiveChart] = useState('planned'); 
             const [plannedPlacements, setPlannedPlacements] = useState([]);
@@ -1512,6 +1674,8 @@
             const [completedCages, setCompletedCages] = useState([]);
             const [plannedConnectors, setPlannedConnectors] = useState([]);
             const [completedConnectors, setCompletedConnectors] = useState([]);
+            const [plannedNotes, setPlannedNotes] = useState([]);
+            const [completedNotes, setCompletedNotes] = useState([]);
             const [colourScheme, setColourScheme] = useState('default');
             const [themeOpen, setThemeOpen] = useState(false);
             const [patientData, setPatientData] = useState({ name: '', id: '', surgeon: '', location: '', date: new Date().toISOString().split('T')[0], company: '', screwSystem: '', leftRod: '', rightRod: '', boneGraft: { types: [], notes: '' } });
@@ -1528,6 +1692,9 @@
             const [forceModalOpen, setForceModalOpen] = useState(false);
             const [helpModalOpen, setHelpModalOpen] = useState(false);
             const [changeLogOpen, setChangeLogOpen] = useState(false);
+            const [noteModalOpen, setNoteModalOpen] = useState(false);
+            const [pendingNoteTool, setPendingNoteTool] = useState(null); // { tool: 'note', levelId, offsetX, offsetY }
+            const [editingNote, setEditingNote] = useState(null); // full note object when editing
             
             // EDITING STATE
             const [pendingPlacement, setPendingPlacement] = useState(null);
@@ -1571,8 +1738,8 @@
                 timestamp: new Date().toISOString(),
                 patient: patientData,
                 preferences: { viewMode, colourScheme },
-                plan: { implants: plannedPlacements, cages: plannedCages, connectors: plannedConnectors },
-                construct: { implants: completedPlacements, cages: completedCages, connectors: completedConnectors },
+                plan: { implants: plannedPlacements, cages: plannedCages, connectors: plannedConnectors, notes: plannedNotes },
+                construct: { implants: completedPlacements, cages: completedCages, connectors: completedConnectors, notes: completedNotes },
             });
             // Migrate old yNorm connectors to {levelId, fraction} format
             const migrateConnectors = (conns) => {
@@ -1594,11 +1761,13 @@
                     if (json.plan.implants) setPlannedPlacements(json.plan.implants);
                     if (json.plan.cages) setPlannedCages(json.plan.cages);
                     if (json.plan.connectors) setPlannedConnectors(migrateConnectors(json.plan.connectors));
+                    if (json.plan.notes) setPlannedNotes(json.plan.notes);
                 }
                 if (json.construct) {
                     if (json.construct.implants) setCompletedPlacements(json.construct.implants);
                     if (json.construct.cages) setCompletedCages(json.construct.cages);
                     if (json.construct.connectors) setCompletedConnectors(migrateConnectors(json.construct.connectors));
+                    if (json.construct.notes) setCompletedNotes(json.construct.notes);
                 }
                 if (json.preferences?.viewMode) setViewMode(json.preferences.viewMode);
                 if (json.preferences?.colourScheme) setColourScheme(json.preferences.colourScheme);
@@ -1622,7 +1791,7 @@
                     localStorage.setItem('spine_planner_v2', JSON.stringify(serializeState()));
                 }
                 if (incognitoMode) localStorage.removeItem('spine_planner_v2');
-            }, [plannedPlacements, completedPlacements, plannedCages, completedCages, plannedConnectors, completedConnectors, patientData, viewMode, colourScheme, hasLoaded, incognitoMode]);
+            }, [plannedPlacements, completedPlacements, plannedCages, completedCages, plannedConnectors, completedConnectors, plannedNotes, completedNotes, patientData, viewMode, colourScheme, hasLoaded, incognitoMode]);
 
             // RESIZE OBSERVER
             useEffect(() => {
@@ -1651,6 +1820,7 @@
                 { id: 'band', label: 'Band', icon: 'band', type: 'implant' },
                 { id: 'wire', label: 'Wire', icon: 'wire', type: 'implant' },
                 { id: 'cable', label: 'Cable', icon: 'cable', type: 'implant' },
+                { id: 'implant', label: 'Implant', icon: 'implant', type: 'mode' },
                 { id: 'connector', label: 'Crosslink', icon: 'connector', type: 'mid' },
                 { id: 'unstable', label: 'Unstable', icon: 'unstable', type: 'mid' },
                 { id: 'osteotomy', label: 'Osteotomy', icon: 'osteotomy', isOsteotomy: true, type: 'mid' },
@@ -1661,15 +1831,28 @@
                 { id: 'distraction', label: 'Distract', icon: 'distraction', type: 'force' },
                 { id: 'derotate_cw', label: 'Derotate', icon: 'derotate_cw', type: 'force' },
                 { id: 'derotate_ccw', label: 'Derotate', icon: 'derotate_ccw', type: 'force' },
+                { id: 'note', label: 'Note', icon: 'note', type: 'annotation' },
             ];
 
             // SIDEBAR PALETTE
             const tools = [
-                { category: 'Midline', items: allTools.filter(t => ['connector','unstable','osteotomy','Corpectomy'].includes(t.id)) },
+                { category: 'Implants', items: allTools.filter(t => ['implant','connector'].includes(t.id)) },
+                { category: 'Annotations', items: allTools.filter(t => ['unstable','osteotomy','Corpectomy','note'].includes(t.id)) },
             ];
 
             // LOGIC HANDLERS — zone determines behaviour
             const handleZoneClick = (levelId, zone) => {
+                // ANNOTATION MODE: when note/pin selected, ALL clicks place notes
+                if (selectedTool === 'note') {
+                    const hs = calculateAutoScale(levels);
+                    const levelObj = levels.find(l => l.id === levelId);
+                    const vertH = levelObj ? getLevelHeight(levelObj) * hs : 30;
+                    setPendingNoteTool({ tool: selectedTool, levelId, offsetX: -100, offsetY: Math.round(vertH / 2) });
+                    setEditingNote(null);
+                    setNoteModalOpen(true);
+                    return;
+                }
+
                 const isForceZone = zone.startsWith('force');
 
                 // Force zones → always open ForceModal
@@ -1692,7 +1875,7 @@
 
                 // Mid zone → use currently selected palette tool
                 const tool = allTools.find(t => t.id === selectedTool);
-                if (!tool) return;
+                if (!tool || tool.type === 'mode') return;
                 if (tool.isOsteotomy) {
                     setPendingPlacement({ levelId, zone, tool: selectedTool });
                     setEditingPlacementId(null);
@@ -1805,6 +1988,43 @@
                 if (activeChart === 'planned') setPlannedConnectors(filter); else setCompletedConnectors(filter);
             };
 
+            // NOTE HANDLERS
+            const handleNoteConfirm = (text, showArrow) => {
+                if (editingNote) {
+                    // Update existing note
+                    const updater = prev => prev.map(n => n.id === editingNote.id ? { ...n, text, showArrow } : n);
+                    if (activeChart === 'planned') setPlannedNotes(updater); else setCompletedNotes(updater);
+                    setEditingNote(null);
+                } else if (pendingNoteTool) {
+                    // Create new note
+                    const newNote = { id: genId(), tool: pendingNoteTool.tool, levelId: pendingNoteTool.levelId, text, offsetX: pendingNoteTool.offsetX, offsetY: pendingNoteTool.offsetY, showArrow };
+                    const setter = activeChart === 'planned' ? setPlannedNotes : setCompletedNotes;
+                    setter(prev => [...prev, newNote]);
+                    setPendingNoteTool(null);
+                }
+            };
+            const handleNoteDelete = () => {
+                if (editingNote) {
+                    const filter = prev => prev.filter(n => n.id !== editingNote.id);
+                    if (activeChart === 'planned') setPlannedNotes(filter); else setCompletedNotes(filter);
+                    setEditingNote(null);
+                    setNoteModalOpen(false);
+                }
+            };
+            const handleNoteClick = (note) => {
+                setEditingNote(note);
+                setPendingNoteTool(null);
+                setNoteModalOpen(true);
+            };
+            const updateNotePosition = (noteId, { offsetX, offsetY }) => {
+                const updater = prev => prev.map(n => n.id === noteId ? { ...n, offsetX, offsetY } : n);
+                if (activeChart === 'planned') setPlannedNotes(updater); else setCompletedNotes(updater);
+            };
+            const removeNote = (noteId) => {
+                const filter = prev => prev.filter(n => n.id !== noteId);
+                if (activeChart === 'planned') setPlannedNotes(filter); else setCompletedNotes(filter);
+            };
+
             // EXPORT
             const prepareExportCanvas = async () => {
                 await document.fonts.ready;
@@ -1875,11 +2095,12 @@
             };
 
             const copyPlanToCompleted = () => {
-                if (plannedPlacements.length === 0 && plannedConnectors.length === 0) return alert("No plan to copy.");
-                if ((completedPlacements.length > 0 || completedConnectors.length > 0) && !confirm("Overwrite existing construct?")) return;
+                if (plannedPlacements.length === 0 && plannedConnectors.length === 0 && plannedNotes.length === 0) return alert("No plan to copy.");
+                if ((completedPlacements.length > 0 || completedConnectors.length > 0 || completedNotes.length > 0) && !confirm("Overwrite existing construct?")) return;
                 setCompletedPlacements(plannedPlacements.map(p => ({...p, id: genId()})));
                 setCompletedCages(plannedCages.map(c => ({...c})));
                 setCompletedConnectors(plannedConnectors.map(c => ({...c, id: genId()})));
+                setCompletedNotes(plannedNotes.map(n => ({...n, id: genId()})));
                 setActiveChart('completed');
             };
 
@@ -1891,23 +2112,24 @@
                     <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
                     <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
                     <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
+                    <NoteModal isOpen={noteModalOpen} onClose={() => { setNoteModalOpen(false); setEditingNote(null); setPendingNoteTool(null); }} onConfirm={handleNoteConfirm} onDelete={handleNoteDelete} initialText={editingNote?.text || ''} initialShowArrow={editingNote?.showArrow || false} isEditing={!!editingNote} />
 
                     <div className="flex-1 overflow-hidden bg-slate-200 flex relative">
                         <aside className="w-64 text-white flex flex-col z-20 overflow-y-auto no-print shadow-xl" style={{ backgroundColor: scheme.sidebarBg, borderRight: `1px solid ${scheme.sidebarBorder}` }}>
                             {/* App Title */}
-                            <div className="p-4" style={{ backgroundColor: scheme.sidebarTitleBg, borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                                <h1 className="font-bold text-lg text-white leading-tight">Spinal Instrumentation Planner</h1>
+                            <div className="px-3 py-2" style={{ backgroundColor: scheme.sidebarTitleBg, borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                                <h1 className="font-bold text-lg text-white leading-tight">Spinal Instrumentation</h1>
                                 <button onClick={() => setChangeLogOpen(true)} className="text-[10px] text-white/40 font-mono hover:text-white">{CURRENT_VERSION}</button>
                             </div>
 
                             {/* Region View */}
                             <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                                <h3 className="text-[10px] uppercase font-bold text-white/40 mb-2 tracking-widest">Region View</h3>
+                                <h3 className="text-[10px] uppercase font-bold text-white/40 mb-1.5 tracking-widest">Region View</h3>
                                 <div className="grid grid-cols-2 gap-1">
                                     {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
                                         const labels = { cervical: 'Cervical (Occ-T4)', thoracolumbar: 'Thoracic (T1-Pelvis)', t10_pelvis: 'Lumbar (T10-Pelvis)', whole: 'Whole Spine' };
                                         const active = viewMode === vm;
-                                        return <button key={vm} onClick={() => setViewMode(vm)} className={`py-2 px-1 text-[10px] rounded border font-bold transition-all ${active ? 'border-transparent' : 'text-white/70 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>{labels[vm]}</button>;
+                                        return <button key={vm} onClick={() => setViewMode(vm)} className={`py-1.5 px-1 text-[10px] rounded border font-bold transition-all ${active ? 'border-transparent' : 'text-white/70 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>{labels[vm]}</button>;
                                     })}
                                 </div>
                             </div>
@@ -1944,15 +2166,15 @@
                             </div>
 
                             {/* Tool Palette */}
-                            <div className="p-3 space-y-4" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                            <div className="p-3 space-y-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
                                 {tools.map((g,i) => (
                                     <div key={i}>
-                                        <h3 className="text-[10px] uppercase font-bold text-white/40 mb-2 tracking-widest">{g.category}</h3>
+                                        <h3 className="text-[10px] uppercase font-bold text-white/40 mb-1.5 tracking-widest">{g.category}</h3>
                                         <div className="grid grid-cols-2 gap-1">
                                             {g.items.map(t => {
                                                 const active = selectedTool === t.id;
-                                                return <button key={t.id} onClick={() => setSelectedTool(t.id)} className={`p-1.5 h-14 rounded border flex flex-col items-center justify-center gap-0.5 transition-all text-xs ${active ? 'font-bold' : 'text-white/80 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>
-                                                    <InstrumentIcon type={t.icon} className="w-4 h-4 mb-0.5" color={active ? scheme.activeText : 'white'} />
+                                                return <button key={t.id} onClick={() => setSelectedTool(t.id)} className={`p-1 h-10 rounded border flex flex-col items-center justify-center gap-0.5 transition-all text-xs ${active ? 'font-bold' : 'text-white/80 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>
+                                                    <InstrumentIcon type={t.icon} className="w-3.5 h-3.5" color={active ? scheme.activeText : 'white'} />
                                                     <span className="text-center text-[9px] leading-tight">{t.label}</span>
                                                 </button>;
                                             })}
@@ -1990,6 +2212,8 @@
                                             setCompletedCages([]);
                                             setPlannedConnectors([]);
                                             setCompletedConnectors([]);
+                                            setPlannedNotes([]);
+                                            setCompletedNotes([]);
                                             setPatientData({
                                                 name: '', id: '', surgeon: '', location: '',
                                                 date: new Date().toISOString().split('T')[0],
@@ -2041,8 +2265,8 @@
                                         </div>
                                         <CreditsFooter />
                                     </div>
-                                    <div className="flex-[4] flex flex-col h-full"><ChartPaper title="Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} /></div>
-                                    <div className="flex-[3] flex flex-col h-full"><ChartPaper title="Final Surgical Construct" placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder="e.g. 5.5mm CoCr Rod">{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder="e.g. 5.5mm TiAlV Rail">{patientData.rightRod}</div></div></React.Fragment>} /></div>
+                                    <div className="flex-[4] flex flex-col h-full"><ChartPaper title="Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} /></div>
+                                    <div className="flex-[3] flex flex-col h-full"><ChartPaper title="Final Surgical Construct" placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder="e.g. 5.5mm CoCr Rod">{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder="e.g. 5.5mm TiAlV Rail">{patientData.rightRod}</div></div></React.Fragment>} /></div>
                                 </div>
                             </div>
                         </div>
