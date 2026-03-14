@@ -99,9 +99,14 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v0.9.6-beta";
+        const CURRENT_VERSION = "v0.9.7-beta";
 
         const CHANGE_LOG = [
+            { version: "v0.9.7-beta", date: "2026-03-14", changes: [
+                "Rod fields added to Plan side — pre-op rod description with length estimate.",
+                "Rods section added to inventory — displays left/right rod details for active chart.",
+                "Plan rod placeholders hint at length (e.g. 5.5mm CoCr 120mm).",
+            ]},
             { version: "v0.9.6-beta", date: "2026-03-04", changes: [
                 "Header text (Force/Left/Right) increased from 9px to 11px for readability.",
                 "New Note tool — level-anchored text annotations with optional arrow, draggable positioning.",
@@ -927,7 +932,7 @@
             { key: 'other', label: 'Other', toolIds: ['connector','unstable'] },
         ];
 
-        const ImplantInventory = ({ placements, tools, title, visibleLevelIds, levels }) => {
+        const ImplantInventory = ({ placements, tools, title, visibleLevelIds, levels, rods }) => {
             const grouped = useMemo(() => {
                 const counts = {};
                 placements.forEach(p => {
@@ -952,8 +957,9 @@
                 return counts;
             }, [placements, tools, visibleLevelIds, levels]);
 
-            const hasItems = Object.values(grouped).some(cat => Object.keys(cat).length > 0);
-            if (!hasItems) return null;
+            const hasImplants = Object.values(grouped).some(cat => Object.keys(cat).length > 0);
+            const hasRods = rods && (rods.left || rods.right);
+            if (!hasImplants && !hasRods) return null;
 
             const totalItems = Object.values(grouped).reduce((sum, cat) => sum + Object.keys(cat).length, 0);
             const useColumns = totalItems > 6;
@@ -977,6 +983,13 @@
                                 </div>
                             );
                         })}
+                        {hasRods && (
+                            <div className="mb-2" style={{ breakInside: 'avoid' }}>
+                                <div className="text-[9px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-0.5 mb-0.5">Rods</div>
+                                {rods.left && <div className="text-[10px] py-0.5 border-b border-slate-100"><span className="text-slate-700 font-medium">L: {rods.left}</span></div>}
+                                {rods.right && <div className="text-[10px] py-0.5 border-b border-slate-100"><span className="text-slate-700 font-medium">R: {rods.right}</span></div>}
+                            </div>
+                        )}
                     </div>
                 </div>
             );
@@ -1678,7 +1691,7 @@
             const [completedNotes, setCompletedNotes] = useState([]);
             const [colourScheme, setColourScheme] = useState('default');
             const [themeOpen, setThemeOpen] = useState(false);
-            const [patientData, setPatientData] = useState({ name: '', id: '', surgeon: '', location: '', date: new Date().toISOString().split('T')[0], company: '', screwSystem: '', leftRod: '', rightRod: '', boneGraft: { types: [], notes: '' } });
+            const [patientData, setPatientData] = useState({ name: '', id: '', surgeon: '', location: '', date: new Date().toISOString().split('T')[0], company: '', screwSystem: '', leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '', boneGraft: { types: [], notes: '' } });
             const [viewMode, setViewMode] = useState('thoracolumbar'); 
             const [scale, setScale] = useState(1);
             const [incognitoMode, setIncognitoMode] = useState(false);
@@ -2218,6 +2231,7 @@
                                                 name: '', id: '', surgeon: '', location: '',
                                                 date: new Date().toISOString().split('T')[0],
                                                 company: '', screwSystem: '', leftRod: '', rightRod: '',
+                                                planLeftRod: '', planRightRod: '',
                                                 boneGraft: { types: [], notes: '' }
                                             });
                                             setActiveChart('planned');
@@ -2261,11 +2275,11 @@
                                                 </div>
                                                 <div className="editable-field w-full text-[10px] mt-1" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, boneGraft: { ...(patientData.boneGraft || {}), notes: e.target.innerText }})} placeholder="Additional details...">{patientData.boneGraft?.notes || ''}</div>
                                             </div>
-                                            <ImplantInventory placements={[...(activeChart === 'planned' ? plannedPlacements : completedPlacements), ...(activeChart === 'planned' ? plannedCages : completedCages).map(c => ({...c, tool: c.tool})), ...(activeChart === 'planned' ? plannedConnectors : completedConnectors).map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid'}))]} tools={[...allTools, {id: 'tlif', label: 'TLIF Cage'}, {id: 'plif', label: 'PLIF Cage'}, {id: 'acdf', label: 'ACDF Cage'}, {id: 'xlif', label: 'XLIF/LLIF Cage'}, {id: 'olif', label: 'OLIF Cage'}, {id: 'alif', label: 'ALIF Cage'}]} title={activeChart === 'planned' ? 'Plan' : 'Construct'} visibleLevelIds={levels.map(l => l.id)} levels={levels} />
+                                            <ImplantInventory placements={[...(activeChart === 'planned' ? plannedPlacements : completedPlacements), ...(activeChart === 'planned' ? plannedCages : completedCages).map(c => ({...c, tool: c.tool})), ...(activeChart === 'planned' ? plannedConnectors : completedConnectors).map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid'}))]} tools={[...allTools, {id: 'tlif', label: 'TLIF Cage'}, {id: 'plif', label: 'PLIF Cage'}, {id: 'acdf', label: 'ACDF Cage'}, {id: 'xlif', label: 'XLIF/LLIF Cage'}, {id: 'olif', label: 'OLIF Cage'}, {id: 'alif', label: 'ALIF Cage'}]} title={activeChart === 'planned' ? 'Plan' : 'Construct'} visibleLevelIds={levels.map(l => l.id)} levels={levels} rods={activeChart === 'planned' ? { left: patientData.planLeftRod, right: patientData.planRightRod } : { left: patientData.leftRod, right: patientData.rightRod }} />
                                         </div>
                                         <CreditsFooter />
                                     </div>
-                                    <div className="flex-[4] flex flex-col h-full"><ChartPaper title="Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} /></div>
+                                    <div className="flex-[4] flex flex-col h-full"><ChartPaper title="Plan" placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planLeftRod: e.target.innerText})} placeholder="e.g. 5.5mm CoCr 120mm">{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planRightRod: e.target.innerText})} placeholder="e.g. 5.5mm TiAlV 120mm">{patientData.planRightRod}</div></div></React.Fragment>} /></div>
                                     <div className="flex-[3] flex flex-col h-full"><ChartPaper title="Final Surgical Construct" placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder="e.g. 5.5mm CoCr Rod">{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">Rod:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder="e.g. 5.5mm TiAlV Rail">{patientData.rightRod}</div></div></React.Fragment>} /></div>
                                 </div>
                             </div>
