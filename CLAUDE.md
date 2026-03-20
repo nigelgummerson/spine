@@ -1,17 +1,22 @@
-# Leeds Spinal Planner
+# Spinal Instrumentation Plan & Record
 
 ## What This Project Is
-A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export.
+A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 14 European languages.
 
 ## Current Status
-- **Version:** v0.9.7-beta
-- **Last Updated:** 2026-03-14
+- **Version:** v1.0.0-beta
+- **Last Updated:** 2026-03-20
 - **License:** GNU GPLv3
 
 ## Project Structure
 ```
 spine-surgery/planning/spine-planner/
-├── index.html          # Single-file app (React 18 + Tailwind via CDN), ~1790 lines
+├── index.html          # Single-file app (React 18 + Tailwind via CDN), ~6200 lines
+├── tests/
+│   ├── i18n-completeness.html    # Layer 1: translation key completeness
+│   ├── i18n-clinical.html        # Layer 2: clinical terminology vs glossary
+│   ├── i18n-overflow.html        # Layer 3: string length overflow detection
+│   └── translation-glossary.json # Reference clinical terms with sources
 ├── alpha-notes.txt     # Development context and version notes
 ├── CLAUDE.md           # This file (Claude-specific collaboration tracking)
 ├── README.md           # GitHub README
@@ -23,7 +28,7 @@ spine-surgery/planning/spine-planner/
 ## GitHub & Deployment
 - **Repository:** github.com/nigelgummerson/spine-planner
 - **Live Site:** nigelgummerson.github.io/spine-planner (GitHub Pages)
-- **Branches:** `main` (v0.9.5-beta)
+- **Branches:** `main` (v1.0.0-beta)
 
 ## Tech Stack
 - React 18 production builds (via CDN - unpkg)
@@ -33,45 +38,41 @@ spine-surgery/planning/spine-planner/
 - All dependencies loaded via CDN for offline hospital use
 
 ## Version History (Recent)
-- **v0.9.7-beta** (2026-03-14): Rod fields added to Plan side with length estimate placeholders. Rods section added to inventory (switches between plan/construct rods). New patient data fields: planLeftRod, planRightRod.
-- **v0.9.5-beta** (2026-03-03): Fixed duplicate ID generation (Date.now() replaced with incrementing counter). Fixed hover jitter on implant icons (GPU layer promotion via will-change). Code formatting cleanup — compressed single-line logic expanded for readability.
-- **v0.9.4-alpha** (2026-03-01): Replaced html2canvas with html-to-image for pixel-perfect export. Fixed text baseline shift, checkbox/select state, cage label artefacts, screen flash during export. React CDN switched to production builds. Cage label border/shadow removed.
-- **v0.9.3-alpha** (2026-03-01): Anatomical proportions (T1-S1), pedicle data (Lien 2007), variable disc heights, auto-scale solver, level-anchored crosslinks, inline labels, cervical cage warning, export artefacts flagged
-- **v0.9.1-alpha** (2026-03-01): Session Privacy Mode rename, JSON v3 format with shared serialiser, help modal rewrite, theme renames
-- **v0.9.0-alpha** (2026-03-01): Up-going TP hook, bands/wires/cables, screw annotations, reconstruction cage text, bone graft section, left panel restructure, XLIF fix (T5-L4), corpectomy rendering fix
-- **v0.8.2-alpha** (2026-02-28): Company/screw system fields, auto-theme from company, rod text fields, screw size compact format, cage label repositioning, UI polish
-- **v0.8.1-alpha** (2026-02-28): Sans-serif throughout, flex ratio fix, auto-scale cap, draggable crosslinks, JSON v2 format, colour schemes, two-column inventory
-- **v0.8.0-alpha** (2026-02-28): Sidebar-only layout, auto-scaling spine height, interbody cages merged, session mode, export panel redesign
-- **v0.7.0-alpha**: Interbody cage support (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) with permissibility engine
-- **v0.5.6-alpha**: Last version before cage support
+- **v1.0.0-beta** (2026-03-20): Internationalisation — 14 European languages. ~220 translation keys, t() function, language auto-detection, sidebar language selector, clinical terminology verification. App renamed to "Spinal Instrumentation Plan & Record". Theme picker redesigned as colour swatches. 3 new colour schemes (Forest Green, Teal & Coral, Steel & Ice). Theme/language persist in localStorage exempt from privacy mode. Sidebar widened to 340px, export left panel to 370px. Tool categories merged. Plan/Construct toggle labelled "Editing".
+- **v0.9.7-beta** (2026-03-14): Rod fields added to Plan side with length estimate placeholders. Rods section added to inventory. New patient data fields: planLeftRod, planRightRod.
+- **v0.9.6-beta** (2026-03-04): Note tool, sidebar reorganisation, hover/UX fixes.
+- **v0.9.5-beta** (2026-03-03): Fixed duplicate ID generation. Fixed hover jitter on implant icons. Code formatting cleanup.
+- **v0.9.4-alpha** (2026-03-01): Replaced html2canvas with html-to-image for pixel-perfect export.
+- **v0.9.3-alpha** (2026-03-01): Anatomical proportions (T1-S1), pedicle data, variable disc heights, auto-scale solver.
 
-## Key Architecture (v0.9.4)
-- **Export container:** Fixed 1485x1050px, 3 columns: patient info (340px) + Plan (flex-4) + Construct (flex-3)
-- **Sidebar:** w-64, colour-themed per company (7 schemes), tool palette, export controls
-- **Colour schemes:** Sidebar only; printed form unaffected. `AUTO_THEME_FROM_COMPANY` flag controls auto-switching. Themes: Slate & Amber (default), NHS Blue, Deep Navy, Gold & Black, Red, Purple, Midnight
+## Key Architecture (v1.0.0)
+- **i18n:** Flat `TRANSLATIONS` object (~220 keys × 14 languages), `t(key, replacements)` function with `??` fallback chain. `_currentLang` module-level variable synced with React state via `changeLang()`.
+- **Supported languages:** en, de, fr, es, it, pt, sv, nb, da, fi, nl, pl, el, tr
+- **Language detection:** `detectLanguage()` checks `localStorage('spine_planner_lang')` → `navigator.language` → `'en'`. `LANG_ALIASES` maps `no`/`nn` → `nb`.
+- **Export container:** Fixed 1485x1050px, 3 columns: patient info (370px) + Plan (flex-4) + Construct (flex-3)
+- **Sidebar:** w-[340px], colour-themed per company (10 schemes), tool palette, export controls
+- **Colour schemes:** 10 themes, swatch-only picker (no text labels). `changeTheme()` wrapper persists to `localStorage('spine_planner_theme')`, exempt from privacy mode.
 - **Company/Screw data:** `IMPLANT_COMPANIES` (16 manufacturers), `SCREW_SYSTEMS` (per-company product lists), `COMPANY_THEME_MAP` (5 mapped companies)
 - **Implant types:** 3 screws (mono/poly/uni), 5 hooks (pedicle, TP down, TP up, supra-lam, infra-lam), 3 fixation (band, wire, cable)
-- **Constants:** `HOOK_TYPES` (5 hook IDs), `NO_SIZE_TYPES` (hooks + band/wire/cable — no diameter/length sizing)
+- **Data arrays:** `allTools`, `INVENTORY_CATEGORIES`, `OSTEOTOMY_TYPES`, `FORCE_TYPES`, `APPROACH_GROUPS` use `labelKey` pattern — data stays English, `t()` called at render time
 - **ScrewModal:** Three-tier visual hierarchy (SCREWS > HOOKS > BANDS & OTHERS), annotations for screws and hooks, free-text description for fixation
 - **Osteotomies:** Schwab 1-6 + Corpectomy, grouped into Posterior/Anterior optgroups. VCR/ML-VCR/Corpectomy show reconstruction cage text input
 - **Bone graft:** Multi-select checkboxes (Local Bone, Autograft, Allograft, Synthetics, DBM, BMP) + free-text notes
-- **JSON v3 format:** `formatVersion: 3`, plan/construct separation, `patient` includes company/screwSystem/leftRod/rightRod/boneGraft
+- **JSON v3 format:** `formatVersion: 3`, plan/construct separation, `patient` includes company/screwSystem/leftRod/rightRod/planLeftRod/planRightRod/boneGraft
 - **Connectors:** Level-anchored `{levelId, fraction}` (branch); legacy `{yNorm}` migrated on load
 - **Session cache:** localStorage key `spine_planner_v2`, formatVersion 3
 - **Save/load:** Shared `serializeState()` / `deserializeState()` functions; loads formatVersion >= 2
-- **Export:** html-to-image (SVG foreignObject) replaces html2canvas. `prepareExportCanvas()` syncs checkbox `checked` and select `selected` attributes before capture. No live DOM modification — no screen flash. jsPDF for PDF generation from canvas.
+- **Export:** html-to-image (SVG foreignObject). `prepareExportCanvas()` syncs checkbox `checked` and select `selected` attributes before capture. jsPDF for PDF generation from canvas.
+- **Translation disclaimer:** Shown in footer and export when language is not English. Feedback email for native-speaker corrections.
 
-## Anatomical Proportions (feature branch)
-- **`VERTEBRA_ANATOMY`:** Per-level mm data (bodyW, bodyH, pedW, pedH) for T1-S1, calibrated from X-ray measurements
-- **`getVertSvgGeometry(levelId)`:** Converts mm to SVG coordinates (body edges, pedicle positions/radii) within 160-unit viewBox
-- **`getLevelHeight(level)`:** Per-level SVG height from bodyH (BODY_H_SCALE = 50/36.0); falls back to REGIONS for cervical/Oc/pelvis
-- **`getDiscHeight(level)`:** Lumbar disc = 1/3 body height, thoracic = 1/5, cervical = 10px fixed
-- **Vertebral body SVG:** Biconcave endplates + waisted sidewalls, rounded corners, `<g transform="scale(1, h/baseH)">` for per-level height
-- **Pedicles:** Ellipses for all T/L (50% schematic scale), thoracic tall-thin, lumbar wider
-- **CageVisualization:** Takes levelId, sizes cages to vertebral body width (XLIF full, PLIF ~10mm bilateral, ACDF ~14mm)
-- **Crosslinks:** Level-anchored `{levelId, fraction}` instead of `{yNorm}` — stable across view changes
+## i18n Translation Quality
+- **Tier B (current):** Machine translation verified against clinical glossary (~48 terms × 13 languages)
+- **Tier C (future):** Native-speaker review via disclaimer feedback email
+- **Verification tests:** 3 browser-based HTML test suites in `tests/`
+- **Glossary sources:** AO Spine, DWG, SFCR, GEER, SICV&GIS, SPP, NVWC, NOV, PTOiTr, HOA, TOTBİD
+- **What stays English:** Vertebral labels, company/screw names, international abbreviations (ACDF, PLIF, etc.), Schwab grades, changelog, "Designed in Leeds" origin line
 
-## Data Model (v0.9.1)
+## Data Model (v0.9.7)
 
 **Placement object:**
 ```
@@ -82,17 +83,19 @@ spine-surgery/planning/spine-planner/
 
 **Patient data:**
 ```
-{ name, id, surgeon, location, date, company, screwSystem, leftRod, rightRod, boneGraft: { types: [], notes: '' } }
+{ name, id, surgeon, location, date, company, screwSystem, leftRod, rightRod, planLeftRod, planRightRod, boneGraft: { types: [], notes: '' } }
 ```
 
 ## Next Steps
 - [x] **Anatomical accuracy:** Data-driven vertebral proportions (T1-S1), merged to main in v0.9.3
 - [x] **Export artefacts:** Fixed in v0.9.4 — replaced html2canvas with html-to-image
+- [x] **Internationalisation:** 14 European languages, merged in v1.0.0-beta
 - [ ] **Cervical spine proportions:** Extend VERTEBRA_ANATOMY to cervical levels (deferred)
 - [ ] **Barcode scanning:** Integrate html5-qrcode for GS1 DataMatrix scanning from implant packages
 - [ ] **Offline bundling:** Embed all JS libraries directly into HTML to bypass hospital firewalls
 - [ ] **User testing:** Get feedback from theatre staff on current workflow
 - [ ] **Specification sync:** SPECIFICATION.md updated to v0.9.0
+- [ ] **i18n Tier C:** Recruit native-speaking surgeons for translation review
 
 ## Key Constraints
 - **Must remain single .html file** - No build process, no npm, no installation
@@ -111,9 +114,15 @@ open index.html                # Opens in browser
 
 # Deploy to GitHub Pages
 git push origin main          # Auto-deploys via GitHub Pages
+
+# Run i18n verification tests
+open tests/i18n-completeness.html   # Check all keys present
+open tests/i18n-clinical.html       # Check against glossary
+open tests/i18n-overflow.html       # Check string lengths
 ```
 
 ## Related Resources
 - **Obsidian Notes:** [[spine-planner]] in vault
 - **Context File:** alpha-notes.txt (version history and feature notes)
 - **User Guide:** Built into app (Help button)
+- **i18n Design Spec:** docs/superpowers/specs/2026-03-20-i18n-european-languages-design.md (local only, gitignored)
