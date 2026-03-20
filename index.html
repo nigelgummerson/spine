@@ -6299,7 +6299,7 @@
                         <div className="portrait-toolbar text-white flex flex-col z-20 no-print shadow-xl shrink-0" style={{ backgroundColor: scheme.sidebarBg }}>
                             {/* Row 1: Title, Theme, Language, Action icons */}
                             <div className="flex items-center gap-2 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                                <span className="font-bold text-xs tracking-tight shrink-0">{t('sidebar.title')}</span>
+                                <span className="font-bold text-sm tracking-tight shrink-0">{t('sidebar.title')}</span>
                                 <div className="flex-1"></div>
                                 {themeDropdown}
                                 <select value={currentLang} onChange={e => changeLang(e.target.value)}
@@ -6362,22 +6362,23 @@
                         </div>
 
                         {/* Portrait Content — swipeable tabs */}
-                        <div ref={portraitContentRef} className="flex-1 overflow-hidden relative bg-slate-200"
+                        <div ref={portraitContentRef} className="flex-1 overflow-hidden relative"
                             onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-                            <div className="portrait-tab-content absolute inset-0" style={{ transform: `translateX(${-portraitTab * 100}%)`, display: 'flex', width: '300%' }}>
-                                {/* Tab 0: Demographics */}
-                                <div className="h-full overflow-y-auto shrink-0 bg-white p-8" style={{ flex: '0 0 33.333%' }}>
-                                    <div className="flex flex-col h-full">{demographicsContent}</div>
+                            {portraitTab === 0 && (
+                                <div className="absolute inset-0 overflow-y-auto bg-white p-8">
+                                    <div className="flex flex-col min-h-full">{demographicsContent}</div>
                                 </div>
-                                {/* Tab 1: Plan */}
-                                <div className="h-full shrink-0 flex flex-col bg-white" style={{ flex: '0 0 33.333%' }}>
+                            )}
+                            {portraitTab === 1 && (
+                                <div className="absolute inset-0 flex flex-col bg-white">
                                     {planChart}
                                 </div>
-                                {/* Tab 2: Construct */}
-                                <div className="h-full shrink-0 flex flex-col bg-white" style={{ flex: '0 0 33.333%' }}>
+                            )}
+                            {portraitTab === 2 && (
+                                <div className="absolute inset-0 flex flex-col bg-white">
                                     {constructChart}
                                 </div>
-                            </div>
+                            )}
                         </div>
 
                         {/* Hidden off-screen export container for PDF/JPG — only mounted during export to avoid duplicate React elements */}
