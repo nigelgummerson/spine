@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>i18n Overflow Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div id="app" class="max-w-6xl mx-auto py-8 px-4">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">i18n String Overflow Test</h1>
+        <p class="text-gray-500 mb-6 text-sm">Layer 3 — Checks translated string lengths against UI width thresholds. German (de) and Finnish (fi) flagged as stress-test languages.</p>
+        <div id="banner" class="rounded-lg p-4 mb-6 bg-gray-200 text-gray-600 font-medium">Loading...</div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+    const THRESHOLDS = [
+        { pattern: /^sidebar\./, max: 25, label: 'sidebar.*' },
+        { pattern: /^modal\..*\.title_/, max: 35, label: 'modal.*.title_*' },
+        { pattern: /^button\./, max: 15, label: 'button.*' },
+        { pattern: /^patient\.(?!.*placeholder)/, max: 25, label: 'patient.* (labels)' },
+        { pattern: /^tool\./, max: 18, label: 'tool.*' },
+        { pattern: /^inventory\./, max: 20, label: 'inventory.*' },
+    ];
+
+    const STRESS_LANGS = ['de', 'fi'];
+
+    function getThreshold(key) {
+        for (const t of THRESHOLDS) {
+            if (t.pattern.test(key)) return t;
+        }
+        return null;
+    }
+
+    async function extractObject(html, marker) {
+        const startIdx = html.indexOf(marker);
+        if (startIdx === -1) throw new Error(marker + ' not found in index.html');
+
+        const isArray = marker.trimEnd().endsWith('[');
+        const openChar = isArray ? '[' : '{';
+        const closeChar = isArray ? ']' : '}';
+
+        let braceCount = 0;
+        let objStart = html.indexOf(openChar, startIdx);
+        let i = objStart;
+        let inString = false;
+        let stringChar = '';
+        let escaped = false;
+
+        for (; i < html.length; i++) {
+            const ch = html[i];
+            if (escaped) { escaped = false; continue; }
+            if (ch === '\\') { escaped = true; continue; }
+            if (inString) {
+                if (ch === stringChar) inString = false;
+                continue;
+            }
+            if (ch === "'" || ch === '"' || ch === '`') {
+                inString = true;
+                stringChar = ch;
+                continue;
+            }
+            if (ch === openChar) braceCount++;
+            if (ch === closeChar) {
+                braceCount--;
+                if (braceCount === 0) break;
+            }
+        }
+
+        const objText = html.substring(objStart, i + 1);
+        return new Function('return ' + objText)();
+    }
+
+    async function run() {
+        const banner = document.getElementById('banner');
+        const resultsDiv = document.getElementById('results');
+
+        try {
+            const resp = await fetch('../index.html');
+            if (!resp.ok) throw new Error('Failed to fetch index.html: ' + resp.status);
+            const html = await resp.text();
+            const translations = await extractObject(html, 'const TRANSLATIONS = {');
+
+            const allLangs = Object.keys(translations);
+            const enKeys = Object.keys(translations.en || {});
+
+            // Determine which keys have thresholds
+            const applicableKeys = enKeys.filter(k => getThreshold(k) !== null);
+
+            const overflowsByLang = {};
+            const summaryByLang = {};
+            let totalOverflows = 0;
+
+            for (const lang of allLangs) {
+                overflowsByLang[lang] = [];
+                summaryByLang[lang] = { checked: 0, pass: 0, overflow: 0 };
+                const t = translations[lang];
+                if (!t) continue;
+
+                for (const key of applicableKeys) {
+                    if (!(key in t)) continue;
+                    const value = t[key];
+                    // Strip HTML tags for length measurement
+                    const plainText = value.replace(/<[^>]*>/g, '');
+                    const threshold = getThreshold(key);
+                    const len = plainText.length;
+
+                    summaryByLang[lang].checked++;
+
+                    if (len > threshold.max) {
+                        summaryByLang[lang].overflow++;
+                        totalOverflows++;
+                        overflowsByLang[lang].push({
+                            key, value: plainText, length: len,
+                            threshold: threshold.max, rule: threshold.label
+                        });
+                    } else {
+                        summaryByLang[lang].pass++;
+                    }
+                }
+            }
+
+            // Banner
+            if (totalOverflows === 0) {
+                banner.className = 'rounded-lg p-4 mb-6 bg-green-100 text-green-800 font-medium';
+                banner.textContent = `All ${applicableKeys.length} applicable keys pass overflow checks across ${allLangs.length} languages.`;
+            } else {
+                banner.className = 'rounded-lg p-4 mb-6 bg-red-100 text-red-800 font-medium';
+                banner.textContent = `${totalOverflows} overflow(s) detected across ${allLangs.filter(l => overflowsByLang[l].length > 0).length} language(s).`;
+            }
+
+            // Summary table
+            let html2 = `
+                <h2 class="text-lg font-semibold text-gray-700 mb-3">Overflow Count by Language</h2>
+                <table class="w-full border-collapse bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+                    <thead>
+                        <tr class="bg-gray-100 text-left text-xs uppercase tracking-wider text-gray-500">
+                            <th class="px-4 py-3">Language</th>
+                            <th class="px-4 py-3 text-right">Checked</th>
+                            <th class="px-4 py-3 text-right">Pass</th>
+                            <th class="px-4 py-3 text-right">Overflow</th>
+                            <th class="px-4 py-3 text-center">Status</th>
+                            <th class="px-4 py-3 text-center">Stress Test</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            // Sort: stress langs first, then by overflow count desc
+            const sortedLangs = [...allLangs].sort((a, b) => {
+                const aStress = STRESS_LANGS.includes(a) ? 0 : 1;
+                const bStress = STRESS_LANGS.includes(b) ? 0 : 1;
+                if (aStress !== bStress) return aStress - bStress;
+                return (summaryByLang[b]?.overflow || 0) - (summaryByLang[a]?.overflow || 0);
+            });
+
+            for (const lang of sortedLangs) {
+                const s = summaryByLang[lang];
+                if (!s || s.checked === 0) continue;
+                const pass = s.overflow === 0;
+                const isStress = STRESS_LANGS.includes(lang);
+                html2 += `
+                    <tr class="border-t border-gray-100 ${!pass ? 'bg-red-50' : ''} ${isStress ? 'font-medium' : ''}">
+                        <td class="px-4 py-2 text-sm font-mono">${lang}</td>
+                        <td class="px-4 py-2 text-sm text-right">${s.checked}</td>
+                        <td class="px-4 py-2 text-sm text-right">${s.pass}</td>
+                        <td class="px-4 py-2 text-sm text-right ${s.overflow > 0 ? 'text-red-600 font-semibold' : ''}">${s.overflow}</td>
+                        <td class="px-4 py-2 text-sm text-center ${pass ? 'text-green-600' : 'text-red-600 font-semibold'}">${pass ? 'PASS' : 'OVERFLOW'}</td>
+                        <td class="px-4 py-2 text-sm text-center">${isStress ? '<span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-xs">STRESS</span>' : ''}</td>
+                    </tr>`;
+            }
+
+            html2 += '</tbody></table>';
+
+            // Threshold reference
+            html2 += `
+                <h2 class="text-lg font-semibold text-gray-700 mb-3">Threshold Rules</h2>
+                <table class="w-full border-collapse bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+                    <thead>
+                        <tr class="bg-gray-100 text-left text-xs uppercase tracking-wider text-gray-500">
+                            <th class="px-4 py-3">Pattern</th>
+                            <th class="px-4 py-3 text-right">Max Characters</th>
+                            <th class="px-4 py-3 text-right">Keys Matched</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            for (const t of THRESHOLDS) {
+                const count = enKeys.filter(k => t.pattern.test(k)).length;
+                html2 += `
+                    <tr class="border-t border-gray-100">
+                        <td class="px-4 py-2 text-sm font-mono">${t.label}</td>
+                        <td class="px-4 py-2 text-sm text-right">${t.max}</td>
+                        <td class="px-4 py-2 text-sm text-right">${count}</td>
+                    </tr>`;
+            }
+
+            html2 += '</tbody></table>';
+
+            // Detail tables for overflows
+            for (const lang of sortedLangs) {
+                const ov = overflowsByLang[lang];
+                if (!ov || ov.length === 0) continue;
+                const isStress = STRESS_LANGS.includes(lang);
+
+                html2 += `
+                    <div class="mb-4 p-4 bg-white rounded-lg shadow-sm border ${isStress ? 'border-amber-300' : 'border-red-200'}">
+                        <h3 class="font-semibold text-gray-800 mb-3">${lang} ${isStress ? '(stress test)' : ''} — ${ov.length} overflow(s)</h3>
+                        <table class="w-full border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-gray-50 text-left text-xs uppercase tracking-wider text-gray-500">
+                                    <th class="px-3 py-2">Key</th>
+                                    <th class="px-3 py-2">Value</th>
+                                    <th class="px-3 py-2 text-right">Length</th>
+                                    <th class="px-3 py-2 text-right">Threshold</th>
+                                    <th class="px-3 py-2 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
+                for (const o of ov) {
+                    const overBy = o.length - o.threshold;
+                    html2 += `
+                        <tr class="border-t border-gray-100">
+                            <td class="px-3 py-2 font-mono text-gray-700">${escHTML(o.key)}</td>
+                            <td class="px-3 py-2 text-gray-600 max-w-xs truncate" title="${escAttr(o.value)}">${escHTML(o.value)}</td>
+                            <td class="px-3 py-2 text-right text-red-600 font-semibold">${o.length}</td>
+                            <td class="px-3 py-2 text-right">${o.threshold}</td>
+                            <td class="px-3 py-2 text-center text-red-600 font-semibold">+${overBy}</td>
+                        </tr>`;
+                }
+
+                html2 += '</tbody></table></div>';
+            }
+
+            resultsDiv.innerHTML = html2;
+
+        } catch (err) {
+            banner.className = 'rounded-lg p-4 mb-6 bg-red-100 text-red-800 font-medium';
+            banner.textContent = 'Error: ' + err.message;
+            console.error(err);
+        }
+    }
+
+    function escHTML(s) {
+        const d = document.createElement('div');
+        d.textContent = s || '';
+        return d.innerHTML;
+    }
+
+    function escAttr(s) {
+        return (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    run();
+    </script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>i18n Clinical Terminology Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div id="app" class="max-w-5xl mx-auto py-8 px-4">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">i18n Clinical Terminology Test</h1>
+        <p class="text-gray-500 mb-6 text-sm">Layer 2 — Verifies critical clinical translations match the glossary of approved terms.</p>
+        <div id="banner" class="rounded-lg p-4 mb-6 bg-gray-200 text-gray-600 font-medium">Loading...</div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+    async function extractObject(html, marker) {
+        const startIdx = html.indexOf(marker);
+        if (startIdx === -1) throw new Error(marker + ' not found in index.html');
+
+        const isArray = marker.trimEnd().endsWith('[');
+        const openChar = isArray ? '[' : '{';
+        const closeChar = isArray ? ']' : '}';
+
+        let braceCount = 0;
+        let objStart = html.indexOf(openChar, startIdx);
+        let i = objStart;
+        let inString = false;
+        let stringChar = '';
+        let escaped = false;
+
+        for (; i < html.length; i++) {
+            const ch = html[i];
+            if (escaped) { escaped = false; continue; }
+            if (ch === '\\') { escaped = true; continue; }
+            if (inString) {
+                if (ch === stringChar) inString = false;
+                continue;
+            }
+            if (ch === "'" || ch === '"' || ch === '`') {
+                inString = true;
+                stringChar = ch;
+                continue;
+            }
+            if (ch === openChar) braceCount++;
+            if (ch === closeChar) {
+                braceCount--;
+                if (braceCount === 0) break;
+            }
+        }
+
+        const objText = html.substring(objStart, i + 1);
+        return new Function('return ' + objText)();
+    }
+
+    async function run() {
+        const banner = document.getElementById('banner');
+        const resultsDiv = document.getElementById('results');
+
+        try {
+            // Load glossary
+            let glossary;
+            try {
+                const glossResp = await fetch('translation-glossary.json');
+                if (!glossResp.ok) throw new Error('HTTP ' + glossResp.status);
+                glossary = await glossResp.json();
+            } catch (err) {
+                banner.className = 'rounded-lg p-4 mb-6 bg-amber-100 text-amber-800 font-medium';
+                banner.innerHTML = 'Could not load <code class="bg-amber-200 px-1 rounded">translation-glossary.json</code>. ' +
+                    'Create this file with a <code class="bg-amber-200 px-1 rounded">terms</code> array to enable clinical terminology checks.<br>' +
+                    '<span class="text-xs text-amber-600">Error: ' + err.message + '</span>';
+                return;
+            }
+
+            // Load translations
+            const resp = await fetch('../index.html');
+            if (!resp.ok) throw new Error('Failed to fetch index.html: ' + resp.status);
+            const html = await resp.text();
+            const translations = await extractObject(html, 'const TRANSLATIONS = {');
+
+            const terms = glossary.terms || [];
+            if (terms.length === 0) {
+                banner.className = 'rounded-lg p-4 mb-6 bg-amber-100 text-amber-800 font-medium';
+                banner.textContent = 'Glossary loaded but contains no terms.';
+                return;
+            }
+
+            // Run checks
+            const allLangs = Object.keys(translations);
+            let totalChecked = 0;
+            let totalMatches = 0;
+            const mismatchesByLang = {};
+            const summaryByLang = {};
+
+            for (const lang of allLangs) {
+                mismatchesByLang[lang] = [];
+                summaryByLang[lang] = { checked: 0, matches: 0, mismatches: 0 };
+            }
+
+            for (const term of terms) {
+                const key = term.key;
+                const expectedByLang = term.translations || {};
+
+                for (const [lang, expected] of Object.entries(expectedByLang)) {
+                    if (!translations[lang]) continue;
+                    if (!(key in translations[lang])) continue;
+
+                    totalChecked++;
+                    summaryByLang[lang].checked++;
+                    const actual = translations[lang][key];
+
+                    if (actual === expected) {
+                        totalMatches++;
+                        summaryByLang[lang].matches++;
+                    } else {
+                        summaryByLang[lang].mismatches++;
+                        mismatchesByLang[lang].push({
+                            key, actual, expected,
+                            source: term.source || ''
+                        });
+                    }
+                }
+            }
+
+            const totalMismatches = totalChecked - totalMatches;
+            const allPass = totalMismatches === 0;
+
+            // Banner
+            if (allPass) {
+                banner.className = 'rounded-lg p-4 mb-6 bg-green-100 text-green-800 font-medium';
+                banner.textContent = `All ${totalChecked} glossary term checks passed across ${allLangs.length} languages.`;
+            } else {
+                banner.className = 'rounded-lg p-4 mb-6 bg-red-100 text-red-800 font-medium';
+                banner.textContent = `${totalMismatches} mismatch(es) found out of ${totalChecked} checks.`;
+            }
+
+            // Summary table
+            const langsWithData = allLangs.filter(l => summaryByLang[l].checked > 0);
+            let html2 = `
+                <h2 class="text-lg font-semibold text-gray-700 mb-3">Summary by Language</h2>
+                <table class="w-full border-collapse bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+                    <thead>
+                        <tr class="bg-gray-100 text-left text-xs uppercase tracking-wider text-gray-500">
+                            <th class="px-4 py-3">Language</th>
+                            <th class="px-4 py-3 text-right">Checked</th>
+                            <th class="px-4 py-3 text-right">Matches</th>
+                            <th class="px-4 py-3 text-right">Mismatches</th>
+                            <th class="px-4 py-3 text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            for (const lang of langsWithData) {
+                const s = summaryByLang[lang];
+                const pass = s.mismatches === 0;
+                html2 += `
+                    <tr class="border-t border-gray-100 ${pass ? '' : 'bg-red-50'}">
+                        <td class="px-4 py-2 text-sm font-mono">${lang}</td>
+                        <td class="px-4 py-2 text-sm text-right">${s.checked}</td>
+                        <td class="px-4 py-2 text-sm text-right">${s.matches}</td>
+                        <td class="px-4 py-2 text-sm text-right ${s.mismatches > 0 ? 'text-red-600 font-semibold' : ''}">${s.mismatches}</td>
+                        <td class="px-4 py-2 text-sm text-center ${pass ? 'text-green-600' : 'text-red-600 font-semibold'}">${pass ? 'PASS' : 'FAIL'}</td>
+                    </tr>`;
+            }
+
+            html2 += '</tbody></table>';
+
+            // Mismatch details grouped by language
+            for (const lang of langsWithData) {
+                const mm = mismatchesByLang[lang];
+                if (mm.length === 0) continue;
+
+                html2 += `
+                    <div class="mb-4 p-4 bg-white rounded-lg shadow-sm border border-red-200">
+                        <h3 class="font-semibold text-gray-800 mb-3">Mismatches: ${lang} (${mm.length})</h3>
+                        <table class="w-full border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-gray-50 text-left text-xs uppercase tracking-wider text-gray-500">
+                                    <th class="px-3 py-2">Key</th>
+                                    <th class="px-3 py-2">Actual</th>
+                                    <th class="px-3 py-2">Expected</th>
+                                    <th class="px-3 py-2">Source</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
+                for (const m of mm) {
+                    html2 += `
+                        <tr class="border-t border-gray-100">
+                            <td class="px-3 py-2 font-mono text-gray-700">${escHTML(m.key)}</td>
+                            <td class="px-3 py-2 text-red-600">${escHTML(m.actual)}</td>
+                            <td class="px-3 py-2 text-green-700">${escHTML(m.expected)}</td>
+                            <td class="px-3 py-2 text-gray-400">${escHTML(m.source)}</td>
+                        </tr>`;
+                }
+
+                html2 += '</tbody></table></div>';
+            }
+
+            resultsDiv.innerHTML = html2;
+
+        } catch (err) {
+            banner.className = 'rounded-lg p-4 mb-6 bg-red-100 text-red-800 font-medium';
+            banner.textContent = 'Error: ' + err.message;
+            console.error(err);
+        }
+    }
+
+    function escHTML(s) {
+        const d = document.createElement('div');
+        d.textContent = s || '';
+        return d.innerHTML;
+    }
+
+    run();
+    </script>
+</body>
+</html>
