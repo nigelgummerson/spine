@@ -82,6 +82,15 @@
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
+
+        /* PORTRAIT MODE */
+        .portrait-toolbar ::-webkit-scrollbar { height: 4px; }
+        .portrait-toolbar ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
+        .portrait-tab-content { transition: transform 0.3s ease-out; }
+
+        @media print {
+            .portrait-toolbar, .portrait-tabs { display: none !important; }
+        }
     </style>
 </head>
 <body class="text-slate-800">
@@ -89,11 +98,25 @@
     <div id="root" class="h-screen w-screen flex flex-col"></div>
 
     <script type="text/babel">
-        const { useState, useRef, useEffect, useLayoutEffect, useMemo } = React;
+        const { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } = React;
 
         // Unique ID generator — counter starts from timestamp to avoid collisions with saved data
         let _nextId = Date.now();
         const genId = () => ++_nextId;
+
+        // ==========================================
+        // ORIENTATION DETECTION
+        // ==========================================
+        const usePortrait = () => {
+            const [isPortrait, setIsPortrait] = useState(() => window.matchMedia('(orientation: portrait)').matches);
+            useEffect(() => {
+                const mql = window.matchMedia('(orientation: portrait)');
+                const handler = (e) => setIsPortrait(e.matches);
+                mql.addEventListener('change', handler);
+                return () => mql.removeEventListener('change', handler);
+            }, []);
+            return isPortrait;
+        };
 
         // ==========================================
         // INTERNATIONALISATION (i18n)
@@ -412,6 +435,13 @@
 
                 // --- Version history modal ---
                 'modal.changelog.title': 'Version History',
+
+                // --- Portrait mode tabs (needs translation for other languages) ---
+                'portrait.tab.demographics': 'Demographics',
+                'portrait.tab.plan': 'Plan',
+                'portrait.tab.construct': 'Construct',
+                'portrait.view_only': 'View only on this screen size. Use a tablet or desktop to edit.',
+                'portrait.view_only_short': 'View only',
             },
 
             de: {
@@ -4059,9 +4089,21 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v1.0.1-beta";
+        const CURRENT_VERSION = "v1.1.0-beta";
 
         const CHANGE_LOG = [
+            { version: "v1.1.0-beta", date: "2026-03-20", changes: [
+                "Portrait/tablet mode: responsive layout detects screen orientation automatically.",
+                "Portrait toolbar: sidebar controls reorganised as compact horizontal toolbar.",
+                "Tab-based column switching: Demographics, Plan, and Construct shown one at a time.",
+                "Swipe gestures: swipe left/right to switch between tabs on touch devices.",
+                "Scaled columns: each tab rendered at export dimensions and scaled to fit viewport.",
+                "Edit mode synced to tabs: Plan tab edits planned, Construct tab edits completed.",
+                "Labelled Copy Plan to Construct button in portrait toolbar.",
+                "View-only mode on phones (<600px): editing disabled with informational banner.",
+                "Export unchanged: PDF/JPG always produces landscape 1485×1050 output.",
+                "Language selector reordered: English first, then alphabetical by native name.",
+            ]},
             { version: "v1.0.1-beta", date: "2026-03-20", changes: [
                 "Fixed Turkish screw terminology: -aksiyal → -aksiyel (per manufacturer literature).",
                 "Fixed Turkish uniplanar: removed incorrect ü (Üniplanar → Uniplanar).",
@@ -5743,6 +5785,46 @@
             const containerWrapperRef = useRef(null);
             const fileInputRef = useRef(null);
 
+            // PORTRAIT MODE
+            const isPortrait = usePortrait();
+            const isSmallScreen = useMemo(() => Math.min(window.screen.width, window.screen.height) < 600, []);
+            const isViewOnly = isPortrait && isSmallScreen;
+            const [portraitExporting, setPortraitExporting] = useState(false);
+            const [portraitTab, setPortraitTab] = useState(0); // 0=Demographics, 1=Plan, 2=Construct
+            const switchPortraitTab = useCallback((tab) => {
+                setPortraitTab(tab);
+                if (tab === 1) setActiveChart('planned');
+                else if (tab === 2) setActiveChart('completed');
+            }, []);
+            const PORTRAIT_TABS = ['portrait.tab.demographics', 'portrait.tab.plan', 'portrait.tab.construct'];
+            const portraitContentRef = useRef(null);
+            const touchStartRef = useRef(null);
+            const [portraitScale, setPortraitScale] = useState(1);
+            // Fixed column sizes matching the export container proportions
+            const PORTRAIT_COL_W = [370, 637, 478]; // demographics, plan, construct
+            const PORTRAIT_COL_H = 1050;
+
+            // Swipe gesture detection for portrait tab switching
+            const handleTouchStart = useCallback((e) => {
+                if (!isPortrait) return;
+                const touch = e.touches[0];
+                touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
+            }, [isPortrait]);
+
+            const handleTouchEnd = useCallback((e) => {
+                if (!isPortrait || !touchStartRef.current) return;
+                const touch = e.changedTouches[0];
+                const dx = touch.clientX - touchStartRef.current.x;
+                const dy = touch.clientY - touchStartRef.current.y;
+                const elapsed = Date.now() - touchStartRef.current.time;
+                touchStartRef.current = null;
+                // Only trigger on predominantly horizontal swipes with min 50px threshold
+                if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5 && elapsed < 500) {
+                    if (dx < 0 && portraitTab < 2) switchPortraitTab(portraitTab + 1);
+                    else if (dx > 0 && portraitTab > 0) switchPortraitTab(portraitTab - 1);
+                }
+            }, [isPortrait, portraitTab]);
+
             const levels = useMemo(() => {
                 const lvls = [];
                 // VIEW LOGIC
@@ -5826,9 +5908,27 @@
                 if (incognitoMode) localStorage.removeItem('spine_planner_v2');
             }, [plannedPlacements, completedPlacements, plannedCages, completedCages, plannedConnectors, completedConnectors, plannedNotes, completedNotes, patientData, viewMode, colourScheme, hasLoaded, incognitoMode]);
 
-            // RESIZE OBSERVER
+            // RESIZE OBSERVER — portrait mode: scale active column to fit
             useEffect(() => {
-                if (!containerWrapperRef.current) return;
+                if (!isPortrait || !portraitContentRef.current) return;
+                const recalc = () => {
+                    if (!portraitContentRef.current) return;
+                    const availW = portraitContentRef.current.clientWidth;
+                    const availH = portraitContentRef.current.clientHeight;
+                    const colW = PORTRAIT_COL_W[portraitTab];
+                    const colH = PORTRAIT_COL_H;
+                    const pad = 16; // small margin
+                    setPortraitScale(Math.min((availW - pad) / colW, (availH - pad) / colH));
+                };
+                recalc();
+                const observer = new ResizeObserver(recalc);
+                observer.observe(portraitContentRef.current);
+                return () => observer.disconnect();
+            }, [isPortrait, portraitTab]);
+
+            // RESIZE OBSERVER — landscape mode: scale export container
+            useEffect(() => {
+                if (isPortrait || !containerWrapperRef.current) return;
                 const observer = new ResizeObserver(() => {
                     if (containerWrapperRef.current && exportRef.current) {
                         const wrapperH = containerWrapperRef.current.clientHeight;
@@ -5838,7 +5938,7 @@
                 });
                 observer.observe(containerWrapperRef.current);
                 return () => observer.disconnect();
-            }, []);
+            }, [isPortrait]);
 
             // ALL TOOL DEFINITIONS (for rendering and lookup)
             const allTools = [
@@ -6060,6 +6160,12 @@
             // EXPORT
             const prepareExportCanvas = async () => {
                 await document.fonts.ready;
+                // In portrait mode, mount the off-screen export container temporarily
+                if (isPortrait) {
+                    setPortraitExporting(true);
+                    // Wait for React to render the export container
+                    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                }
                 const element = exportRef.current;
                 // Sync DOM properties to attributes so cloneNode preserves them
                 element.querySelectorAll('input[type="checkbox"]').forEach(cb => {
@@ -6087,6 +6193,7 @@
                 link.href = canvas.toDataURL('image/jpeg', 0.9);
                 link.click();
                 if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+                setPortraitExporting(false);
             };
             const runExportPDF = async () => {
                 const canvas = await prepareExportCanvas();
@@ -6096,6 +6203,7 @@
                 pdf.addImage(imgData, 'JPEG', 0, 0, 1485, 1050);
                 pdf.save(`SpinePlan_${patientData.name || 'Patient'}.pdf`);
                 if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+                setPortraitExporting(false);
             };
             const saveProjectJSON = () => {
                 const data = serializeState();
@@ -6136,8 +6244,58 @@
                 setActiveChart('completed');
             };
 
-            return (
-                <div className="h-full flex flex-col overflow-hidden">
+            // --- Shared sub-elements (used in both portrait and landscape) ---
+            const demographicsContent = (
+                <React.Fragment>
+                    <h2 className="font-bold text-2xl text-slate-900 mb-4 border-b-4 border-slate-900 pb-2">{t('export.title')}</h2>
+                    <div className="flex-1 flex flex-col overflow-y-auto min-h-0">
+                        <div className="space-y-1 shrink-0">
+                            <div><label className="block text-[9px] font-bold text-slate-500 uppercase mb-0">{t('patient.name')}</label><div className="editable-field w-full text-xs font-semibold" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, name: e.target.innerText})} placeholder={t('patient.click_to_enter')}>{patientData.name}</div></div>
+                            <div><label className="block text-[9px] font-bold text-slate-500 uppercase mb-0">{t('patient.id')}</label><div className="editable-field w-full text-xs font-mono" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, id: e.target.innerText})} placeholder={t('patient.click_to_enter')}>{patientData.id}</div></div>
+                            <div><label className="block text-[9px] font-bold text-slate-500 uppercase mb-0">{t('patient.surgeon')}</label><div className="editable-field w-full text-xs" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, surgeon: e.target.innerText})} placeholder={t('patient.click_to_enter')}>{patientData.surgeon}</div></div>
+                            <div><label className="block text-[9px] font-bold text-slate-500 uppercase mb-0">{t('patient.date')}</label><div className="editable-field w-full text-xs cursor-pointer" onClick={() => setIsEditingDate(true)}>{isEditingDate ? <input type="date" className="w-full text-xs border-b border-slate-800 bg-transparent outline-none py-0" value={patientData.date} autoFocus onBlur={()=>setIsEditingDate(false)} onChange={e=>setPatientData({...patientData, date:e.target.value})} /> : formatDate(patientData.date)}</div></div>
+                        </div>
+                        <div className="border-t border-slate-200 my-3"></div>
+                        <div className="space-y-1 shrink-0">
+                            <div><label className="block text-[9px] font-bold text-slate-500 uppercase mb-0">{t('patient.supplier')}</label><select className="editable-field w-full text-xs bg-white cursor-pointer" value={patientData.company} onChange={e => { const v = e.target.value; setPatientData({...patientData, company: v}); if (AUTO_THEME_FROM_COMPANY && COMPANY_THEME_MAP[v]) { changeTheme(COMPANY_THEME_MAP[v]); } }}><option value="">{t('patient.select_supplier')}</option>{IMPLANT_COMPANIES.map(c => <option key={c} value={c}>{c}</option>)}<option value="__other">{t('patient.other')}</option></select>{patientData.company === '__other' && <div className="editable-field w-full text-xs mt-0.5" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, company: e.target.innerText})} placeholder={t('patient.enter_company')}></div>}</div>
+                            <div><label className="block text-[9px] font-bold text-slate-500 uppercase mb-0">{t('patient.screw_system')}</label><ScrewSystemCombo value={patientData.screwSystem} onChange={v => setPatientData({...patientData, screwSystem: v})} company={patientData.company} placeholder={t('patient.screw_system_placeholder')} /></div>
+                        </div>
+                        <div className="border-t border-slate-200 my-2"></div>
+                        <div className="shrink-0">
+                            <h3 className="text-[9px] font-bold text-slate-500 uppercase mb-1">{t('patient.bone_graft')}</h3>
+                            <div className="grid grid-cols-3 gap-x-1 gap-y-0.5">
+                                {BONE_GRAFT_OPTIONS.map(opt => (
+                                    <label key={opt} className="flex items-center gap-1 text-[10px] text-slate-700 cursor-pointer hover:text-slate-900 leading-tight">
+                                        <input type="checkbox" className="w-3 h-3 rounded border-slate-300 text-amber-500 focus:ring-amber-500 shrink-0" checked={(patientData.boneGraft?.types || []).includes(opt)} onChange={e => { const types = patientData.boneGraft?.types || []; setPatientData({...patientData, boneGraft: { ...patientData.boneGraft, types: e.target.checked ? [...types, opt] : types.filter(v => v !== opt) }}); }} />
+                                        <span className="truncate">{BONE_GRAFT_LABEL_KEYS[opt] ? t(BONE_GRAFT_LABEL_KEYS[opt]) : opt}</span>
+                                    </label>
+                                ))}
+                            </div>
+                            <div className="editable-field w-full text-[10px] mt-1" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, boneGraft: { ...(patientData.boneGraft || {}), notes: e.target.innerText }})} placeholder={t('patient.bone_graft_notes_placeholder')}>{patientData.boneGraft?.notes || ''}</div>
+                        </div>
+                        <ImplantInventory placements={[...(activeChart === 'planned' ? plannedPlacements : completedPlacements), ...(activeChart === 'planned' ? plannedCages : completedCages).map(c => ({...c, tool: c.tool})), ...(activeChart === 'planned' ? plannedConnectors : completedConnectors).map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid'}))]} tools={[...allTools, {id: 'tlif', labelKey: 'inventory.cage.tlif'}, {id: 'plif', labelKey: 'inventory.cage.plif'}, {id: 'acdf', labelKey: 'inventory.cage.acdf'}, {id: 'xlif', labelKey: 'inventory.cage.xlif'}, {id: 'olif', labelKey: 'inventory.cage.olif'}, {id: 'alif', labelKey: 'inventory.cage.alif'}]} title={activeChart === 'planned' ? t('inventory.title_plan') : t('inventory.title_construct')} visibleLevelIds={levels.map(l => l.id)} levels={levels} rods={activeChart === 'planned' ? { left: patientData.planLeftRod, right: patientData.planRightRod } : { left: patientData.leftRod, right: patientData.rightRod }} />
+                    </div>
+                    <CreditsFooter lang={currentLang} />
+                </React.Fragment>
+            );
+
+            const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planLeftRod: e.target.innerText})} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planRightRod: e.target.innerText})} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} />;
+
+            const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} />;
+
+            const newPatientAction = () => {
+                if (confirm(t('alert.new_patient'))) {
+                    setPlannedPlacements([]); setCompletedPlacements([]);
+                    setPlannedCages([]); setCompletedCages([]);
+                    setPlannedConnectors([]); setCompletedConnectors([]);
+                    setPlannedNotes([]); setCompletedNotes([]);
+                    setPatientData({ name: '', id: '', surgeon: '', location: '', date: new Date().toISOString().split('T')[0], company: '', screwSystem: '', leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '', boneGraft: { types: [], notes: '' } });
+                    setActiveChart('planned');
+                }
+            };
+
+            const modals = (
+                <React.Fragment>
                     <ScrewModal isOpen={screwModalOpen} onClose={() => setScrewModalOpen(false)} onConfirm={handleScrewConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} initialTool={editingTool} defaultDiameter={defaultDiameter} defaultLength={defaultLength} defaultMode={defaultScrewMode} defaultCustomText={defaultCustomText} initialAnnotation={editingAnnotation} />
                     <OsteotomyModal isOpen={osteoModalOpen} onClose={() => setOsteoModalOpen(false)} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} />
                     <CageModal isOpen={cageModalOpen} onClose={() => setCageModalOpen(false)} onConfirm={handleCageConfirm} onDelete={handleDeleteCage} initialData={editingData} levelId={editingCageLevel} levels={levels} />
@@ -6145,6 +6303,165 @@
                     <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
                     <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
                     <NoteModal isOpen={noteModalOpen} onClose={() => { setNoteModalOpen(false); setEditingNote(null); setPendingNoteTool(null); }} onConfirm={handleNoteConfirm} onDelete={handleNoteDelete} initialText={editingNote?.text || ''} initialShowArrow={editingNote?.showArrow || false} isEditing={!!editingNote} />
+                </React.Fragment>
+            );
+
+            const themeDropdown = (
+                <div className="relative">
+                    <button onClick={() => setThemeOpen(!themeOpen)} className="flex items-center gap-0.5 p-1 rounded hover:bg-white/10">
+                        {[scheme.sidebarBg, '#FFFFFF', scheme.activeBg, scheme.activeText].map((c, i) => (
+                            <div key={i} className="w-2.5 h-2.5 rounded-full border border-white/20" style={{ backgroundColor: c }}></div>
+                        ))}
+                    </button>
+                    {themeOpen && (
+                        <div className="absolute right-0 top-full mt-1 rounded-lg shadow-xl border p-1.5 z-50" style={{ backgroundColor: scheme.sidebarTitleBg, borderColor: scheme.sidebarBorder }}>
+                            {COLOUR_SCHEMES.map(s => (
+                                <button key={s.id} onClick={() => { changeTheme(s.id); setThemeOpen(false); }}
+                                    className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-all ${colourScheme === s.id ? 'ring-1 ring-white/50' : 'hover:bg-white/10'}`}>
+                                    <div className="w-4 h-4 rounded-full border border-white/20 shrink-0" style={{ backgroundColor: s.sidebarBg }}></div>
+                                    <div className="w-4 h-4 rounded-full border border-white/20 shrink-0" style={{ backgroundColor: '#FFFFFF' }}></div>
+                                    <div className="w-4 h-4 rounded-full border border-white/20 shrink-0" style={{ backgroundColor: s.activeBg }}></div>
+                                    <div className="w-4 h-4 rounded-full border border-white/20 shrink-0" style={{ backgroundColor: s.activeText }}></div>
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+
+            // ============================================================
+            // PORTRAIT LAYOUT
+            // ============================================================
+            if (isPortrait) {
+                return (
+                    <div className="h-full flex flex-col overflow-hidden">
+                        {modals}
+                        <input type="file" ref={fileInputRef} onChange={loadProjectJSON} className="hidden" accept=".json" />
+
+                        {/* Portrait Toolbar */}
+                        <div className="portrait-toolbar text-white flex flex-col z-20 no-print shadow-xl shrink-0" style={{ backgroundColor: scheme.sidebarBg }}>
+                            {/* Row 1: Title, Theme, Language, Action icons */}
+                            <div className="flex items-center gap-2 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                                <span className="font-bold text-sm tracking-tight shrink-0">{t('sidebar.title')}</span>
+                                <div className="flex-1"></div>
+                                {themeDropdown}
+                                <select value={currentLang} onChange={e => changeLang(e.target.value)}
+                                    className="bg-transparent text-white/70 text-[10px] border-none outline-none cursor-pointer w-14">
+                                    {SUPPORTED_LANGUAGES.map(l => (
+                                        <option key={l.code} value={l.code} style={{color: '#1e293b'}}>{l.code.toUpperCase()}</option>
+                                    ))}
+                                </select>
+                                <div className="flex items-center gap-0.5">
+                                    <button onClick={() => fileInputRef.current.click()} className="p-1.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.load')}><IconUpload /></button>
+                                    <button onClick={saveProjectJSON} className="p-1.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.save')}><IconSave /></button>
+                                    <button onClick={runExportJPG} className="p-1.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.jpg')}><IconImage /></button>
+                                    <button onClick={runExportPDF} className="p-1.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.pdf')}><IconPDF /></button>
+                                    <button onClick={() => setHelpModalOpen(true)} className="p-1.5 rounded hover:bg-white/10 text-white/40 hover:text-white" title={t('sidebar.help')}><IconHelp /></button>
+                                </div>
+                            </div>
+
+                            {/* Row 2: Editing tools (tablet+) or view-only banner (phone) */}
+                            {isViewOnly ? (
+                                <div className="flex items-center gap-2 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                                    <div className="flex gap-0.5 shrink-0">
+                                        {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
+                                            const shortLabels = { cervical: 'C', thoracolumbar: 'T', t10_pelvis: 'L', whole: 'All' };
+                                            const active = viewMode === vm;
+                                            return <button key={vm} onClick={() => setViewMode(vm)} className={`px-2 py-1 text-[9px] rounded border font-bold ${active ? '' : 'text-white/60 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>{shortLabels[vm]}</button>;
+                                        })}
+                                    </div>
+                                    <div className="flex-1 text-center text-[10px] text-white/50 italic">{t('portrait.view_only')}</div>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-1 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                                    <div className="flex gap-0.5 shrink-0">
+                                        {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
+                                            const shortLabels = { cervical: 'C', thoracolumbar: 'T', t10_pelvis: 'L', whole: 'All' };
+                                            const active = viewMode === vm;
+                                            return <button key={vm} onClick={() => setViewMode(vm)} className={`px-2 py-1 text-[9px] rounded border font-bold ${active ? '' : 'text-white/60 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>{shortLabels[vm]}</button>;
+                                        })}
+                                    </div>
+                                    <div className="w-px h-5 bg-white/20 mx-1"></div>
+                                    <div className="flex gap-0.5 overflow-x-auto flex-1 min-w-0">
+                                        {tools[0].items.map(item => {
+                                            const active = selectedTool === item.id;
+                                            return <button key={item.id} onClick={() => setSelectedTool(item.id)} className={`shrink-0 px-1.5 py-1 rounded border flex items-center gap-1 text-[9px] font-bold ${active ? '' : 'text-white/70 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>
+                                                <InstrumentIcon type={item.icon} className="w-3 h-3" color={active ? scheme.activeText : 'white'} />
+                                            </button>;
+                                        })}
+                                    </div>
+                                    <div className="w-px h-5 bg-white/20 mx-1"></div>
+                                    <button onClick={() => { copyPlanToCompleted(); switchPortraitTab(2); }} className="flex items-center gap-1 px-2 py-1 rounded text-[9px] font-bold hover:bg-white/10 text-white/70 hover:text-white shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)' }}><IconCopy /> {t('sidebar.copy_plan')}</button>
+                                    <div className={`shrink-0 w-3 h-3 rounded-full cursor-pointer ${incognitoMode ? 'bg-red-500' : 'bg-white/20'}`} onClick={() => setIncognitoMode(!incognitoMode)} title={t('sidebar.session_privacy')}></div>
+                                    <button onClick={newPatientAction} className="p-1 rounded hover:bg-white/10 text-red-400 hover:text-red-200 shrink-0" title={t('sidebar.new_patient')}><IconTrash /></button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Portrait Tab Bar */}
+                        <div className="portrait-tabs flex shrink-0 z-10" style={{ backgroundColor: scheme.sidebarTitleBg }}>
+                            {PORTRAIT_TABS.map((tabKey, i) => {
+                                const active = portraitTab === i;
+                                return (
+                                    <button key={tabKey} onClick={() => switchPortraitTab(i)}
+                                        className={`flex-1 py-2 text-xs font-bold transition-all border-b-2 ${active ? '' : 'text-white/50 hover:text-white/80 border-transparent'}`}
+                                        style={active ? { color: scheme.activeText, backgroundColor: scheme.activeBg, borderColor: scheme.activeText } : undefined}>
+                                        {t(tabKey)}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Portrait Content — swipeable tabs */}
+                        <div ref={portraitContentRef} className="flex-1 overflow-hidden relative bg-slate-300"
+                            onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div style={{ width: PORTRAIT_COL_W[portraitTab], height: PORTRAIT_COL_H, transform: `scale(${portraitScale})`, transformOrigin: 'center center' }}>
+                                    {portraitTab === 0 && (
+                                        <div className="w-full h-full overflow-y-auto bg-white p-8 flex flex-col">
+                                            {demographicsContent}
+                                        </div>
+                                    )}
+                                    {portraitTab === 1 && (
+                                        <div className="w-full h-full flex flex-col bg-white">
+                                            {planChart}
+                                        </div>
+                                    )}
+                                    {portraitTab === 2 && (
+                                        <div className="w-full h-full flex flex-col bg-white">
+                                            {constructChart}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Hidden off-screen export container for PDF/JPG — only mounted during export to avoid duplicate React elements */}
+                        {portraitExporting && (
+                            <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', pointerEvents: 'none' }}>
+                                <div id="export-container" ref={exportRef}>
+                                    <div className="w-[370px] bg-white border-r border-slate-300 flex flex-col p-8">
+                                        <CreditsFooter lang={currentLang} />
+                                    </div>
+                                    <div className="flex-[4] flex flex-col h-full">
+                                        <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={() => {}} connectors={plannedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[9px] py-0.5 px-1 text-right">{patientData.planLeftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[9px] py-0.5 px-1 text-left">{patientData.planRightRod}</span></div></React.Fragment>} />
+                                    </div>
+                                    <div className="flex-[3] flex flex-col h-full">
+                                        <ChartPaper title={t('export.construct')} placements={completedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={() => {}} connectors={completedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={completedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[9px] py-0.5 px-1 text-right">{patientData.leftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[9px] py-0.5 px-1 text-left">{patientData.rightRod}</span></div></React.Fragment>} />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+            }
+
+            // ============================================================
+            // LANDSCAPE LAYOUT (unchanged)
+            // ============================================================
+            return (
+                <div className="h-full flex flex-col overflow-hidden">
+                    {modals}
 
                     <div className="flex-1 overflow-hidden bg-slate-200 flex relative">
                         <aside className="w-[340px] text-white flex flex-col z-20 overflow-y-auto no-print shadow-xl" style={{ backgroundColor: scheme.sidebarBg, borderRight: `1px solid ${scheme.sidebarBorder}` }}>
@@ -6249,25 +6566,7 @@
                                 <div className="pt-2 mt-2 flex gap-1" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
                                     <button onClick={() => setHelpModalOpen(true)} className="flex-1 flex items-center justify-center gap-1 text-white/50 hover:text-white px-2 py-1.5 rounded text-[10px] font-bold hover:bg-white/10"><IconHelp /> {t('sidebar.help')}</button>
                                     <button onClick={() => setChangeLogOpen(true)} className="flex items-center justify-center text-white/30 hover:text-white px-2 py-1.5 rounded text-[10px] font-mono hover:bg-white/10">{CURRENT_VERSION}</button>
-                                    <button onClick={() => {
-                                        if (confirm(t('alert.new_patient'))) {
-                                            setPlannedPlacements([]);
-                                            setCompletedPlacements([]);
-                                            setPlannedCages([]);
-                                            setCompletedCages([]);
-                                            setPlannedConnectors([]);
-                                            setCompletedConnectors([]);
-                                            setPlannedNotes([]);
-                                            setCompletedNotes([]);
-                                            setPatientData({
-                                                name: '', id: '', surgeon: '', location: '',
-                                                date: new Date().toISOString().split('T')[0],
-                                                company: '', screwSystem: '', leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '',
-                                                boneGraft: { types: [], notes: '' }
-                                            });
-                                            setActiveChart('planned');
-                                        }
-                                    }} className="flex-1 flex items-center justify-center gap-1 text-red-400 hover:text-red-200 px-2 py-1.5 rounded text-[10px] font-bold hover:bg-white/10">
+                                    <button onClick={newPatientAction} className="flex-1 flex items-center justify-center gap-1 text-red-400 hover:text-red-200 px-2 py-1.5 rounded text-[10px] font-bold hover:bg-white/10">
                                         <IconTrash /> {t('sidebar.new_patient')}
                                     </button>
                                 </div>
@@ -6279,39 +6578,9 @@
                         <div ref={containerWrapperRef} id="print-wrapper" className="flex-1 flex items-center justify-center p-8 bg-slate-300 overflow-hidden relative">
                             <div style={{ transform: `scale(${scale})` }}>
                                 <div id="export-container" ref={exportRef}>
-                                    <div className="w-[370px] bg-white border-r border-slate-300 flex flex-col p-8">
-                                        <h2 className="font-bold text-2xl text-slate-900 mb-4 border-b-4 border-slate-900 pb-2">{t('export.title')}</h2>
-                                        <div className="flex-1 flex flex-col overflow-y-auto min-h-0">
-                                            <div className="space-y-1 shrink-0">
-                                                <div><label className="block text-[9px] font-bold text-slate-500 uppercase mb-0">{t('patient.name')}</label><div className="editable-field w-full text-xs font-semibold" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, name: e.target.innerText})} placeholder={t('patient.click_to_enter')}>{patientData.name}</div></div>
-                                                <div><label className="block text-[9px] font-bold text-slate-500 uppercase mb-0">{t('patient.id')}</label><div className="editable-field w-full text-xs font-mono" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, id: e.target.innerText})} placeholder={t('patient.click_to_enter')}>{patientData.id}</div></div>
-                                                <div><label className="block text-[9px] font-bold text-slate-500 uppercase mb-0">{t('patient.surgeon')}</label><div className="editable-field w-full text-xs" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, surgeon: e.target.innerText})} placeholder={t('patient.click_to_enter')}>{patientData.surgeon}</div></div>
-                                                <div><label className="block text-[9px] font-bold text-slate-500 uppercase mb-0">{t('patient.date')}</label><div className="editable-field w-full text-xs cursor-pointer" onClick={() => setIsEditingDate(true)}>{isEditingDate ? <input type="date" className="w-full text-xs border-b border-slate-800 bg-transparent outline-none py-0" value={patientData.date} autoFocus onBlur={()=>setIsEditingDate(false)} onChange={e=>setPatientData({...patientData, date:e.target.value})} /> : formatDate(patientData.date)}</div></div>
-                                            </div>
-                                            <div className="border-t border-slate-200 my-3"></div>
-                                            <div className="space-y-1 shrink-0">
-                                                <div><label className="block text-[9px] font-bold text-slate-500 uppercase mb-0">{t('patient.supplier')}</label><select className="editable-field w-full text-xs bg-white cursor-pointer" value={patientData.company} onChange={e => { const v = e.target.value; setPatientData({...patientData, company: v}); if (AUTO_THEME_FROM_COMPANY && COMPANY_THEME_MAP[v]) { changeTheme(COMPANY_THEME_MAP[v]); } }}><option value="">{t('patient.select_supplier')}</option>{IMPLANT_COMPANIES.map(c => <option key={c} value={c}>{c}</option>)}<option value="__other">{t('patient.other')}</option></select>{patientData.company === '__other' && <div className="editable-field w-full text-xs mt-0.5" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, company: e.target.innerText})} placeholder={t('patient.enter_company')}></div>}</div>
-                                                <div><label className="block text-[9px] font-bold text-slate-500 uppercase mb-0">{t('patient.screw_system')}</label><ScrewSystemCombo value={patientData.screwSystem} onChange={v => setPatientData({...patientData, screwSystem: v})} company={patientData.company} placeholder={t('patient.screw_system_placeholder')} /></div>
-                                            </div>
-                                            <div className="border-t border-slate-200 my-2"></div>
-                                            <div className="shrink-0">
-                                                <h3 className="text-[9px] font-bold text-slate-500 uppercase mb-1">{t('patient.bone_graft')}</h3>
-                                                <div className="grid grid-cols-3 gap-x-1 gap-y-0.5">
-                                                    {BONE_GRAFT_OPTIONS.map(opt => (
-                                                        <label key={opt} className="flex items-center gap-1 text-[10px] text-slate-700 cursor-pointer hover:text-slate-900 leading-tight">
-                                                            <input type="checkbox" className="w-3 h-3 rounded border-slate-300 text-amber-500 focus:ring-amber-500 shrink-0" checked={(patientData.boneGraft?.types || []).includes(opt)} onChange={e => { const types = patientData.boneGraft?.types || []; setPatientData({...patientData, boneGraft: { ...patientData.boneGraft, types: e.target.checked ? [...types, opt] : types.filter(v => v !== opt) }}); }} />
-                                                            <span className="truncate">{BONE_GRAFT_LABEL_KEYS[opt] ? t(BONE_GRAFT_LABEL_KEYS[opt]) : opt}</span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                                <div className="editable-field w-full text-[10px] mt-1" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, boneGraft: { ...(patientData.boneGraft || {}), notes: e.target.innerText }})} placeholder={t('patient.bone_graft_notes_placeholder')}>{patientData.boneGraft?.notes || ''}</div>
-                                            </div>
-                                            <ImplantInventory placements={[...(activeChart === 'planned' ? plannedPlacements : completedPlacements), ...(activeChart === 'planned' ? plannedCages : completedCages).map(c => ({...c, tool: c.tool})), ...(activeChart === 'planned' ? plannedConnectors : completedConnectors).map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid'}))]} tools={[...allTools, {id: 'tlif', labelKey: 'inventory.cage.tlif'}, {id: 'plif', labelKey: 'inventory.cage.plif'}, {id: 'acdf', labelKey: 'inventory.cage.acdf'}, {id: 'xlif', labelKey: 'inventory.cage.xlif'}, {id: 'olif', labelKey: 'inventory.cage.olif'}, {id: 'alif', labelKey: 'inventory.cage.alif'}]} title={activeChart === 'planned' ? t('inventory.title_plan') : t('inventory.title_construct')} visibleLevelIds={levels.map(l => l.id)} levels={levels} rods={activeChart === 'planned' ? { left: patientData.planLeftRod, right: patientData.planRightRod } : { left: patientData.leftRod, right: patientData.rightRod }} />
-                                        </div>
-                                        <CreditsFooter lang={currentLang} />
-                                    </div>
-                                    <div className="flex-[4] flex flex-col h-full"><ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planLeftRod: e.target.innerText})} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planRightRod: e.target.innerText})} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} /></div>
-                                    <div className="flex-[3] flex flex-col h-full"><ChartPaper title={t('export.construct')} placements={completedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={activeChart !== 'completed'} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} /></div>
+                                    <div className="w-[370px] bg-white border-r border-slate-300 flex flex-col p-8">{demographicsContent}</div>
+                                    <div className="flex-[4] flex flex-col h-full">{planChart}</div>
+                                    <div className="flex-[3] flex flex-col h-full">{constructChart}</div>
                                 </div>
                             </div>
                         </div>
