@@ -3,3 +3,4 @@ docs/
 .claude/
 .DS_Store
 *.pdf
+.worktrees/
