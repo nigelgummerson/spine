@@ -1883,7 +1883,7 @@
                 // --- Screw types ---
                 'clinical.screw.monoaxial': 'Monoaxial',
                 'clinical.screw.polyaxial': 'Polyaxial',
-                'clinical.screw.uniplanar': 'Uniplanär',
+                'clinical.screw.uniplanar': 'Uniplanar',
                 'clinical.screw.monoaxial.short': 'Mono',
                 'clinical.screw.polyaxial.short': 'Poly',
                 'clinical.screw.uniplanar.short': 'Uni',
@@ -2162,7 +2162,7 @@
                 // --- Screw types ---
                 'clinical.screw.monoaxial': 'Monoaksial',
                 'clinical.screw.polyaxial': 'Polyaksial',
-                'clinical.screw.uniplanar': 'Uniplanær',
+                'clinical.screw.uniplanar': 'Uniplanar',
                 'clinical.screw.monoaxial.short': 'Mono',
                 'clinical.screw.polyaxial.short': 'Poly',
                 'clinical.screw.uniplanar.short': 'Uni',
@@ -2441,7 +2441,7 @@
                 // --- Screw types ---
                 'clinical.screw.monoaxial': 'Monoaksial',
                 'clinical.screw.polyaxial': 'Polyaksial',
-                'clinical.screw.uniplanar': 'Uniplanær',
+                'clinical.screw.uniplanar': 'Uniplanar',
                 'clinical.screw.monoaxial.short': 'Mono',
                 'clinical.screw.polyaxial.short': 'Poly',
                 'clinical.screw.uniplanar.short': 'Uni',
@@ -3276,9 +3276,9 @@
                 'modal.screw.annotation_placeholder': 'np. fenestrowana, kortykalna, rewizyjna',
 
                 // --- Screw types ---
-                'clinical.screw.monoaxial': 'Monoaksjalny',
-                'clinical.screw.polyaxial': 'Poliaksjalny',
-                'clinical.screw.uniplanar': 'Uniplanarny',
+                'clinical.screw.monoaxial': 'Monoaksjalna',
+                'clinical.screw.polyaxial': 'Poliaksjalna',
+                'clinical.screw.uniplanar': 'Uniplanarna',
                 'clinical.screw.monoaxial.short': 'Mono',
                 'clinical.screw.polyaxial.short': 'Poli',
                 'clinical.screw.uniplanar.short': 'Uni',
@@ -3834,12 +3834,12 @@
                 'modal.screw.annotation_placeholder': 'ör. fenestreli, kortikal, revizyon',
 
                 // --- Screw types ---
-                'clinical.screw.monoaxial': 'Monoaksiyal',
-                'clinical.screw.polyaxial': 'Poliaksiyal',
+                'clinical.screw.monoaxial': 'Monoaksiyel',
+                'clinical.screw.polyaxial': 'Poliaksiyel',
                 'clinical.screw.uniplanar': 'Uniplanar',
                 'clinical.screw.monoaxial.short': 'Mono',
                 'clinical.screw.polyaxial.short': 'Poli',
-                'clinical.screw.uniplanar.short': 'Üni',
+                'clinical.screw.uniplanar.short': 'Uni',
 
                 // --- Hook labels ---
                 'clinical.hook.pedicle_hook': 'Pedikül',
@@ -3941,9 +3941,9 @@
                 'clinical.note.neutral_vertebra': 'nötral omur',
 
                 // --- Tool labels ---
-                'tool.monoaxial': 'Monoaksiyal',
-                'tool.polyaxial': 'Poliaksiyal',
-                'tool.uniplanar': 'Üniplanar',
+                'tool.monoaxial': 'Monoaksiyel',
+                'tool.polyaxial': 'Poliaksiyel',
+                'tool.uniplanar': 'Uniplanar',
                 'tool.pedicle_hook': 'Pedikül',
                 'tool.tp_hook': 'TÇ kancası',
                 'tool.tp_hook_up': 'TÇ kancası (Yuk)',
@@ -4059,9 +4059,15 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v1.0.0-beta";
+        const CURRENT_VERSION = "v1.0.1-beta";
 
         const CHANGE_LOG = [
+            { version: "v1.0.1-beta", date: "2026-03-20", changes: [
+                "Fixed Turkish screw terminology: -aksiyal → -aksiyel (per manufacturer literature).",
+                "Fixed Turkish uniplanar: removed incorrect ü (Üniplanar → Uniplanar).",
+                "Fixed Polish screw adjective gender: masculine → feminine (matching śruba).",
+                "Fixed Swedish/Norwegian/Danish uniplanar: removed unattested localised forms (Uniplanär/Uniplanær → Uniplanar).",
+            ]},
             { version: "v1.0.0-beta", date: "2026-03-20", changes: [
                 "Internationalisation: 14 languages (English + 13 European).",
                 "Language auto-detected from browser; selectable via sidebar dropdown.",
