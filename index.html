@@ -5773,6 +5773,7 @@
 
             // PORTRAIT MODE
             const isPortrait = usePortrait();
+            const [portraitExporting, setPortraitExporting] = useState(false);
             const [portraitTab, setPortraitTab] = useState(0); // 0=Demographics, 1=Plan, 2=Construct
             const PORTRAIT_TABS = ['portrait.tab.demographics', 'portrait.tab.plan', 'portrait.tab.construct'];
             const portraitContentRef = useRef(null);
@@ -6116,6 +6117,12 @@
             // EXPORT
             const prepareExportCanvas = async () => {
                 await document.fonts.ready;
+                // In portrait mode, mount the off-screen export container temporarily
+                if (isPortrait) {
+                    setPortraitExporting(true);
+                    // Wait for React to render the export container
+                    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                }
                 const element = exportRef.current;
                 // Sync DOM properties to attributes so cloneNode preserves them
                 element.querySelectorAll('input[type="checkbox"]').forEach(cb => {
@@ -6143,6 +6150,7 @@
                 link.href = canvas.toDataURL('image/jpeg', 0.9);
                 link.click();
                 if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+                setPortraitExporting(false);
             };
             const runExportPDF = async () => {
                 const canvas = await prepareExportCanvas();
@@ -6152,6 +6160,7 @@
                 pdf.addImage(imgData, 'JPEG', 0, 0, 1485, 1050);
                 pdf.save(`SpinePlan_${patientData.name || 'Patient'}.pdf`);
                 if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+                setPortraitExporting(false);
             };
             const saveProjectJSON = () => {
                 const data = serializeState();
@@ -6290,7 +6299,7 @@
                         <div className="portrait-toolbar text-white flex flex-col z-20 no-print shadow-xl shrink-0" style={{ backgroundColor: scheme.sidebarBg }}>
                             {/* Row 1: Title, Theme, Language, Action icons */}
                             <div className="flex items-center gap-2 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                                <span className="font-heading font-bold text-xs tracking-tight shrink-0">{t('sidebar.title')}</span>
+                                <span className="font-bold text-xs tracking-tight shrink-0">{t('sidebar.title')}</span>
                                 <div className="flex-1"></div>
                                 {themeDropdown}
                                 <select value={currentLang} onChange={e => changeLang(e.target.value)}
@@ -6361,24 +6370,32 @@
                                     <div className="flex flex-col h-full">{demographicsContent}</div>
                                 </div>
                                 {/* Tab 1: Plan */}
-                                <div className="h-full overflow-y-auto shrink-0 flex items-start justify-center bg-slate-300 p-4" style={{ flex: '0 0 33.333%' }}>
-                                    <div className="flex flex-col h-full w-full">{planChart}</div>
+                                <div className="h-full shrink-0 flex flex-col bg-white" style={{ flex: '0 0 33.333%' }}>
+                                    {planChart}
                                 </div>
                                 {/* Tab 2: Construct */}
-                                <div className="h-full overflow-y-auto shrink-0 flex items-start justify-center bg-slate-300 p-4" style={{ flex: '0 0 33.333%' }}>
-                                    <div className="flex flex-col h-full w-full">{constructChart}</div>
+                                <div className="h-full shrink-0 flex flex-col bg-white" style={{ flex: '0 0 33.333%' }}>
+                                    {constructChart}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Hidden off-screen export container for PDF/JPG */}
-                        <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', pointerEvents: 'none' }}>
-                            <div id="export-container" ref={exportRef}>
-                                <div className="w-[370px] bg-white border-r border-slate-300 flex flex-col p-8">{demographicsContent}</div>
-                                <div className="flex-[4] flex flex-col h-full">{planChart}</div>
-                                <div className="flex-[3] flex flex-col h-full">{constructChart}</div>
+                        {/* Hidden off-screen export container for PDF/JPG — only mounted during export to avoid duplicate React elements */}
+                        {portraitExporting && (
+                            <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', pointerEvents: 'none' }}>
+                                <div id="export-container" ref={exportRef}>
+                                    <div className="w-[370px] bg-white border-r border-slate-300 flex flex-col p-8">
+                                        <CreditsFooter lang={currentLang} />
+                                    </div>
+                                    <div className="flex-[4] flex flex-col h-full">
+                                        <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={() => {}} connectors={plannedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[9px] py-0.5 px-1 text-right">{patientData.planLeftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[9px] py-0.5 px-1 text-left">{patientData.planRightRod}</span></div></React.Fragment>} />
+                                    </div>
+                                    <div className="flex-[3] flex flex-col h-full">
+                                        <ChartPaper title={t('export.construct')} placements={completedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={() => {}} connectors={completedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={completedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[9px] py-0.5 px-1 text-right">{patientData.leftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[9px] py-0.5 px-1 text-left">{patientData.rightRod}</span></div></React.Fragment>} />
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 );
             }
