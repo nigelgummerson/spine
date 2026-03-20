@@ -4089,9 +4089,21 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v1.0.1-beta";
+        const CURRENT_VERSION = "v1.1.0-beta";
 
         const CHANGE_LOG = [
+            { version: "v1.1.0-beta", date: "2026-03-20", changes: [
+                "Portrait/tablet mode: responsive layout detects screen orientation automatically.",
+                "Portrait toolbar: sidebar controls reorganised as compact horizontal toolbar.",
+                "Tab-based column switching: Demographics, Plan, and Construct shown one at a time.",
+                "Swipe gestures: swipe left/right to switch between tabs on touch devices.",
+                "Scaled columns: each tab rendered at export dimensions and scaled to fit viewport.",
+                "Edit mode synced to tabs: Plan tab edits planned, Construct tab edits completed.",
+                "Labelled Copy Plan to Construct button in portrait toolbar.",
+                "View-only mode on phones (<600px): editing disabled with informational banner.",
+                "Export unchanged: PDF/JPG always produces landscape 1485×1050 output.",
+                "Language selector reordered: English first, then alphabetical by native name.",
+            ]},
             { version: "v1.0.1-beta", date: "2026-03-20", changes: [
                 "Fixed Turkish screw terminology: -aksiyal → -aksiyel (per manufacturer literature).",
                 "Fixed Turkish uniplanar: removed incorrect ü (Üniplanar → Uniplanar).",

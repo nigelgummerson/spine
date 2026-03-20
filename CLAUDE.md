@@ -4,7 +4,7 @@
 A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 14 European languages.
 
 ## Current Status
-- **Version:** v1.0.1-beta
+- **Version:** v1.1.0-beta
 - **Last Updated:** 2026-03-20
 - **License:** GNU GPLv3
 
@@ -28,7 +28,7 @@ spine-surgery/planning/spine-planner/
 ## GitHub & Deployment
 - **Repository:** github.com/nigelgummerson/spine-planner
 - **Live Site:** nigelgummerson.github.io/spine-planner (GitHub Pages)
-- **Branches:** `main` (v1.0.1-beta)
+- **Branches:** `main` (v1.1.0-beta)
 
 ## Tech Stack
 - React 18 production builds (via CDN - unpkg)
@@ -38,6 +38,7 @@ spine-surgery/planning/spine-planner/
 - All dependencies loaded via CDN for offline hospital use
 
 ## Version History (Recent)
+- **v1.1.0-beta** (2026-03-20): Portrait/tablet responsive mode. Orientation-aware layout: sidebar becomes horizontal toolbar, columns shown one at a time via tab bar with swipe gestures. Each column scaled to fit viewport at export proportions. Edit mode auto-syncs with active tab. View-only mode on phones (<600px short dimension). Language selector reordered (English first, then alphabetical by native name). Export always landscape 1485x1050.
 - **v1.0.1-beta** (2026-03-20): Fixed screw type translations — Turkish -aksiyal corrected to -aksiyel per manufacturer literature, removed spurious ü from Turkish uniplanar, Polish adjective gender corrected to feminine (matching śruba), Swedish/Norwegian/Danish uniplanar reverted to English form (unattested localised forms removed).
 - **v1.0.0-beta** (2026-03-20): Internationalisation — 14 European languages. ~220 translation keys, t() function, language auto-detection, sidebar language selector, clinical terminology verification. App renamed to "Spinal Instrumentation Plan & Record". Theme picker redesigned as colour swatches. 3 new colour schemes (Forest Green, Teal & Coral, Steel & Ice). Theme/language persist in localStorage exempt from privacy mode. Sidebar widened to 340px, export left panel to 370px. Tool categories merged. Plan/Construct toggle labelled "Editing".
 - **v0.9.7-beta** (2026-03-14): Rod fields added to Plan side with length estimate placeholders. Rods section added to inventory. New patient data fields: planLeftRod, planRightRod.
@@ -46,12 +47,14 @@ spine-surgery/planning/spine-planner/
 - **v0.9.4-alpha** (2026-03-01): Replaced html2canvas with html-to-image for pixel-perfect export.
 - **v0.9.3-alpha** (2026-03-01): Anatomical proportions (T1-S1), pedicle data, variable disc heights, auto-scale solver.
 
-## Key Architecture (v1.0.0)
+## Key Architecture (v1.1.0)
 - **i18n:** Flat `TRANSLATIONS` object (~220 keys × 14 languages), `t(key, replacements)` function with `??` fallback chain. `_currentLang` module-level variable synced with React state via `changeLang()`.
 - **Supported languages:** en, de, fr, es, it, pt, sv, nb, da, fi, nl, pl, el, tr
 - **Language detection:** `detectLanguage()` checks `localStorage('spine_planner_lang')` → `navigator.language` → `'en'`. `LANG_ALIASES` maps `no`/`nn` → `nb`.
 - **Export container:** Fixed 1485x1050px, 3 columns: patient info (370px) + Plan (flex-4) + Construct (flex-3)
-- **Sidebar:** w-[340px], colour-themed per company (10 schemes), tool palette, export controls
+- **Sidebar:** w-[340px] in landscape, colour-themed per company (10 schemes), tool palette, export controls
+- **Portrait mode:** `usePortrait()` hook via `matchMedia('(orientation: portrait)')`. Sidebar becomes 2-row horizontal toolbar. Three tabs (Demographics/Plan/Construct) with `switchPortraitTab()` syncing `portraitTab` and `activeChart`. Each column rendered at fixed export dimensions and CSS-scaled via `portraitScale` (ResizeObserver). Swipe gestures for tab switching (50px threshold, horizontal-dominant). Export mounts off-screen container temporarily via `portraitExporting` state.
+- **View-only mode:** `isSmallScreen` = `Math.min(screen.width, screen.height) < 600`. On phones: tool palette hidden, ChartPaper `readOnly=true`, informational banner shown. Load/Save/Export/Help remain accessible.
 - **Colour schemes:** 10 themes, swatch-only picker (no text labels). `changeTheme()` wrapper persists to `localStorage('spine_planner_theme')`, exempt from privacy mode.
 - **Company/Screw data:** `IMPLANT_COMPANIES` (16 manufacturers), `SCREW_SYSTEMS` (per-company product lists), `COMPANY_THEME_MAP` (5 mapped companies)
 - **Implant types:** 3 screws (mono/poly/uni), 5 hooks (pedicle, TP down, TP up, supra-lam, infra-lam), 3 fixation (band, wire, cable)
@@ -91,6 +94,7 @@ spine-surgery/planning/spine-planner/
 - [x] **Anatomical accuracy:** Data-driven vertebral proportions (T1-S1), merged to main in v0.9.3
 - [x] **Export artefacts:** Fixed in v0.9.4 — replaced html2canvas with html-to-image
 - [x] **Internationalisation:** 14 European languages, merged in v1.0.0-beta
+- [x] **Portrait/tablet mode:** Responsive layout with tab-based columns, merged in v1.1.0-beta
 - [ ] **Cervical spine proportions:** Extend VERTEBRA_ANATOMY to cervical levels (deferred)
 - [ ] **Barcode scanning:** Integrate html5-qrcode for GS1 DataMatrix scanning from implant packages
 - [ ] **Offline bundling:** Embed all JS libraries directly into HTML to bypass hospital firewalls

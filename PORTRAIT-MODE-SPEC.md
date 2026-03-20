@@ -1,8 +1,8 @@
 # Portrait Mode — Responsive Layout for Spine Planner
 
-**Status:** Planned (not yet implemented)
+**Status:** Implemented in v1.1.0-beta
 **Created:** 2026-03-20
-**Target version:** TBD (post multilingual support)
+**Implemented:** 2026-03-20
 
 ## Context
 
