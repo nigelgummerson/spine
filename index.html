@@ -6463,7 +6463,16 @@
 
             // LOGIC HANDLERS — zone determines behaviour
             const handleZoneClick = (levelId, zone) => {
-                // ANNOTATION MODE: when note/pin selected, ALL clicks place notes
+                const isForceZone = zone.startsWith('force');
+
+                // Force zones → always open ForceModal, regardless of selected tool
+                if (isForceZone) {
+                    setPendingForceZone({ levelId, zone });
+                    setForceModalOpen(true);
+                    return;
+                }
+
+                // ANNOTATION MODE: when note/pin selected, non-force clicks place notes
                 if (selectedTool === 'note') {
                     const hs = calculateAutoScale(levels);
                     const levelObj = levels.find(l => l.id === levelId);
@@ -6471,15 +6480,6 @@
                     setPendingNoteTool({ tool: selectedTool, levelId, offsetX: -100, offsetY: Math.round(vertH / 2) });
                     setEditingNote(null);
                     setNoteModalOpen(true);
-                    return;
-                }
-
-                const isForceZone = zone.startsWith('force');
-
-                // Force zones → always open ForceModal
-                if (isForceZone) {
-                    setPendingForceZone({ levelId, zone });
-                    setForceModalOpen(true);
                     return;
                 }
 
