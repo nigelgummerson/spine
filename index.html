@@ -4624,7 +4624,7 @@
         const IconHelp = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>);
         const IconLink = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>);
         const IconHistory = () => (<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>);
-        const IconCardinal = () => (<svg viewBox="0 0 24 24" className="w-5 h-5 opacity-40 hover:opacity-100 transition-opacity text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/><path d="M8 7l4-4 4 4"/><path d="M8 17l4 4 4-4"/><path d="M17 8l4 4-4 4"/><path d="M7 8l-4 4 4 4"/></svg>);
+        const IconCardinal = () => (<svg viewBox="0 0 24 24" className="w-5 h-5 opacity-40 hover:opacity-100 transition-opacity text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/><path d="M8 7l4-4 4 4"/><path d="M8 17l4 4 4-4"/><path d="M17 8l4 4-4 4"/><path d="M7 8l-4 4 4 4"/></svg>);
 
         // ==========================================
         // SECTION 2: UI COMPONENTS & MODALS
@@ -5133,15 +5133,15 @@
             return (
                 <div ref={forceRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: () => {}, onClose, onDelete: null, isEditing: false })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden">
-                        <div className="bg-emerald-800 text-white px-4 py-3 flex justify-between items-center">
+                        <div className="bg-amber-700 text-white px-4 py-3 flex justify-between items-center">
                             <h3 className="font-bold text-sm">{t('modal.force.title')}</h3>
-                            <button onClick={onClose} className="hover:text-emerald-200"><IconX /></button>
+                            <button onClick={onClose} className="hover:text-amber-200"><IconX /></button>
                         </div>
                         <div className="p-4 grid grid-cols-2 gap-2">
                             {FORCE_TYPES.map(f => (
                                 <button key={f.id} onClick={() => { onConfirm(f.id); onClose(); }}
-                                    className="flex flex-col items-center gap-1 p-3 rounded border border-slate-200 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 transition-all">
-                                    <InstrumentIcon type={f.icon} className="w-8 h-8" color="#059669" />
+                                    className="flex flex-col items-center gap-1 p-3 rounded border border-slate-200 bg-slate-50 hover:bg-amber-50 hover:border-amber-300 transition-all">
+                                    <InstrumentIcon type={f.icon} className="w-8 h-8" color="#d97706" />
                                     <span className="text-[10px] font-bold text-slate-700">{t(f.labelKey)}</span>
                                 </button>
                             ))}
@@ -5797,7 +5797,7 @@
             return (
                 <div data-zone-click="true" className="flex flex-col w-full relative border-b border-slate-100">
                     <div className="flex w-full relative z-20" style={{ height: `${rowHeight}px` }}>
-                        {showForces && <div className={`w-10 border-r border-slate-100/50 bg-emerald-50/20 ${!readOnly && !forcePlacements ? 'hover:bg-emerald-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && !forcePlacements && onZoneClick(level.id, 'force_left')}><ZoneContent zone="force_left" align="center"/></div>}
+                        {showForces && <div className={`w-10 border-r border-slate-100/50 bg-amber-50/20 ${!readOnly && !forcePlacements ? 'hover:bg-amber-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && !forcePlacements && onZoneClick(level.id, 'force_left')}><ZoneContent zone="force_left" align="center"/></div>}
                         <div className={`flex-1 overflow-visible min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><div className="flex items-center h-full">{reconCageText && <span className="font-bold text-sky-700 bg-sky-50 border border-sky-200 px-1 rounded shadow-sm whitespace-nowrap ml-1 shrink-0" style={{ fontSize: Math.max(8, cageLabelPx) + 'px' }}>{reconCageText}</span>}<div className="flex-1 h-full"><ZoneContent zone="left" align="left"/></div></div></div>
 
                         <div style={{ width: `${scaledWidth}px` }} className={`relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}>
@@ -5866,7 +5866,7 @@
                         </div>
 
                         <div className={`flex-1 overflow-visible min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'right')}><ZoneContent zone="right" align="right"/></div>
-                        {showForces && <div className={`w-10 border-l border-slate-100/50 bg-emerald-50/20 ${!readOnly && !forcePlacements ? 'hover:bg-emerald-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && !forcePlacements && onZoneClick(level.id, 'force_right')}><ZoneContent zone="force_right" align="center"/></div>}
+                        {showForces && <div className={`w-10 border-l border-slate-100/50 bg-amber-50/20 ${!readOnly && !forcePlacements ? 'hover:bg-amber-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && !forcePlacements && onZoneClick(level.id, 'force_right')}><ZoneContent zone="force_right" align="center"/></div>}
                     </div>
 
                     {/* INTERBODY DISC ZONE (Except after Pelvis or C1) */}
@@ -5989,13 +5989,13 @@
 
 
             return (
-            <div className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative"><div className={`${forcePlacements ? 'py-1' : 'p-2'} px-2 bg-slate-50 border-b border-slate-200 text-center font-bold text-sm text-slate-800 uppercase tracking-wider`}>{title}{forcePlacements && <span className="text-[10px] font-normal normal-case tracking-normal text-emerald-600/70 ml-2">{t('chart.force_plan_only')}</span>}</div><div className="flex-1 relative flex flex-col pt-8 px-2 justify-center">
+            <div className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative"><div className="p-2 bg-slate-50 border-b border-slate-200 text-center font-bold text-sm text-slate-800 uppercase tracking-wider">{title}{forcePlacements && <span className="text-[10px] font-normal normal-case tracking-normal text-slate-400 italic ml-2">{t('chart.force_plan_only')}</span>}</div><div className="flex-1 relative flex flex-col pt-8 px-2 justify-center">
                 <div className="flex w-full absolute top-1 left-0 right-0 px-2 text-[11px] font-bold uppercase tracking-tighter text-center pointer-events-none z-10">
-                    {showForces && <div className="w-10 text-emerald-600/50">{t('chart.header.force')}</div>}
+                    {showForces && <div className="w-10 text-amber-500">{t('chart.header.force')}</div>}
                     <div className="flex-1 text-right pr-4 text-slate-400">{t('chart.header.left')}</div>
                     <div style={{ width: `${scaledWidth}px` }}></div>
                     <div className="flex-1 text-left pl-4 text-slate-400">{t('chart.header.right')}</div>
-                    {showForces && <div className="w-10 text-emerald-600/50">{t('chart.header.force')}</div>}
+                    {showForces && <div className="w-10 text-amber-500">{t('chart.header.force')}</div>}
                 </div>
                 {rodHeader && <div className="flex w-full absolute top-4 left-0 right-0 px-2 z-10">
                     {showForces && <div className="w-10"></div>}
