@@ -6158,6 +6158,8 @@
             const [completedConnectors, setCompletedConnectors] = useState([]);
             const [plannedNotes, setPlannedNotes] = useState([]);
             const [completedNotes, setCompletedNotes] = useState([]);
+            const [documentId, setDocumentId] = useState(() => crypto.randomUUID());
+            const [documentCreated, setDocumentCreated] = useState(() => new Date().toISOString());
             const [colourScheme, setColourScheme] = useState(() => {
                 const stored = localStorage.getItem('spine_planner_theme');
                 return (stored && COLOUR_SCHEMES.some(s => s.id === stored)) ? stored : 'default';
@@ -6297,31 +6299,196 @@
 
             const scheme = COLOUR_SCHEMES.find(s => s.id === colourScheme) || COLOUR_SCHEMES[0];
 
-            // SERIALISE / DESERIALISE (single source of truth for save/load)
-            const serializeState = () => ({
-                formatVersion: 3,
-                appVersion: CURRENT_VERSION,
-                timestamp: new Date().toISOString(),
-                patient: patientData,
-                preferences: { viewMode, colourScheme },
-                plan: { implants: plannedPlacements, cages: plannedCages, connectors: plannedConnectors, notes: plannedNotes },
-                construct: { implants: completedPlacements, cages: completedCages, connectors: completedConnectors, notes: completedNotes },
-            });
-            // Migrate old yNorm connectors to {levelId, fraction} format
+            // SERIALISE / DESERIALISE — v4 spinal-instrumentation format
+            // Mapping tables: internal tool IDs ↔ v4 schema types
+            const TOOL_TO_V4_HOOK = { pedicle_hook: 'pedicle', tp_hook: 'transverse-process-down', tp_hook_up: 'transverse-process-up', sl_hook: 'supralaminar', il_hook: 'infralaminar', supra_laminar_hook: 'supralaminar', infra_laminar_hook: 'infralaminar' };
+            const V4_HOOK_TO_TOOL = Object.fromEntries(Object.entries(TOOL_TO_V4_HOOK).map(([k,v]) => [v, k]));
+            const TOOL_TO_V4_FIXATION = { band: 'sublaminar-band', wire: 'sublaminar-wire', cable: 'cable' };
+            const V4_FIXATION_TO_TOOL = Object.fromEntries(Object.entries(TOOL_TO_V4_FIXATION).map(([k,v]) => [v, k]));
+            const OSTEO_TO_V4 = { Facet: { t: 'facetectomy', g: 1 }, Ponte: { t: 'ponte', g: 2 }, PSO: { t: 'PSO', g: 3 }, ExtPSO: { t: 'extended-PSO', g: 4 }, VCR: { t: 'VCR', g: 5 }, 'ML-VCR': { t: 'multilevel-VCR', g: 6 }, Corpectomy: { t: 'corpectomy', g: null } };
+            const V4_OSTEO_TO_TOOL = Object.fromEntries(Object.entries(OSTEO_TO_V4).map(([k,v]) => [v.t, k]));
+            const FORCE_TO_V4 = { translate_left: { type: 'translation', direction: 'left' }, translate_right: { type: 'translation', direction: 'right' }, compression: { type: 'compression' }, distraction: { type: 'distraction' }, derotate_cw: { type: 'derotation', direction: 'clockwise' }, derotate_ccw: { type: 'derotation', direction: 'anticlockwise' } };
+            const V4_FORCE_TO_TOOL = { 'translation-left': 'translate_left', 'translation-right': 'translate_right', compression: 'compression', distraction: 'distraction', 'derotation-clockwise': 'derotate_cw', 'derotation-anticlockwise': 'derotate_ccw' };
+            const ZONE_TO_SIDE = { left: 'left', right: 'right', mid: 'midline', disc: 'midline', force_left: 'left', force_right: 'right' };
+            const BONEGRAFT_TO_V4 = { 'Local Bone': 'local-bone', 'Autograft': 'iliac-crest-autograft', 'Allograft': 'allograft', 'Synthetics': 'synthetic', 'DBM': 'DBM', 'BMP': 'BMP' };
+            const V4_BONEGRAFT_TO_TOOL = Object.fromEntries(Object.entries(BONEGRAFT_TO_V4).map(([k,v]) => [v, k]));
+
+            // Convert internal placements/cages/connectors/notes/forces → v4 elements/forces/notes
+            const internalToV4Chart = (placements, cages, connectors, notes, rodText, planRodText) => {
+                const elements = [];
+                const forces = [];
+                // Placements → elements or forces
+                (placements || []).forEach(p => {
+                    const fv4 = FORCE_TO_V4[p.tool];
+                    if (fv4) {
+                        forces.push({ id: p.id, type: fv4.type, direction: fv4.direction || undefined, level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left' });
+                        return;
+                    }
+                    if (p.tool === 'unstable') return; // UI-only marker
+                    const screwTypes = ['monoaxial', 'polyaxial', 'uniplanar'];
+                    const hookTypes = Object.keys(TOOL_TO_V4_HOOK);
+                    const fixTypes = Object.keys(TOOL_TO_V4_FIXATION);
+                    if (screwTypes.includes(p.tool)) {
+                        const el = { id: p.id, type: 'screw', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left' };
+                        const screw = { headType: p.tool };
+                        if (typeof p.data === 'string' && p.data.includes('x')) {
+                            const parts = p.data.split('x').map(Number);
+                            if (!isNaN(parts[0])) screw.diameter = parts[0];
+                            if (!isNaN(parts[1])) screw.length = parts[1];
+                        }
+                        el.screw = screw;
+                        if (p.annotation) el.annotation = p.annotation;
+                        elements.push(el);
+                    } else if (hookTypes.includes(p.tool)) {
+                        const el = { id: p.id, type: 'hook', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', hook: { hookType: TOOL_TO_V4_HOOK[p.tool] } };
+                        if (p.annotation) el.annotation = p.annotation;
+                        elements.push(el);
+                    } else if (fixTypes.includes(p.tool)) {
+                        const el = { id: p.id, type: 'fixation', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', fixation: { fixationType: TOOL_TO_V4_FIXATION[p.tool] } };
+                        if (p.data) el.fixation.description = p.data;
+                        if (p.annotation) el.annotation = p.annotation;
+                        elements.push(el);
+                    } else if (p.tool === 'osteotomy' && typeof p.data === 'object') {
+                        const ov4 = OSTEO_TO_V4[p.data.type] || { t: p.data.type, g: null };
+                        const el = { id: p.id, type: 'osteotomy', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'midline' };
+                        el.osteotomy = { osteotomyType: ov4.t };
+                        if (ov4.g) el.osteotomy.schwabGrade = ov4.g;
+                        if (p.data.angle != null && p.data.angle !== '') el.osteotomy.correctionAngle = Number(p.data.angle);
+                        if (p.data.reconstructionCage) el.osteotomy.reconstructionCage = p.data.reconstructionCage;
+                        elements.push(el);
+                    }
+                });
+                // Cages → elements
+                (cages || []).forEach(c => {
+                    const el = { id: c.id, type: 'cage', level: c.levelId, side: c.data?.side || 'bilateral' };
+                    el.cage = { approach: c.tool.toUpperCase() };
+                    if (c.data) {
+                        if (c.data.height) el.cage.height = Number(c.data.height);
+                        if (c.data.width) el.cage.width = Number(c.data.width);
+                        if (c.data.length) el.cage.length = Number(c.data.length);
+                        if (c.data.lordosis) el.cage.lordosis = Number(c.data.lordosis);
+                    }
+                    elements.push(el);
+                });
+                // Connectors → elements
+                (connectors || []).forEach(cn => {
+                    elements.push({ id: cn.id, type: 'connector', level: cn.levelId, side: 'midline', connector: { connectorType: 'crosslink', fraction: cn.fraction } });
+                });
+                // Rods from free text
+                const rods = [];
+                if (rodText?.left) rods.push({ id: 'rod-left', side: 'left', freeText: rodText.left });
+                if (rodText?.right) rods.push({ id: 'rod-right', side: 'right', freeText: rodText.right });
+                // Notes (strip pixel offsets)
+                const v4Notes = (notes || []).map(n => ({ id: n.id, level: n.levelId, text: n.text, showArrow: n.showArrow || false }));
+                const notePositions = {};
+                (notes || []).forEach(n => { if (n.offsetX !== undefined) notePositions[n.id] = { offsetX: n.offsetX, offsetY: n.offsetY }; });
+                return { elements, forces, rods, notes: v4Notes, notePositions };
+            };
+
+            // Convert v4 elements/forces/notes → internal state arrays
+            const v4ChartToInternal = (chartData, notePositions) => {
+                const placements = [], cages = [], connectors = [], notes = [];
+                (chartData.elements || []).forEach(el => {
+                    if (el.type === 'screw') {
+                        const sizeStr = (el.screw?.diameter && el.screw?.length) ? `${el.screw.diameter}x${el.screw.length}` : null;
+                        const zone = el.side === 'right' ? 'right' : 'left';
+                        placements.push({ id: el.id, levelId: el.level, zone, tool: el.screw?.headType || 'polyaxial', data: sizeStr, annotation: el.annotation || '' });
+                    } else if (el.type === 'hook') {
+                        const tool = V4_HOOK_TO_TOOL[el.hook?.hookType] || 'pedicle_hook';
+                        const zone = el.side === 'right' ? 'right' : 'left';
+                        placements.push({ id: el.id, levelId: el.level, zone, tool, data: null, annotation: el.annotation || '' });
+                    } else if (el.type === 'fixation') {
+                        const tool = V4_FIXATION_TO_TOOL[el.fixation?.fixationType] || 'band';
+                        const zone = el.side === 'right' ? 'right' : 'left';
+                        placements.push({ id: el.id, levelId: el.level, zone, tool, data: el.fixation?.description || null, annotation: el.annotation || '' });
+                    } else if (el.type === 'osteotomy') {
+                        const v3Type = V4_OSTEO_TO_TOOL[el.osteotomy?.osteotomyType] || el.osteotomy?.osteotomyType || 'PSO';
+                        const isDisc = ['facetectomy', 'ponte'].includes(el.osteotomy?.osteotomyType);
+                        placements.push({ id: el.id, levelId: el.level, zone: isDisc ? 'disc' : 'mid', tool: 'osteotomy', data: { type: v3Type, shortLabel: el.osteotomy?.osteotomyType === 'facetectomy' ? 'Facet' : (v3Type.length <= 6 ? v3Type : v3Type.substring(0,3).toUpperCase()), angle: el.osteotomy?.correctionAngle ?? null, reconstructionCage: el.osteotomy?.reconstructionCage || '' }, annotation: '' });
+                    } else if (el.type === 'cage') {
+                        cages.push({ id: el.id, levelId: el.level, tool: (el.cage?.approach || 'TLIF').toLowerCase(), data: { height: String(el.cage?.height || ''), lordosis: String(el.cage?.lordosis || ''), side: el.side || 'bilateral', width: el.cage?.width ? String(el.cage.width) : undefined, length: el.cage?.length ? String(el.cage.length) : undefined } });
+                    } else if (el.type === 'connector') {
+                        connectors.push({ id: el.id, levelId: el.level, fraction: el.connector?.fraction || 0.5, tool: 'connector' });
+                    }
+                });
+                // Forces → placements
+                (chartData.forces || []).forEach(f => {
+                    const key = f.direction ? `${f.type}-${f.direction}` : f.type;
+                    const tool = V4_FORCE_TO_TOOL[key] || 'compression';
+                    const zone = f.side === 'right' ? 'force_right' : 'force_left';
+                    placements.push({ id: f.id, levelId: f.level, zone, tool, data: null, annotation: '' });
+                });
+                // Notes — restore pixel offsets
+                (chartData.notes || []).forEach(n => {
+                    const pos = notePositions?.[n.id] || { offsetX: -100, offsetY: 0 };
+                    notes.push({ id: n.id, tool: 'note', levelId: n.level, text: n.text, offsetX: pos.offsetX, offsetY: pos.offsetY, showArrow: n.showArrow || false });
+                });
+                // Rod free text
+                const rodLeft = (chartData.rods || []).find(r => r.side === 'left');
+                const rodRight = (chartData.rods || []).find(r => r.side === 'right');
+                return { placements, cages, connectors, notes, rodLeft: rodLeft?.freeText || '', rodRight: rodRight?.freeText || '' };
+            };
+
+            const serializeState = () => {
+                const planChart = internalToV4Chart(plannedPlacements, plannedCages, plannedConnectors, plannedNotes, { left: patientData.planLeftRod, right: patientData.planRightRod });
+                const constChart = internalToV4Chart(completedPlacements, completedCages, completedConnectors, completedNotes, { left: patientData.leftRod, right: patientData.rightRod });
+                return {
+                    schema: { format: 'spinal-instrumentation', version: 4, schemaUrl: 'https://spine-planner.org/schema/v4/spinal-instrumentation.json', generator: { name: 'Spinal Instrumentation Plan & Record', version: CURRENT_VERSION, url: 'https://nigelgummerson.github.io/spine-planner' } },
+                    document: { id: documentId, created: documentCreated, modified: new Date().toISOString(), language: currentLang },
+                    patient: { name: patientData.name, identifier: patientData.id },
+                    case: { date: patientData.date, surgeon: patientData.surgeon, location: patientData.location || '' },
+                    implantSystem: { manufacturer: patientData.company, system: patientData.screwSystem },
+                    plan: { elements: planChart.elements, rods: planChart.rods, forces: planChart.forces, boneGraft: { types: (patientData.boneGraft?.types || []).map(t => BONEGRAFT_TO_V4[t] || t), notes: patientData.boneGraft?.notes || '' }, notes: planChart.notes },
+                    construct: { elements: constChart.elements, rods: constChart.rods, forces: constChart.forces, boneGraft: { types: [], notes: '' }, notes: constChart.notes },
+                    ui: { colourScheme, viewMode, notePositions: { ...planChart.notePositions, ...constChart.notePositions } }
+                };
+            };
+
+            // Migrate v3 → internal state (legacy support)
             const migrateConnectors = (conns) => {
                 if (!conns) return conns;
                 return conns.map(c => {
-                    if (c.levelId) return c; // already migrated
+                    if (c.levelId) return c;
                     if (c.yNorm === undefined) return c;
                     const anatomicalY = (c.yNorm / 1000) * WHOLE_SPINE_MAP.totalHeight;
-                    const entry = WHOLE_SPINE_MAP.map.find(e => anatomicalY >= e.startY && anatomicalY < e.endY)
-                        || WHOLE_SPINE_MAP.map[WHOLE_SPINE_MAP.map.length - 1];
+                    const entry = WHOLE_SPINE_MAP.map.find(e => anatomicalY >= e.startY && anatomicalY < e.endY) || WHOLE_SPINE_MAP.map[WHOLE_SPINE_MAP.map.length - 1];
                     const segLen = entry.vertEnd - entry.startY;
                     const fraction = segLen > 0 ? Math.max(0, Math.min(1, (anatomicalY - entry.startY) / segLen)) : 0.5;
                     return { id: c.id, levelId: entry.levelId, fraction, tool: 'connector' };
                 });
             };
+
             const deserializeState = (json) => {
+                // v4 format
+                if (json.schema?.version === 4) {
+                    if (json.document?.id) setDocumentId(json.document.id);
+                    if (json.document?.created) setDocumentCreated(json.document.created);
+                    // Patient data — reconstruct internal format
+                    const pd = {
+                        name: json.patient?.name || '', id: json.patient?.identifier || '',
+                        surgeon: json.case?.surgeon || '', location: json.case?.location || '',
+                        date: json.case?.date || new Date().toISOString().split('T')[0],
+                        company: json.implantSystem?.manufacturer || '', screwSystem: json.implantSystem?.system || '',
+                        leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '',
+                        boneGraft: { types: (json.plan?.boneGraft?.types || []).map(t => V4_BONEGRAFT_TO_TOOL[t] || t), notes: json.plan?.boneGraft?.notes || '' }
+                    };
+                    const notePos = json.ui?.notePositions || {};
+                    if (json.plan) {
+                        const p = v4ChartToInternal(json.plan, notePos);
+                        setPlannedPlacements(p.placements); setPlannedCages(p.cages); setPlannedConnectors(p.connectors); setPlannedNotes(p.notes);
+                        pd.planLeftRod = p.rodLeft; pd.planRightRod = p.rodRight;
+                    }
+                    if (json.construct) {
+                        const c = v4ChartToInternal(json.construct, notePos);
+                        setCompletedPlacements(c.placements); setCompletedCages(c.cages); setCompletedConnectors(c.connectors); setCompletedNotes(c.notes);
+                        pd.leftRod = c.rodLeft; pd.rightRod = c.rodRight;
+                    }
+                    setPatientData(pd);
+                    if (json.ui?.viewMode) setViewMode(json.ui.viewMode);
+                    if (json.ui?.colourScheme) changeTheme(json.ui.colourScheme);
+                    return;
+                }
+                // v3 / v2 legacy format
                 if (json.patient) setPatientData(json.patient);
                 if (json.plan) {
                     if (json.plan.implants) setPlannedPlacements(json.plan.implants);
@@ -6353,7 +6520,7 @@
                 if (saved) {
                     try {
                         const parsed = JSON.parse(saved);
-                        if (parsed.formatVersion >= 2) deserializeState(parsed);
+                        if (parsed.schema?.version === 4 || parsed.formatVersion >= 2) deserializeState(parsed);
                     } catch (e) { console.error("Data load error"); }
                 }
                 setHasLoaded(true);
@@ -6836,7 +7003,7 @@
                 reader.onload = (ev) => {
                     try {
                         const json = JSON.parse(ev.target.result);
-                        if (json.formatVersion >= 2) {
+                        if (json.schema?.version === 4 || json.formatVersion >= 2) {
                             deserializeState(json);
                             // Broadcast loaded state immediately so synced windows update
                             if (syncChannelRef.current) {
@@ -6933,8 +7100,11 @@
                 const emptyPatient = { name: '', id: '', surgeon: '', location: '', date: new Date().toISOString().split('T')[0], company: '', screwSystem: '', leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '', boneGraft: { types: [], notes: '' } };
                 setPatientData(emptyPatient);
                 setActiveChart('planned');
+                setDocumentId(crypto.randomUUID());
+                setDocumentCreated(new Date().toISOString());
                 if (syncChannelRef.current) {
                     clearTimeout(syncTimerRef.current);
+                    const emptyV4 = serializeState();
                     syncChannelRef.current.postMessage({ type: 'state', payload: {
                         formatVersion: 3, patient: emptyPatient, preferences: { viewMode, colourScheme },
                         plan: { implants: [], cages: [], connectors: [], notes: [] },
