@@ -5624,7 +5624,7 @@
             );
         };
 
-        const ChartPaper = ({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick }) => {
+        const ChartPaper = ({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick }) => {
             const contentRef = useRef(null);
             const [draggingId, setDraggingId] = useState(null);
             const dragStartRef = useRef(null);
@@ -5747,7 +5747,12 @@
                         </div>
                     )}
                     {/* Notes overlay */}
-                    {notes && notes.length > 0 && (
+                    {(() => {
+                        const activeGhostNotes = ghostNotes ? ghostNotes.filter(gn => !notes.some(n => n.levelId === gn.levelId)) : [];
+                        const hasNotes = notes && notes.length > 0;
+                        const hasGhosts = activeGhostNotes.length > 0;
+                        if (!hasNotes && !hasGhosts) return null;
+                        return (
                         <React.Fragment>
                             {/* Arrow SVG layer */}
                             <svg className="absolute inset-0 pointer-events-none z-31 w-full h-full" style={{ overflow: 'visible' }}>
@@ -5756,7 +5761,7 @@
                                         <polygon points="0 0, 8 3, 0 6" fill="#7c3aed" />
                                     </marker>
                                 </defs>
-                                {notes.filter(n => n.showArrow).map(n => {
+                                {hasNotes && notes.filter(n => n.showArrow).map(n => {
                                     const pos = getNotePixelPos(n);
                                     if (!pos) return null;
                                     const contentW = contentRef.current?.clientWidth || 600;
@@ -5764,7 +5769,6 @@
                                     const noteY = pos.y;
                                     const anchorX = contentW / 2;
                                     const anchorY = pos.anchorY;
-                                    // Arrow from note label toward anchor, shortened so it doesn't overlap the label
                                     const dx = anchorX - noteX;
                                     const dy = anchorY - noteY;
                                     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -5775,10 +5779,30 @@
                                     const endY = anchorY - (dy / dist) * 4;
                                     return <line key={n.id} x1={startX} y1={startY} x2={endX} y2={endY} stroke="#7c3aed" strokeWidth="1" markerEnd={`url(#arrowhead-${title.replace(/\s+/g,'')})`} />;
                                 })}
+                                {hasGhosts && <g style={{ opacity: 0.4 }}>
+                                    {activeGhostNotes.filter(gn => gn.showArrow).map(gn => {
+                                        const pos = getNotePixelPos(gn);
+                                        if (!pos) return null;
+                                        const contentW = contentRef.current?.clientWidth || 600;
+                                        const noteX = contentW / 2 + pos.x;
+                                        const noteY = pos.y;
+                                        const anchorX = contentW / 2;
+                                        const anchorY = pos.anchorY;
+                                        const dx = anchorX - noteX;
+                                        const dy = anchorY - noteY;
+                                        const dist = Math.sqrt(dx * dx + dy * dy);
+                                        if (dist < 10) return null;
+                                        const startX = noteX + (dx / dist) * 8;
+                                        const startY = noteY + (dy / dist) * 8;
+                                        const endX = anchorX - (dx / dist) * 4;
+                                        const endY = anchorY - (dy / dist) * 4;
+                                        return <line key={`ghost-${gn.id}`} x1={startX} y1={startY} x2={endX} y2={endY} stroke="#7c3aed" strokeWidth="1" markerEnd={`url(#arrowhead-${title.replace(/\s+/g,'')})`} />;
+                                    })}
+                                </g>}
                             </svg>
                             {/* Note label layer */}
                             <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 32 }}>
-                                {notes.map(n => {
+                                {hasNotes && notes.map(n => {
                                     const pos = getNotePixelPos(n);
                                     if (!pos) return null;
                                     return (
@@ -5802,9 +5826,23 @@
                                         </div>
                                     );
                                 })}
+                                {hasGhosts && activeGhostNotes.map(gn => {
+                                    const pos = getNotePixelPos(gn);
+                                    if (!pos) return null;
+                                    return (
+                                        <div key={`ghost-${gn.id}`}
+                                            className="absolute pointer-events-auto select-none"
+                                            style={{ left: `calc(50% + ${pos.x}px)`, top: `${pos.y}px`, transform: 'translate(-50%, -50%)', opacity: 0.4, cursor: 'pointer' }}
+                                            onClick={(e) => { e.stopPropagation(); if (onGhostNoteClick) onGhostNoteClick(gn); }}
+                                        >
+                                            <span className="text-[10px] font-bold text-violet-700 bg-white/90 border border-violet-200 px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">{gn.text}</span>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </React.Fragment>
-                    )}
+                        );
+                    })()}
                 </div></div></div>
             );
         };
@@ -6242,12 +6280,17 @@
             // NOTE HANDLERS
             const handleNoteConfirm = (text, showArrow) => {
                 if (editingNote) {
-                    // Update existing note
-                    const updater = prev => prev.map(n => n.id === editingNote.id ? { ...n, text, showArrow } : n);
-                    if (activeChart === 'planned') setPlannedNotes(updater); else setCompletedNotes(updater);
+                    const currentNotes = activeChart === 'planned' ? plannedNotes : completedNotes;
+                    const exists = currentNotes.some(n => n.id === editingNote.id);
+                    if (exists) {
+                        const updater = prev => prev.map(n => n.id === editingNote.id ? { ...n, text, showArrow } : n);
+                        if (activeChart === 'planned') setPlannedNotes(updater); else setCompletedNotes(updater);
+                    } else {
+                        const newNote = { id: genId(), tool: 'note', levelId: editingNote.levelId, text, offsetX: editingNote.offsetX, offsetY: editingNote.offsetY, showArrow };
+                        setCompletedNotes(prev => [...prev, newNote]);
+                    }
                     setEditingNote(null);
                 } else if (pendingNoteTool) {
-                    // Create new note
                     const newNote = { id: genId(), tool: pendingNoteTool.tool, levelId: pendingNoteTool.levelId, text, offsetX: pendingNoteTool.offsetX, offsetY: pendingNoteTool.offsetY, showArrow };
                     const setter = activeChart === 'planned' ? setPlannedNotes : setCompletedNotes;
                     setter(prev => [...prev, newNote]);
@@ -6264,6 +6307,12 @@
             };
             const handleNoteClick = (note) => {
                 setEditingNote(note);
+                setPendingNoteTool(null);
+                setNoteModalOpen(true);
+            };
+            const handleGhostNoteClick = (ghostNote) => {
+                setActiveChart('completed');
+                setEditingNote({ ...ghostNote });
                 setPendingNoteTool(null);
                 setNoteModalOpen(true);
             };
@@ -6400,7 +6449,7 @@
 
             const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planLeftRod: e.target.innerText})} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planRightRod: e.target.innerText})} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} />;
 
-            const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={plannedPlacements} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} />;
+            const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={plannedPlacements} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostNotes={plannedNotes} onGhostNoteClick={handleGhostNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} />;
 
             const newPatientAction = () => {
                 if (confirm(t('alert.new_patient'))) {
