@@ -47,10 +47,13 @@
         .editable-field:focus {
             border-bottom: 1px solid #0f172a;
             background-color: #f8fafc;
+            outline: 2px solid #3b82f6;
+            outline-offset: 1px;
+            border-radius: 2px;
         }
         .editable-field:empty:before {
             content: attr(placeholder);
-            color: #94a3b8;
+            color: #6b7280;
         }
         
         /* Custom Scrollbar */
@@ -81,6 +84,12 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .animate-\[fadeIn_0\.2s_ease-out\], [class*="animate-"] { animation: none !important; }
+            .portrait-tab-content { transition: none !important; }
+            .transition-all, .transition-colors, .transition-transform { transition: none !important; }
         }
 
         /* PORTRAIT MODE */
@@ -4668,7 +4677,7 @@
         const ChangeLogModal = ({ isOpen, onClose }) => {
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" onClick={onClose}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" onClick={onClose}>
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[80vh]" onClick={e => e.stopPropagation()}>
                         <div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm flex items-center gap-2"><IconHistory/> {t('modal.changelog.title')}</h3><button onClick={onClose} className="hover:text-slate-300"><IconX /></button></div>
                         <div className="p-0 overflow-y-auto flex-1">
@@ -4697,7 +4706,7 @@
         const HelpModal = ({ isOpen, onClose }) => {
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" onClick={onClose}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" onClick={onClose}>
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
                         <div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center">
                             <h3 className="font-bold text-sm">{t('help.title')}</h3>
@@ -4818,7 +4827,7 @@
             useEffect(() => { if (modalRef.current) modalRef.current.focus(); }, []);
 
             return (
-                <div ref={modalRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
+                <div ref={modalRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
                         <div className="bg-slate-900 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{isEditing ? t('modal.screw.title_edit') : t('modal.screw.title_new')}</h3><button onClick={onClose} className="hover:text-red-400"><IconX /></button></div>
                         <div className="p-6">
@@ -4927,7 +4936,7 @@
             useEffect(() => { if (cageRef.current) cageRef.current.focus(); }, []);
 
             return (
-                <div ref={cageRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing: !!initialData })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
+                <div ref={cageRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing: !!initialData })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden">
                         <div className="bg-sky-800 text-white px-4 py-3 flex justify-between items-center">
                             <h3 className="font-bold text-sm">{initialData ? t('modal.cage.title_edit') : t('modal.cage.title_new')} — {discLabel}</h3>
@@ -5051,7 +5060,7 @@
             return (
                 <div ref={osteoRef} tabIndex={-1} style={{outline:'none'}}
                     onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })}
-                    className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
+                    className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
                         <div className="bg-red-800 text-white px-4 py-3 flex justify-between items-center">
                             <h3 className="font-bold text-sm">{isEditing ? t('modal.osteotomy.title_edit') : t('modal.osteotomy.title_new')}</h3>
@@ -5149,7 +5158,7 @@
                     {editing ? (
                         <input ref={inputRef} type="text" className="editable-field w-full text-xs" value={value} placeholder={placeholder} onChange={e => { onChange(e.target.value); setFilter(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} />
                     ) : (
-                        <div className="editable-field w-full text-xs cursor-pointer" style={{ whiteSpace: 'normal', wordBreak: 'break-word' }} onClick={() => { setEditing(true); setOpen(true); }}>{value || <span style={{ color: '#94a3b8' }}>{placeholder}</span>}</div>
+                        <div className="editable-field w-full text-xs cursor-pointer" style={{ whiteSpace: 'normal', wordBreak: 'break-word' }} onClick={() => { setEditing(true); setOpen(true); }}>{value || <span style={{ color: '#6b7280' }}>{placeholder}</span>}</div>
                     )}
                     {open && (matchedCompany.length > 0 || matchedOther.length > 0) && (
                         <div className="absolute z-50 left-0 right-0 top-full mt-0.5 bg-white border border-slate-300 rounded shadow-lg max-h-48 overflow-y-auto text-xs">
@@ -5168,7 +5177,7 @@
             const forceRef = useRef(null);
             useEffect(() => { if (forceRef.current) forceRef.current.focus(); }, []);
             return (
-                <div ref={forceRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: () => {}, onClose, onDelete: null, isEditing: false })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
+                <div ref={forceRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: () => {}, onClose, onDelete: null, isEditing: false })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden">
                         <div className="bg-blue-700 text-white px-4 py-3 flex justify-between items-center">
                             <h3 className="font-bold text-sm">{t('modal.force.title')}</h3>
@@ -5213,7 +5222,7 @@
             };
 
             return (
-                <div ref={noteRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]">
+                <div ref={noteRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
                     <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
                         <div className="bg-violet-800 text-white px-4 py-3 flex justify-between items-center">
                             <h3 className="font-bold text-sm">{isEditing ? t('modal.note.title_edit') : t('modal.note.title_new')}</h3>
@@ -6040,9 +6049,9 @@
             <div className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative"><div className={`${forcePlacements ? 'px-2 py-1' : 'p-2'} bg-slate-50 border-b border-slate-200 text-center`}><div className="font-bold text-sm text-slate-800 uppercase tracking-wider">{title}</div>{forcePlacements && <div className="text-[9px] font-normal text-blue-400 italic -mt-0.5">{t('chart.force_plan_only')}</div>}</div><div className="flex-1 relative flex flex-col pt-8 px-2 justify-center">
                 <div className="flex w-full absolute top-1 left-0 right-0 px-2 text-[11px] font-bold uppercase tracking-tighter text-center pointer-events-none z-10">
                     {showForces && <div className="w-10 text-blue-400">{t('chart.header.force')}</div>}
-                    <div className="flex-1 text-right pr-4 text-slate-400">{t('chart.header.left')}</div>
+                    <div className="flex-1 text-right pr-4 text-slate-500">{t('chart.header.left')}</div>
                     <div style={{ width: `${scaledWidth}px` }}></div>
-                    <div className="flex-1 text-left pl-4 text-slate-400">{t('chart.header.right')}</div>
+                    <div className="flex-1 text-left pl-4 text-slate-500">{t('chart.header.right')}</div>
                     {showForces && <div className="w-10 text-blue-400">{t('chart.header.force')}</div>}
                 </div>
                 {rodHeader && <div className="flex w-full absolute top-4 left-0 right-0 px-2 z-10">
@@ -6934,7 +6943,7 @@
                             <div className="grid grid-cols-3 gap-x-1 gap-y-0.5">
                                 {BONE_GRAFT_OPTIONS.map(opt => (
                                     <label key={opt} className="flex items-center gap-1 text-[10px] text-slate-700 cursor-pointer hover:text-slate-900 leading-tight">
-                                        <input type="checkbox" className="w-3 h-3 rounded border-slate-300 text-amber-500 focus:ring-amber-500 shrink-0" checked={(patientData.boneGraft?.types || []).includes(opt)} onChange={e => { const types = patientData.boneGraft?.types || []; setPatientData({...patientData, boneGraft: { ...patientData.boneGraft, types: e.target.checked ? [...types, opt] : types.filter(v => v !== opt) }}); }} />
+                                        <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500 shrink-0" checked={(patientData.boneGraft?.types || []).includes(opt)} onChange={e => { const types = patientData.boneGraft?.types || []; setPatientData({...patientData, boneGraft: { ...patientData.boneGraft, types: e.target.checked ? [...types, opt] : types.filter(v => v !== opt) }}); }} />
                                         <span className="truncate">{BONE_GRAFT_LABEL_KEYS[opt] ? t(BONE_GRAFT_LABEL_KEYS[opt]) : opt}</span>
                                     </label>
                                 ))}
@@ -6981,7 +6990,7 @@
                     <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
                     <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
                     <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
-                    {discPickerLevel && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" onClick={() => setDiscPickerLevel(null)}>
+                    {discPickerLevel && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" onClick={() => setDiscPickerLevel(null)}>
                         <div className="bg-white rounded-lg shadow-2xl w-full max-w-[200px] overflow-hidden" onClick={e => e.stopPropagation()}>
                             <div className="bg-slate-700 text-white px-3 py-2 text-center text-xs font-bold uppercase tracking-wider">{getDiscLabel(discPickerLevel, levels)}</div>
                             <div className="p-2 flex flex-col gap-1">
@@ -7156,7 +7165,7 @@
                         <aside className="w-[340px] text-white flex flex-col z-20 overflow-y-auto no-print shadow-xl" style={{ backgroundColor: scheme.sidebarBg, borderRight: `1px solid ${scheme.sidebarBorder}` }}>
                             {/* Region View */}
                             <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                                <h3 className="text-[10px] uppercase font-bold text-white/40 mb-1.5 tracking-widest">{t('sidebar.region_view')}</h3>
+                                <h3 className="text-[10px] uppercase font-bold text-white/60 mb-1.5 tracking-widest">{t('sidebar.region_view')}</h3>
                                 <div className="grid grid-cols-2 gap-1">
                                     {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
                                         const labels = { cervical: t('sidebar.view.cervical'), thoracolumbar: t('sidebar.view.thoracolumbar'), t10_pelvis: t('sidebar.view.t10_pelvis'), whole: t('sidebar.view.whole') };
@@ -7171,7 +7180,7 @@
                                 <div className="flex items-center gap-3">
                                     <div className="relative">
                                         <button onClick={() => setThemeOpen(!themeOpen)} className="flex items-center gap-1.5 text-white/70 hover:text-white py-1 rounded transition-colors">
-                                            <span className="font-bold text-[10px] uppercase tracking-widest text-white/40">{t('sidebar.theme')}</span>
+                                            <span className="font-bold text-[10px] uppercase tracking-widest text-white/60">{t('sidebar.theme')}</span>
                                             <div className="flex gap-0.5">
                                                 <div className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: scheme.sidebarBg }}></div>
                                                 <div className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: '#FFFFFF' }}></div>
@@ -7194,7 +7203,7 @@
                                         )}
                                     </div>
                                     <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                                        <span className="font-bold text-[10px] uppercase tracking-widest text-white/40 shrink-0">{t('sidebar.language')}</span>
+                                        <span className="font-bold text-[10px] uppercase tracking-widest text-white/60 shrink-0">{t('sidebar.language')}</span>
                                         <select value={currentLang} onChange={e => changeLang(e.target.value)}
                                             className="flex-1 min-w-0 bg-transparent text-white/70 text-[10px] border-none outline-none cursor-pointer">
                                             {SUPPORTED_LANGUAGES.map(l => (
@@ -7207,19 +7216,19 @@
 
                             {/* Plan / Construct Toggle */}
                             <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                                <h3 className="text-[10px] uppercase font-bold text-white/40 mb-1.5 tracking-widest">{t('sidebar.editing')}</h3>
+                                <h3 className="text-[10px] uppercase font-bold text-white/60 mb-1.5 tracking-widest">{t('sidebar.editing')}</h3>
                                 <div className="flex rounded p-1 border" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>
                                     <button onClick={() => setActiveChart('planned')} className={`flex-1 px-3 py-1.5 rounded transition-all text-xs ${activeChart==='planned'?'font-bold':'text-white/50 hover:text-white'}`} style={activeChart==='planned' ? { backgroundColor: scheme.activeBg, color: scheme.activeText } : undefined}>{t('sidebar.plan')}</button>
                                     <button onClick={() => setActiveChart('completed')} className={`flex-1 px-3 py-1.5 rounded transition-all text-xs ${activeChart==='completed'?'font-bold':'text-white/50 hover:text-white'}`} style={activeChart==='completed' ? { backgroundColor: scheme.activeBg, color: scheme.activeText } : undefined}>{t('sidebar.construct')}</button>
                                 </div>
-                                <p className="text-[9px] text-white/30 mt-1.5 leading-tight">{t('sidebar.editing_hint')}</p>
+                                <p className="text-[9px] text-white/50 mt-1.5 leading-tight">{t('sidebar.editing_hint')}</p>
                             </div>
 
                             {/* Tool Palette */}
                             <div className="p-3 space-y-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
                                 {tools.map((g,i) => (
                                     <div key={i}>
-                                        <h3 className="text-[10px] uppercase font-bold text-white/40 mb-1.5 tracking-widest">{t(g.categoryKey)}</h3>
+                                        <h3 className="text-[10px] uppercase font-bold text-white/60 mb-1.5 tracking-widest">{t(g.categoryKey)}</h3>
                                         <div className="grid grid-cols-2 gap-1">
                                             {g.items.map(item => {
                                                 const active = selectedTool === item.id;
@@ -7235,7 +7244,7 @@
 
                             {/* Actions */}
                             <div className="p-3 space-y-2">
-                                <h3 className="text-[10px] uppercase font-bold text-white/40 mb-2 tracking-widest">{t('sidebar.actions')}</h3>
+                                <h3 className="text-[10px] uppercase font-bold text-white/60 mb-2 tracking-widest">{t('sidebar.actions')}</h3>
                                 <button onClick={copyPlanToCompleted} className="w-full flex items-center justify-center gap-2 text-white px-3 py-2 rounded text-xs font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
                                 <div className="pt-2 mt-2" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
                                     <input type="file" ref={fileInputRef} onChange={loadProjectJSON} className="hidden" accept=".json" />
@@ -7249,13 +7258,13 @@
                                 <div className="pt-2 mt-2" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
                                     <div className={`flex items-center gap-2 px-2 py-2 rounded border cursor-pointer transition-colors ${incognitoMode ? 'bg-red-900/30 border-red-500/50' : 'bg-transparent border-transparent hover:bg-white/5'}`} onClick={() => setIncognitoMode(!incognitoMode)}>
                                         <div className="relative inline-block w-10 h-5 align-middle select-none shrink-0"><input type="checkbox" className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300" style={{ top: 0, left: 0 }} checked={incognitoMode} onChange={(e) => setIncognitoMode(e.target.checked)}/><label className={`toggle-label block overflow-hidden h-5 rounded-full cursor-pointer border ${incognitoMode ? 'bg-red-600 border-red-600' : 'bg-slate-600 border-slate-600'}`}></label></div>
-                                        <span className={`text-[10px] font-bold uppercase tracking-wider ${incognitoMode ? 'text-red-400' : 'text-white/40'}`}>{t('sidebar.session_privacy')}</span>
+                                        <span className={`text-[10px] font-bold uppercase tracking-wider ${incognitoMode ? 'text-red-400' : 'text-white/60'}`}>{t('sidebar.session_privacy')}</span>
                                     </div>
                                 </div>
                                 <div className="pt-2 mt-2 flex gap-1" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
                                     <div className={`flex items-center justify-center px-1.5 py-1.5 rounded text-[10px] ${syncConnected ? 'text-emerald-400' : 'text-white/20'}`} title={syncConnected ? 'Linked to another window' : 'No other window detected'}><IconLink />{syncConnected && <span className="ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
                                     <button onClick={() => setHelpModalOpen(true)} className="flex-1 flex items-center justify-center gap-1 text-white/50 hover:text-white px-2 py-1.5 rounded text-[10px] font-bold hover:bg-white/10"><IconHelp /> {t('sidebar.help')}</button>
-                                    <button onClick={() => setChangeLogOpen(true)} className="flex items-center justify-center text-white/30 hover:text-white px-2 py-1.5 rounded text-[10px] font-mono hover:bg-white/10">{CURRENT_VERSION}</button>
+                                    <button onClick={() => setChangeLogOpen(true)} className="flex items-center justify-center text-white/50 hover:text-white px-2 py-1.5 rounded text-[10px] font-mono hover:bg-white/10">{CURRENT_VERSION}</button>
                                     <button onClick={newPatientAction} className="flex-1 flex items-center justify-center gap-1 text-red-400 hover:text-red-200 px-2 py-1.5 rounded text-[10px] font-bold hover:bg-white/10">
                                         <IconTrash /> {t('sidebar.new_patient')}
                                     </button>
