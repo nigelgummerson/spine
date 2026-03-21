@@ -6264,6 +6264,16 @@
             const [pendingNoteTool, setPendingNoteTool] = useState(null); // { tool: 'note', levelId, offsetX, offsetY }
             const [editingNote, setEditingNote] = useState(null); // full note object when editing
             
+            // TOAST NOTIFICATIONS
+            const [toasts, setToasts] = useState([]);
+            const toastIdRef = useRef(0);
+            const showToast = useCallback((message, type = 'info') => {
+                const id = ++toastIdRef.current;
+                setToasts(prev => [...prev, { id, message, type }]);
+                if (type !== 'error') setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
+            }, []);
+            const dismissToast = useCallback((id) => setToasts(prev => prev.filter(t => t.id !== id)), []);
+
             // EDITING STATE
             const [pendingPlacement, setPendingPlacement] = useState(null);
             const [editingPlacementId, setEditingPlacementId] = useState(null);
@@ -6613,7 +6623,7 @@
             };
 
             const handleDiscClick = (levelId) => {
-                if (levelId === 'Oc' || levelId === 'C1' || levelId === 'S1' || levelId === 'Pelvis') return alert(t('alert.no_disc_space'));
+                if (levelId === 'Oc' || levelId === 'C1' || levelId === 'S1' || levelId === 'Pelvis') return showToast(t('alert.no_disc_space'), 'error');
 
                 // If disc-level osteotomy exists, edit it
                 const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
@@ -6632,7 +6642,7 @@
                 const levelId = discPickerLevel;
                 setDiscPickerLevel(null);
                 const anyPermitted = Object.values(CAGE_PERMISSIBILITY).some(arr => arr.includes(levelId));
-                if (!anyPermitted) return alert(t('alert.no_cage_types', { level: getDiscLabel(levelId, levels) }));
+                if (!anyPermitted) return showToast(t('alert.no_cage_types', { level: getDiscLabel(levelId, levels) }), 'error');
                 setEditingCageLevel(levelId);
                 setEditingData(undefined);
                 setCageModalOpen(true);
@@ -6652,7 +6662,7 @@
                 const permitted = CAGE_PERMISSIBILITY[data.type] || [];
                 if (!permitted.includes(lvl)) {
                     const cageType = CAGE_TYPES.find(ct => ct.id === data.type);
-                    return alert(t('alert.cage_not_permitted', { cageType: cageType?.label || data.type.toUpperCase(), level: getDiscLabel(lvl, levels) }));
+                    return showToast(t('alert.cage_not_permitted', { cageType: cageType?.label || data.type.toUpperCase(), level: getDiscLabel(lvl, levels) }), 'error');
                 }
 
                 const newCage = { levelId: editingCageLevel, tool: data.type, data: { height: data.height, width: data.width, length: data.length, lordosis: data.lordosis, side: data.side } };
@@ -6882,17 +6892,17 @@
                                 syncChannelRef.current.postMessage({ type: 'state', payload: json });
                             }
                         } else {
-                            alert(t('alert.unsupported_format'));
+                            showToast(t('alert.unsupported_format'), 'error');
                             return;
                         }
-                        alert(t('alert.loaded'));
-                    } catch(err) { alert(t('alert.invalid_file')); }
+                        showToast(t('alert.loaded'));
+                    } catch(err) { showToast(t('alert.invalid_file'), 'error'); }
                 };
                 reader.readAsText(file); e.target.value = null;
             };
 
             const copyPlanToCompleted = () => {
-                if (plannedPlacements.length === 0 && plannedConnectors.length === 0 && plannedNotes.length === 0 && plannedCages.length === 0) return alert(t('alert.no_plan'));
+                if (plannedPlacements.length === 0 && plannedConnectors.length === 0 && plannedNotes.length === 0 && plannedCages.length === 0) return showToast(t('alert.no_plan'));
 
                 // Filter out plan placements that already have a construct placement at the same levelId + zone
                 // Also exclude force placements (force_left, force_right) — forces are plan-only
@@ -6911,7 +6921,7 @@
                 );
 
                 if (newPlacements.length === 0 && newConnectors.length === 0 && newNotes.length === 0 && newCages.length === 0) {
-                    return alert(t('alert.all_confirmed'));
+                    return showToast(t('alert.all_confirmed'));
                 }
 
                 setCompletedPlacements(prev => [...prev, ...newPlacements.map(p => ({...p, id: genId()}))]);
@@ -7284,6 +7294,15 @@
                             </div>
                         </div>
                     </div>
+                    {/* Toast notifications */}
+                    {toasts.length > 0 && <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2 pointer-events-none">
+                        {toasts.map(toast => (
+                            <div key={toast.id} className={`pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium animate-[fadeIn_0.2s_ease-out] ${toast.type === 'error' ? 'bg-red-800 text-white' : 'bg-slate-800 text-white'}`}>
+                                <span>{toast.message}</span>
+                                <button onClick={() => dismissToast(toast.id)} className="ml-1 text-white/60 hover:text-white text-xs font-bold">✕</button>
+                            </div>
+                        ))}
+                    </div>}
                 </div>
             );
         };
