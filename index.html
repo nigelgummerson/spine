@@ -7007,7 +7007,7 @@
                                     <div className="w-px h-5 bg-white/20 mx-1"></div>
                                     <button onClick={() => { copyPlanToCompleted(); switchPortraitTab(2); }} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold hover:bg-white/10 hover:brightness-125 shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)' }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
                                     <div className={`shrink-0 w-5 h-5 rounded-full cursor-pointer ${incognitoMode ? 'bg-red-500' : 'bg-white/20'}`} onClick={() => setIncognitoMode(!incognitoMode)} title={t('sidebar.session_privacy')}></div>
-                                    <button onClick={newPatientAction} className="p-2.5 rounded hover:bg-white/10 text-red-400 hover:text-red-200 shrink-0" title={t('sidebar.new_patient')}><IconTrash /></button>
+                                    <button onClick={newPatientAction} className="p-2.5 rounded shrink-0" style={{ color: '#dc2626' }} title={t('sidebar.new_patient')}><IconTrash /></button>
                                 </div>
                             )}
                         </div>
@@ -7190,7 +7190,7 @@
                                 <div className="flex items-center justify-center px-1.5 py-1.5 rounded text-[10px]" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? 'Linked to another window' : 'No other window detected'}><IconLink />{syncConnected && <span className="ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
                                 <button onClick={() => setChangeLogOpen(true)} className="flex items-center justify-center px-2 py-1.5 rounded text-[10px] font-mono" style={{ color: scheme.textMuted }}>{CURRENT_VERSION}</button>
                                 <div className="flex-1"></div>
-                                <button onClick={newPatientAction} className="flex items-center justify-center gap-1 text-red-400 hover:text-red-200 px-2 py-1.5 rounded text-[10px] font-bold">
+                                <button onClick={newPatientAction} className="flex items-center justify-center gap-1 px-2 py-1.5 rounded text-[10px] font-bold" style={{ color: '#dc2626' }}>
                                     <IconTrash /> {t('sidebar.new_patient')}
                                 </button>
                             </div>
