@@ -4527,9 +4527,15 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v2.0.0-beta";
+        const CURRENT_VERSION = "v2.0.1-beta";
 
         const CHANGE_LOG = [
+            { version: "v2.0.1-beta", date: "2026-03-21", changes: [
+                "Translated 8 hardcoded English UI strings across all 14 languages — rod inventory labels, cervical cage hint, osteotomy fallback, corpectomy label, sync tooltips, whole-spine button.",
+                "Fixed dual-window sync race condition — stale state no longer overwrites deletions. Incoming sync cancels pending outbound debounce.",
+                "One-implant-per-zone enforced at state level — rapid clicks can no longer create duplicates.",
+                "App version check on sync — mismatched versions block data exchange with a warning toast.",
+            ]},
             { version: "v2.0.0-beta", date: "2026-03-21", changes: [
                 "JSON format v4 — spinal-instrumentation schema for clinical records, research, and data exchange. Structured screw sizes, typed elements, separated forces/rods, document metadata (UUID, timestamps), barcode-ready.",
                 "Apple HIG design overhaul — light sidebar with corporate brand accents (Medtronic, DePuy, Stryker, VB Spine, Globus). Osteotomy colour amber (red reserved for destructive actions). Uniform vertebral body fill.",
