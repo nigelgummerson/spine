@@ -4779,11 +4779,13 @@
             else if (!inTextField && (e.key === 'Delete' || e.key === 'Backspace') && isEditing && onDelete) { e.preventDefault(); onDelete(); }
             else if (e.key === 'Tab') {
                 const modal = e.currentTarget;
-                const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                const focusable = Array.from(modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'));
                 if (focusable.length === 0) return;
                 const first = focusable[0], last = focusable[focusable.length - 1];
-                if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+                const idx = focusable.indexOf(document.activeElement);
+                if (idx === -1) { e.preventDefault(); first.focus(); }
+                else if (e.shiftKey && idx === 0) { e.preventDefault(); last.focus(); }
+                else if (!e.shiftKey && idx === focusable.length - 1) { e.preventDefault(); first.focus(); }
             }
         };
 
