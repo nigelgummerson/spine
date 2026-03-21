@@ -4,7 +4,7 @@
 A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 14 European languages.
 
 ## Current Status
-- **Version:** v1.3.1-beta
+- **Version:** v2.0.0-beta
 - **Last Updated:** 2026-03-21
 - **License:** GNU GPLv3
 
@@ -47,6 +47,7 @@ spine-surgery/planning/spine-planner/
 - All dependencies loaded via CDN for offline hospital use
 
 ## Version History (Recent)
+- **v2.0.0-beta** (2026-03-21): JSON format v4 — spinal-instrumentation schema. Unified elements array with typed sub-objects (screw, hook, cage, osteotomy, fixation, connector). Forces separated from implants. Structured screw data (diameter/length as numbers). Rod objects with material/diameter/profile fields. Document metadata (UUID, timestamps, institution, language). Schema self-description for interoperability. Clinical terminology throughout. Backward-compatible — loads v2/v3 files. JSON Schema spec at docs/spinal-instrumentation-schema-v4.json.
 - **v1.3.1-beta** (2026-03-21): Expert review polish. Active chart accent border + 20% inactive overlay. Uniform vertebral body fill (#f1f5f9). Osteotomy colour red→amber (red reserved for destructive actions). Custom New Patient confirmation modal (replaces browser confirm). Export picker — choose Plan or Final Record before JPG/PDF. Export timestamp footer. Pedicle vertical position based on pedicle height. Force zones always open ForceModal regardless of tool. Note preset labels sentence case. Linked Screens help entry (14 languages). Dark theme button borders improved.
 - **v1.3.0-beta** (2026-03-21): Major design overhaul following Apple HIG review. Light sidebar with corporate brand accents — Medtronic (navy title bar, electric blue), DePuy (dark red, crimson), Stryker (black, gold), VB Spine (purple), Globus (midnight blue, red). Dark themes available for preference. Sidebar and portrait toolbar reordered by workflow frequency (tools first). Click inactive chart to switch editing side in landscape. 10px minimum font size (Inter). Help and Changelog modals: two-column landscape layout, wider, Escape to close. Changelog consolidated to date-based entries. Pedicle proportions at full anatomical scale. Theme swatch borders and tool palette icons adapt to light/dark themes.
 - **v1.2.6-beta** (2026-03-21): Design review — accessibility and UX improvements. Colour contrast fixed: placeholder text, chart headers, sidebar labels all now meet WCAG AA (4.5:1 minimum). Toast notifications replace all browser alert() dialogs — non-blocking, auto-dismiss for info, persist for errors. Modal focus trapping — Tab/Shift+Tab cycle within modal, cannot escape to background (manually managed focus with preventDefault). Portrait touch targets enlarged for tablet/gloved use (toolbar icons 28→36px, view/tool buttons, privacy indicator). prefers-reduced-motion support disables all animations. ARIA roles on all modals. Visible focus ring on editable fields. Bone graft checkboxes enlarged.
@@ -80,7 +81,7 @@ spine-surgery/planning/spine-planner/
 - **ScrewModal:** Three-tier visual hierarchy (SCREWS > HOOKS > BANDS & OTHERS), annotations for screws and hooks, free-text description for fixation
 - **Osteotomies:** Schwab 1-6 + Corpectomy, grouped into Posterior/Anterior optgroups. VCR/ML-VCR/Corpectomy show reconstruction cage text input
 - **Bone graft:** Multi-select checkboxes (Local Bone, Autograft, Allograft, Synthetics, DBM, BMP) + free-text notes
-- **JSON v3 format:** `formatVersion: 3`, plan/construct separation, `patient` includes company/screwSystem/leftRod/rightRod/planLeftRod/planRightRod/boneGraft
+- **JSON v4 format:** `schema.format: 'spinal-instrumentation'`, `schema.version: 4`. Unified `elements` array with typed sub-objects. Forces, rods, notes, boneGraft as separate arrays within plan/construct. Document metadata (UUID, timestamps). UI state separated. Loads v2/v3 legacy files. Schema: `docs/spinal-instrumentation-schema-v4.json`
 - **Connectors:** Level-anchored `{levelId, fraction}` (branch); legacy `{yNorm}` migrated on load
 - **Session cache:** localStorage key `spine_planner_v2`, formatVersion 3
 - **Save/load:** Shared `serializeState()` / `deserializeState()` functions; loads formatVersion >= 2
