@@ -6689,7 +6689,7 @@
                 ch.onmessage = (e) => {
                     const msg = e.data;
                     // Version mismatch — ignore sync from older/newer app versions
-                    if (msg.appVersion && msg.appVersion !== CURRENT_VERSION) {
+                    if (msg.appVersion !== CURRENT_VERSION) {
                         if (!syncVersionMismatchRef.current) {
                             syncVersionMismatchRef.current = true;
                             showToast(`Another window is running ${msg.appVersion} — please reload all windows to sync.`, 'error');
