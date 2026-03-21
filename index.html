@@ -6315,6 +6315,7 @@
             const syncTimerRef = useRef(null);
             const lastPongRef = useRef(0);
             const syncVersionRef = useRef(0);
+            const syncVersionMismatchRef = useRef(false);
             const serializeRef = useRef(null);
             const deserializeRef = useRef(null);
 
@@ -6667,7 +6668,7 @@
                     clearTimeout(syncTimerRef.current);
                     syncTimerRef.current = setTimeout(() => {
                         if (syncChannelRef.current) {
-                            syncChannelRef.current.postMessage({ type: 'state', payload: serializeState(), version: syncVersionRef.current });
+                            syncChannelRef.current.postMessage({ type: 'state', appVersion: CURRENT_VERSION, payload: serializeState(), version: syncVersionRef.current });
                         }
                     }, 200);
                 }
@@ -6681,8 +6682,16 @@
 
                 ch.onmessage = (e) => {
                     const msg = e.data;
+                    // Version mismatch — ignore sync from older/newer app versions
+                    if (msg.appVersion && msg.appVersion !== CURRENT_VERSION) {
+                        if (!syncVersionMismatchRef.current) {
+                            syncVersionMismatchRef.current = true;
+                            showToast(`Another window is running ${msg.appVersion} — please reload all windows to sync.`, 'error');
+                        }
+                        return;
+                    }
                     if (msg.type === 'ping') {
-                        ch.postMessage({ type: 'pong', payload: serializeRef.current() });
+                        ch.postMessage({ type: 'pong', appVersion: CURRENT_VERSION, payload: serializeRef.current() });
                     } else if (msg.type === 'pong') {
                         lastPongRef.current = Date.now();
                         setSyncConnected(true);
@@ -6702,11 +6711,11 @@
                 };
 
                 // Initial ping to discover existing peers
-                ch.postMessage({ type: 'ping' });
+                ch.postMessage({ type: 'ping', appVersion: CURRENT_VERSION });
 
                 // Heartbeat: ping every 5s, disconnect if no pong in 10s
                 const heartbeat = setInterval(() => {
-                    ch.postMessage({ type: 'ping' });
+                    ch.postMessage({ type: 'ping', appVersion: CURRENT_VERSION });
                     if (lastPongRef.current > 0 && Date.now() - lastPongRef.current > 10000) {
                         setSyncConnected(false);
                         lastPongRef.current = 0;
