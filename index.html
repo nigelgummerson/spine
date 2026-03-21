@@ -6151,7 +6151,10 @@
         const App = () => {
             const [selectedTool, setSelectedTool] = useState('implant');
             const [lastUsedScrewType, setLastUsedScrewType] = useState('polyaxial');
-            const [activeChart, setActiveChart] = useState('planned'); 
+            const [activeChart, setActiveChart] = useState(() => {
+                const savedTab = localStorage.getItem('spine_planner_tab');
+                return savedTab === '2' ? 'completed' : 'planned';
+            }); 
             const [plannedPlacements, setPlannedPlacements] = useState([]);
             const [completedPlacements, setCompletedPlacements] = useState([]);
             const [plannedCages, setPlannedCages] = useState([]);
@@ -6228,9 +6231,14 @@
             const isSmallScreen = useMemo(() => Math.min(window.screen.width, window.screen.height) < 600, []);
             const isViewOnly = isPortrait && isSmallScreen;
             const [portraitExporting, setPortraitExporting] = useState(false);
-            const [portraitTab, setPortraitTab] = useState(0); // 0=Demographics, 1=Plan, 2=Construct
+            const [portraitTab, setPortraitTab] = useState(() => {
+                const saved = localStorage.getItem('spine_planner_tab');
+                const n = saved ? parseInt(saved, 10) : 0;
+                return (n >= 0 && n <= 2) ? n : 0;
+            });
             const switchPortraitTab = useCallback((tab) => {
                 setPortraitTab(tab);
+                localStorage.setItem('spine_planner_tab', String(tab));
                 if (tab === 1) setActiveChart('planned');
                 else if (tab === 2) setActiveChart('completed');
             }, []);
