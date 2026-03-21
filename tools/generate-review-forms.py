@@ -2,11 +2,15 @@
 """
 Generate per-language HTML review forms from the TRANSLATIONS object in index.html.
 
+Each form has two parts:
+  1. Translation Review — verify/correct every translated string
+  2. Bug Reports — report any technical issues found while testing
+
 Usage:
     python tools/generate-review-forms.py
 
 Outputs:
-    review-forms/{lang}-review.html  (one per non-English language)
+    review-forms/{lang}/{lang}-review.html  (one per non-English language)
 """
 
 import json
@@ -58,22 +62,32 @@ SECTIONS = [
     (
         "App Header & Sidebar",
         "These strings appear in the left sidebar (landscape) or top toolbar (portrait/tablet mode). "
-        "Open the app and look at the sidebar to see the language selector, region view buttons, "
-        "editing toggle, action buttons, and theme label.",
+        "The sidebar contains: language selector, region view buttons (Cervical, Thoracolumbar, Lumbar, "
+        "Whole Spine), Plan/Construct editing toggle, tool palette (Implants, Annotations, Tools), "
+        "action buttons (Copy Plan, Confirm Plan, Load, Save, JPG, PDF, Help, New Patient), "
+        "session privacy toggle, and theme colour swatches. In portrait mode, the sidebar becomes "
+        "a compact horizontal toolbar with Demographics/Plan/Construct tabs.",
         ["sidebar.", "portrait."],
     ),
     (
         "Patient Demographics",
-        "The left column of the main view. Fill in patient details to see all fields. "
-        "The Bone Graft section is below the rod fields — tick checkboxes to see each option label.",
+        "The left column of the main view. Fill in patient details to see all fields: "
+        "Patient Name, Patient ID, Surgeon, Date, Implant Supplier (dropdown of 16 manufacturers "
+        "plus 'Other'), Screw System, Rod fields (left/right for both Plan and Construct), "
+        "and Bone Graft section with checkboxes (Local Bone, Autograft, Allograft, Synthetics) "
+        "plus a free-text notes field. The rod placeholder text shows example measurements.",
         ["patient.", "clinical.bone_graft."],
     ),
     (
         "Implant Modal — Screws, Hooks & Bands",
-        "Click any pedicle marker (small circle) on the spine diagram to open this modal. "
-        "It has three sections: SCREWS (top, with Monoaxial/Polyaxial/Uniplanar buttons), "
-        "HOOKS (middle, with 5 hook types), and BANDS & OTHERS (bottom, with Band/Wire/Cable). "
-        "Select each type to see all its labels, sizing modes, annotation field, and description field.",
+        "Click any pedicle marker (small circle on either side of a vertebra) to open this modal. "
+        "It has a three-tier visual hierarchy: SCREWS (top, with Monoaxial/Polyaxial/Uniplanar buttons), "
+        "HOOKS (middle, with 5 hook types: Pedicle, TP Down, TP Up, Supra-laminar, Infra-laminar), "
+        "and BANDS & OTHERS (bottom, with Band/Wire/Cable). "
+        "Screws offer three sizing modes: Standard (dropdown), Custom (free text), and No Size. "
+        "Screws and hooks have an Annotation field (e.g. fenestrated, cortical, revision). "
+        "Bands/wires/cables have a free-text Description field. "
+        "Clicking an occupied zone opens the edit modal (not a duplicate).",
         ["modal.screw.", "clinical.screw.", "clinical.hook.", "clinical.fixation."],
     ),
     (
@@ -82,71 +96,108 @@ SECTIONS = [
         "Cage types are grouped by surgical approach: Posterior (PLIF, TLIF), Anterior (ACDF, ALIF), "
         "Lateral (XLIF/LLIF, OLIF). Important: ALIF only appears at L4-S1 disc spaces; ACDF only "
         "at cervical levels (C2-C7). Switch the Region View to 'Cervical' or 'Lumbar' to access all types. "
-        "Each cage type shows Side, Height, Lordosis, Length, and Width fields.",
+        "Each cage type shows Side (Left/Right/Bilateral/Midline), Height, Lordosis, Length, and Width fields. "
+        "At disc levels that support osteotomies (Schwab 1-2), a picker offers Interbody Cage or Osteotomy.",
         ["modal.cage.", "clinical.cage.", "clinical.approach."],
     ),
     (
         "Osteotomy Modal",
-        "Select the Osteotomy tool from the sidebar tool palette, then click a vertebral level. "
+        "Schwab 1-2 (Facet, Ponte) are placed at the disc level — click between vertebrae. "
+        "Schwab 3+ (PSO, VCR, etc.) are placed on the vertebral body — click midline. "
         "The dropdown shows two groups: Posterior (Schwab Grades 1-6: Facet release, Ponte, "
         "Standard PSO, Extended PSO, VCR, Multi-level VCR) and Anterior (Corpectomy). "
         "Each osteotomy type has a label, Schwab grade, and description. "
-        "VCR, Multi-level VCR, and Corpectomy also show a Reconstruction Cage text field.",
+        "VCR, Multi-level VCR, and Corpectomy also show a Reconstruction Cage text field. "
+        "Correction angle is optional — defaults to empty with placeholder hints showing typical values. "
+        "Osteotomies render as amber-coloured markers (red is reserved for destructive actions).",
         ["modal.osteotomy.", "clinical.osteotomy."],
     ),
     (
         "Force Modal",
         "Click the left or right edge zone of a vertebral level to open the Force modal. "
         "Six force/correction types are shown as clickable buttons: Translate Left, Translate Right, "
-        "Compression, Distraction, Derotate CW, Derotate CCW.",
+        "Compression, Distraction, Derotate CW, Derotate CCW. "
+        "Forces use blue colour scheme (biomechanics convention for corrective vectors). "
+        "Forces can only be placed on the Plan — on the Construct tab they appear read-only. "
+        "Force zones always open the ForceModal regardless of which tool is selected.",
         ["modal.force.", "clinical.force."],
     ),
     (
         "Note Modal",
         "Select the Note tool from the sidebar, then click anywhere on the spine diagram. "
         "The modal shows preset chips (last visible rib, end-vertebra, apex, transitional level, "
-        "stable vertebra, neutral vertebra), a free-text field, and a 'Show arrow' checkbox.",
+        "stable vertebra, neutral vertebra), a free-text field, and a 'Show arrow' checkbox. "
+        "Preset labels use sentence case.",
         ["modal.note.", "clinical.note."],
     ),
     (
         "Tool Palette Labels",
         "These are the labels on tool buttons in the sidebar (landscape) or horizontal toolbar (portrait). "
-        "They include screw types, hook types, fixation types, annotations (crosslink, unstable, "
-        "osteotomy, corpectomy), forces, and the note tool.",
+        "They include screw types (Monoaxial, Polyaxial, Uniplanar), hook types (Pedicle, TP Hook, "
+        "TP Hook Up, Supra-laminar, Infra-laminar), fixation (Band, Wire, Cable), annotations "
+        "(Crosslink, Unstable, Osteotomy, Corpectomy), forces (Trans Left/Right, Compress, Distract, "
+        "Derotate), and the Note tool.",
         ["tool."],
     ),
     (
         "Inventory Panel",
         "The inventory summary appears below each spine diagram in the Plan and Construct columns. "
         "Add implants, cages, and osteotomies to the diagram to see the inventory category headers "
-        "and item labels. The Rods section appears at the bottom.",
+        "and item labels. The Rods section appears at the bottom. "
+        "Demographics panel shows Plan inventory by default with a 'View Final' / 'View Plan' toggle. "
+        "Rod left/right use 'L:' and 'R:' prefixes. Cage inventory items are labelled by type "
+        "(TLIF Cage, PLIF Cage, ACDF Cage, etc.).",
         ["inventory."],
+    ),
+    (
+        "Chart Headers & Diagram Labels",
+        "The column headers on each spine chart: Left, Right, and Force. "
+        "'Forces — edit in Plan' appears as a hint on the Construct chart (in portrait mode and "
+        "in the export) indicating that forces are read-only on the Construct side. "
+        "The cervical cage hint and corpectomy label appear on the diagram itself. "
+        "Region view short label ('All') appears in compact contexts.",
+        ["chart."],
+    ),
+    (
+        "Linked Screens (Sync)",
+        "Open the app in two windows of the same browser on a dual-screen setup. "
+        "Changes sync automatically via BroadcastChannel — one screen can show the Plan while "
+        "the other shows Demographics with live inventory. A green link icon in the sidebar "
+        "indicates active sync. These strings are the tooltip text for the sync status indicator.",
+        ["sync."],
     ),
     (
         "Export & Column Headers",
         "These appear at the top of the exported PDF/JPG image. The three columns are: "
-        "patient info (left), Plan (middle), and Final Surgical Construct (right).",
+        "patient info (left), Plan (middle), and Final Surgical Construct (right). "
+        "An export picker lets you choose Plan or Final Record before JPG/PDF export. "
+        "Export timestamp appears in the footer.",
         ["export."],
     ),
     (
         "Help Modal",
         "Click the Help button (? icon) in the sidebar Actions section. The help modal has "
-        "multiple sections, each with a title and body text. Bodies may contain HTML markup — "
-        "please preserve any HTML tags (<b>, <br>, <ul>, <li>, etc.) and only translate the text content.",
+        "multiple sections: Session Privacy, Screws & Hooks, Interbody Cages, Osteotomies, "
+        "Confirm Plan, Portrait & Tablet Mode, Save/Load/Export, Linked Screens, and Keyboard Shortcuts. "
+        "Bodies may contain HTML markup — please preserve any HTML tags "
+        "(<strong>, <br>, <ul>, <li>, etc.) and only translate the text content. "
+        "The help modal uses a two-column layout in landscape and closes with Escape.",
         ["help."],
     ),
     (
         "Common Buttons & Shortcuts",
         "These appear at the bottom of every modal dialog. The four buttons are: Confirm (green), "
         "Cancel (grey), Remove (red, only in edit mode), and Close (help/changelog modals). "
-        "Shortcut tooltips appear on hover.",
+        "Shortcut tooltips appear on hover. The New Patient action uses a custom confirmation modal "
+        "(not a browser dialog).",
         ["button.", "shortcut."],
     ),
     (
         "Alerts & Confirmations",
-        "These appear as browser alert/confirm pop-up dialogs during specific actions: "
+        "These appear as toast notifications or custom modals during specific actions: "
         "loading invalid files, starting a new patient, copying plan to construct, "
-        "and cage permissibility warnings. Some contain {placeholder} replacements — "
+        "and cage permissibility warnings. Info toasts auto-dismiss; error toasts persist. "
+        "Some contain {placeholder} replacements — "
         "keep the {braces} intact and only translate the surrounding text.",
         ["alert."],
     ),
@@ -160,7 +211,7 @@ SECTIONS = [
     (
         "Version History Modal",
         "The Version History / Changelog modal title. Opened from the version number link "
-        "in the Help modal footer.",
+        "in the Help modal footer. Changelog uses date-based entries.",
         ["modal.changelog."],
     ),
 ]
@@ -422,6 +473,7 @@ def generate_html(lang: str, translations: dict) -> str:
     total_keys = sum(len(keys) for _, _, keys in sections)
     nav_html = "\n            ".join(nav_items)
     sections_html = "\n".join(section_blocks)
+    bug_section_idx = len(sections)  # index for the bug reports "section"
 
     return f'''<!DOCTYPE html>
 <html lang="{lang}">
@@ -544,6 +596,31 @@ def generate_html(lang: str, translations: dict) -> str:
         .filter-btn:hover {{ background: #f0f0f0; }}
         .filter-btn.active {{ background: #1a1a2e; color: white; border-color: #1a1a2e; }}
 
+        /* Bug reports */
+        .bug-title {{ color: #b45309; }}
+        .add-bug-btn {{ background: white; border: 2px dashed #d1d5db; border-radius: 8px; padding: 12px 20px;
+                        width: 100%; cursor: pointer; font-size: 14px; color: #666; margin-top: 8px; }}
+        .add-bug-btn:hover {{ border-color: #b45309; color: #b45309; background: #fffbeb; }}
+        .bug-report {{ background: white; border: 1px solid #e0e0e0; border-left: 4px solid #f59e0b;
+                       border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }}
+        .bug-header {{ display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }}
+        .bug-number {{ font-weight: 600; font-size: 13px; color: #b45309; white-space: nowrap; }}
+        .bug-severity {{ font-size: 13px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;
+                         background: white; flex: 1; max-width: 280px; }}
+        .bug-severity:focus {{ outline: none; border-color: #b45309; }}
+        .bug-remove-btn {{ background: none; border: none; font-size: 20px; color: #ccc; cursor: pointer;
+                           padding: 0 4px; line-height: 1; margin-left: auto; }}
+        .bug-remove-btn:hover {{ color: #e76f51; }}
+        .bug-grid {{ display: grid; grid-template-columns: 1fr; gap: 10px; }}
+        .bug-grid label {{ font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+                           color: #888; display: block; margin-bottom: 3px; }}
+        .bug-grid input, .bug-grid textarea {{ font-size: 14px; width: 100%; padding: 8px; border: 1px solid #ddd;
+                                               border-radius: 4px; font-family: inherit; }}
+        .bug-grid input:focus, .bug-grid textarea:focus {{ outline: none; border-color: #b45309;
+                                                           box-shadow: 0 0 0 2px rgba(180,83,9,0.15); }}
+        .bug-grid textarea {{ resize: vertical; min-height: 60px; }}
+        .nav-link-bugs {{ color: #b45309 !important; font-weight: 500; }}
+
         /* Responsive */
         @media (max-width: 900px) {{
             .nav {{ display: none; }}
@@ -578,6 +655,8 @@ def generate_html(lang: str, translations: dict) -> str:
             <div class="nav-divider"></div>
             <div class="nav-sections">
                 {nav_html}
+                <div class="nav-divider"></div>
+                <a href="#section-bugs" class="nav-link nav-link-bugs" data-section="bugs">Bug Reports <span class="nav-count" id="nav-count-bugs">0</span></a>
             </div>
         </nav>
         <main class="content">
@@ -621,6 +700,42 @@ def generate_html(lang: str, translations: dict) -> str:
                 <button class="filter-btn" data-filter="corrected" onclick="setFilter('corrected')">Corrected</button>
             </div>
             {sections_html}
+
+            <div class="section" id="section-bugs">
+                <h2 class="section-title bug-title">Bug Reports</h2>
+                <div class="section-guidance">
+                    If you notice any technical problems while testing the app in {escape(native_name)}, please report them here.
+                    This could include: layout issues (text overflow, truncation, overlapping elements), broken buttons or interactions,
+                    display problems on specific screen sizes or orientations, export/PDF issues, or anything that does not work as expected.
+                    You do not need to report English-only issues here — focus on problems you see when the app is set to {escape(native_name)}.
+                </div>
+                <div id="bug-list"></div>
+                <button class="add-bug-btn" onclick="addBugReport()">+ Add Bug Report</button>
+                <template id="bug-template">
+                    <div class="bug-report" data-bug-idx="">
+                        <div class="bug-header">
+                            <span class="bug-number"></span>
+                            <select class="bug-severity">
+                                <option value="">Severity...</option>
+                                <option value="minor">Minor — cosmetic / wording</option>
+                                <option value="moderate">Moderate — confusing or awkward</option>
+                                <option value="major">Major — blocks workflow or loses data</option>
+                            </select>
+                            <button class="bug-remove-btn" onclick="removeBugReport(this)" title="Remove this bug report">&times;</button>
+                        </div>
+                        <div class="bug-grid">
+                            <div>
+                                <label>Where in the app?</label>
+                                <input type="text" class="bug-location" placeholder="e.g. Osteotomy modal, Export PDF, Portrait toolbar...">
+                            </div>
+                            <div>
+                                <label>What happened?</label>
+                                <textarea class="bug-description" placeholder="Describe what you saw and what you expected to happen..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
         </main>
     </div>
 
@@ -693,6 +808,7 @@ def generate_html(lang: str, translations: dict) -> str:
                 localStorage.setItem(STORAGE_KEY, JSON.stringify({{
                     items: getState(),
                     reviewer: getReviewer(),
+                    bugs: getBugReports(),
                 }}));
             }} catch(e) {{}}
         }}
@@ -705,6 +821,7 @@ def generate_html(lang: str, translations: dict) -> str:
                 if (data.reviewer) loadReviewer(data.reviewer);
                 if (data.items) loadState(data.items);
                 else loadState(data);  // backwards compat with old format
+                if (data.bugs) loadBugReports(data.bugs);
             }} catch(e) {{}}
         }}
 
@@ -771,12 +888,14 @@ def generate_html(lang: str, translations: dict) -> str:
 
         window.exportReview = function() {{
             const state = getState();
+            const bugs = getBugReports();
             const output = {{
                 lang: LANG,
                 date: new Date().toISOString().split('T')[0],
                 app: "Spinal Instrumentation Plan & Record",
                 reviewer: getReviewer(),
                 items: state,
+                bugs: bugs.length ? bugs : undefined,
             }};
             const blob = new Blob([JSON.stringify(output, null, 2)], {{ type: 'application/json' }});
             const url = URL.createObjectURL(blob);
@@ -788,7 +907,7 @@ def generate_html(lang: str, translations: dict) -> str:
         }};
 
         window.resetReview = function() {{
-            if (!confirm('This will clear all your review progress, corrections, comments, and personal details.\\n\\nThis cannot be undone. Continue?')) return;
+            if (!confirm('This will clear all your review progress, corrections, comments, bug reports, and personal details.\\n\\nThis cannot be undone. Continue?')) return;
             localStorage.removeItem(STORAGE_KEY);
             document.querySelectorAll('.translation-field').forEach(ta => {{
                 ta.value = ta.dataset.original;
@@ -804,6 +923,9 @@ def generate_html(lang: str, translations: dict) -> str:
             document.getElementById('reviewer-institution').value = '';
             document.getElementById('reviewer-country').value = '';
             document.getElementById('reviewer-anon').checked = false;
+            document.getElementById('bug-list').innerHTML = '';
+            bugCounter = 0;
+            updateBugCount();
             updateProgress();
         }};
 
@@ -821,8 +943,14 @@ def generate_html(lang: str, translations: dict) -> str:
                     if (data.items) {{
                         if (data.reviewer) loadReviewer(data.reviewer);
                         loadState(data.items);
+                        if (data.bugs) {{
+                            document.getElementById('bug-list').innerHTML = '';
+                            bugCounter = 0;
+                            loadBugReports(data.bugs);
+                        }}
                         autoSave();
-                        alert('Review loaded: ' + Object.keys(data.items).length + ' items.');
+                        const bugMsg = data.bugs ? ', ' + data.bugs.length + ' bug reports' : '';
+                        alert('Review loaded: ' + Object.keys(data.items).length + ' items' + bugMsg + '.');
                     }} else {{
                         alert('Invalid review file — no items found.');
                     }}
@@ -834,6 +962,72 @@ def generate_html(lang: str, translations: dict) -> str:
             e.target.value = '';
         }};
 
+        // --- Bug Reports ---
+
+        let bugCounter = 0;
+
+        window.addBugReport = function() {{
+            bugCounter++;
+            const template = document.getElementById('bug-template');
+            const clone = template.content.cloneNode(true);
+            const report = clone.querySelector('.bug-report');
+            report.dataset.bugIdx = bugCounter;
+            report.querySelector('.bug-number').textContent = 'Bug #' + bugCounter;
+            document.getElementById('bug-list').appendChild(clone);
+            updateBugCount();
+            debouncedSave();
+        }};
+
+        window.removeBugReport = function(btn) {{
+            const report = btn.closest('.bug-report');
+            if (report) {{
+                report.remove();
+                updateBugCount();
+                autoSave();
+            }}
+        }};
+
+        function updateBugCount() {{
+            const count = document.querySelectorAll('.bug-report').length;
+            const el = document.getElementById('nav-count-bugs');
+            if (el) el.textContent = count || '0';
+        }}
+
+        function getBugReports() {{
+            const bugs = [];
+            document.querySelectorAll('.bug-report').forEach(report => {{
+                const severity = report.querySelector('.bug-severity').value || null;
+                const location = report.querySelector('.bug-location').value || null;
+                const description = report.querySelector('.bug-description').value || null;
+                if (location || description) {{
+                    bugs.push({{ severity, location, description }});
+                }}
+            }});
+            return bugs;
+        }}
+
+        function loadBugReports(bugs) {{
+            if (!bugs || !bugs.length) return;
+            bugs.forEach(bug => {{
+                bugCounter++;
+                const template = document.getElementById('bug-template');
+                const clone = template.content.cloneNode(true);
+                const report = clone.querySelector('.bug-report');
+                report.dataset.bugIdx = bugCounter;
+                report.querySelector('.bug-number').textContent = 'Bug #' + bugCounter;
+                if (bug.severity) report.querySelector('.bug-severity').value = bug.severity;
+                if (bug.location) report.querySelector('.bug-location').value = bug.location;
+                if (bug.description) report.querySelector('.bug-description').value = bug.description;
+                document.getElementById('bug-list').appendChild(clone);
+            }});
+            updateBugCount();
+        }}
+
+        function debouncedSave() {{
+            clearTimeout(window._saveTimer);
+            window._saveTimer = setTimeout(autoSave, 1000);
+        }}
+
         // --- Event Listeners ---
 
         document.addEventListener('change', function(e) {{
@@ -842,6 +1036,10 @@ def generate_html(lang: str, translations: dict) -> str:
                 if (item) updateItemAppearance(item);
                 updateProgress();
                 autoSave();
+            }}
+            // Bug report fields
+            if (e.target.matches('.bug-severity')) {{
+                debouncedSave();
             }}
         }});
 
@@ -856,6 +1054,10 @@ def generate_html(lang: str, translations: dict) -> str:
             if (e.target.matches('.comment-field')) {{
                 clearTimeout(window._saveTimer);
                 window._saveTimer = setTimeout(autoSave, 1000);
+            }}
+            // Bug report fields
+            if (e.target.matches('.bug-location') || e.target.matches('.bug-description')) {{
+                debouncedSave();
             }}
         }});
 

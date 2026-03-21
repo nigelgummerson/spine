@@ -3,10 +3,12 @@
 ## 1. Generate review forms
 
 ```bash
-python tools/generate-review-forms.py
+python3 tools/generate-review-forms.py
 ```
 
 Produces 13 HTML files (one per non-English language) in `review-forms/{lang}/`. Each language gets its own subdirectory with a `responses/` folder for returned JSON. Re-run this any time translations in `index.html` are updated — new keys are picked up automatically.
+
+The form includes two parts: translation review (verify/correct every string) and bug reports (report technical issues found while testing).
 
 ## 2. Send to reviewers
 
@@ -20,7 +22,7 @@ Reviewers can be spine surgeons, surgical trainees, or industry professionals (e
 
 ## 3. Await feedback
 
-Reviewers open the HTML file in any browser, work through the translations, and click **Export Review** when done. They email the exported JSON file to **nigelgummerson@mac.com**.
+Reviewers open the HTML file in any browser, work through the translations, add any bug reports, and click **Export Review** when done. They email the exported JSON file to **nigelgummerson@mac.com**.
 
 Partial reviews are fine — progress auto-saves in the browser and they can continue later.
 
@@ -28,16 +30,16 @@ Partial reviews are fine — progress auto-saves in the browser and they can con
 
 ```bash
 # Report mode — see what changed without modifying anything:
-python tools/import-reviews.py review-forms/de/responses/de-review-2026-03-21.json
+python3 tools/import-reviews.py review-forms/de/responses/de-review-2026-03-21.json
 
 # Apply corrections directly to index.html:
-python tools/import-reviews.py --apply review-forms/de/responses/de-review-2026-03-21.json
+python3 tools/import-reviews.py --apply review-forms/de/responses/de-review-2026-03-21.json
 
 # Process all returned reviews at once:
-python tools/import-reviews.py
+python3 tools/import-reviews.py
 ```
 
-The report shows reviewer details, correction counts, and writes a `review-forms/{lang}/{lang}-corrections.txt` with full before/after diffs.
+The report shows reviewer details, correction counts, and writes a `review-forms/{lang}/{lang}-corrections.txt` with full before/after diffs. Bug reports are listed separately — they require manual investigation and are not auto-applied.
 
 ## 5. Verify and regenerate
 
@@ -52,7 +54,7 @@ open tests/i18n-completeness.html
 open tests/i18n-clinical.html
 
 # Regenerate review forms with updated translations
-python tools/generate-review-forms.py
+python3 tools/generate-review-forms.py
 ```
 
 ## 6. Commit

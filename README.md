@@ -1,28 +1,32 @@
-# Leeds Spinal Planner
+# Spinal Instrumentation Plan & Record
 
-A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instrumentation diagrams with a visual, exportable chart that documents the pre-operative plan and post-operative construct.
+A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instrumentation diagrams with a visual, exportable chart that documents the pre-operative plan and post-operative construct. Runs offline on hospital computers as a single HTML file — no installation required.
 
-**Version:** v0.9.3-alpha | **License:** GNU GPLv3
+**Version:** v2.0.1-beta | **License:** GNU GPLv3
 **Live:** [nigelgummerson.github.io/spine-planner](https://nigelgummerson.github.io/spine-planner)
 
 ## Features
 
+- **14 languages:** English, German, French, Spanish, Italian, Portuguese, Swedish, Norwegian, Danish, Finnish, Dutch, Polish, Greek, Turkish — auto-detects browser locale
 - **Screws:** Monoaxial, polyaxial, uniplanar with diameter/length sizing and free-text annotations
 - **Hooks:** Pedicle, TP (down/up), supra-laminar, infra-laminar with annotations
 - **Fixation:** Bands, wires, cables with free-text descriptions
-- **Interbody cages:** ACDF, PLIF, TLIF, XLIF, OLIF, ALIF with anatomical permissibility engine
-- **Osteotomies:** Schwab grade 1-6 + Corpectomy, with reconstruction cage recording for VCR
+- **Interbody cages:** ACDF, PLIF, TLIF, XLIF/LLIF, OLIF, ALIF with anatomical permissibility engine and approach grouping
+- **Osteotomies:** Schwab grade 1–6 + Corpectomy, with disc-level vs vertebral body placement and optional correction angles
 - **Bone graft:** Multi-select types (Local Bone, Autograft, Allograft, Synthetics, DBM, BMP) with notes
 - **Deformity forces:** Translate, compress, distract, derotate — shown on the plan chart only
-- **Company/screw system:** 16 implant manufacturers with product-specific screw system suggestions
-- **Colour themes:** 7 sidebar colour schemes (inc. NHS Blue), auto-switch from selected implant company
-- **Four views:** Cervical (Oc-T4), Thoracic (T1-Pelvis), Lumbar (T10-Pelvis), Whole Spine
+- **Company/screw system:** 16 implant manufacturers, 90+ screw systems, searchable dropdown
+- **10 colour themes:** 6 light (including 5 corporate-branded) + 4 dark; auto-switch from selected implant company
+- **Four views:** Cervical (Oc–T4), Thoracolumbar (T1–Pelvis), Lumbar (T10–Pelvis), Whole Spine
 - **Dual chart:** Pre-operative Plan and Final Surgical Construct side by side, with copy-plan-to-construct
-- **Rod recording:** Free-text rod description fields (e.g. "5.5mm CoCr Rod") under each construct column
-- **Implant inventory:** Auto-generated two-column table from placed instruments
-- **Export:** PDF and JPG at print quality (1485x1050px landscape), filenames include patient name
-- **JSON save/load:** v3 format with plan/construct separation and full state round-trip
-- **Session Privacy Mode:** Prevents patient data being stored on the computer — for GDPR compliance on shared machines
+- **Ghost placements:** Plan data shown as confirmable ghosts on the Construct (portrait mode) — tap to review and confirm
+- **Dual-window sync:** Two browser windows on the same machine synchronise in real time for theatre dual-display setups
+- **Responsive:** Landscape (sidebar + two columns), portrait/tablet (toolbar + three tabs with swipe), view-only on phones
+- **Accessibility:** WCAG AA contrast, toast notifications, modal focus trapping, prefers-reduced-motion, enlarged touch targets
+- **Rod recording:** Free-text rod descriptions for plan and construct, auto-generated inventory
+- **Implant inventory:** Auto-generated from placed instruments with rod section
+- **Export:** JPG, PDF (print quality 1485x1050px), and JSON v4 (spinal-instrumentation schema with UUID, timestamps, schema self-description)
+- **Session Privacy Mode:** Prevents patient data being stored on the computer — for GDPR/Caldicott compliance on shared machines
 
 ## Requirements
 
@@ -32,11 +36,13 @@ A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instru
 
 ## Tech Stack
 
-React 18, Tailwind CSS, html2canvas, jsPDF — all via CDN. No build process, no npm, no installation.
+React 18, Tailwind CSS, html-to-image, jsPDF — all via CDN. No build process, no npm, no installation.
 
 ## Usage
 
 Open `index.html` in a browser, or visit the [live site](https://nigelgummerson.github.io/spine-planner).
+
+See [quick-reference.html](quick-reference.html) for a translated quick-start guide (14 languages).
 
 ## Author
 
