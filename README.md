@@ -42,7 +42,7 @@ React 18, Tailwind CSS, html-to-image, jsPDF — all via CDN. No build process, 
 
 Open `index.html` in a browser, or visit the [live site](https://nigelgummerson.github.io/spine-planner).
 
-See [quick-reference.html](quick-reference.html) for a translated quick-start guide (14 languages).
+See the [Quick Reference Guide](https://nigelgummerson.github.io/spine-planner/quick-reference.html) for a translated quick-start guide (14 languages).
 
 ## Author
 
