@@ -4,7 +4,7 @@
 A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 14 European languages.
 
 ## Current Status
-- **Version:** v1.3.0-beta
+- **Version:** v1.3.1-beta
 - **Last Updated:** 2026-03-21
 - **License:** GNU GPLv3
 
@@ -47,6 +47,7 @@ spine-surgery/planning/spine-planner/
 - All dependencies loaded via CDN for offline hospital use
 
 ## Version History (Recent)
+- **v1.3.1-beta** (2026-03-21): Expert review polish. Active chart accent border + 20% inactive overlay. Uniform vertebral body fill (#f1f5f9). Osteotomy colour red→amber (red reserved for destructive actions). Custom New Patient confirmation modal (replaces browser confirm). Export picker — choose Plan or Final Record before JPG/PDF. Export timestamp footer. Pedicle vertical position based on pedicle height. Force zones always open ForceModal regardless of tool. Note preset labels sentence case. Linked Screens help entry (14 languages). Dark theme button borders improved.
 - **v1.3.0-beta** (2026-03-21): Major design overhaul following Apple HIG review. Light sidebar with corporate brand accents — Medtronic (navy title bar, electric blue), DePuy (dark red, crimson), Stryker (black, gold), VB Spine (purple), Globus (midnight blue, red). Dark themes available for preference. Sidebar and portrait toolbar reordered by workflow frequency (tools first). Click inactive chart to switch editing side in landscape. 10px minimum font size (Inter). Help and Changelog modals: two-column landscape layout, wider, Escape to close. Changelog consolidated to date-based entries. Pedicle proportions at full anatomical scale. Theme swatch borders and tool palette icons adapt to light/dark themes.
 - **v1.2.6-beta** (2026-03-21): Design review — accessibility and UX improvements. Colour contrast fixed: placeholder text, chart headers, sidebar labels all now meet WCAG AA (4.5:1 minimum). Toast notifications replace all browser alert() dialogs — non-blocking, auto-dismiss for info, persist for errors. Modal focus trapping — Tab/Shift+Tab cycle within modal, cannot escape to background (manually managed focus with preventDefault). Portrait touch targets enlarged for tablet/gloved use (toolbar icons 28→36px, view/tool buttons, privacy indicator). prefers-reduced-motion support disables all animations. ARIA roles on all modals. Visible focus ring on editable fields. Bone graft checkboxes enlarged.
 - **v1.2.5-beta** (2026-03-21): Osteotomy placement reworked to match Schwab classification anatomy. Schwab 1-2 (Facet, Ponte) now placed at disc level — clicking between vertebrae shows a picker offering Interbody Cage or Osteotomy. Schwab 3+ (PSO, VCR, etc.) placed on the vertebral body — clicking midline always opens the osteotomy modal regardless of tool selection. Correction angle now optional — defaults to empty with placeholder hints showing typical values. Disc-level osteotomies render as labelled tags in the disc space. Ghost placement support for all osteotomy types.
