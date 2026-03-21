@@ -6314,6 +6314,7 @@
             const syncChannelRef = useRef(null);
             const syncTimerRef = useRef(null);
             const lastPongRef = useRef(0);
+            const syncVersionRef = useRef(0);
             const serializeRef = useRef(null);
             const deserializeRef = useRef(null);
 
@@ -6662,10 +6663,11 @@
                     return;
                 }
                 if (hasLoaded && syncChannelRef.current) {
+                    syncVersionRef.current++;
                     clearTimeout(syncTimerRef.current);
                     syncTimerRef.current = setTimeout(() => {
                         if (syncChannelRef.current) {
-                            syncChannelRef.current.postMessage({ type: 'state', payload: serializeState() });
+                            syncChannelRef.current.postMessage({ type: 'state', payload: serializeState(), version: syncVersionRef.current });
                         }
                     }, 200);
                 }
@@ -6685,11 +6687,14 @@
                         lastPongRef.current = Date.now();
                         setSyncConnected(true);
                         if (msg.payload) {
+                            clearTimeout(syncTimerRef.current);
                             receivingSync.current = true;
                             deserializeRef.current(msg.payload);
                         }
                     } else if (msg.type === 'state') {
                         if (msg.payload) {
+                            // Cancel any pending outbound sync — the incoming state supersedes it
+                            clearTimeout(syncTimerRef.current);
                             receivingSync.current = true;
                             deserializeRef.current(msg.payload);
                         }
@@ -6960,7 +6965,12 @@
             const addPlacement = (levelId, zone, tool, data, annotation) => {
                 const newP = { id: genId(), levelId, zone, tool, data, annotation: annotation || '' };
                 const setter = activeChart === 'planned' ? setPlannedPlacements : setCompletedPlacements;
-                setter(prev => [...prev, newP]);
+                // One implant per left/right zone — use functional update to check latest state
+                if (zone === 'left' || zone === 'right') {
+                    setter(prev => prev.some(p => p.levelId === levelId && p.zone === zone) ? prev : [...prev, newP]);
+                } else {
+                    setter(prev => [...prev, newP]);
+                }
             };
             const updatePlacement = (id, tool, data, annotation) => {
                 const updater = (prev) => prev.map(p =>
