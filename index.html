@@ -6167,6 +6167,30 @@
                 else { removePlacement(p.id); }
             };
 
+            const handleGhostClick = (ghost) => {
+                // Ensure we're editing construct side
+                setActiveChart('completed');
+
+                const tool = allTools.find(item => item.id === ghost.tool);
+                const isHookType = NO_SIZE_TYPES.includes(ghost.tool);
+
+                if (tool.needsSize || isHookType) {
+                    // Screws, hooks, fixation — open ScrewModal pre-filled
+                    setPendingPlacement({ levelId: ghost.levelId, zone: ghost.zone, tool: ghost.tool });
+                    setEditingPlacementId(null);
+                    setEditingData(ghost.data);
+                    setEditingTool(ghost.tool);
+                    setEditingAnnotation(ghost.annotation || '');
+                    setScrewModalOpen(true);
+                } else if (tool.isOsteotomy) {
+                    // Osteotomies — open OsteotomyModal pre-filled
+                    setPendingPlacement({ levelId: ghost.levelId, zone: ghost.zone, tool: ghost.tool });
+                    setEditingPlacementId(null);
+                    setEditingData(ghost.data);
+                    setOsteoModalOpen(true);
+                }
+            };
+
             const handleScrewConfirm = (sizeData, components, finalType, annotation) => {
                 if (components) { setDefaultDiameter(components.diameter); setDefaultLength(components.length); setDefaultScrewMode(components.mode); setDefaultCustomText(components.customText || ''); }
                 setLastUsedScrewType(finalType);
