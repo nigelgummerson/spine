@@ -6171,6 +6171,7 @@
             const [editingNote, setEditingNote] = useState(null); // full note object when editing
             
             const [confirmNewPatient, setConfirmNewPatient] = useState(false);
+            const [exportPicker, setExportPicker] = useState(null); // 'jpg' or 'pdf'
 
             // TOAST NOTIFICATIONS
             const [toasts, setToasts] = useState([]);
@@ -6757,6 +6758,16 @@
                 });
                 return canvas;
             };
+            const promptExportJPG = () => setExportPicker('jpg');
+            const promptExportPDF = () => setExportPicker('pdf');
+            const runExportWithChoice = async (format, useFinal) => {
+                setExportPicker(null);
+                setActiveChart(useFinal ? 'completed' : 'planned');
+                setShowFinalInventory(useFinal);
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                if (format === 'jpg') await runExportJPG();
+                else await runExportPDF();
+            };
             const runExportJPG = async () => {
                 const canvas = await prepareExportCanvas();
                 const link = document.createElement('a');
@@ -6908,6 +6919,15 @@
                     <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
                     <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
                     <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
+                    {exportPicker && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" onClick={() => setExportPicker(null)}>
+                        <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
+                            <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold uppercase tracking-wider text-center">{exportPicker.toUpperCase()}</div>
+                            <div className="p-3 flex flex-col gap-2">
+                                <button onClick={() => runExportWithChoice(exportPicker, false)} className="w-full px-4 py-3 rounded text-sm font-bold border transition-colors hover:brightness-95" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{t('export.plan')}</button>
+                                <button onClick={() => runExportWithChoice(exportPicker, true)} className="w-full px-4 py-3 rounded text-sm font-bold text-white bg-slate-800 hover:bg-slate-700">{t('export.construct')}</button>
+                            </div>
+                        </div>
+                    </div>}
                     {confirmNewPatient && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" onClick={() => setConfirmNewPatient(false)}>
                         <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
                             <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold">{t('sidebar.new_patient')}</div>
@@ -6979,8 +6999,8 @@
                                 <div className="flex items-center gap-0">
                                     <button onClick={() => fileInputRef.current.click()} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.load')}><IconUpload /></button>
                                     <button onClick={saveProjectJSON} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.save')}><IconSave /></button>
-                                    <button onClick={runExportJPG} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.jpg')}><IconImage /></button>
-                                    <button onClick={runExportPDF} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.pdf')}><IconPDF /></button>
+                                    <button onClick={promptExportJPG} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.jpg')}><IconImage /></button>
+                                    <button onClick={promptExportPDF} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.pdf')}><IconPDF /></button>
                                     <button onClick={() => setHelpModalOpen(true)} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.help')}><IconHelp /></button>
                                     <div className="p-2.5 rounded" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? 'Linked to another window' : 'No other window detected'}><IconLink />{syncConnected && <span className="inline-block ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
                                 </div>
@@ -7138,8 +7158,8 @@
                                 <div className="grid grid-cols-2 gap-1">
                                     <button onClick={() => fileInputRef.current.click()} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconUpload /> {t('sidebar.load')}</button>
                                     <button onClick={saveProjectJSON} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconSave /> {t('sidebar.save')}</button>
-                                    <button onClick={runExportJPG} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconImage /> {t('sidebar.jpg')}</button>
-                                    <button onClick={runExportPDF} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconPDF /> {t('sidebar.pdf')}</button>
+                                    <button onClick={promptExportJPG} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconImage /> {t('sidebar.jpg')}</button>
+                                    <button onClick={promptExportPDF} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconPDF /> {t('sidebar.pdf')}</button>
                                 </div>
                             </div>
 
