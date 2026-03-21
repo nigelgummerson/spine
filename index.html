@@ -366,6 +366,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Plan Inventory',
                 'inventory.title_construct': 'Construct Inventory',
+                'inventory.view_final': 'View Final',
+                'inventory.view_plan': 'View Plan',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Screws',
@@ -663,6 +665,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Plan-Inventar',
                 'inventory.title_construct': 'Konstrukt-Inventar',
+                'inventory.view_final': 'Endgültig',
+                'inventory.view_plan': 'Plan',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Schrauben',
@@ -960,6 +964,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Inventaire du plan',
                 'inventory.title_construct': 'Inventaire du montage',
+                'inventory.view_final': 'Voir final',
+                'inventory.view_plan': 'Voir plan',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Vis',
@@ -1257,6 +1263,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Inventario del plan',
                 'inventory.title_construct': 'Inventario del montaje',
+                'inventory.view_final': 'Ver final',
+                'inventory.view_plan': 'Ver plan',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Tornillos',
@@ -1554,6 +1562,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Inventario del piano',
                 'inventory.title_construct': 'Inventario del costrutto',
+                'inventory.view_final': 'Vedi finale',
+                'inventory.view_plan': 'Vedi piano',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Viti',
@@ -1851,6 +1861,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Inventário do plano',
                 'inventory.title_construct': 'Inventário da montagem',
+                'inventory.view_final': 'Ver final',
+                'inventory.view_plan': 'Ver plano',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Parafusos',
@@ -2148,6 +2160,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Planinventering',
                 'inventory.title_construct': 'Konstruktionsinventering',
+                'inventory.view_final': 'Visa slutlig',
+                'inventory.view_plan': 'Visa plan',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Skruvar',
@@ -2445,6 +2459,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Planinventar',
                 'inventory.title_construct': 'Konstruksjonsinventar',
+                'inventory.view_final': 'Vis endelig',
+                'inventory.view_plan': 'Vis plan',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Skruer',
@@ -2742,6 +2758,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Planinventar',
                 'inventory.title_construct': 'Konstruktionsinventar',
+                'inventory.view_final': 'Vis endelig',
+                'inventory.view_plan': 'Vis plan',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Skruer',
@@ -3039,6 +3057,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Suunn. inventaario',
                 'inventory.title_construct': 'Rak. inventaario',
+                'inventory.view_final': 'Näytä lopullinen',
+                'inventory.view_plan': 'Näytä suunn.',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Ruuvit',
@@ -3336,6 +3356,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Planinventaris',
                 'inventory.title_construct': 'Constructinventaris',
+                'inventory.view_final': 'Bekijk definitief',
+                'inventory.view_plan': 'Bekijk plan',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Schroeven',
@@ -3633,6 +3655,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Inwentarz planu',
                 'inventory.title_construct': 'Inwentarz konstrukcji',
+                'inventory.view_final': 'Pokaż końcowy',
+                'inventory.view_plan': 'Pokaż plan',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Śruby',
@@ -3930,6 +3954,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Απογραφή σχεδίου',
                 'inventory.title_construct': 'Απογραφή κατασκευής',
+                'inventory.view_final': 'Τελικό',
+                'inventory.view_plan': 'Σχέδιο',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Κοχλίες',
@@ -4227,6 +4253,8 @@
                 // --- Inventory titles ---
                 'inventory.title_plan': 'Plan envanteri',
                 'inventory.title_construct': 'Yapı envanteri',
+                'inventory.view_final': 'Son hali',
+                'inventory.view_plan': 'Plan',
 
                 // --- Inventory categories ---
                 'inventory.screws': 'Vidalar',
@@ -6168,6 +6196,7 @@
                 return (stored && COLOUR_SCHEMES.some(s => s.id === stored)) ? stored : 'default';
             });
             const [themeOpen, setThemeOpen] = useState(false);
+            const [showFinalInventory, setShowFinalInventory] = useState(false);
             const [currentLang, setCurrentLang] = useState(detectLanguage());
 
             const changeLang = (code) => {
@@ -6504,8 +6533,15 @@
                     return;
                 }
 
-                // Left/right zones → always open ScrewModal with last-used type
+                // Left/right zones — one implant per zone
                 if (zone === 'left' || zone === 'right') {
+                    const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
+                    const existing = currentPlacements.find(p => p.levelId === levelId && p.zone === zone);
+                    if (existing) {
+                        // Zone occupied → edit existing implant
+                        handlePlacementClick(existing);
+                        return;
+                    }
                     setPendingPlacement({ levelId, zone, tool: lastUsedScrewType });
                     setEditingPlacementId(null);
                     setEditingData(undefined);
@@ -6849,8 +6885,8 @@
                             </div>
                             <div className="editable-field w-full text-[10px] mt-1" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, boneGraft: { ...(patientData.boneGraft || {}), notes: e.target.innerText }})} placeholder={t('patient.bone_graft_notes_placeholder')}>{patientData.boneGraft?.notes || ''}</div>
                         </div>
-                        <ImplantInventory placements={[...plannedPlacements, ...plannedCages.map(c => ({...c, tool: c.tool})), ...plannedConnectors.map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid'}))]} tools={[...allTools, {id: 'tlif', labelKey: 'inventory.cage.tlif'}, {id: 'plif', labelKey: 'inventory.cage.plif'}, {id: 'acdf', labelKey: 'inventory.cage.acdf'}, {id: 'xlif', labelKey: 'inventory.cage.xlif'}, {id: 'olif', labelKey: 'inventory.cage.olif'}, {id: 'alif', labelKey: 'inventory.cage.alif'}]} title={t('inventory.title_plan')} visibleLevelIds={levels.map(l => l.id)} levels={levels} rods={{ left: patientData.planLeftRod, right: patientData.planRightRod }} />
-                        <ImplantInventory placements={[...completedPlacements, ...completedCages.map(c => ({...c, tool: c.tool})), ...completedConnectors.map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid'}))]} tools={[...allTools, {id: 'tlif', labelKey: 'inventory.cage.tlif'}, {id: 'plif', labelKey: 'inventory.cage.plif'}, {id: 'acdf', labelKey: 'inventory.cage.acdf'}, {id: 'xlif', labelKey: 'inventory.cage.xlif'}, {id: 'olif', labelKey: 'inventory.cage.olif'}, {id: 'alif', labelKey: 'inventory.cage.alif'}]} title={t('inventory.title_construct')} visibleLevelIds={levels.map(l => l.id)} levels={levels} rods={{ left: patientData.leftRod, right: patientData.rightRod }} />
+                        <ImplantInventory placements={[...(showFinalInventory ? completedPlacements : plannedPlacements), ...(showFinalInventory ? completedCages : plannedCages).map(c => ({...c, tool: c.tool})), ...(showFinalInventory ? completedConnectors : plannedConnectors).map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid'}))]} tools={[...allTools, {id: 'tlif', labelKey: 'inventory.cage.tlif'}, {id: 'plif', labelKey: 'inventory.cage.plif'}, {id: 'acdf', labelKey: 'inventory.cage.acdf'}, {id: 'xlif', labelKey: 'inventory.cage.xlif'}, {id: 'olif', labelKey: 'inventory.cage.olif'}, {id: 'alif', labelKey: 'inventory.cage.alif'}]} title={showFinalInventory ? t('inventory.title_construct') : t('inventory.title_plan')} visibleLevelIds={levels.map(l => l.id)} levels={levels} rods={showFinalInventory ? { left: patientData.leftRod, right: patientData.rightRod } : { left: patientData.planLeftRod, right: patientData.planRightRod }} />
+                        <button onClick={() => setShowFinalInventory(!showFinalInventory)} className="mt-1 w-full text-[9px] font-bold text-slate-400 hover:text-slate-600 uppercase tracking-wider py-1 border border-slate-200 rounded hover:bg-slate-50 transition-colors">{showFinalInventory ? t('inventory.view_plan') : t('inventory.view_final')}</button>
                     </div>
                     <CreditsFooter lang={currentLang} />
                 </React.Fragment>
