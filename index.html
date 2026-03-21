@@ -6855,7 +6855,8 @@
                     pixelRatio: 2,
                     backgroundColor: '#ffffff',
                     width: 1485,
-                    height: 1050
+                    height: 1050,
+                    filter: (node) => !node.dataset?.exportHide
                 });
                 return canvas;
             };
@@ -7299,8 +7300,14 @@
                             <div style={{ transform: `scale(${scale})` }}>
                                 <div id="export-container" ref={exportRef}>
                                     <div className="w-[370px] bg-white border-r border-slate-300 flex flex-col p-8">{demographicsContent}</div>
-                                    <div className="flex-[4] flex flex-col h-full">{planChart}</div>
-                                    <div className="flex-[3] flex flex-col h-full">{constructChart}</div>
+                                    <div className="flex-[4] flex flex-col h-full relative" onClick={() => activeChart !== 'planned' && setActiveChart('planned')}>
+                                        {planChart}
+                                        {activeChart !== 'planned' && !isPortrait && <div className="absolute inset-0 bg-slate-400/10 cursor-pointer z-20" data-export-hide="true" />}
+                                    </div>
+                                    <div className="flex-[3] flex flex-col h-full relative" onClick={() => activeChart !== 'completed' && setActiveChart('completed')}>
+                                        {constructChart}
+                                        {activeChart !== 'completed' && !isPortrait && <div className="absolute inset-0 bg-slate-400/10 cursor-pointer z-20" data-export-hide="true" />}
+                                    </div>
                                 </div>
                             </div>
                         </div>
