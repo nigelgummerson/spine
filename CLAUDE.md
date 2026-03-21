@@ -17,6 +17,11 @@ spine-surgery/planning/spine-planner/
 │   ├── i18n-clinical.html        # Layer 2: clinical terminology vs glossary
 │   ├── i18n-overflow.html        # Layer 3: string length overflow detection
 │   └── translation-glossary.json # Reference clinical terms with sources
+├── tools/
+│   ├── generate-review-forms.py    # Generates per-language HTML review forms
+│   ├── import-reviews.py           # Imports reviewer JSON, reports & applies corrections
+│   ├── TRANSLATION-REVIEW-GUIDE.md # Instructions for reviewers and developers
+│   └── review-forms/               # Generated HTML forms and reviewer JSON (gitignored)
 ├── alpha-notes.txt     # Development context and version notes
 ├── CLAUDE.md           # This file (Claude-specific collaboration tracking)
 ├── README.md           # GitHub README
@@ -100,7 +105,8 @@ spine-surgery/planning/spine-planner/
 - [ ] **Offline bundling:** Embed all JS libraries directly into HTML to bypass hospital firewalls
 - [ ] **User testing:** Get feedback from theatre staff on current workflow
 - [ ] **Specification sync:** SPECIFICATION.md updated to v0.9.0
-- [ ] **i18n Tier C:** Recruit native-speaking surgeons for translation review
+- [x] **i18n review tooling:** Python generator + import pipeline for native-speaker translation review
+- [ ] **i18n Tier C:** Awaiting feedback from native-speaking reviewers (surgeons & industry professionals)
 
 ## Key Constraints
 - **Must remain single .html file** - No build process, no npm, no installation
@@ -124,6 +130,14 @@ git push origin main          # Auto-deploys via GitHub Pages
 open tests/i18n-completeness.html   # Check all keys present
 open tests/i18n-clinical.html       # Check against glossary
 open tests/i18n-overflow.html       # Check string lengths
+
+# Translation review workflow
+python tools/generate-review-forms.py           # Generate HTML review forms (tools/review-forms/)
+# Email {lang}-review.html + TRANSLATION-REVIEW-GUIDE.md to reviewers
+# Reviewer exports JSON, emails to nigelgummerson@mac.com
+python tools/import-reviews.py review-file.json          # Report corrections
+python tools/import-reviews.py --apply review-file.json  # Apply corrections to index.html
+python tools/generate-review-forms.py                     # Regenerate forms with updated translations
 ```
 
 ## Related Resources
