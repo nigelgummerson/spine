@@ -4622,6 +4622,7 @@
         const IconX = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>);
         const IconPDF = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>);
         const IconHelp = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>);
+        const IconLink = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>);
         const IconHistory = () => (<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>);
         const IconCardinal = () => (<svg viewBox="0 0 24 24" className="w-5 h-5 opacity-40 hover:opacity-100 transition-opacity text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/><path d="M8 7l4-4 4 4"/><path d="M8 17l4 4 4-4"/><path d="M17 8l4 4-4 4"/><path d="M7 8l-4 4 4 4"/></svg>);
 
@@ -5988,7 +5989,7 @@
 
 
             return (
-            <div className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative"><div className="p-2 bg-slate-50 border-b border-slate-200 text-center font-bold text-sm text-slate-800 uppercase tracking-wider">{title}{forcePlacements && <div className="text-[10px] font-normal normal-case tracking-normal text-emerald-600/70 mt-0.5">{t('chart.force_plan_only')}</div>}</div><div className="flex-1 relative flex flex-col pt-8 px-2 justify-center">
+            <div className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative"><div className={`${forcePlacements ? 'py-1' : 'p-2'} px-2 bg-slate-50 border-b border-slate-200 text-center font-bold text-sm text-slate-800 uppercase tracking-wider`}>{title}{forcePlacements && <span className="text-[10px] font-normal normal-case tracking-normal text-emerald-600/70 ml-2">{t('chart.force_plan_only')}</span>}</div><div className="flex-1 relative flex flex-col pt-8 px-2 justify-center">
                 <div className="flex w-full absolute top-1 left-0 right-0 px-2 text-[11px] font-bold uppercase tracking-tighter text-center pointer-events-none z-10">
                     {showForces && <div className="w-10 text-emerald-600/50">{t('chart.header.force')}</div>}
                     <div className="flex-1 text-right pr-4 text-slate-400">{t('chart.header.left')}</div>
@@ -6183,7 +6184,12 @@
             const [incognitoMode, setIncognitoMode] = useState(false);
             const [isEditingDate, setIsEditingDate] = useState(false);
             const [hasLoaded, setHasLoaded] = useState(false);
-            
+            const [syncConnected, setSyncConnected] = useState(false);
+            const receivingSync = useRef(false);
+            const syncChannelRef = useRef(null);
+            const syncTimerRef = useRef(null);
+            const lastPongRef = useRef(0);
+
             // MODALS
             const [screwModalOpen, setScrewModalOpen] = useState(false);
             const [osteoModalOpen, setOsteoModalOpen] = useState(false);
@@ -6330,13 +6336,75 @@
                 setHasLoaded(true);
             }, []);
 
-            // AUTO-SAVE
+            // AUTO-SAVE + BROADCAST SYNC
             useEffect(() => {
                 if (hasLoaded && !incognitoMode) {
                     localStorage.setItem('spine_planner_v2', JSON.stringify(serializeState()));
                 }
                 if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+                // Broadcast to other windows (skip if this update came from sync)
+                if (receivingSync.current) {
+                    receivingSync.current = false;
+                    return;
+                }
+                if (hasLoaded && syncChannelRef.current) {
+                    clearTimeout(syncTimerRef.current);
+                    syncTimerRef.current = setTimeout(() => {
+                        if (syncChannelRef.current) {
+                            syncChannelRef.current.postMessage({ type: 'state', payload: serializeState() });
+                        }
+                    }, 200);
+                }
             }, [plannedPlacements, completedPlacements, plannedCages, completedCages, plannedConnectors, completedConnectors, plannedNotes, completedNotes, patientData, viewMode, colourScheme, hasLoaded, incognitoMode]);
+
+            // BROADCAST CHANNEL SYNC
+            useEffect(() => {
+                if (typeof BroadcastChannel === 'undefined') return;
+                const ch = new BroadcastChannel('spine-planner-sync');
+                syncChannelRef.current = ch;
+
+                ch.onmessage = (e) => {
+                    const msg = e.data;
+                    if (msg.type === 'ping') {
+                        ch.postMessage({ type: 'pong', payload: serializeState() });
+                    } else if (msg.type === 'pong') {
+                        lastPongRef.current = Date.now();
+                        setSyncConnected(true);
+                        if (hasLoaded && msg.payload) {
+                            receivingSync.current = true;
+                            deserializeState(msg.payload);
+                        }
+                    } else if (msg.type === 'state') {
+                        if (hasLoaded && msg.payload) {
+                            receivingSync.current = true;
+                            deserializeState(msg.payload);
+                        }
+                    }
+                };
+
+                // Initial ping to discover existing peers
+                ch.postMessage({ type: 'ping' });
+
+                // Heartbeat: ping every 5s, disconnect if no pong in 10s
+                const heartbeat = setInterval(() => {
+                    ch.postMessage({ type: 'ping' });
+                    if (lastPongRef.current > 0 && Date.now() - lastPongRef.current > 10000) {
+                        setSyncConnected(false);
+                        lastPongRef.current = 0;
+                    }
+                }, 5000);
+
+                const handleUnload = () => ch.postMessage({ type: 'bye' });
+                window.addEventListener('beforeunload', handleUnload);
+
+                return () => {
+                    clearInterval(heartbeat);
+                    window.removeEventListener('beforeunload', handleUnload);
+                    ch.postMessage({ type: 'bye' });
+                    ch.close();
+                    syncChannelRef.current = null;
+                };
+            }, [hasLoaded]);
 
             // RESIZE OBSERVER — portrait mode: scale active column to fit
             useEffect(() => {
