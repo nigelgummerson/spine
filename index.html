@@ -4403,17 +4403,14 @@
         const CURRENT_VERSION = "v2.0.0-beta";
 
         const CHANGE_LOG = [
-            { version: "v1.2.6-beta", date: "2026-03-21", changes: [
-                "Dual-window sync — two browser windows stay synchronised in real time via BroadcastChannel, designed for dual-display use in operating theatres.",
-                "Osteotomies placed at correct anatomical level — Schwab 1-2 (Facet, Ponte) at disc level, Schwab 3+ (PSO, VCR) on the vertebral body. Clicking disc space offers cage or osteotomy; clicking midline opens Schwab 3+ directly.",
-                "Force diagrams — blue colour scheme (biomechanics convention), optional correction angles with placeholder hints, 'Forces — edit in Plan' hint on Construct.",
-                "One implant per zone — clicking an occupied zone edits the existing implant. Click inactive chart to switch editing side.",
-                "Inventory — Plan inventory shown by default with View Final/View Plan toggle.",
-                "Chart headers (Left/Right/Force) translated in all 14 languages.",
-                "Ghost placements — plan data shown as confirmable ghosts on Construct in portrait mode.",
-                "Accessibility — WCAG contrast fixes, toast notifications (replacing browser alerts), modal focus trapping, visible focus rings, prefers-reduced-motion support, ARIA roles, enlarged touch targets.",
-                "Sidebar and toolbar reordered by workflow frequency — tools first.",
-                "Portrait tab selection persists across reloads.",
+            { version: "v2.0.0-beta", date: "2026-03-21", changes: [
+                "JSON format v4 — spinal-instrumentation schema for clinical records, research, and data exchange. Structured screw sizes, typed elements, separated forces/rods, document metadata (UUID, timestamps), barcode-ready.",
+                "Apple HIG design overhaul — light sidebar with corporate brand accents (Medtronic, DePuy, Stryker, VB Spine, Globus). Osteotomy colour amber (red reserved for destructive actions). Uniform vertebral body fill.",
+                "Dual-window sync — BroadcastChannel for theatre dual displays. Export picker (Plan or Final Record). Export timestamp footer.",
+                "Osteotomies at correct anatomical level — Schwab 1-2 at disc level, Schwab 3+ on vertebral body. Optional correction angles.",
+                "Accessibility — WCAG contrast, toast notifications, modal focus trapping, prefers-reduced-motion, ARIA roles, 10px font floor, enlarged touch targets.",
+                "Sidebar and toolbar reordered by workflow frequency. Click inactive chart to switch editing side. Help modal two-column landscape. Linked Screens help entry.",
+                "Pedicle proportions at full anatomical scale with height-based vertical positioning.",
             ]},
             { version: "v1.1.0-beta", date: "2026-03-20", changes: [
                 "Portrait/tablet mode — responsive layout detects screen orientation. Toolbar, tab-based columns, swipe gestures. View-only on phones (<600px).",
