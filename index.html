@@ -6084,7 +6084,7 @@
                                         onMouseDown={(e) => { if (!readOnly) { e.preventDefault(); dragStartRef.current = { y: e.clientY }; setDraggingId(conn.id); } }}>
                                         <InstrumentIcon type="connector" className="w-full h-full drop-shadow-md text-slate-900" />
                                         {!readOnly && <button
-                                            className="hidden group-hover:flex absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 items-center justify-center text-[8px] font-bold shadow hover:bg-red-600 z-50"
+                                            className="hidden group-hover:flex absolute -top-2.5 -right-2.5 bg-red-500 text-white rounded-full w-5 h-5 items-center justify-center text-[9px] font-bold shadow hover:bg-red-600 z-50"
                                             onClick={(e) => { e.stopPropagation(); onConnectorRemove(conn.id); }}
                                             onMouseDown={(e) => e.stopPropagation()}>x</button>}
                                     </div>
@@ -6183,7 +6183,7 @@
                                         >
                                             <span className="text-[10px] font-bold text-violet-700 bg-white/90 border border-violet-200 px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">{n.text}</span>
                                             {!readOnly && <button
-                                                className="hidden group-hover:flex absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 items-center justify-center text-[8px] font-bold shadow hover:bg-red-600 z-50"
+                                                className="hidden group-hover:flex absolute -top-2.5 -right-2.5 bg-red-500 text-white rounded-full w-5 h-5 items-center justify-center text-[9px] font-bold shadow hover:bg-red-600 z-50"
                                                 onClick={(e) => { e.stopPropagation(); onNoteRemove(n.id); }}
                                                 onMouseDown={(e) => e.stopPropagation()}>x</button>}
                                         </div>
@@ -7066,13 +7066,13 @@
                                         <option key={l.code} value={l.code} style={{color: '#1e293b'}}>{l.code.toUpperCase()}</option>
                                     ))}
                                 </select>
-                                <div className="flex items-center gap-0.5">
-                                    <button onClick={() => fileInputRef.current.click()} className="p-1.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.load')}><IconUpload /></button>
-                                    <button onClick={saveProjectJSON} className="p-1.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.save')}><IconSave /></button>
-                                    <button onClick={runExportJPG} className="p-1.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.jpg')}><IconImage /></button>
-                                    <button onClick={runExportPDF} className="p-1.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.pdf')}><IconPDF /></button>
-                                    <button onClick={() => setHelpModalOpen(true)} className="p-1.5 rounded hover:bg-white/10 text-white/40 hover:text-white" title={t('sidebar.help')}><IconHelp /></button>
-                                    <div className={`p-1.5 rounded ${syncConnected ? 'text-emerald-400' : 'text-white/20'}`} title={syncConnected ? 'Linked to another window' : 'No other window detected'}><IconLink />{syncConnected && <span className="inline-block ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
+                                <div className="flex items-center gap-0">
+                                    <button onClick={() => fileInputRef.current.click()} className="p-2.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.load')}><IconUpload /></button>
+                                    <button onClick={saveProjectJSON} className="p-2.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.save')}><IconSave /></button>
+                                    <button onClick={runExportJPG} className="p-2.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.jpg')}><IconImage /></button>
+                                    <button onClick={runExportPDF} className="p-2.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.pdf')}><IconPDF /></button>
+                                    <button onClick={() => setHelpModalOpen(true)} className="p-2.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.help')}><IconHelp /></button>
+                                    <div className={`p-2.5 rounded ${syncConnected ? 'text-emerald-400' : 'text-white/20'}`} title={syncConnected ? 'Linked to another window' : 'No other window detected'}><IconLink />{syncConnected && <span className="inline-block ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
                                 </div>
                             </div>
 
@@ -7083,7 +7083,7 @@
                                         {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
                                             const shortLabels = { cervical: 'C', thoracolumbar: 'T', t10_pelvis: 'L', whole: 'All' };
                                             const active = viewMode === vm;
-                                            return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-2 py-1 text-[9px] rounded border font-bold ${active ? '' : 'text-white/60 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>{shortLabels[vm]}</button>;
+                                            return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'text-white/60 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>{shortLabels[vm]}</button>;
                                         })}
                                     </div>
                                     <div className="flex-1 text-center text-[10px] text-white/50 italic">{t('portrait.view_only')}</div>
@@ -7094,22 +7094,22 @@
                                         {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
                                             const shortLabels = { cervical: 'C', thoracolumbar: 'T', t10_pelvis: 'L', whole: 'All' };
                                             const active = viewMode === vm;
-                                            return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-2 py-1 text-[9px] rounded border font-bold ${active ? '' : 'text-white/60 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>{shortLabels[vm]}</button>;
+                                            return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'text-white/60 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>{shortLabels[vm]}</button>;
                                         })}
                                     </div>
                                     <div className="w-px h-5 bg-white/20 mx-1"></div>
                                     <div className="flex gap-0.5 overflow-x-auto flex-1 min-w-0">
                                         {tools[0].items.map(item => {
                                             const active = selectedTool === item.id;
-                                            return <button key={item.id} onClick={() => setSelectedTool(item.id)} title={t(item.labelKey)} className={`shrink-0 px-1.5 py-1 rounded border flex items-center gap-1 text-[9px] font-bold ${active ? '' : 'text-white/70 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>
+                                            return <button key={item.id} onClick={() => setSelectedTool(item.id)} title={t(item.labelKey)} className={`shrink-0 px-2.5 py-2 rounded border flex items-center gap-1 text-[10px] font-bold ${active ? '' : 'text-white/70 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>
                                                 <InstrumentIcon type={item.icon} className="w-3 h-3" color={active ? scheme.activeText : 'white'} />
                                             </button>;
                                         })}
                                     </div>
                                     <div className="w-px h-5 bg-white/20 mx-1"></div>
-                                    <button onClick={() => { copyPlanToCompleted(); switchPortraitTab(2); }} className="flex items-center gap-1 px-2 py-1 rounded text-[9px] font-bold hover:bg-white/10 text-white/70 hover:text-white shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)' }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
-                                    <div className={`shrink-0 w-3 h-3 rounded-full cursor-pointer ${incognitoMode ? 'bg-red-500' : 'bg-white/20'}`} onClick={() => setIncognitoMode(!incognitoMode)} title={t('sidebar.session_privacy')}></div>
-                                    <button onClick={newPatientAction} className="p-1 rounded hover:bg-white/10 text-red-400 hover:text-red-200 shrink-0" title={t('sidebar.new_patient')}><IconTrash /></button>
+                                    <button onClick={() => { copyPlanToCompleted(); switchPortraitTab(2); }} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold hover:bg-white/10 text-white/70 hover:text-white shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)' }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
+                                    <div className={`shrink-0 w-5 h-5 rounded-full cursor-pointer ${incognitoMode ? 'bg-red-500' : 'bg-white/20'}`} onClick={() => setIncognitoMode(!incognitoMode)} title={t('sidebar.session_privacy')}></div>
+                                    <button onClick={newPatientAction} className="p-2.5 rounded hover:bg-white/10 text-red-400 hover:text-red-200 shrink-0" title={t('sidebar.new_patient')}><IconTrash /></button>
                                 </div>
                             )}
                         </div>
