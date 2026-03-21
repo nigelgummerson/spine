@@ -427,7 +427,7 @@
                 'help.cages.title': 'Interbody Cages',
                 'help.cages.body': 'Click the space <strong>between</strong> vertebrae to place a cage. Types are grouped by surgical approach (Posterior, Anterior, Lateral) and filtered by anatomical level.',
                 'help.osteotomies.title': 'Osteotomies',
-                'help.osteotomies.body': 'Click the <strong>vertebral body</strong> (midline) to place an osteotomy. Schwab grades 1-6 plus anterior corpectomy. VCR, ML-VCR, and Corpectomy include a reconstruction cage description field.',
+                'help.osteotomies.body': 'Schwab 1-2 (Facet, Ponte) are placed at the <strong>disc level</strong> — click the space between vertebrae. Schwab 3+ (PSO, VCR, etc.) are placed on the <strong>vertebral body</strong> — click the midline. VCR, ML-VCR, and Corpectomy include a reconstruction cage description field.',
                 'help.copy_plan.title': 'Confirm Plan',
                 'help.copy_plan.body': 'In <strong>portrait mode</strong>, planned placements appear as faint ghosts on the Construct tab. Tap any ghost to review and confirm it — the modal opens pre-filled with planned sizes and annotations. <strong>Confirm Plan</strong> accepts all remaining unconfirmed placements at once. In landscape mode, both columns are visible side by side.',
                 'help.portrait_mode.title': 'Portrait & Tablet Mode',
@@ -4988,15 +4988,15 @@
             );
         };
 
-        const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, defaultType, defaultAngle }) => {
+        const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, defaultType, defaultAngle, discLevelOnly }) => {
             if (!isOpen) return null;
             const [type, setType] = useState(defaultType || 'PSO');
             const [angle, setAngle] = useState(defaultAngle || '25');
             const [reconstructionCage, setReconstructionCage] = useState('');
 
             const OSTEOTOMY_TYPES = [
-                { id: 'Facet', labelKey: 'clinical.osteotomy.facet.label', shortLabel: 'Facet', schwabKey: 'clinical.osteotomy.facet.schwab', descKey: 'clinical.osteotomy.facet.desc', defaultAngle: '5', group: 'posterior' },
-                { id: 'Ponte', labelKey: 'clinical.osteotomy.ponte.label', shortLabel: 'Ponte', schwabKey: 'clinical.osteotomy.ponte.schwab', descKey: 'clinical.osteotomy.ponte.desc', defaultAngle: '10', group: 'posterior' },
+                { id: 'Facet', labelKey: 'clinical.osteotomy.facet.label', shortLabel: 'Facet', schwabKey: 'clinical.osteotomy.facet.schwab', descKey: 'clinical.osteotomy.facet.desc', defaultAngle: '5', group: 'posterior', discLevel: true },
+                { id: 'Ponte', labelKey: 'clinical.osteotomy.ponte.label', shortLabel: 'Ponte', schwabKey: 'clinical.osteotomy.ponte.schwab', descKey: 'clinical.osteotomy.ponte.desc', defaultAngle: '10', group: 'posterior', discLevel: true },
                 { id: 'PSO', labelKey: 'clinical.osteotomy.pso.label', shortLabel: 'PSO', schwabKey: 'clinical.osteotomy.pso.schwab', descKey: 'clinical.osteotomy.pso.desc', defaultAngle: '25', group: 'posterior' },
                 { id: 'ExtPSO', labelKey: 'clinical.osteotomy.extpso.label', shortLabel: 'Ext PSO', schwabKey: 'clinical.osteotomy.extpso.schwab', descKey: 'clinical.osteotomy.extpso.desc', defaultAngle: '35', group: 'posterior' },
                 { id: 'VCR', labelKey: 'clinical.osteotomy.vcr.label', shortLabel: 'VCR', schwabKey: 'clinical.osteotomy.vcr.schwab', descKey: 'clinical.osteotomy.vcr.desc', defaultAngle: '40', group: 'posterior' },
@@ -5004,6 +5004,11 @@
                 { id: 'Corpectomy', labelKey: 'clinical.osteotomy.corpectomy.label', shortLabel: 'Corpectomy', schwabKey: 'clinical.osteotomy.corpectomy.schwab', descKey: 'clinical.osteotomy.corpectomy.desc', defaultAngle: '0', group: 'anterior' }
             ];
 
+            const filteredTypes = discLevelOnly === true
+                ? OSTEOTOMY_TYPES.filter(ot => ot.discLevel)
+                : discLevelOnly === false
+                    ? OSTEOTOMY_TYPES.filter(ot => !ot.discLevel)
+                    : OSTEOTOMY_TYPES;
             const needsReconCage = ['VCR','ML-VCR','Corpectomy'].includes(type);
 
             useEffect(() => {
@@ -5013,8 +5018,9 @@
                         setAngle(initialData.angle);
                         setReconstructionCage(initialData.reconstructionCage || '');
                     } else {
-                        setType(defaultType || 'PSO');
-                        setAngle(defaultAngle || '25');
+                        const fallback = filteredTypes[0];
+                        setType(defaultType || fallback?.id || 'PSO');
+                        setAngle(defaultAngle || fallback?.defaultAngle || '25');
                         setReconstructionCage('');
                     }
                 }
@@ -5053,16 +5059,16 @@
                                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('modal.osteotomy.type')}</label>
                                 <select value={type} onChange={handleTypeChange}
                                     className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-red-500 outline-none">
-                                    <optgroup label={t('modal.osteotomy.optgroup_posterior')}>
-                                        {OSTEOTOMY_TYPES.filter(ot => ot.group === 'posterior').map(ot =>
+                                    {filteredTypes.some(ot => ot.group === 'posterior') && <optgroup label={t('modal.osteotomy.optgroup_posterior')}>
+                                        {filteredTypes.filter(ot => ot.group === 'posterior').map(ot =>
                                             <option key={ot.id} value={ot.id}>{t(ot.labelKey)}</option>
                                         )}
-                                    </optgroup>
-                                    <optgroup label={t('modal.osteotomy.optgroup_anterior')}>
-                                        {OSTEOTOMY_TYPES.filter(ot => ot.group === 'anterior').map(ot =>
+                                    </optgroup>}
+                                    {filteredTypes.some(ot => ot.group === 'anterior') && <optgroup label={t('modal.osteotomy.optgroup_anterior')}>
+                                        {filteredTypes.filter(ot => ot.group === 'anterior').map(ot =>
                                             <option key={ot.id} value={ot.id}>{t(ot.labelKey)}</option>
                                         )}
-                                    </optgroup>
+                                    </optgroup>}
                                 </select>
                             </div>
                             <div className="bg-red-50 border border-red-100 rounded p-3 text-xs">
@@ -5680,6 +5686,9 @@
             // Check for Cage below this level
             const cageBelow = cages.find(c => c.levelId === level.id);
             const ghostCageBelow = !cageBelow && ghostCages ? ghostCages.find(c => c.levelId === level.id) : null;
+            // Check for disc-level osteotomy (Schwab 1-2)
+            const discOsteo = placements.find(p => p.levelId === level.id && p.zone === 'disc');
+            const ghostDiscOsteo = !discOsteo && ghostPlacements ? ghostPlacements.find(p => p.levelId === level.id && p.zone === 'disc') : null;
 
             const GhostTarget = ({ type }) => {
                 if (type === 'force') return <div className="flex items-center justify-center h-full w-full"><IconCardinal /></div>;
@@ -5921,6 +5930,14 @@
                                         <svg viewBox="0 0 160 20" preserveAspectRatio="none" className="w-full h-full overflow-visible"><CageVisualization cageType={ghostCageBelow.tool} heightScale={1} levelId={level.id} /></svg>
                                         <span className="absolute font-bold text-sky-700 bg-white/80 px-0.5 rounded whitespace-nowrap z-20" style={{ left: 'calc(75% + 2em)', top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{ghostCageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {ghostCageBelow.data.height}H {ghostCageBelow.data.lordosis}°{ghostCageBelow.data.side && ghostCageBelow.data.side !== 'bilateral' && ghostCageBelow.data.side !== 'midline' ? ` (${ghostCageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
                                     </div>)
+                                ) : discOsteo ? (
+                                    <div className="relative group w-full h-full flex items-center justify-center cursor-pointer" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(discOsteo); }}>
+                                        <span className="font-bold text-red-700 bg-red-50/80 border border-red-200 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{discOsteo.data?.shortLabel || 'Osteo'} {getDiscLabel(level.id, levels)} {discOsteo.data?.angle}°</span>
+                                    </div>
+                                ) : ghostDiscOsteo ? (
+                                    <div className="relative group w-full h-full flex items-center justify-center cursor-pointer" style={{ opacity: 0.4 }} onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostDiscOsteo); }}>
+                                        <span className="font-bold text-red-700 bg-red-50/80 border border-red-200 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{ghostDiscOsteo.data?.shortLabel || 'Osteo'} {getDiscLabel(level.id, levels)} {ghostDiscOsteo.data?.angle}°</span>
+                                    </div>
                                 ) : (
                                     !readOnly && <div className="h-2 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>
                                 )}
@@ -6249,6 +6266,7 @@
             const [defaultCustomText, setDefaultCustomText] = useState('');
             const [defaultOsteoType, setDefaultOsteoType] = useState('PSO');
             const [defaultOsteoAngle, setDefaultOsteoAngle] = useState('25');
+            const [osteoDiscLevel, setOsteoDiscLevel] = useState(undefined); // true=disc only, false=vertebral only, undefined=all
             const [pendingForceZone, setPendingForceZone] = useState(null);
             
             const exportRef = useRef(null);
@@ -6559,6 +6577,7 @@
                     setEditingPlacementId(null);
                     setEditingData(undefined);
                     if (selectedTool === 'Corpectomy') { setDefaultOsteoType('Corpectomy'); setDefaultOsteoAngle('0'); }
+                    setOsteoDiscLevel(false); // Schwab 3+ only (vertebral body)
                     setOsteoModalOpen(true);
                 } else if (selectedTool === 'connector') {
                     addConnector(levelId);
@@ -6576,6 +6595,22 @@
 
             const handleDiscClick = (levelId) => {
                 if (levelId === 'Oc' || levelId === 'C1' || levelId === 'S1' || levelId === 'Pelvis') return alert(t('alert.no_disc_space'));
+
+                // Osteotomy tool selected → open disc-level osteotomy modal (Schwab 1-2)
+                if (selectedTool === 'osteotomy') {
+                    const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
+                    const existing = currentPlacements.find(p => p.levelId === levelId && p.zone === 'disc');
+                    if (existing) {
+                        handlePlacementClick(existing);
+                    } else {
+                        setPendingPlacement({ levelId, zone: 'disc', tool: 'osteotomy' });
+                        setEditingPlacementId(null);
+                        setEditingData(undefined);
+                        setOsteoDiscLevel(true); // Schwab 1-2 only
+                        setOsteoModalOpen(true);
+                    }
+                    return;
+                }
 
                 // Check if ANY cage type is permitted here
                 const anyPermitted = Object.values(CAGE_PERMISSIBILITY).some(arr => arr.includes(levelId));
@@ -6614,7 +6649,7 @@
                 const tool = allTools.find(item => item.id === p.tool);
                 const isHookType = NO_SIZE_TYPES.includes(p.tool);
                 if (tool.needsSize || isHookType) { setEditingPlacementId(p.id); setEditingData(p.data); setEditingTool(p.tool); setEditingAnnotation(p.annotation || ''); setScrewModalOpen(true); }
-                else if (tool.isOsteotomy) { setEditingPlacementId(p.id); setEditingData(p.data); setOsteoModalOpen(true); }
+                else if (tool.isOsteotomy) { setEditingPlacementId(p.id); setEditingData(p.data); setOsteoDiscLevel(p.zone === 'disc' ? true : false); setOsteoModalOpen(true); }
                 else { removePlacement(p.id); }
             };
 
@@ -6638,6 +6673,7 @@
                     setPendingPlacement({ levelId: ghost.levelId, zone: ghost.zone, tool: ghost.tool });
                     setEditingPlacementId(null);
                     setEditingData(ghost.data);
+                    setOsteoDiscLevel(ghost.zone === 'disc' ? true : false);
                     setOsteoModalOpen(true);
                 }
             };
@@ -6925,7 +6961,7 @@
             const modals = (
                 <React.Fragment>
                     <ScrewModal isOpen={screwModalOpen} onClose={() => setScrewModalOpen(false)} onConfirm={handleScrewConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} initialTool={editingTool} defaultDiameter={defaultDiameter} defaultLength={defaultLength} defaultMode={defaultScrewMode} defaultCustomText={defaultCustomText} initialAnnotation={editingAnnotation} />
-                    <OsteotomyModal isOpen={osteoModalOpen} onClose={() => setOsteoModalOpen(false)} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} />
+                    <OsteotomyModal isOpen={osteoModalOpen} onClose={() => { setOsteoModalOpen(false); setOsteoDiscLevel(undefined); }} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} discLevelOnly={osteoDiscLevel} />
                     <CageModal isOpen={cageModalOpen} onClose={() => setCageModalOpen(false)} onConfirm={handleCageConfirm} onDelete={handleDeleteCage} initialData={editingData} levelId={editingCageLevel} levels={levels} />
                     <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
                     <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
