@@ -6189,6 +6189,8 @@
             const syncChannelRef = useRef(null);
             const syncTimerRef = useRef(null);
             const lastPongRef = useRef(0);
+            const serializeRef = useRef(null);
+            const deserializeRef = useRef(null);
 
             // MODALS
             const [screwModalOpen, setScrewModalOpen] = useState(false);
@@ -6317,6 +6319,8 @@
                 if (json.preferences?.viewMode) setViewMode(json.preferences.viewMode);
                 if (json.preferences?.colourScheme) changeTheme(json.preferences.colourScheme);
             };
+            serializeRef.current = serializeState;
+            deserializeRef.current = deserializeState;
 
             // AUTO-LOAD
             // SYNC LANGUAGE ON MOUNT
@@ -6366,18 +6370,18 @@
                 ch.onmessage = (e) => {
                     const msg = e.data;
                     if (msg.type === 'ping') {
-                        ch.postMessage({ type: 'pong', payload: serializeState() });
+                        ch.postMessage({ type: 'pong', payload: serializeRef.current() });
                     } else if (msg.type === 'pong') {
                         lastPongRef.current = Date.now();
                         setSyncConnected(true);
-                        if (hasLoaded && msg.payload) {
+                        if (msg.payload) {
                             receivingSync.current = true;
-                            deserializeState(msg.payload);
+                            deserializeRef.current(msg.payload);
                         }
                     } else if (msg.type === 'state') {
-                        if (hasLoaded && msg.payload) {
+                        if (msg.payload) {
                             receivingSync.current = true;
-                            deserializeState(msg.payload);
+                            deserializeRef.current(msg.payload);
                         }
                     }
                 };
