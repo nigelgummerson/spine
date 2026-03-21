@@ -6730,6 +6730,10 @@
             // EXPORT
             const prepareExportCanvas = async () => {
                 await document.fonts.ready;
+                // Switch to final construct view for export
+                setActiveChart('completed');
+                setShowFinalInventory(true);
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
                 // In portrait mode, mount the off-screen export container temporarily
                 if (isPortrait) {
                     setPortraitExporting(true);
