@@ -5489,7 +5489,7 @@
                 const isForceZone = zone.startsWith('force');
                 const verticalClass = isForceZone ? 'items-center' : 'items-start pt-[2px]';
                 return (
-                    <div className={`flex ${verticalClass} gap-1 h-full ${justifyClass} relative`}>{!hasItems && !readOnly && (zone === 'left' || zone === 'right' || isForceZone) && <GhostTarget type={isForceZone ? 'force' : 'screw'} />}
+                    <div className={`flex ${verticalClass} gap-1 h-full ${justifyClass} relative`}>{!hasItems && !ghostItem && !readOnly && (zone === 'left' || zone === 'right' || isForceZone) && <GhostTarget type={isForceZone ? 'force' : 'screw'} />}
                         {items.map(p => {
                             const tool = tools.find(item => item.id === p.tool);
                             const isHookItem = HOOK_TYPES.includes(p.tool);
