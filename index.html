@@ -7185,7 +7185,35 @@
 
                     <div className="flex-1 overflow-hidden bg-slate-200 flex relative">
                         <aside className="w-[340px] text-white flex flex-col z-20 overflow-y-auto no-print shadow-xl" style={{ backgroundColor: scheme.sidebarBg, borderRight: `1px solid ${scheme.sidebarBorder}` }}>
-                            {/* Region View */}
+                            {/* 1. Tool Palette — most used, top position */}
+                            <div className="p-3 space-y-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                                {tools.map((g,i) => (
+                                    <div key={i}>
+                                        <h3 className="text-[10px] uppercase font-bold text-white/60 mb-1.5 tracking-widest">{t(g.categoryKey)}</h3>
+                                        <div className="grid grid-cols-2 gap-1">
+                                            {g.items.map(item => {
+                                                const active = selectedTool === item.id;
+                                                return <button key={item.id} onClick={() => setSelectedTool(item.id)} className={`p-1 h-10 rounded border flex flex-col items-center justify-center gap-0.5 transition-all text-xs ${active ? 'font-bold' : 'text-white/80 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>
+                                                    <InstrumentIcon type={item.icon} className="w-3.5 h-3.5" color={active ? scheme.activeText : 'white'} />
+                                                    <span className="text-center text-[10px] leading-tight">{t(item.labelKey)}</span>
+                                                </button>;
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* 2. Plan/Construct Toggle + Confirm Plan — workflow controls */}
+                            <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                                <h3 className="text-[10px] uppercase font-bold text-white/60 mb-1.5 tracking-widest">{t('sidebar.editing')}</h3>
+                                <div className="flex rounded p-1 border" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>
+                                    <button onClick={() => setActiveChart('planned')} className={`flex-1 px-3 py-1.5 rounded transition-all text-xs ${activeChart==='planned'?'font-bold':'text-white/50 hover:text-white'}`} style={activeChart==='planned' ? { backgroundColor: scheme.activeBg, color: scheme.activeText } : undefined}>{t('sidebar.plan')}</button>
+                                    <button onClick={() => setActiveChart('completed')} className={`flex-1 px-3 py-1.5 rounded transition-all text-xs ${activeChart==='completed'?'font-bold':'text-white/50 hover:text-white'}`} style={activeChart==='completed' ? { backgroundColor: scheme.activeBg, color: scheme.activeText } : undefined}>{t('sidebar.construct')}</button>
+                                </div>
+                                <button onClick={copyPlanToCompleted} className="w-full flex items-center justify-center gap-2 text-white px-3 py-2 rounded text-xs font-bold border transition-colors hover:brightness-125 mt-2" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
+                            </div>
+
+                            {/* 3. Region View */}
                             <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
                                 <h3 className="text-[10px] uppercase font-bold text-white/60 mb-1.5 tracking-widest">{t('sidebar.region_view')}</h3>
                                 <div className="grid grid-cols-2 gap-1">
@@ -7197,7 +7225,26 @@
                                 </div>
                             </div>
 
-                            {/* Theme & Language */}
+                            {/* 4. File Operations */}
+                            <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                                <input type="file" ref={fileInputRef} onChange={loadProjectJSON} className="hidden" accept=".json" />
+                                <div className="grid grid-cols-2 gap-1">
+                                    <button onClick={() => fileInputRef.current.click()} className="flex items-center justify-center gap-1 text-white/70 hover:text-white px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}><IconUpload /> {t('sidebar.load')}</button>
+                                    <button onClick={saveProjectJSON} className="flex items-center justify-center gap-1 text-white/70 hover:text-white px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}><IconSave /> {t('sidebar.save')}</button>
+                                    <button onClick={runExportJPG} className="flex items-center justify-center gap-1 text-white/70 hover:text-white px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}><IconImage /> {t('sidebar.jpg')}</button>
+                                    <button onClick={runExportPDF} className="flex items-center justify-center gap-1 text-white/70 hover:text-white px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}><IconPDF /> {t('sidebar.pdf')}</button>
+                                </div>
+                            </div>
+
+                            {/* 5. Session Privacy */}
+                            <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                                <div className={`flex items-center gap-2 px-2 py-2 rounded border cursor-pointer transition-colors ${incognitoMode ? 'bg-red-900/30 border-red-500/50' : 'bg-transparent border-transparent hover:bg-white/5'}`} onClick={() => setIncognitoMode(!incognitoMode)}>
+                                    <div className="relative inline-block w-10 h-5 align-middle select-none shrink-0"><input type="checkbox" className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300" style={{ top: 0, left: 0 }} checked={incognitoMode} onChange={(e) => setIncognitoMode(e.target.checked)}/><label className={`toggle-label block overflow-hidden h-5 rounded-full cursor-pointer border ${incognitoMode ? 'bg-red-600 border-red-600' : 'bg-slate-600 border-slate-600'}`}></label></div>
+                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${incognitoMode ? 'text-red-400' : 'text-white/60'}`}>{t('sidebar.session_privacy')}</span>
+                                </div>
+                            </div>
+
+                            {/* 6. Theme & Language — preferences, rarely changed */}
                             <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
                                 <div className="flex items-center gap-3">
                                     <div className="relative">
@@ -7211,7 +7258,7 @@
                                             </div>
                                         </button>
                                         {themeOpen && (
-                                            <div className="absolute left-0 top-full mt-1 rounded-lg shadow-xl border p-1.5 z-50" style={{ backgroundColor: scheme.sidebarTitleBg, borderColor: scheme.sidebarBorder }}>
+                                            <div className="absolute left-0 bottom-full mb-1 rounded-lg shadow-xl border p-1.5 z-50" style={{ backgroundColor: scheme.sidebarTitleBg, borderColor: scheme.sidebarBorder }}>
                                                 {COLOUR_SCHEMES.map(s => (
                                                     <button key={s.id} onClick={() => { changeTheme(s.id); setThemeOpen(false); }}
                                                         className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-all ${colourScheme === s.id ? 'ring-1 ring-white/50' : 'hover:bg-white/10'}`}>
@@ -7236,61 +7283,22 @@
                                 </div>
                             </div>
 
-                            {/* Plan / Construct Toggle */}
-                            <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                                <h3 className="text-[10px] uppercase font-bold text-white/60 mb-1.5 tracking-widest">{t('sidebar.editing')}</h3>
-                                <div className="flex rounded p-1 border" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>
-                                    <button onClick={() => setActiveChart('planned')} className={`flex-1 px-3 py-1.5 rounded transition-all text-xs ${activeChart==='planned'?'font-bold':'text-white/50 hover:text-white'}`} style={activeChart==='planned' ? { backgroundColor: scheme.activeBg, color: scheme.activeText } : undefined}>{t('sidebar.plan')}</button>
-                                    <button onClick={() => setActiveChart('completed')} className={`flex-1 px-3 py-1.5 rounded transition-all text-xs ${activeChart==='completed'?'font-bold':'text-white/50 hover:text-white'}`} style={activeChart==='completed' ? { backgroundColor: scheme.activeBg, color: scheme.activeText } : undefined}>{t('sidebar.construct')}</button>
-                                </div>
-                                <p className="text-[10px] text-white/50 mt-1.5 leading-tight">{t('sidebar.editing_hint')}</p>
+                            {/* Spacer to push bottom items down */}
+                            <div className="flex-1"></div>
+
+                            {/* 7. Help — prominent, bottom right */}
+                            <div className="p-3" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
+                                <button onClick={() => setHelpModalOpen(true)} className="w-full flex items-center justify-center gap-2 text-white/70 hover:text-white px-3 py-2 rounded text-xs font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}><IconHelp /> {t('sidebar.help')}</button>
                             </div>
 
-                            {/* Tool Palette */}
-                            <div className="p-3 space-y-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                                {tools.map((g,i) => (
-                                    <div key={i}>
-                                        <h3 className="text-[10px] uppercase font-bold text-white/60 mb-1.5 tracking-widest">{t(g.categoryKey)}</h3>
-                                        <div className="grid grid-cols-2 gap-1">
-                                            {g.items.map(item => {
-                                                const active = selectedTool === item.id;
-                                                return <button key={item.id} onClick={() => setSelectedTool(item.id)} className={`p-1 h-10 rounded border flex flex-col items-center justify-center gap-0.5 transition-all text-xs ${active ? 'font-bold' : 'text-white/80 hover:text-white'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}>
-                                                    <InstrumentIcon type={item.icon} className="w-3.5 h-3.5" color={active ? scheme.activeText : 'white'} />
-                                                    <span className="text-center text-[10px] leading-tight">{t(item.labelKey)}</span>
-                                                </button>;
-                                            })}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Actions */}
-                            <div className="p-3 space-y-2">
-                                <h3 className="text-[10px] uppercase font-bold text-white/60 mb-2 tracking-widest">{t('sidebar.actions')}</h3>
-                                <button onClick={copyPlanToCompleted} className="w-full flex items-center justify-center gap-2 text-white px-3 py-2 rounded text-xs font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
-                                <div className="pt-2 mt-2" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
-                                    <input type="file" ref={fileInputRef} onChange={loadProjectJSON} className="hidden" accept=".json" />
-                                    <div className="grid grid-cols-2 gap-1">
-                                        <button onClick={() => fileInputRef.current.click()} className="flex items-center justify-center gap-1 text-white/70 hover:text-white px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}><IconUpload /> {t('sidebar.load')}</button>
-                                        <button onClick={saveProjectJSON} className="flex items-center justify-center gap-1 text-white/70 hover:text-white px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}><IconSave /> {t('sidebar.save')}</button>
-                                        <button onClick={runExportJPG} className="flex items-center justify-center gap-1 text-white/70 hover:text-white px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}><IconImage /> {t('sidebar.jpg')}</button>
-                                        <button onClick={runExportPDF} className="flex items-center justify-center gap-1 text-white/70 hover:text-white px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.12)' }}><IconPDF /> {t('sidebar.pdf')}</button>
-                                    </div>
-                                </div>
-                                <div className="pt-2 mt-2" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
-                                    <div className={`flex items-center gap-2 px-2 py-2 rounded border cursor-pointer transition-colors ${incognitoMode ? 'bg-red-900/30 border-red-500/50' : 'bg-transparent border-transparent hover:bg-white/5'}`} onClick={() => setIncognitoMode(!incognitoMode)}>
-                                        <div className="relative inline-block w-10 h-5 align-middle select-none shrink-0"><input type="checkbox" className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300" style={{ top: 0, left: 0 }} checked={incognitoMode} onChange={(e) => setIncognitoMode(e.target.checked)}/><label className={`toggle-label block overflow-hidden h-5 rounded-full cursor-pointer border ${incognitoMode ? 'bg-red-600 border-red-600' : 'bg-slate-600 border-slate-600'}`}></label></div>
-                                        <span className={`text-[10px] font-bold uppercase tracking-wider ${incognitoMode ? 'text-red-400' : 'text-white/60'}`}>{t('sidebar.session_privacy')}</span>
-                                    </div>
-                                </div>
-                                <div className="pt-2 mt-2 flex gap-1" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
-                                    <div className={`flex items-center justify-center px-1.5 py-1.5 rounded text-[10px] ${syncConnected ? 'text-emerald-400' : 'text-white/20'}`} title={syncConnected ? 'Linked to another window' : 'No other window detected'}><IconLink />{syncConnected && <span className="ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
-                                    <button onClick={() => setHelpModalOpen(true)} className="flex-1 flex items-center justify-center gap-1 text-white/50 hover:text-white px-2 py-1.5 rounded text-[10px] font-bold hover:bg-white/10"><IconHelp /> {t('sidebar.help')}</button>
-                                    <button onClick={() => setChangeLogOpen(true)} className="flex items-center justify-center text-white/50 hover:text-white px-2 py-1.5 rounded text-[10px] font-mono hover:bg-white/10">{CURRENT_VERSION}</button>
-                                    <button onClick={newPatientAction} className="flex-1 flex items-center justify-center gap-1 text-red-400 hover:text-red-200 px-2 py-1.5 rounded text-[10px] font-bold hover:bg-white/10">
-                                        <IconTrash /> {t('sidebar.new_patient')}
-                                    </button>
-                                </div>
+                            {/* 8. Utility row — version, new patient, sync */}
+                            <div className="px-3 pb-1 flex items-center gap-1">
+                                <div className={`flex items-center justify-center px-1.5 py-1.5 rounded text-[10px] ${syncConnected ? 'text-emerald-400' : 'text-white/20'}`} title={syncConnected ? 'Linked to another window' : 'No other window detected'}><IconLink />{syncConnected && <span className="ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
+                                <button onClick={() => setChangeLogOpen(true)} className="flex items-center justify-center text-white/50 hover:text-white px-2 py-1.5 rounded text-[10px] font-mono hover:bg-white/10">{CURRENT_VERSION}</button>
+                                <div className="flex-1"></div>
+                                <button onClick={newPatientAction} className="flex items-center justify-center gap-1 text-red-400 hover:text-red-200 px-2 py-1.5 rounded text-[10px] font-bold hover:bg-white/10">
+                                    <IconTrash /> {t('sidebar.new_patient')}
+                                </button>
                             </div>
 
                             <CreditsFooter lang={currentLang} />
