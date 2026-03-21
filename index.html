@@ -5512,12 +5512,12 @@
                 case 'alif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><ellipse cx="12" cy="12" rx="10" ry="6" /></svg>;
                 
                 // --- Forces ---
-                case 'translate_left': return <svg viewBox="0 0 24 24" className={className} fill="#059669" stroke="none"><path d="M20 12H4M4 12l8-8M4 12l8 8" stroke="#059669" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>; 
-                case 'translate_right': return <svg viewBox="0 0 24 24" className={className} fill="#059669" stroke="none"><path d="M4 12h16M20 12l-8-8M20 12l-8 8" stroke="#059669" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>; 
-                case 'derotate_cw': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="2.5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>;
-                case 'derotate_ccw': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>;
-                case 'compression': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="3"><path d="M12 2v8m-4-4 4 4 4-4" /><path d="M12 22v-8m4 4-4-4-4 4" /></svg>; 
-                case 'distraction': return <svg viewBox="0 0 24 24" className={className} stroke="#059669" fill="none" strokeWidth="3"><path d="M12 10V2m4 4-4-4-4 4" /><path d="M12 14v8m-4-4 4 4 4-4" /></svg>;
+                case 'translate_left': return <svg viewBox="0 0 24 24" className={className} fill="#2563eb" stroke="none"><path d="M20 12H4M4 12l8-8M4 12l8 8" stroke="#2563eb" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>; 
+                case 'translate_right': return <svg viewBox="0 0 24 24" className={className} fill="#2563eb" stroke="none"><path d="M4 12h16M20 12l-8-8M20 12l-8 8" stroke="#2563eb" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>; 
+                case 'derotate_cw': return <svg viewBox="0 0 24 24" className={className} stroke="#2563eb" fill="none" strokeWidth="2.5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>;
+                case 'derotate_ccw': return <svg viewBox="0 0 24 24" className={className} stroke="#2563eb" fill="none" strokeWidth="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>;
+                case 'compression': return <svg viewBox="0 0 24 24" className={className} stroke="#2563eb" fill="none" strokeWidth="3"><path d="M12 2v8m-4-4 4 4 4-4" /><path d="M12 22v-8m4 4-4-4-4 4" /></svg>; 
+                case 'distraction': return <svg viewBox="0 0 24 24" className={className} stroke="#2563eb" fill="none" strokeWidth="3"><path d="M12 10V2m4 4-4-4-4 4" /><path d="M12 14v8m-4-4 4 4 4-4" /></svg>;
 
                 // --- Mode ---
                 case 'implant': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="3" /></svg>;
@@ -5989,7 +5989,7 @@
 
 
             return (
-            <div className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative"><div className={`${forcePlacements ? 'px-2 py-1' : 'p-2'} bg-slate-50 border-b border-slate-200 text-center`}><div className="font-bold text-sm text-slate-800 uppercase tracking-wider">{title}</div>{forcePlacements && <div className="text-[9px] font-normal text-slate-400 italic -mt-0.5">{t('chart.force_plan_only')}</div>}</div><div className="flex-1 relative flex flex-col pt-8 px-2 justify-center">
+            <div className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative"><div className={`${forcePlacements ? 'px-2 py-1' : 'p-2'} bg-slate-50 border-b border-slate-200 text-center`}><div className="font-bold text-sm text-slate-800 uppercase tracking-wider">{title}</div>{forcePlacements && <div className="text-[9px] font-normal text-blue-400 italic -mt-0.5">{t('chart.force_plan_only')}</div>}</div><div className="flex-1 relative flex flex-col pt-8 px-2 justify-center">
                 <div className="flex w-full absolute top-1 left-0 right-0 px-2 text-[11px] font-bold uppercase tracking-tighter text-center pointer-events-none z-10">
                     {showForces && <div className="w-10 text-blue-400">{t('chart.header.force')}</div>}
                     <div className="flex-1 text-right pr-4 text-slate-400">{t('chart.header.left')}</div>
