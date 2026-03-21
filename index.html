@@ -5384,7 +5384,7 @@
             }
         };
 
-        const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tools, onPlacementClick, onGhostClick, readOnly, showForces, heightScale, onDiscClick, cages, levels, viewMode, forcePlacements }) => {
+        const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tools, onPlacementClick, onGhostClick, readOnly, showForces, heightScale, onDiscClick, cages, levels, viewMode, forcePlacements, ghostCages, onGhostCageClick }) => {
             const getItems = (z) => {
                 const src = (forcePlacements && z.startsWith('force')) ? forcePlacements : placements;
                 return src.filter(p => p.levelId === level.id && p.zone === z);
@@ -5414,6 +5414,7 @@
 
             // Check for Cage below this level
             const cageBelow = cages.find(c => c.levelId === level.id);
+            const ghostCageBelow = !cageBelow && ghostCages ? ghostCages.find(c => c.levelId === level.id) : null;
 
             const GhostTarget = ({ type }) => {
                 if (type === 'force') return <div className="flex items-center justify-center h-full w-full"><IconCardinal /></div>;
@@ -5645,6 +5646,16 @@
                                         <svg viewBox="0 0 160 20" preserveAspectRatio="none" className="w-full h-full overflow-visible"><CageVisualization cageType={cageBelow.tool} heightScale={1} levelId={level.id} /></svg>
                                         <span className="absolute font-bold text-sky-700 bg-white/80 px-0.5 rounded whitespace-nowrap z-20" style={{ left: 'calc(75% + 2em)', top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{cageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {cageBelow.data.height}H {cageBelow.data.lordosis}°{cageBelow.data.side && cageBelow.data.side !== 'bilateral' && cageBelow.data.side !== 'midline' ? ` (${cageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
                                     </div>)
+                                ) : ghostCageBelow ? (
+                                    viewMode === 'whole' && level.type === 'C' ? (
+                                        <div className="relative w-full h-full flex items-center justify-center" style={{ opacity: 0.4 }}>
+                                            <span className="text-amber-600 italic whitespace-nowrap" style={{ fontSize: Math.max(9, cageLabelPx - 1) + 'px' }}>Cervical cage — use Cervical view</span>
+                                        </div>
+                                    ) : (
+                                    <div className="relative group w-full h-full flex justify-center cursor-pointer" style={{ opacity: 0.4 }} onClick={(e) => { e.stopPropagation(); onGhostCageClick && onGhostCageClick(ghostCageBelow); }}>
+                                        <svg viewBox="0 0 160 20" preserveAspectRatio="none" className="w-full h-full overflow-visible"><CageVisualization cageType={ghostCageBelow.tool} heightScale={1} levelId={level.id} /></svg>
+                                        <span className="absolute font-bold text-sky-700 bg-white/80 px-0.5 rounded whitespace-nowrap z-20" style={{ left: 'calc(75% + 2em)', top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{ghostCageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {ghostCageBelow.data.height}H {ghostCageBelow.data.lordosis}°{ghostCageBelow.data.side && ghostCageBelow.data.side !== 'bilateral' && ghostCageBelow.data.side !== 'midline' ? ` (${ghostCageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
+                                    </div>)
                                 ) : (
                                     !readOnly && <div className="h-2 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>
                                 )}
@@ -5655,7 +5666,7 @@
             );
         };
 
-        const ChartPaper = ({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements }) => {
+        const ChartPaper = ({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements, ghostConnectors, onGhostConnectorClick, ghostCages, onGhostCageClick }) => {
             const contentRef = useRef(null);
             const [draggingId, setDraggingId] = useState(null);
             const dragStartRef = useRef(null);
@@ -5665,6 +5676,8 @@
             const iconScale = Math.max(0.65, Math.min(1.3, heightScale));
             const connW = Math.round(80 * iconScale);
             const connH = Math.round(24 * iconScale);
+
+            const activeGhostConnectors = ghostConnectors ? ghostConnectors.filter(gc => !connectors.some(c => c.levelId === gc.levelId)) : [];
 
             // Convert connector {levelId, fraction} to rendered Y pixel position
             const connectorToRenderedY = (conn) => {
@@ -5755,7 +5768,7 @@
                     {showForces && <div className="w-10"></div>}
                 </div>}
                 <div ref={contentRef} className="flex flex-col w-full relative">
-                    {levels.map(lvl => <LevelRow key={lvl.id} level={lvl} placements={placements} ghostPlacements={ghostPlacements} onZoneClick={onZoneClick} onPlacementClick={onPlacementClick} onGhostClick={onGhostClick} tools={tools} readOnly={readOnly} showForces={showForces} heightScale={heightScale} cages={cages} onDiscClick={onDiscClick} levels={levels} viewMode={viewMode} forcePlacements={forcePlacements} />)}
+                    {levels.map(lvl => <LevelRow key={lvl.id} level={lvl} placements={placements} ghostPlacements={ghostPlacements} onZoneClick={onZoneClick} onPlacementClick={onPlacementClick} onGhostClick={onGhostClick} tools={tools} readOnly={readOnly} showForces={showForces} heightScale={heightScale} cages={cages} onDiscClick={onDiscClick} levels={levels} viewMode={viewMode} forcePlacements={forcePlacements} ghostCages={ghostCages} onGhostCageClick={onGhostCageClick} />)}
                     {/* Connector overlay */}
                     {connectors && connectors.length > 0 && (
                         <div className="absolute inset-0 pointer-events-none z-30">
@@ -5772,6 +5785,23 @@
                                             className="hidden group-hover:flex absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 items-center justify-center text-[8px] font-bold shadow hover:bg-red-600 z-50"
                                             onClick={(e) => { e.stopPropagation(); onConnectorRemove(conn.id); }}
                                             onMouseDown={(e) => e.stopPropagation()}>x</button>}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                    {/* Ghost connector overlay */}
+                    {activeGhostConnectors.length > 0 && (
+                        <div className="absolute inset-0 pointer-events-none z-29">
+                            {activeGhostConnectors.map(gc => {
+                                const y = connectorToRenderedY(gc);
+                                if (y === null) return null;
+                                return (
+                                    <div key={gc.id || gc.levelId}
+                                        className="absolute pointer-events-auto cursor-pointer"
+                                        style={{ top: `${y - connH / 2}px`, left: '50%', transform: 'translateX(-50%)', width: `${scaledWidth}px`, height: `${connH}px`, opacity: 0.4 }}
+                                        onClick={() => onGhostConnectorClick && onGhostConnectorClick(gc)}>
+                                        <InstrumentIcon type="connector" className="w-full h-full drop-shadow-md text-slate-900" />
                                     </div>
                                 );
                             })}
@@ -6347,6 +6377,17 @@
                 setPendingNoteTool(null);
                 setNoteModalOpen(true);
             };
+
+            const handleGhostConnectorClick = (ghostConn) => {
+                setCompletedConnectors(prev => [...prev, { id: genId(), levelId: ghostConn.levelId, fraction: ghostConn.fraction, tool: 'connector' }]);
+            };
+
+            const handleGhostCageClick = (ghostCage) => {
+                setActiveChart('completed');
+                setEditingCageLevel(ghostCage.levelId);
+                setEditingData(ghostCage);
+                setCageModalOpen(true);
+            };
             const updateNotePosition = (noteId, { offsetX, offsetY }) => {
                 const updater = prev => prev.map(n => n.id === noteId ? { ...n, offsetX, offsetY } : n);
                 if (activeChart === 'planned') setPlannedNotes(updater); else setCompletedNotes(updater);
@@ -6500,7 +6541,7 @@
 
             const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planLeftRod: e.target.innerText})} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planRightRod: e.target.innerText})} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} />;
 
-            const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={plannedPlacements} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostNotes={plannedNotes} onGhostNoteClick={handleGhostNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} />;
+            const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={plannedPlacements} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostNotes={plannedNotes} onGhostNoteClick={handleGhostNoteClick} ghostConnectors={plannedConnectors} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={plannedCages} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[8px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[9px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} />;
 
             const newPatientAction = () => {
                 if (confirm(t('alert.new_patient'))) {
