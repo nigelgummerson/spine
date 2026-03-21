@@ -6,11 +6,11 @@ Usage:
     python tools/import-reviews.py [review-file.json ...]         # Report only
     python tools/import-reviews.py --apply [review-file.json ...]  # Apply corrections to index.html
 
-    If no files specified, processes all *-review-*.json files in tools/review-forms/
+    If no files specified, processes all *-review-*.json files in review-forms/
 
 Outputs:
     - Console summary of corrections per language
-    - tools/review-forms/{lang}-corrections.txt — detailed correction report
+    - review-forms/{lang}-corrections.txt — detailed correction report
     - With --apply: updates TRANSLATIONS in index.html with corrected strings
 """
 
@@ -22,7 +22,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_DIR = SCRIPT_DIR.parent
 INDEX_HTML = PROJECT_DIR / "index.html"
-REVIEW_DIR = SCRIPT_DIR / "review-forms"
+REVIEW_DIR = PROJECT_DIR / "review-forms"
 
 
 def process_review(filepath: Path) -> dict:
@@ -77,7 +77,9 @@ def process_review(filepath: Path) -> dict:
 def write_correction_report(result: dict, output_dir: Path):
     """Write a detailed correction report for a single language."""
     lang = result["lang"]
-    outfile = output_dir / f"{lang}-corrections.txt"
+    lang_dir = output_dir / lang
+    lang_dir.mkdir(parents=True, exist_ok=True)
+    outfile = lang_dir / f"{lang}-corrections.txt"
 
     reviewer = result.get("reviewer", {})
     lines = []
@@ -228,7 +230,7 @@ def main():
         if not REVIEW_DIR.exists():
             print(f"No review-forms directory found at {REVIEW_DIR}")
             sys.exit(1)
-        files = sorted(REVIEW_DIR.glob("*-review-*.json"))
+        files = sorted(REVIEW_DIR.glob("*/responses/*-review-*.json"))
         if not files:
             print(f"No review JSON files found in {REVIEW_DIR}/")
             print(f"Expected files matching pattern: {{lang}}-review-{{date}}.json")
@@ -295,7 +297,7 @@ def main():
     elif apply_mode:
         print("No corrections to apply.")
     elif len(files) > 1:
-        print("Done. Correction reports written to tools/review-forms/")
+        print("Done. Correction reports written to review-forms/")
         print("Re-run with --apply to write corrections to index.html.")
 
 

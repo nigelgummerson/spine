@@ -6,7 +6,7 @@ Usage:
     python tools/generate-review-forms.py
 
 Outputs:
-    tools/review-forms/{lang}-review.html  (one per non-English language)
+    review-forms/{lang}-review.html  (one per non-English language)
 """
 
 import json
@@ -19,7 +19,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_DIR = SCRIPT_DIR.parent
 INDEX_HTML = PROJECT_DIR / "index.html"
-OUTPUT_DIR = SCRIPT_DIR / "review-forms"
+OUTPUT_DIR = PROJECT_DIR / "review-forms"
 
 # Language metadata: code -> (English name, native name)
 LANG_NAMES = {
@@ -926,17 +926,19 @@ def main():
     en_keys = list(translations.get("en", {}).keys())
     print(f"Found {len(en_keys)} English keys, {len(langs)} target languages: {', '.join(sorted(langs))}")
 
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
     for lang in sorted(langs):
+        lang_dir = OUTPUT_DIR / lang
+        lang_dir.mkdir(parents=True, exist_ok=True)
+        (lang_dir / "responses").mkdir(exist_ok=True)
+
         lang_dict = translations.get(lang, {})
         missing = [k for k in en_keys if k not in lang_dict]
-        outfile = OUTPUT_DIR / f"{lang}-review.html"
+        outfile = lang_dir / f"{lang}-review.html"
         html_content = generate_html(lang, translations)
         outfile.write_text(html_content, encoding="utf-8")
         status = f"({len(missing)} missing keys)" if missing else "(complete)"
         en_name = LANG_NAMES.get(lang, (lang, lang))[0]
-        print(f"  {lang} ({en_name}): {outfile.name} {status}")
+        print(f"  {lang} ({en_name}): {lang}/{outfile.name} {status}")
 
     print(f"\nGenerated {len(langs)} review forms in {OUTPUT_DIR}/")
 
