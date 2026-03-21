@@ -6816,6 +6816,11 @@
                         const json = JSON.parse(ev.target.result);
                         if (json.formatVersion >= 2) {
                             deserializeState(json);
+                            // Broadcast loaded state immediately so synced windows update
+                            if (syncChannelRef.current) {
+                                clearTimeout(syncTimerRef.current);
+                                syncChannelRef.current.postMessage({ type: 'state', payload: json });
+                            }
                         } else {
                             alert(t('alert.unsupported_format'));
                             return;
