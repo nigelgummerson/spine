@@ -6921,6 +6921,7 @@
                                     <button onClick={runExportJPG} className="p-1.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.jpg')}><IconImage /></button>
                                     <button onClick={runExportPDF} className="p-1.5 rounded hover:bg-white/10 text-white/60 hover:text-white" title={t('sidebar.pdf')}><IconPDF /></button>
                                     <button onClick={() => setHelpModalOpen(true)} className="p-1.5 rounded hover:bg-white/10 text-white/40 hover:text-white" title={t('sidebar.help')}><IconHelp /></button>
+                                    <div className={`p-1.5 rounded ${syncConnected ? 'text-emerald-400' : 'text-white/20'}`} title={syncConnected ? 'Linked to another window' : 'No other window detected'}><IconLink />{syncConnected && <span className="inline-block ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
                                 </div>
                             </div>
 
@@ -7128,6 +7129,7 @@
                                     </div>
                                 </div>
                                 <div className="pt-2 mt-2 flex gap-1" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
+                                    <div className={`flex items-center justify-center px-1.5 py-1.5 rounded text-[10px] ${syncConnected ? 'text-emerald-400' : 'text-white/20'}`} title={syncConnected ? 'Linked to another window' : 'No other window detected'}><IconLink />{syncConnected && <span className="ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
                                     <button onClick={() => setHelpModalOpen(true)} className="flex-1 flex items-center justify-center gap-1 text-white/50 hover:text-white px-2 py-1.5 rounded text-[10px] font-bold hover:bg-white/10"><IconHelp /> {t('sidebar.help')}</button>
                                     <button onClick={() => setChangeLogOpen(true)} className="flex items-center justify-center text-white/30 hover:text-white px-2 py-1.5 rounded text-[10px] font-mono hover:bg-white/10">{CURRENT_VERSION}</button>
                                     <button onClick={newPatientAction} className="flex-1 flex items-center justify-center gap-1 text-red-400 hover:text-red-200 px-2 py-1.5 rounded text-[10px] font-bold hover:bg-white/10">
