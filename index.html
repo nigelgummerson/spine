@@ -6902,8 +6902,18 @@
                     setPlannedCages([]); setCompletedCages([]);
                     setPlannedConnectors([]); setCompletedConnectors([]);
                     setPlannedNotes([]); setCompletedNotes([]);
-                    setPatientData({ name: '', id: '', surgeon: '', location: '', date: new Date().toISOString().split('T')[0], company: '', screwSystem: '', leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '', boneGraft: { types: [], notes: '' } });
+                    const emptyPatient = { name: '', id: '', surgeon: '', location: '', date: new Date().toISOString().split('T')[0], company: '', screwSystem: '', leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '', boneGraft: { types: [], notes: '' } };
+                    setPatientData(emptyPatient);
                     setActiveChart('planned');
+                    // Broadcast clear immediately so other synced windows don't send stale data back
+                    if (syncChannelRef.current) {
+                        clearTimeout(syncTimerRef.current);
+                        syncChannelRef.current.postMessage({ type: 'state', payload: {
+                            formatVersion: 3, patient: emptyPatient, preferences: { viewMode, colourScheme },
+                            plan: { implants: [], cages: [], connectors: [], notes: [] },
+                            construct: { implants: [], cages: [], connectors: [], notes: [] },
+                        }});
+                    }
                 }
             };
 
