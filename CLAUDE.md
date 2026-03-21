@@ -4,7 +4,7 @@
 A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 14 European languages.
 
 ## Current Status
-- **Version:** v1.2.1-beta
+- **Version:** v1.2.2-beta
 - **Last Updated:** 2026-03-21
 - **License:** GNU GPLv3
 
@@ -17,12 +17,15 @@ spine-surgery/planning/spine-planner/
 │   ├── i18n-clinical.html        # Layer 2: clinical terminology vs glossary
 │   ├── i18n-overflow.html        # Layer 3: string length overflow detection
 │   └── translation-glossary.json # Reference clinical terms with sources
+├── review-forms/           # Per-language review HTML (sent) and JSON responses (received)
+│   ├── {lang}/
+│   │   ├── {lang}-review.html    # Generated review form
+│   │   └── responses/            # Reviewer JSON files
 ├── tools/
-│   ├── generate-review-forms.py    # Generates per-language HTML review forms
+│   ├── generate-review-forms.py    # Generates per-language HTML review forms → review-forms/
 │   ├── import-reviews.py           # Imports reviewer JSON, reports & applies corrections
 │   ├── TRANSLATION-REVIEW-GUIDE.md   # Instructions for reviewers and developers
-│   ├── TRANSLATION-REVIEW-WORKFLOW.md # Developer workflow for review pipeline
-│   └── review-forms/                  # Generated HTML forms and reviewer JSON (gitignored)
+│   └── TRANSLATION-REVIEW-WORKFLOW.md # Developer workflow for review pipeline
 ├── data/ -> Dropbox    # Symlink: PDFs, reference images, rod data
 ├── docs/ -> Dropbox    # Symlink: specs (SPECIFICATION.md, PHASE-0-SPEC.md), plans
 ├── alpha-notes.txt     # Development context and version notes
@@ -44,6 +47,7 @@ spine-surgery/planning/spine-planner/
 - All dependencies loaded via CDN for offline hospital use
 
 ## Version History (Recent)
+- **v1.2.2-beta** (2026-03-21): Dual-window sync via BroadcastChannel. Two browser windows on the same machine stay synchronised in real time — designed for dual-display use in operating theatres. One screen can show the Plan while the other shows Demographics with live inventory. Heartbeat-based peer detection with automatic reconnect. Green link icon in sidebar indicates active sync. Debounced at 200ms with echo prevention. No new dependencies.
 - **v1.2.1-beta** (2026-03-21): Translate chart column headers (Left/Right/Force) in all 14 languages — previously hardcoded English. Portrait Construct tab shows "Forces — edit in Plan" hint below title when force columns are displayed read-only. Dropbox symlinks created for data/ and docs/; stray PDF moved to Dropbox. Project structure in CLAUDE.md updated.
 - **v1.2.0-beta** (2026-03-21): Ghost placements on construct view (portrait mode). Plan data shown at 0.40 opacity as ghost placements — tap to open pre-filled modal and confirm. Plan forces shown at full opacity (read-only). Construct column widened to 637px to accommodate force columns. "Confirm Plan" button with tooltip — accepts all remaining unconfirmed placements, excludes forces. Ghost notes, connectors, and cages all supported. New "Portrait & Tablet Mode" help section. Updated "Confirm Plan" help section describing ghost workflow. Export and landscape mode unchanged. No JSON format changes.
 - **v1.1.0-beta** (2026-03-20): Portrait/tablet responsive mode. Orientation-aware layout: sidebar becomes horizontal toolbar, columns shown one at a time via tab bar with swipe gestures. Each column scaled to fit viewport at export proportions. Edit mode auto-syncs with active tab. View-only mode on phones (<600px short dimension). Language selector reordered (English first, then alphabetical by native name). Export always landscape 1485x1050.
@@ -136,7 +140,7 @@ open tests/i18n-clinical.html       # Check against glossary
 open tests/i18n-overflow.html       # Check string lengths
 
 # Translation review workflow
-python tools/generate-review-forms.py           # Generate HTML review forms (tools/review-forms/)
+python tools/generate-review-forms.py           # Generate HTML review forms (review-forms/)
 # Email {lang}-review.html + TRANSLATION-REVIEW-GUIDE.md to reviewers
 # Reviewer exports JSON, emails to nigelgummerson@mac.com
 python tools/import-reviews.py review-file.json          # Report corrections
