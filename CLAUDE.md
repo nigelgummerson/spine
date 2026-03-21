@@ -4,7 +4,7 @@
 A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 14 European languages.
 
 ## Current Status
-- **Version:** v1.2.0-beta
+- **Version:** v1.2.1-beta
 - **Last Updated:** 2026-03-21
 - **License:** GNU GPLv3
 
@@ -20,20 +20,21 @@ spine-surgery/planning/spine-planner/
 ├── tools/
 │   ├── generate-review-forms.py    # Generates per-language HTML review forms
 │   ├── import-reviews.py           # Imports reviewer JSON, reports & applies corrections
-│   ├── TRANSLATION-REVIEW-GUIDE.md # Instructions for reviewers and developers
-│   └── review-forms/               # Generated HTML forms and reviewer JSON (gitignored)
+│   ├── TRANSLATION-REVIEW-GUIDE.md   # Instructions for reviewers and developers
+│   ├── TRANSLATION-REVIEW-WORKFLOW.md # Developer workflow for review pipeline
+│   └── review-forms/                  # Generated HTML forms and reviewer JSON (gitignored)
+├── data/ -> Dropbox    # Symlink: PDFs, reference images, rod data
+├── docs/ -> Dropbox    # Symlink: specs (SPECIFICATION.md, PHASE-0-SPEC.md), plans
 ├── alpha-notes.txt     # Development context and version notes
 ├── CLAUDE.md           # This file (Claude-specific collaboration tracking)
 ├── README.md           # GitHub README
-├── SPECIFICATION.md    # Retrospective spec (updated to v0.9.0)
-├── PHASE-0-SPEC.md     # Cage implementation spec and permissibility matrix
 └── .git/               # Git repository
 ```
 
 ## GitHub & Deployment
 - **Repository:** github.com/nigelgummerson/spine-planner
 - **Live Site:** nigelgummerson.github.io/spine-planner (GitHub Pages)
-- **Branches:** `main` (v1.1.0-beta)
+- **Branches:** `main` (v1.2.0-beta)
 
 ## Tech Stack
 - React 18 production builds (via CDN - unpkg)
@@ -43,6 +44,7 @@ spine-surgery/planning/spine-planner/
 - All dependencies loaded via CDN for offline hospital use
 
 ## Version History (Recent)
+- **v1.2.1-beta** (2026-03-21): Translate chart column headers (Left/Right/Force) in all 14 languages — previously hardcoded English. Portrait Construct tab shows "Forces — edit in Plan" hint below title when force columns are displayed read-only. Dropbox symlinks created for data/ and docs/; stray PDF moved to Dropbox. Project structure in CLAUDE.md updated.
 - **v1.2.0-beta** (2026-03-21): Ghost placements on construct view (portrait mode). Plan data shown at 0.40 opacity as ghost placements — tap to open pre-filled modal and confirm. Plan forces shown at full opacity (read-only). Construct column widened to 637px to accommodate force columns. "Confirm Plan" button with tooltip — accepts all remaining unconfirmed placements, excludes forces. Ghost notes, connectors, and cages all supported. New "Portrait & Tablet Mode" help section. Updated "Confirm Plan" help section describing ghost workflow. Export and landscape mode unchanged. No JSON format changes.
 - **v1.1.0-beta** (2026-03-20): Portrait/tablet responsive mode. Orientation-aware layout: sidebar becomes horizontal toolbar, columns shown one at a time via tab bar with swipe gestures. Each column scaled to fit viewport at export proportions. Edit mode auto-syncs with active tab. View-only mode on phones (<600px short dimension). Language selector reordered (English first, then alphabetical by native name). Export always landscape 1485x1050.
 - **v1.0.1-beta** (2026-03-20): Fixed screw type translations — Turkish -aksiyal corrected to -aksiyel per manufacturer literature, removed spurious ü from Turkish uniplanar, Polish adjective gender corrected to feminine (matching śruba), Swedish/Norwegian/Danish uniplanar reverted to English form (unattested localised forms removed).
