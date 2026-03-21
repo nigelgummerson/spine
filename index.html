@@ -6261,6 +6261,7 @@
             const [editingData, setEditingData] = useState(null);
             const [editingTool, setEditingTool] = useState(null);
             const [editingCageLevel, setEditingCageLevel] = useState(null);
+            const [discPickerLevel, setDiscPickerLevel] = useState(null);
             const [editingAnnotation, setEditingAnnotation] = useState('');
 
             const [defaultDiameter, setDefaultDiameter] = useState('6.5');
@@ -6572,20 +6573,26 @@
                     return;
                 }
 
-                // Mid zone → use currently selected palette tool
+                // Mid zone — check for existing osteotomy first
+                const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
+                const existingOsteo = currentPlacements.find(p => p.levelId === levelId && p.zone === 'mid' && p.tool === 'osteotomy');
+                if (existingOsteo) {
+                    handlePlacementClick(existingOsteo);
+                    return;
+                }
+                // Connector/unstable tools still work when selected
                 const tool = allTools.find(item => item.id === selectedTool);
-                if (!tool || tool.type === 'mode') return;
-                if (tool.isOsteotomy) {
-                    setPendingPlacement({ levelId, zone, tool: selectedTool });
+                if (tool && selectedTool === 'connector') {
+                    addConnector(levelId);
+                } else if (tool && !tool.isOsteotomy && tool.type !== 'mode' && selectedTool !== 'implant') {
+                    addPlacement(levelId, zone, selectedTool, null);
+                } else {
+                    // Default: open osteotomy modal (Schwab 3+)
+                    setPendingPlacement({ levelId, zone, tool: 'osteotomy' });
                     setEditingPlacementId(null);
                     setEditingData(undefined);
-                    if (selectedTool === 'Corpectomy') { setDefaultOsteoType('Corpectomy'); setDefaultOsteoAngle('0'); }
-                    setOsteoDiscLevel(false); // Schwab 3+ only (vertebral body)
+                    setOsteoDiscLevel(false);
                     setOsteoModalOpen(true);
-                } else if (selectedTool === 'connector') {
-                    addConnector(levelId);
-                } else {
-                    addPlacement(levelId, zone, selectedTool, null);
                 }
             };
 
@@ -6599,31 +6606,36 @@
             const handleDiscClick = (levelId) => {
                 if (levelId === 'Oc' || levelId === 'C1' || levelId === 'S1' || levelId === 'Pelvis') return alert(t('alert.no_disc_space'));
 
-                // Osteotomy tool selected → open disc-level osteotomy modal (Schwab 1-2)
-                if (selectedTool === 'osteotomy') {
-                    const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
-                    const existing = currentPlacements.find(p => p.levelId === levelId && p.zone === 'disc');
-                    if (existing) {
-                        handlePlacementClick(existing);
-                    } else {
-                        setPendingPlacement({ levelId, zone: 'disc', tool: 'osteotomy' });
-                        setEditingPlacementId(null);
-                        setEditingData(undefined);
-                        setOsteoDiscLevel(true); // Schwab 1-2 only
-                        setOsteoModalOpen(true);
-                    }
-                    return;
-                }
+                // If disc-level osteotomy exists, edit it
+                const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
+                const existingOsteo = currentPlacements.find(p => p.levelId === levelId && p.zone === 'disc');
+                if (existingOsteo) { handlePlacementClick(existingOsteo); return; }
 
-                // Check if ANY cage type is permitted here
+                // If cage exists, edit it
+                const currentCages = activeChart === 'planned' ? plannedCages : completedCages;
+                const existingCage = currentCages.find(c => c.levelId === levelId);
+                if (existingCage) { setEditingCageLevel(levelId); setEditingData(existingCage); setCageModalOpen(true); return; }
+
+                // Nothing exists — show picker (cage vs osteotomy)
+                setDiscPickerLevel(levelId);
+            };
+            const handleDiscPickCage = () => {
+                const levelId = discPickerLevel;
+                setDiscPickerLevel(null);
                 const anyPermitted = Object.values(CAGE_PERMISSIBILITY).some(arr => arr.includes(levelId));
                 if (!anyPermitted) return alert(t('alert.no_cage_types', { level: getDiscLabel(levelId, levels) }));
-
-                const currentCages = activeChart === 'planned' ? plannedCages : completedCages;
-                const existing = currentCages.find(c => c.levelId === levelId);
                 setEditingCageLevel(levelId);
-                setEditingData(existing);
+                setEditingData(undefined);
                 setCageModalOpen(true);
+            };
+            const handleDiscPickOsteo = () => {
+                const levelId = discPickerLevel;
+                setDiscPickerLevel(null);
+                setPendingPlacement({ levelId, zone: 'disc', tool: 'osteotomy' });
+                setEditingPlacementId(null);
+                setEditingData(undefined);
+                setOsteoDiscLevel(true);
+                setOsteoModalOpen(true);
             };
 
             const handleCageConfirm = (data) => {
@@ -6969,6 +6981,15 @@
                     <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
                     <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
                     <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
+                    {discPickerLevel && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" onClick={() => setDiscPickerLevel(null)}>
+                        <div className="bg-white rounded-lg shadow-2xl w-full max-w-[200px] overflow-hidden" onClick={e => e.stopPropagation()}>
+                            <div className="bg-slate-700 text-white px-3 py-2 text-center text-xs font-bold uppercase tracking-wider">{getDiscLabel(discPickerLevel, levels)}</div>
+                            <div className="p-2 flex flex-col gap-1">
+                                <button onClick={handleDiscPickCage} className="w-full px-3 py-2 rounded text-sm font-bold text-sky-800 bg-sky-50 border border-sky-200 hover:bg-sky-100 transition-colors">{t('help.cages.title')}</button>
+                                <button onClick={handleDiscPickOsteo} className="w-full px-3 py-2 rounded text-sm font-bold text-red-800 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors">{t('help.osteotomies.title')}</button>
+                            </div>
+                        </div>
+                    </div>}
                     <NoteModal isOpen={noteModalOpen} onClose={() => { setNoteModalOpen(false); setEditingNote(null); setPendingNoteTool(null); }} onConfirm={handleNoteConfirm} onDelete={handleNoteDelete} initialText={editingNote?.text || ''} initialShowArrow={editingNote?.showArrow || false} isEditing={!!editingNote} />
                 </React.Fragment>
             );
