@@ -5015,12 +5015,12 @@
                 if (isOpen) {
                     if (initialData && typeof initialData === 'object') {
                         setType(initialData.type);
-                        setAngle(initialData.angle);
+                        setAngle(initialData.angle !== undefined && initialData.angle !== null ? String(initialData.angle) : '');
                         setReconstructionCage(initialData.reconstructionCage || '');
                     } else {
                         const fallback = filteredTypes[0];
                         setType(defaultType || fallback?.id || 'PSO');
-                        setAngle(defaultAngle || fallback?.defaultAngle || '25');
+                        setAngle('');
                         setReconstructionCage('');
                     }
                 }
@@ -5030,13 +5030,12 @@
             const handleTypeChange = (e) => {
                 const newTypeID = e.target.value;
                 setType(newTypeID);
-                const newDef = OSTEOTOMY_TYPES.find(ot => ot.id === newTypeID);
-                if (newDef) setAngle(newDef.defaultAngle);
+                setAngle('');
                 if (!['VCR','ML-VCR','Corpectomy'].includes(newTypeID)) setReconstructionCage('');
             };
             const handleSubmit = () => {
                 onConfirm({
-                    type, angle,
+                    type, angle: angle !== '' ? angle : null,
                     shortLabel: selectedDef.shortLabel,
                     reconstructionCage: needsReconCage ? reconstructionCage : ''
                 });
@@ -5078,7 +5077,7 @@
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('modal.osteotomy.angle')}</label>
                                 <div className="flex items-center gap-2">
-                                    <input type="number" value={angle} onChange={(e) => setAngle(e.target.value)}
+                                    <input type="number" value={angle} onChange={(e) => setAngle(e.target.value)} placeholder={selectedDef.defaultAngle}
                                         className="w-24 p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-red-500 outline-none text-center" />
                                     <span className="italic text-slate-400 text-sm">{t('modal.osteotomy.degrees')}</span>
                                 </div>
@@ -5281,7 +5280,7 @@
                     let key = toolLabel;
                     if (p.data) {
                         if (typeof p.data === 'string' && tool.needsSize) { key = `${toolLabel} (${p.data})`; }
-                        else if (p.tool === 'osteotomy' && typeof p.data === 'object') { key = `${p.data.shortLabel} (${p.data.angle}°)`; }
+                        else if (p.tool === 'osteotomy' && typeof p.data === 'object') { key = p.data.angle != null && p.data.angle !== '' ? `${p.data.shortLabel} (${p.data.angle}°)` : p.data.shortLabel; }
                         else if (typeof p.data === 'object' && p.data.height) {
                             const discLbl = levels ? getDiscLabel(p.levelId, levels) : p.levelId;
                             const sideStr = p.data.side && p.data.side !== 'bilateral' && p.data.side !== 'midline' ? ` (${p.data.side.charAt(0).toUpperCase()})` : '';
@@ -5735,7 +5734,7 @@
                                             className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight"
                                             style={{ fontSize: labelPx + 'px' }}
                                         >
-                                            {isOsteo ? `${displayLabel} ${angle}\u00B0` : displayLabel}
+                                            {isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : displayLabel) : displayLabel}
                                         </span>
                                     )}
                                     {showAnn && (
@@ -5795,7 +5794,7 @@
                                             className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight"
                                             style={{ fontSize: labelPx + 'px' }}
                                         >
-                                            {isOsteo ? `${displayLabel} ${angle}\u00B0` : displayLabel}
+                                            {isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : displayLabel) : displayLabel}
                                         </span>
                                     )}
                                     {showAnn && (
@@ -5862,7 +5861,7 @@
                                                     className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 px-1 rounded shadow-sm whitespace-nowrap z-20"
                                                     style={{ fontSize: osteoLabelPx + 'px' }}
                                                 >
-                                                    {displayLabel} {angle}&deg;
+                                                    {displayLabel}{angle != null && angle !== '' ? ` ${angle}\u00B0` : ''}
                                                 </div>
                                             )}
                                         </div>
@@ -5893,7 +5892,7 @@
                                                     className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 px-1 rounded shadow-sm whitespace-nowrap z-20"
                                                     style={{ fontSize: osteoLabelPx + 'px' }}
                                                 >
-                                                    {displayLabel} {angle}&deg;
+                                                    {displayLabel}{angle != null && angle !== '' ? ` ${angle}\u00B0` : ''}
                                                 </div>
                                             )}
                                         </div>
@@ -5932,11 +5931,11 @@
                                     </div>)
                                 ) : discOsteo ? (
                                     <div className="relative group w-full h-full flex items-center justify-center cursor-pointer" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(discOsteo); }}>
-                                        <span className="font-bold text-red-700 bg-red-50/80 border border-red-200 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{discOsteo.data?.shortLabel || 'Osteo'} {getDiscLabel(level.id, levels)} {discOsteo.data?.angle}°</span>
+                                        <span className="font-bold text-red-700 bg-red-50/80 border border-red-200 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{discOsteo.data?.shortLabel || 'Osteo'} {getDiscLabel(level.id, levels)}{discOsteo.data?.angle != null && discOsteo.data?.angle !== '' ? ` ${discOsteo.data.angle}\u00B0` : ''}</span>
                                     </div>
                                 ) : ghostDiscOsteo ? (
                                     <div className="relative group w-full h-full flex items-center justify-center cursor-pointer" style={{ opacity: 0.4 }} onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostDiscOsteo); }}>
-                                        <span className="font-bold text-red-700 bg-red-50/80 border border-red-200 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{ghostDiscOsteo.data?.shortLabel || 'Osteo'} {getDiscLabel(level.id, levels)} {ghostDiscOsteo.data?.angle}°</span>
+                                        <span className="font-bold text-red-700 bg-red-50/80 border border-red-200 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{ghostDiscOsteo.data?.shortLabel || 'Osteo'} {getDiscLabel(level.id, levels)}{ghostDiscOsteo.data?.angle != null && ghostDiscOsteo.data?.angle !== '' ? ` ${ghostDiscOsteo.data.angle}\u00B0` : ''}</span>
                                     </div>
                                 ) : (
                                     !readOnly && <div className="h-2 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>
@@ -6686,7 +6685,7 @@
             };
 
             const handleOsteoConfirm = (data) => {
-                setDefaultOsteoType(data.type); setDefaultOsteoAngle(data.angle);
+                setDefaultOsteoType(data.type);
                 if (editingPlacementId) { updatePlacement(editingPlacementId, 'osteotomy', data); setEditingPlacementId(null); } 
                 else if (pendingPlacement) { addPlacement(pendingPlacement.levelId, pendingPlacement.zone, 'osteotomy', data); setPendingPlacement(null); }
             };
