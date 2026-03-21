@@ -4778,14 +4778,15 @@
             else if (e.key === 'Escape') { e.preventDefault(); onClose(); }
             else if (!inTextField && (e.key === 'Delete' || e.key === 'Backspace') && isEditing && onDelete) { e.preventDefault(); onDelete(); }
             else if (e.key === 'Tab') {
+                e.preventDefault();
                 const modal = e.currentTarget;
-                const focusable = Array.from(modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'));
+                const focusable = Array.from(modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
                 if (focusable.length === 0) return;
-                const first = focusable[0], last = focusable[focusable.length - 1];
                 const idx = focusable.indexOf(document.activeElement);
-                if (idx === -1) { e.preventDefault(); first.focus(); }
-                else if (e.shiftKey && idx === 0) { e.preventDefault(); last.focus(); }
-                else if (!e.shiftKey && idx === focusable.length - 1) { e.preventDefault(); first.focus(); }
+                const next = e.shiftKey
+                    ? (idx <= 0 ? focusable.length - 1 : idx - 1)
+                    : (idx >= focusable.length - 1 ? 0 : idx + 1);
+                focusable[next].focus();
             }
         };
 
