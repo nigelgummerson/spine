@@ -5391,6 +5391,9 @@
 
             const ZoneContent = ({ zone, align }) => {
                 const items = getItems(zone);
+                const ghostItem = (!items.length && ghostPlacements && !zone.startsWith('force'))
+                    ? ghostPlacements.find(p => p.levelId === level.id && p.zone === zone)
+                    : null;
                 const hasItems = items.length > 0;
                 const justifyClass = align === 'right' ? 'justify-start pl-1' : (align === 'center' ? 'justify-center' : 'justify-end pr-1');
                 const isForceZone = zone.startsWith('force');
@@ -5457,6 +5460,67 @@
                                 </div>
                             );
                         })}
+                        {ghostItem && (() => {
+                            const tool = tools.find(item => item.id === ghostItem.tool);
+                            const isHookItem = HOOK_TYPES.includes(ghostItem.tool);
+                            const isOsteo = ghostItem.tool === 'osteotomy';
+                            let displayLabel = ghostItem.data;
+                            let angle = null;
+                            if (isOsteo && typeof ghostItem.data === 'object') {
+                                displayLabel = ghostItem.data.shortLabel || ghostItem.data.type;
+                                angle = ghostItem.data.angle;
+                            }
+                            const iW = isHookItem ? hookW : isOsteo ? osteoPx : screwPx;
+                            const iH = isHookItem ? hookH : isOsteo ? osteoPx : screwPx;
+                            const ann = ghostItem.annotation || '';
+                            const showData = ghostItem.data && !isHookItem;
+                            const showAnn = !!ann;
+                            const isInline = heightScale < 0.85 && showData && showAnn;
+                            const ghostLabelBlock = (showData || showAnn) ? (
+                                <div
+                                    className={`flex ${isInline ? (align === 'left' ? 'flex-row-reverse' : 'flex-row') : 'flex-col'} leading-none`}
+                                    style={{
+                                        alignItems: isInline ? 'center' : (align === 'right' ? 'flex-start' : 'flex-end'),
+                                        gap: isInline ? '3px' : '0px'
+                                    }}
+                                >
+                                    {showData && (
+                                        <span
+                                            className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight"
+                                            style={{ fontSize: labelPx + 'px' }}
+                                        >
+                                            {isOsteo ? `${displayLabel} ${angle}\u00B0` : displayLabel}
+                                        </span>
+                                    )}
+                                    {showAnn && (
+                                        <span
+                                            className="text-slate-400 italic whitespace-nowrap px-1 leading-tight"
+                                            style={{ fontSize: Math.max(8, labelPx - 2) + 'px' }}
+                                        >
+                                            {ann}
+                                        </span>
+                                    )}
+                                </div>
+                            ) : null;
+                            return (
+                                <div
+                                    key={'ghost-' + ghostItem.id}
+                                    className="relative group flex items-center gap-1 cursor-pointer"
+                                    style={{ opacity: 0.4 }}
+                                    onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostItem); }}
+                                >
+                                    {align === 'left' && ghostLabelBlock}
+                                    <div
+                                        style={{ width: iW, height: iH, willChange: 'transform' }}
+                                        className="group-hover:scale-110 transition-transform"
+                                    >
+                                        <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />
+                                        <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />
+                                    </div>
+                                    {align === 'right' && ghostLabelBlock}
+                                </div>
+                            );
+                        })()}
                     </div>
                 );
             };
@@ -5498,6 +5562,37 @@
                                         </div>
                                     );
                                 })}
+                                {ghostPlacements && !getItems('mid').length && (() => {
+                                    const gp = ghostPlacements.find(p => p.levelId === level.id && p.zone === 'mid');
+                                    if (!gp) return null;
+                                    const tool = tools.find(item => item.id === gp.tool);
+                                    let displayLabel = '';
+                                    let angle = '';
+                                    if (gp.tool === 'osteotomy' && typeof gp.data === 'object') {
+                                        displayLabel = gp.data.shortLabel || gp.data.type;
+                                        angle = gp.data.angle;
+                                    }
+                                    return (
+                                        <div
+                                            key={'ghost-' + gp.id}
+                                            className="pointer-events-auto relative group flex flex-col items-center cursor-pointer"
+                                            style={{ opacity: 0.4 }}
+                                            onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(gp); }}
+                                        >
+                                            <div style={{ width: midPx, height: midPx }}>
+                                                <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-md text-slate-900" />
+                                            </div>
+                                            {gp.tool === 'osteotomy' && gp.data && (
+                                                <div
+                                                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-red-200 text-red-800 px-1 rounded shadow-sm whitespace-nowrap z-20"
+                                                    style={{ fontSize: osteoLabelPx + 'px' }}
+                                                >
+                                                    {displayLabel} {angle}&deg;
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })()}
                             </div>
                         </div>
 
