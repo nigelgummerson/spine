@@ -4990,9 +4990,6 @@
 
         const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, defaultType, defaultAngle, discLevelOnly }) => {
             if (!isOpen) return null;
-            const [type, setType] = useState(defaultType || 'PSO');
-            const [angle, setAngle] = useState(defaultAngle || '25');
-            const [reconstructionCage, setReconstructionCage] = useState('');
 
             const OSTEOTOMY_TYPES = [
                 { id: 'Facet', labelKey: 'clinical.osteotomy.facet.label', shortLabel: 'Facet', schwabKey: 'clinical.osteotomy.facet.schwab', descKey: 'clinical.osteotomy.facet.desc', defaultAngle: '5', group: 'posterior', discLevel: true },
@@ -5009,6 +5006,14 @@
                 : discLevelOnly === false
                     ? OSTEOTOMY_TYPES.filter(ot => !ot.discLevel)
                     : OSTEOTOMY_TYPES;
+
+            // Resolve initial type: use defaultType only if it's in the filtered list
+            const resolvedDefault = filteredTypes.find(ot => ot.id === defaultType) ? defaultType : filteredTypes[0]?.id || 'PSO';
+
+            const [type, setType] = useState(resolvedDefault);
+            const [angle, setAngle] = useState('');
+            const [reconstructionCage, setReconstructionCage] = useState('');
+
             const needsReconCage = ['VCR','ML-VCR','Corpectomy'].includes(type);
 
             useEffect(() => {
@@ -5018,15 +5023,14 @@
                         setAngle(initialData.angle !== undefined && initialData.angle !== null ? String(initialData.angle) : '');
                         setReconstructionCage(initialData.reconstructionCage || '');
                     } else {
-                        const fallback = filteredTypes[0];
-                        setType(defaultType || fallback?.id || 'PSO');
+                        setType(resolvedDefault);
                         setAngle('');
                         setReconstructionCage('');
                     }
                 }
             }, [isOpen, initialData, defaultType, defaultAngle]);
 
-            const selectedDef = OSTEOTOMY_TYPES.find(ot => ot.id === type) || OSTEOTOMY_TYPES[0];
+            const selectedDef = filteredTypes.find(ot => ot.id === type) || filteredTypes[0];
             const handleTypeChange = (e) => {
                 const newTypeID = e.target.value;
                 setType(newTypeID);
