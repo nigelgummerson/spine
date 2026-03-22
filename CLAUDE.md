@@ -4,7 +4,7 @@
 A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 14 European languages.
 
 ## Current Status
-- **Version:** v2.1.0-beta
+- **Version:** v2.1.2-beta
 - **Last Updated:** 2026-03-22
 - **License:** GNU GPLv3
 
@@ -68,7 +68,7 @@ spine-planner/
 - **All dependencies bundled** — no CDN calls, fully offline
 
 ## Version History (Recent)
-- **v2.1.0-beta** (2026-03-22): Vite build system — modular source (26 files), pre-compiled JSX, single-file output via vite-plugin-singlefile. Fully offline with embedded fonts (Inter, Source Serif 4). Translations externalised to JSON. Translation tools and tests updated to read JSON directly. GitHub Actions deployment.
+- **v2.1.2-beta** (2026-03-22): Vite build system — modular source, single-file output, embedded fonts, GitHub Actions deployment. Custom domain plan.skeletalsurgery.com/spine/. Important Notice disclaimer modal on startup (half-day session expiry), acceptance timestamp on exports. Version shown in portrait toolbar. Landing page with SEO and structured data.
 - **v2.0.3-beta** (2026-03-22): Review form UX — persistent backup banner, auto-scroll to next unreviewed, larger touch targets, guide page.
 - **v2.0.2-beta** (2026-03-22): Clinical translation audit — Greek, Polish fixes. Localised ghost placement terminology.
 - **v2.0.1-beta** (2026-03-21): Translated 8 hardcoded strings. Sync race condition fix. One-implant-per-zone enforcement. App version check on sync.
