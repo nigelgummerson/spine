@@ -5,6 +5,7 @@
 *.pdf
 .worktrees/
 .superpowers/
+_archive/
 node_modules/
 dist/
 

@@ -30,8 +30,8 @@ A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instru
 
 ## Requirements
 
-- **No install required** — single HTML file, runs in any modern browser
-- **Fully offline** — all dependencies and fonts embedded, no network required
+- **No install required** — runs in any modern browser, distributable as a single HTML file
+- **Fully offline** — all dependencies and fonts embedded, no network required (connected variant planned for future CJK language support)
 - **Hospital friendly** — designed for locked-down NHS workstations
 
 ## Tech Stack

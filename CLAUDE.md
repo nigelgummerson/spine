@@ -44,13 +44,14 @@ spine-planner/
 │   │   └── usePortrait.js       # Orientation detection hook
 │   └── utils/
 │       └── id.js                # Unique ID generator
-├── dist/                   # Build output (single index.html, ~1.9MB)
+├── dist/                   # Build output (single index.html, ~1.99MB)
 ├── tests/                  # i18n verification (read from src/i18n/*.json)
 ├── tools/                  # Translation review tools (read/write src/i18n/translations.json)
-├── review-forms/           # Per-language review HTML + responses
+├── public/review-forms/    # Per-language review HTML + responses (auto-generated)
+├── _archive/               # Historical notes and prompts (alpha-notes.txt, design-review.md)
 ├── .github/workflows/deploy.yml  # GitHub Actions: build + deploy to Pages
-├── data/ -> Dropbox        # Symlink: PDFs, reference images, rod data
-├── docs/ -> Dropbox        # Symlink: specs, plans
+├── data/ -> Dropbox        # Symlink: reference PDFs, rod data, anatomical images
+├── docs/ -> Dropbox        # Symlink: SPECIFICATION.md, JSON v4 schema
 └── .gitignore              # + node_modules/, dist/
 ```
 
@@ -135,22 +136,11 @@ spine-planner/
 { name, id, surgeon, location, date, company, screwSystem, leftRod, rightRod, planLeftRod, planRightRod, boneGraft: { types: [], notes: '' } }
 ```
 
-## Next Steps
-- [x] **Anatomical accuracy:** Data-driven vertebral proportions (T1-S1), merged to main in v0.9.3
-- [x] **Export artefacts:** Fixed in v0.9.4 — replaced html2canvas with html-to-image
-- [x] **Internationalisation:** 14 European languages, merged in v1.0.0-beta
-- [x] **Portrait/tablet mode:** Responsive layout with tab-based columns, merged in v1.1.0-beta
-- [x] **Ghost placements:** Plan data as confirmable ghosts on construct view (portrait), merged in v1.2.0-beta
-- [ ] **Cervical spine proportions:** Extend VERTEBRA_ANATOMY to cervical levels (deferred)
-- [ ] **Barcode scanning:** Integrate html5-qrcode for GS1 DataMatrix scanning from implant packages
-- [x] **Offline bundling:** Vite + vite-plugin-singlefile embeds all JS, CSS, and fonts into single HTML file (v2.1.0)
-- [ ] **User testing:** Get feedback from theatre staff on current workflow
-- [ ] **Specification sync:** SPECIFICATION.md updated to v0.9.0
-- [x] **i18n review tooling:** Python generator + import pipeline for native-speaker translation review
-- [ ] **i18n Tier C:** Awaiting feedback from native-speaking reviewers (surgeons & industry professionals)
+## Task Tracking
+See **TODO.md** for the full task list, organised by SPEC.md implementation phases.
 
 ## Key Constraints
-- **Must remain single .html file** - Vite build produces one self-contained HTML file via vite-plugin-singlefile
+- **Single-file build (current)** - Vite produces one self-contained HTML file via vite-plugin-singlefile for offline distribution (USB, email, intranet). Not a hard constraint — a future connected variant could lazy-load translation files and fonts from GitHub Pages, which would be needed if CJK languages are added (5-20MB font files cannot be embedded)
 - **Offline-first** - All dependencies and fonts embedded, no network required
 - **Hospital environment** - Assumes locked-down Windows machines with restricted permissions
 - **Print-friendly** - PDF export must be high quality for clinical records
