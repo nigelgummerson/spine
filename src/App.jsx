@@ -3,7 +3,7 @@ import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
 import { t, detectLanguage, getCurrentLang, setCurrentLang, SUPPORTED_LANGUAGES, LOCALE_MAP, LANG_ALIASES } from './i18n/i18n';
 
-// Unique ID generator — counter starts from timestamp to avoid collisions with saved data
+// Unique ID generator - counter starts from timestamp to avoid collisions with saved data
 let _nextId = Date.now();
 const genId = () => ++_nextId;
 
@@ -34,32 +34,35 @@ const CURRENT_VERSION = "v2.0.3-beta";
 
 const CHANGE_LOG = [
     { version: "v2.0.3-beta", date: "2026-03-22", changes: [
-        "Translation disclaimer now links to language-specific review form on GitHub Pages — reviewers always see the latest translations.",
+        "Translation disclaimer now links to language-specific review form on GitHub Pages. Reviewers always see the latest translations.",
         "Review forms: persistent backup banner after first edit, 50% milestone prompt to download progress backup.",
+        "Review forms: larger Correct/Corrected touch targets, auto-scroll to next unreviewed item, Next unreviewed button.",
+        "Review forms: guide page linked from header for reviewer instructions.",
+        "Removed em dashes throughout all UI strings, help text, and changelog across all 14 languages.",
     ]},
     { version: "v2.0.2-beta", date: "2026-03-22", changes: [
-        "Audit and correction of clinical translations across 14 languages — fixed Greek distraction/derotation terms and Polish surgical terminology.",
+        "Audit and correction of clinical translations across 14 languages - fixed Greek distraction/derotation terms and Polish surgical terminology.",
         "Localized 'Ghost placements' to more idiomatic clinical terms (Phantomplatzierungen, Pozycje widmo, etc.).",
         "Updated translation glossary and regenerated clinical review forms.",
     ]},
     { version: "v2.0.1-beta", date: "2026-03-21", changes: [
-        "Translated 8 hardcoded English UI strings across all 14 languages — rod inventory labels, cervical cage hint, osteotomy fallback, corpectomy label, sync tooltips, whole-spine button.",
-        "Fixed dual-window sync race condition — stale state no longer overwrites deletions. Incoming sync cancels pending outbound debounce.",
-        "One-implant-per-zone enforced at state level — rapid clicks can no longer create duplicates.",
-        "App version check on sync — mismatched versions block data exchange with a warning toast.",
+        "Translated 8 hardcoded English UI strings across all 14 languages - rod inventory labels, cervical cage hint, osteotomy fallback, corpectomy label, sync tooltips, whole-spine button.",
+        "Fixed dual-window sync race condition - stale state no longer overwrites deletions. Incoming sync cancels pending outbound debounce.",
+        "One-implant-per-zone enforced at state level - rapid clicks can no longer create duplicates.",
+        "App version check on sync - mismatched versions block data exchange with a warning toast.",
     ]},
     { version: "v2.0.0-beta", date: "2026-03-21", changes: [
-        "JSON format v4 — spinal-instrumentation schema for clinical records, research, and data exchange. Structured screw sizes, typed elements, separated forces/rods, document metadata (UUID, timestamps), barcode-ready.",
-        "Apple HIG design overhaul — light sidebar with corporate brand accents (Medtronic, DePuy, Stryker, VB Spine, Globus). Osteotomy colour amber (red reserved for destructive actions). Uniform vertebral body fill.",
-        "Dual-window sync — BroadcastChannel for theatre dual displays. Export picker (Plan or Final Record). Export timestamp footer.",
-        "Osteotomies at correct anatomical level — Schwab 1-2 at disc level, Schwab 3+ on vertebral body. Optional correction angles.",
-        "Accessibility — WCAG contrast, toast notifications, modal focus trapping, prefers-reduced-motion, ARIA roles, 10px font floor, enlarged touch targets.",
+        "JSON format v4 - spinal-instrumentation schema for clinical records, research, and data exchange. Structured screw sizes, typed elements, separated forces/rods, document metadata (UUID, timestamps), barcode-ready.",
+        "Apple HIG design overhaul - light sidebar with corporate brand accents (Medtronic, DePuy, Stryker, VB Spine, Globus). Osteotomy colour amber (red reserved for destructive actions). Uniform vertebral body fill.",
+        "Dual-window sync - BroadcastChannel for theatre dual displays. Export picker (Plan or Final Record). Export timestamp footer.",
+        "Osteotomies at correct anatomical level - Schwab 1-2 at disc level, Schwab 3+ on vertebral body. Optional correction angles.",
+        "Accessibility - WCAG contrast, toast notifications, modal focus trapping, prefers-reduced-motion, ARIA roles, 10px font floor, enlarged touch targets.",
         "Sidebar and toolbar reordered by workflow frequency. Click inactive chart to switch editing side. Help modal two-column landscape. Linked Screens help entry.",
         "Pedicle proportions at full anatomical scale with height-based vertical positioning.",
     ]},
     { version: "v1.1.0-beta", date: "2026-03-20", changes: [
-        "Portrait/tablet mode — responsive layout detects screen orientation. Toolbar, tab-based columns, swipe gestures. View-only on phones (<600px).",
-        "Internationalisation — 14 European languages with auto-detection. Clinical terminology verified against national spine society glossaries.",
+        "Portrait/tablet mode - responsive layout detects screen orientation. Toolbar, tab-based columns, swipe gestures. View-only on phones (<600px).",
+        "Internationalisation - 14 European languages with auto-detection. Clinical terminology verified against national spine society glossaries.",
         "Renamed to Spinal Instrumentation Plan & Record.",
         "3 new colour schemes (Forest Green, Teal & Coral, Steel & Ice). Theme picker redesigned as colour swatches.",
     ]},
@@ -68,7 +71,7 @@ const CHANGE_LOG = [
         "Rods section added to inventory.",
     ]},
     { version: "v0.9.6-beta", date: "2026-03-04", changes: [
-        "Note tool — level-anchored text annotations with optional arrow, draggable positioning, preset label chips.",
+        "Note tool - level-anchored text annotations with optional arrow, draggable positioning, preset label chips.",
         "Sidebar reorganised: Implants and Annotations categories.",
     ]},
     { version: "v0.9.5-beta", date: "2026-03-03", changes: [
@@ -82,7 +85,7 @@ const CHANGE_LOG = [
         "7 colour themes. JSON format v3 with plan/construct separation.",
     ]},
     { version: "v0.8.0-alpha", date: "2026-02-28", changes: [
-        "Sidebar-only UI — all controls moved from header to sidebar.",
+        "Sidebar-only UI - all controls moved from header to sidebar.",
         "16 implant manufacturers with auto-theme switching.",
         "Cage permissibility by surgical approach and anatomical level.",
         "Draggable crosslinks, auto-scaling views, Inter font throughout.",
@@ -98,7 +101,7 @@ const CHANGE_LOG = [
 
 const BONE_GRAFT_OPTIONS = [
     'Local Bone', 'Autograft', 'Allograft',
-    'Synthetics', 'DBM', 'BMP' // DBM, BMP — international abbreviations, not translated
+    'Synthetics', 'DBM', 'BMP' // DBM, BMP - international abbreviations, not translated
 ];
 
 const BONE_GRAFT_LABEL_KEYS = {
@@ -188,7 +191,7 @@ const NOTE_PRESET_KEYS = [
     'clinical.note.transitional_level', 'clinical.note.stable_vertebra', 'clinical.note.neutral_vertebra'
 ];
 
-const CAGE_TYPES = [ // International abbreviations — not translated
+const CAGE_TYPES = [ // International abbreviations - not translated
   { id: 'acdf', label: 'ACDF', descKey: 'clinical.cage.acdf.desc', approach: 'anterior', defaultSide: 'left', sideOptions: ['left','right'], defaults: { height:'6', width:'16', length:'14', lordosis:'0' } },
   { id: 'plif', label: 'PLIF', descKey: 'clinical.cage.plif.desc', approach: 'posterior', defaultSide: 'bilateral', sideOptions: null, defaults: { height:'10', width:'10', length:'25', lordosis:'0' } },
   { id: 'tlif', label: 'TLIF', descKey: 'clinical.cage.tlif.desc', approach: 'posterior', defaultSide: 'left', sideOptions: ['left','right'], defaults: { height:'10', width:'10', length:'30', lordosis:'0' } },
@@ -321,7 +324,7 @@ const HelpModal = ({ isOpen, onClose }) => {
                         <p className="text-xs text-slate-700 leading-relaxed">
                             <span className="font-bold text-slate-900">{t('credits.app_name')}</span> {CURRENT_VERSION}<br/>
                             {t('credits.developer')} <span className="font-bold">{t('credits.developer_name')}</span><br/>
-                            {/* Statement of origin — not translated */}Designed in Leeds · Yorkshire · England
+                            {/* Statement of origin - not translated */}Designed in Leeds · Yorkshire · England
                         </p>
                         <div className="flex items-start gap-1 text-[10px] text-slate-400 leading-tight mt-2">
                             <div className="mt-0.5 shrink-0"><IconCC /></div>
@@ -520,7 +523,7 @@ const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, levelId,
         <div ref={cageRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing: !!initialData })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden">
                 <div className="bg-sky-800 text-white px-4 py-3 flex justify-between items-center">
-                    <h3 className="font-bold text-sm">{initialData ? t('modal.cage.title_edit') : t('modal.cage.title_new')} — {discLabel}</h3>
+                    <h3 className="font-bold text-sm">{initialData ? t('modal.cage.title_edit') : t('modal.cage.title_new')} - {discLabel}</h3>
                     <button onClick={onClose} className="hover:text-sky-200"><IconX /></button>
                 </div>
                 <div className="p-5 space-y-4">
@@ -532,7 +535,7 @@ const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, levelId,
                         if (permittedInGroup.length === 0) return null;
                         return (
                             <div key={group.labelKey}>
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{t(group.labelKey)} <span className="font-normal normal-case">— {t(group.descKey)}</span></div>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{t(group.labelKey)} <span className="font-normal normal-case">- {t(group.descKey)}</span></div>
                                 <div className="flex gap-1.5">
                                     {permittedInGroup.map(ct => (
                                         <button key={ct.id} onClick={() => handleTypeChange(ct.id)}
@@ -841,14 +844,15 @@ const CreditsFooter = ({ lang }) => (
         <p className="text-xs text-slate-500 leading-tight text-center">
             {t('credits.app_name')}
         </p>
-        {/* Statement of origin — not translated */}
+        {/* Statement of origin - not translated */}
         <p className="text-[10px] text-slate-400 leading-tight text-center mt-0.5">
             Designed in Leeds · Yorkshire · England
         </p>
         {lang !== 'en' && (
-            <p className="text-[10px] text-amber-600 leading-tight text-center mt-1 italic">
-                {t('disclaimer.text')} — <a href={`https://nigelgummerson.github.io/spine-planner/review-forms/${lang}/${lang}-review.html`} target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-800">{t('disclaimer.review')}</a>
-            </p>
+            <div className="text-[10px] text-amber-600 leading-tight text-center mt-1 italic">
+                <div>{t('disclaimer.text')}</div>
+                <a href={`https://nigelgummerson.github.io/spine-planner/review-forms/${lang}/${lang}-review.html`} target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-800">{t('disclaimer.review')}</a>
+            </div>
         )}
     </div>
 );
@@ -942,7 +946,7 @@ const REGIONS = {
 
 // Anatomical dimensions (mm): bodyW/bodyH from X-ray measurements interpolated
 // between anchors T2(36x20), T12(48x30), L4(60x36).
-// Pedicle data from Lien et al. 2007 (Eur Spine J, PMC2200778) — averaged L/R.
+// Pedicle data from Lien et al. 2007 (Eur Spine J, PMC2200778) - averaged L/R.
 // Lumbar pedH cross-checked against Zindrick 1987 (Spine 12:160-166).
 const VERTEBRA_ANATOMY = {
     T1:  { bodyW: 34.8, bodyH: 19.0, pedW: 7.7, pedH:  8.7 },
@@ -1944,7 +1948,7 @@ const App = () => {
 
     const scheme = COLOUR_SCHEMES.find(s => s.id === colourScheme) || COLOUR_SCHEMES[0];
 
-    // SERIALISE / DESERIALISE — v4 spinal-instrumentation format
+    // SERIALISE / DESERIALISE - v4 spinal-instrumentation format
     // Mapping tables: internal tool IDs ↔ v4 schema types
     const TOOL_TO_V4_HOOK = { pedicle_hook: 'pedicle', tp_hook: 'transverse-process-down', tp_hook_up: 'transverse-process-up', sl_hook: 'supralaminar', il_hook: 'infralaminar', supra_laminar_hook: 'supralaminar', infra_laminar_hook: 'infralaminar' };
     const V4_HOOK_TO_TOOL = Object.fromEntries(Object.entries(TOOL_TO_V4_HOOK).map(([k,v]) => [v, k]));
@@ -2063,7 +2067,7 @@ const App = () => {
             const zone = f.side === 'right' ? 'force_right' : 'force_left';
             placements.push({ id: f.id, levelId: f.level, zone, tool, data: null, annotation: '' });
         });
-        // Notes — restore pixel offsets
+        // Notes - restore pixel offsets
         (chartData.notes || []).forEach(n => {
             const pos = notePositions?.[n.id] || { offsetX: -100, offsetY: 0 };
             notes.push({ id: n.id, tool: 'note', levelId: n.level, text: n.text, offsetX: pos.offsetX, offsetY: pos.offsetY, showArrow: n.showArrow || false });
@@ -2108,7 +2112,7 @@ const App = () => {
         if (json.schema?.version === 4) {
             if (json.document?.id) setDocumentId(json.document.id);
             if (json.document?.created) setDocumentCreated(json.document.created);
-            // Patient data — reconstruct internal format
+            // Patient data - reconstruct internal format
             const pd = {
                 name: json.patient?.name || '', id: json.patient?.identifier || '',
                 surgeon: json.case?.surgeon || '', location: json.case?.location || '',
@@ -2201,11 +2205,11 @@ const App = () => {
 
         ch.onmessage = (e) => {
             const msg = e.data;
-            // Version mismatch — ignore sync from older/newer app versions
+            // Version mismatch - ignore sync from older/newer app versions
             if (msg.appVersion !== CURRENT_VERSION) {
                 if (!syncVersionMismatchRef.current) {
                     syncVersionMismatchRef.current = true;
-                    showToast(`Another window is running ${msg.appVersion} — please reload all windows to sync.`, 'error');
+                    showToast(`Another window is running ${msg.appVersion} - please reload all windows to sync.`, 'error');
                 }
                 return;
             }
@@ -2221,7 +2225,7 @@ const App = () => {
                 }
             } else if (msg.type === 'state') {
                 if (msg.payload) {
-                    // Cancel any pending outbound sync — the incoming state supersedes it
+                    // Cancel any pending outbound sync - the incoming state supersedes it
                     clearTimeout(syncTimerRef.current);
                     receivingSync.current = true;
                     deserializeRef.current(msg.payload);
@@ -2253,7 +2257,7 @@ const App = () => {
         };
     }, [hasLoaded]);
 
-    // RESIZE OBSERVER — portrait mode: scale active column to fit
+    // RESIZE OBSERVER - portrait mode: scale active column to fit
     useEffect(() => {
         if (!isPortrait || !portraitContentRef.current) return;
         const recalc = () => {
@@ -2271,7 +2275,7 @@ const App = () => {
         return () => observer.disconnect();
     }, [isPortrait, portraitTab]);
 
-    // RESIZE OBSERVER — landscape mode: scale export container
+    // RESIZE OBSERVER - landscape mode: scale export container
     useEffect(() => {
         if (isPortrait || !containerWrapperRef.current) return;
         const observer = new ResizeObserver(() => {
@@ -2317,7 +2321,7 @@ const App = () => {
         { categoryKey: 'sidebar.category.tools', items: allTools.filter(item => ['implant','connector','unstable','osteotomy','Corpectomy','note'].includes(item.id)) },
     ];
 
-    // LOGIC HANDLERS — zone determines behaviour
+    // LOGIC HANDLERS - zone determines behaviour
     const handleZoneClick = (levelId, zone) => {
         const isForceZone = zone.startsWith('force');
 
@@ -2339,7 +2343,7 @@ const App = () => {
             return;
         }
 
-        // Left/right zones — one implant per zone
+        // Left/right zones - one implant per zone
         if (zone === 'left' || zone === 'right') {
             const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
             const existing = currentPlacements.find(p => p.levelId === levelId && p.zone === zone);
@@ -2357,7 +2361,7 @@ const App = () => {
             return;
         }
 
-        // Mid zone — check for existing osteotomy first
+        // Mid zone - check for existing osteotomy first
         const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
         const existingOsteo = currentPlacements.find(p => p.levelId === levelId && p.zone === 'mid' && p.tool === 'osteotomy');
         if (existingOsteo) {
@@ -2400,7 +2404,7 @@ const App = () => {
         const existingCage = currentCages.find(c => c.levelId === levelId);
         if (existingCage) { setEditingCageLevel(levelId); setEditingData(existingCage); setCageModalOpen(true); return; }
 
-        // Nothing exists — show picker (cage vs osteotomy)
+        // Nothing exists - show picker (cage vs osteotomy)
         setDiscPickerLevel(levelId);
     };
     const handleDiscPickCage = () => {
@@ -2460,7 +2464,7 @@ const App = () => {
         const isHookType = NO_SIZE_TYPES.includes(ghost.tool);
 
         if (tool.needsSize || isHookType) {
-            // Screws, hooks, fixation — open ScrewModal pre-filled
+            // Screws, hooks, fixation - open ScrewModal pre-filled
             setPendingPlacement({ levelId: ghost.levelId, zone: ghost.zone, tool: ghost.tool });
             setEditingPlacementId(null);
             setEditingData(ghost.data);
@@ -2468,7 +2472,7 @@ const App = () => {
             setEditingAnnotation(ghost.annotation || '');
             setScrewModalOpen(true);
         } else if (tool.isOsteotomy) {
-            // Osteotomies — open OsteotomyModal pre-filled
+            // Osteotomies - open OsteotomyModal pre-filled
             setPendingPlacement({ levelId: ghost.levelId, zone: ghost.zone, tool: ghost.tool });
             setEditingPlacementId(null);
             setEditingData(ghost.data);
@@ -2493,7 +2497,7 @@ const App = () => {
     const addPlacement = (levelId, zone, tool, data, annotation) => {
         const newP = { id: genId(), levelId, zone, tool, data, annotation: annotation || '' };
         const setter = activeChart === 'planned' ? setPlannedPlacements : setCompletedPlacements;
-        // One implant per left/right zone — use functional update to check latest state
+        // One implant per left/right zone - use functional update to check latest state
         if (zone === 'left' || zone === 'right') {
             setter(prev => prev.some(p => p.levelId === levelId && p.zone === zone) ? prev : [...prev, newP]);
         } else {
@@ -2686,7 +2690,7 @@ const App = () => {
         if (plannedPlacements.length === 0 && plannedConnectors.length === 0 && plannedNotes.length === 0 && plannedCages.length === 0) return showToast(t('alert.no_plan'));
 
         // Filter out plan placements that already have a construct placement at the same levelId + zone
-        // Also exclude force placements (force_left, force_right) — forces are plan-only
+        // Also exclude force placements (force_left, force_right) - forces are plan-only
         const newPlacements = plannedPlacements.filter(p =>
             !p.zone.startsWith('force') &&
             !completedPlacements.some(cp => cp.levelId === p.levelId && cp.zone === p.zone)
@@ -2922,7 +2926,7 @@ const App = () => {
                     })}
                 </div>
 
-                {/* Portrait Content — swipeable tabs */}
+                {/* Portrait Content - swipeable tabs */}
                 <div ref={portraitContentRef} className="flex-1 overflow-hidden relative bg-slate-300"
                     onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -2946,7 +2950,7 @@ const App = () => {
                     </div>
                 </div>
 
-                {/* Hidden off-screen export container for PDF/JPG — only mounted during export to avoid duplicate React elements */}
+                {/* Hidden off-screen export container for PDF/JPG - only mounted during export to avoid duplicate React elements */}
                 {portraitExporting && (
                     <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', pointerEvents: 'none' }}>
                         <div id="export-container" ref={exportRef}>
@@ -2976,7 +2980,7 @@ const App = () => {
 
             <div className="flex-1 overflow-hidden bg-slate-200 flex relative">
                 <aside className="w-[340px] flex flex-col z-20 overflow-y-auto no-print shadow-xl" style={{ backgroundColor: scheme.sidebarBg, borderRight: `1px solid ${scheme.sidebarBorder}`, color: scheme.textPrimary }}>
-                    {/* 1. Tool Palette — most used, top position */}
+                    {/* 1. Tool Palette - most used, top position */}
                     <div className="p-3 space-y-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
                         {tools.map((g,i) => (
                             <div key={i}>
@@ -2994,7 +2998,7 @@ const App = () => {
                         ))}
                     </div>
 
-                    {/* 2. Plan/Construct Toggle + Confirm Plan — workflow controls */}
+                    {/* 2. Plan/Construct Toggle + Confirm Plan - workflow controls */}
                     <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
                         <h3 className="text-[10px] uppercase font-bold mb-1.5 tracking-widest" style={{ color: scheme.textMuted }}>{t('sidebar.editing')}</h3>
                         <div className="flex rounded p-1 border" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>
@@ -3035,7 +3039,7 @@ const App = () => {
                         </div>
                     </div>
 
-                    {/* 6. Theme & Language — preferences, rarely changed */}
+                    {/* 6. Theme & Language - preferences, rarely changed */}
                     <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
                         <div className="flex items-center gap-3">
                             <div className="relative">
@@ -3077,12 +3081,12 @@ const App = () => {
                     {/* Spacer to push bottom items down */}
                     <div className="flex-1"></div>
 
-                    {/* 7. Help — prominent, bottom right */}
+                    {/* 7. Help - prominent, bottom right */}
                     <div className="p-3" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
                         <button onClick={() => setHelpModalOpen(true)} className="w-full flex items-center justify-center gap-2 hover:brightness-125 px-3 py-2 rounded text-xs font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconHelp /> {t('sidebar.help')}</button>
                     </div>
 
-                    {/* 8. Utility row — version, new patient, sync */}
+                    {/* 8. Utility row - version, new patient, sync */}
                     <div className="px-3 pb-1 flex items-center gap-1">
                         <div className="flex items-center justify-center px-1.5 py-1.5 rounded text-[10px]" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? t('sync.linked') : t('sync.no_peer')}><IconLink />{syncConnected && <span className="ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
                         <button onClick={() => setChangeLogOpen(true)} className="flex items-center justify-center px-2 py-1.5 rounded text-[10px] font-mono" style={{ color: scheme.textMuted }}>{CURRENT_VERSION}</button>

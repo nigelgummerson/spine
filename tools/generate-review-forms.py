@@ -3,8 +3,8 @@
 Generate per-language HTML review forms from translations.json.
 
 Each form has two parts:
-  1. Translation Review — verify/correct every translated string
-  2. Bug Reports — report any technical issues found while testing
+  1. Translation Review: verify/correct every translated string
+  2. Bug Reports: report any technical issues found while testing
 
 Usage:
     python tools/generate-review-forms.py
@@ -42,21 +42,21 @@ LANG_NAMES = {
     "tr": ("Turkish", "Türkçe"),
 }
 
-# Keys to exclude from review — untranslatable proper nouns, universal abbreviations,
+# Keys to exclude from review: untranslatable proper nouns, universal abbreviations,
 # and strings that are intentionally identical across all languages.
 SKIP_KEYS = {
-    "credits.developer_name",       # Proper name — "Nigel Gummerson FRCS (Tr & Orth)"
-    "sidebar.jpg",                   # Universal abbreviation — "JPG"
-    "sidebar.pdf",                   # Universal abbreviation — "PDF"
-    "clinical.osteotomy.ponte.label",  # Eponymous procedure — "Ponte / Smith Petersen"
-    "clinical.osteotomy.vcr.label",    # International abbreviation — "VCR"
-    "clinical.screw.uniplanar.short",  # Universal abbreviation — "Uni"
-    "patient.plan_rod_left_placeholder",   # Example measurements — "e.g. 5.5mm CoCr 120mm"
-    "patient.plan_rod_right_placeholder",  # Example measurements — "e.g. 5.5mm TiAlV 120mm"
-    "disclaimer.review",                   # UI link text — "Help improve this translation"
+    "credits.developer_name",       # Proper name: "Nigel Gummerson FRCS (Tr & Orth)"
+    "sidebar.jpg",                   # Universal abbreviation: "JPG"
+    "sidebar.pdf",                   # Universal abbreviation: "PDF"
+    "clinical.osteotomy.ponte.label",  # Eponymous procedure: "Ponte / Smith Petersen"
+    "clinical.osteotomy.vcr.label",    # International abbreviation: "VCR"
+    "clinical.screw.uniplanar.short",  # Universal abbreviation: "Uni"
+    "patient.plan_rod_left_placeholder",   # Example measurements: "e.g. 5.5mm CoCr 120mm"
+    "patient.plan_rod_right_placeholder",  # Example measurements: "e.g. 5.5mm TiAlV 120mm"
+    "disclaimer.review",                   # UI link text: "Help improve this translation"
 }
 
-# UI workflow sections — keys grouped by where they appear in the app.
+# UI workflow sections: keys grouped by where they appear in the app.
 # Each entry: (section_title, guidance_text, list_of_key_prefixes)
 # Keys are matched by prefix in order; first match wins.
 SECTIONS = [
@@ -80,7 +80,7 @@ SECTIONS = [
         ["patient.", "clinical.bone_graft."],
     ),
     (
-        "Implant Modal — Screws, Hooks & Bands",
+        "Implant Modal: Screws, Hooks & Bands",
         "Click any pedicle marker (small circle on either side of a vertebra) to open this modal. "
         "It has a three-tier visual hierarchy: SCREWS (top, with Monoaxial/Polyaxial/Uniplanar buttons), "
         "HOOKS (middle, with 5 hook types: Pedicle, TP Down, TP Up, Supra-laminar, Infra-laminar), "
@@ -92,7 +92,7 @@ SECTIONS = [
         ["modal.screw.", "clinical.screw.", "clinical.hook.", "clinical.fixation."],
     ),
     (
-        "Cage Modal — Interbody Cages",
+        "Cage Modal: Interbody Cages",
         "Click a disc space (gap between vertebrae) on the spine diagram to open this modal. "
         "Cage types are grouped by surgical approach: Posterior (PLIF, TLIF), Anterior (ACDF, ALIF), "
         "Lateral (XLIF/LLIF, OLIF). Important: ALIF only appears at L4-S1 disc spaces; ACDF only "
@@ -103,13 +103,13 @@ SECTIONS = [
     ),
     (
         "Osteotomy Modal",
-        "Schwab 1-2 (Facet, Ponte) are placed at the disc level — click between vertebrae. "
-        "Schwab 3+ (PSO, VCR, etc.) are placed on the vertebral body — click midline. "
+        "Schwab 1-2 (Facet, Ponte) are placed at the disc level: click between vertebrae. "
+        "Schwab 3+ (PSO, VCR, etc.) are placed on the vertebral body: click midline. "
         "The dropdown shows two groups: Posterior (Schwab Grades 1-6: Facet release, Ponte, "
         "Standard PSO, Extended PSO, VCR, Multi-level VCR) and Anterior (Corpectomy). "
         "Each osteotomy type has a label, Schwab grade, and description. "
         "VCR, Multi-level VCR, and Corpectomy also show a Reconstruction Cage text field. "
-        "Correction angle is optional — defaults to empty with placeholder hints showing typical values. "
+        "Correction angle is optional, defaults to empty with placeholder hints showing typical values. "
         "Osteotomies render as amber-coloured markers (red is reserved for destructive actions).",
         ["modal.osteotomy.", "clinical.osteotomy."],
     ),
@@ -119,7 +119,7 @@ SECTIONS = [
         "Six force/correction types are shown as clickable buttons: Translate Left, Translate Right, "
         "Compression, Distraction, Derotate CW, Derotate CCW. "
         "Forces use blue colour scheme (biomechanics convention for corrective vectors). "
-        "Forces can only be placed on the Plan — on the Construct tab they appear read-only. "
+        "Forces can only be placed on the Plan. On the Construct tab they appear read-only. "
         "Force zones always open the ForceModal regardless of which tool is selected.",
         ["modal.force.", "clinical.force."],
     ),
@@ -153,7 +153,7 @@ SECTIONS = [
     (
         "Chart Headers & Diagram Labels",
         "The column headers on each spine chart: Left, Right, and Force. "
-        "'Forces — edit in Plan' appears as a hint on the Construct chart (in portrait mode and "
+        "'Forces - edit in Plan' appears as a hint on the Construct chart (in portrait mode and "
         "in the export) indicating that forces are read-only on the Construct side. "
         "The cervical cage hint and corpectomy label appear on the diagram itself. "
         "Region view short label ('All') appears in compact contexts.",
@@ -162,7 +162,7 @@ SECTIONS = [
     (
         "Linked Screens (Sync)",
         "Open the app in two windows of the same browser on a dual-screen setup. "
-        "Changes sync automatically via BroadcastChannel — one screen can show the Plan while "
+        "Changes sync automatically via BroadcastChannel. One screen can show the Plan while "
         "the other shows Demographics with live inventory. A green link icon in the sidebar "
         "indicates active sync. These strings are the tooltip text for the sync status indicator.",
         ["sync."],
@@ -180,7 +180,7 @@ SECTIONS = [
         "Click the Help button (? icon) in the sidebar Actions section. The help modal has "
         "multiple sections: Session Privacy, Screws & Hooks, Interbody Cages, Osteotomies, "
         "Confirm Plan, Portrait & Tablet Mode, Save/Load/Export, Linked Screens, and Keyboard Shortcuts. "
-        "Bodies may contain HTML markup — please preserve any HTML tags "
+        "Bodies may contain HTML markup. Please preserve any HTML tags "
         "(<strong>, <br>, <ul>, <li>, etc.) and only translate the text content. "
         "The help modal uses a two-column layout in landscape and closes with Escape.",
         ["help."],
@@ -198,7 +198,7 @@ SECTIONS = [
         "These appear as toast notifications or custom modals during specific actions: "
         "loading invalid files, starting a new patient, copying plan to construct, "
         "and cage permissibility warnings. Info toasts auto-dismiss; error toasts persist. "
-        "Some contain {placeholder} replacements — "
+        "Some contain {placeholder} replacements: "
         "keep the {braces} intact and only translate the surrounding text.",
         ["alert."],
     ),
@@ -206,7 +206,7 @@ SECTIONS = [
         "Credits & Disclaimer",
         "The app name, developer credit, and license link appear in the Help modal footer. "
         "The translation disclaimer appears in the main app footer and on exported documents. "
-        "The license text contains an HTML link — preserve the <a> tag and only translate surrounding text.",
+        "The license text contains an HTML link. Preserve the <a> tag and only translate surrounding text.",
         ["credits.", "disclaimer."],
     ),
     (
@@ -287,9 +287,9 @@ def generate_html(lang: str, translations: dict) -> str:
 
             hints = []
             if has_html:
-                hints.append('<span class="hint html-hint">Contains HTML — preserve tags</span>')
+                hints.append('<span class="hint html-hint">Contains HTML: preserve tags</span>')
             if has_placeholder:
-                hints.append('<span class="hint placeholder-hint">Contains {placeholders} — keep braces intact</span>')
+                hints.append('<span class="hint placeholder-hint">Contains {placeholders}: keep braces intact</span>')
 
             hint_html = " ".join(hints)
 
@@ -346,7 +346,7 @@ def generate_html(lang: str, translations: dict) -> str:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Translation Review — {escape(en_name)} ({escape(native_name)})</title>
+    <title>Translation Review: {escape(en_name)} ({escape(native_name)})</title>
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -424,11 +424,16 @@ def generate_html(lang: str, translations: dict) -> str:
 
         .col-status {{ grid-column: 1; }}
         .col-comment {{ grid-column: 2; }}
-        .status-radios {{ display: flex; gap: 12px; }}
-        .radio-label {{ display: flex; align-items: center; gap: 4px; font-size: 13px; cursor: pointer; }}
-        .radio-label input {{ cursor: pointer; }}
-        .correct-label span {{ color: #2d6a4f; }}
-        .corrected-label span {{ color: #e76f51; }}
+        .status-radios {{ display: flex; gap: 8px; }}
+        .radio-label {{ display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;
+                        padding: 6px 14px; border: 1px solid #ddd; border-radius: 6px; transition: all 0.15s; }}
+        .radio-label:hover {{ background: #f5f5f5; }}
+        .radio-label input {{ cursor: pointer; width: 16px; height: 16px; accent-color: currentColor; }}
+        .radio-label input:checked + span {{ font-weight: 600; }}
+        .correct-label {{ color: #2d6a4f; }}
+        .correct-label:has(input:checked) {{ background: #f0f8f4; border-color: #2d6a4f; }}
+        .corrected-label {{ color: #e76f51; }}
+        .corrected-label:has(input:checked) {{ background: #fff8f0; border-color: #e76f51; }}
         .comment-field {{ font-size: 13px; width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; }}
         .comment-field:focus {{ outline: none; border-color: #2d6a4f; }}
 
@@ -487,16 +492,19 @@ def generate_html(lang: str, translations: dict) -> str:
         .bug-grid textarea {{ resize: vertical; min-height: 60px; }}
         .nav-link-bugs {{ color: #b45309 !important; font-weight: 500; }}
 
-        /* Backup banner — persistent, below header */
-        .backup-banner {{ display: none; background: #f0f4f8; border-bottom: 1px solid #d1d5db;
-                          padding: 6px 24px; font-size: 12px; color: #555; text-align: center;
-                          position: sticky; top: var(--header-h, 80px); z-index: 99; }}
-        .backup-banner.visible {{ display: flex; align-items: center; justify-content: center; gap: 12px; }}
-        .backup-banner .backup-btn {{ background: #2d6a4f; color: white; border: none; padding: 3px 10px;
-                                      border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500; }}
-        .backup-banner .backup-btn:hover {{ background: #40916c; }}
+        /* Save hint: small note under progress bar */
+        .save-hint {{ font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; display: none; }}
+        .save-hint.visible {{ display: block; }}
 
-        /* Milestone toast — 50% prompt */
+        /* Next unreviewed button */
+        .next-unreviewed {{ position: fixed; bottom: 24px; left: 24px; z-index: 150;
+                            background: #1a1a2e; color: white; border: none; padding: 10px 18px;
+                            border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: background 0.15s; }}
+        .next-unreviewed:hover {{ background: #2d3a5e; }}
+        .next-unreviewed:disabled {{ opacity: 0.4; cursor: default; }}
+
+        /* Milestone toast: 50% prompt */
         .milestone-toast {{ display: none; position: fixed; bottom: 24px; right: 24px; z-index: 200;
                             background: #1a1a2e; color: white; padding: 16px 20px; border-radius: 10px;
                             box-shadow: 0 8px 24px rgba(0,0,0,0.25); max-width: 340px; font-size: 13px;
@@ -524,10 +532,11 @@ def generate_html(lang: str, translations: dict) -> str:
     <div class="header">
         <div class="header-top">
             <div>
-                <h1>Spinal Instrumentation Plan & Record — Translation Review</h1>
-                <span class="lang-badge">{escape(en_name)} — {escape(native_name)} ({lang})</span>
+                <h1>Spinal Instrumentation Plan & Record: Translation Review</h1>
+                <span class="lang-badge">{escape(en_name)} / {escape(native_name)} ({lang})</span>
             </div>
             <div class="header-actions">
+                <a href="../guide.html" target="_blank" style="color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: none; padding: 6px 10px;" title="How to use this form">Guide</a>
                 <button onclick="resetReview()" class="btn-reset" title="Clear all progress and start over">Reset</button>
                 <button onclick="importReview()" title="Load a previously saved review">Import</button>
                 <button class="btn-export" onclick="exportReview()" title="Download review as JSON">Export Review</button>
@@ -537,12 +546,8 @@ def generate_html(lang: str, translations: dict) -> str:
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
             <div class="progress-text" id="progress-text">0 of {total_keys} items reviewed (0%)</div>
+            <div class="save-hint" id="save-hint"></div>
         </div>
-    </div>
-
-    <div class="backup-banner" id="backup-banner">
-        <span>Your progress is saved in this browser. To continue on another device, download a backup.</span>
-        <button class="backup-btn" onclick="exportReview()">Download backup</button>
     </div>
 
     <div class="milestone-toast" id="milestone-toast">
@@ -553,6 +558,8 @@ def generate_html(lang: str, translations: dict) -> str:
             <button class="toast-btn toast-btn-dismiss" onclick="dismissMilestone()">Not now</button>
         </div>
     </div>
+
+    <button class="next-unreviewed" id="next-unreviewed" onclick="goToNextUnreviewed()" title="Jump to next unreviewed item">Next unreviewed &#x2193;</button>
 
     <div class="layout">
         <nav class="nav" id="nav">
@@ -612,7 +619,7 @@ def generate_html(lang: str, translations: dict) -> str:
                     If you notice any technical problems while testing the app in {escape(native_name)}, please report them here.
                     This could include: layout issues (text overflow, truncation, overlapping elements), broken buttons or interactions,
                     display problems on specific screen sizes or orientations, export/PDF issues, or anything that does not work as expected.
-                    You do not need to report English-only issues here — focus on problems you see when the app is set to {escape(native_name)}.
+                    You do not need to report English-only issues here. Focus on problems you see when the app is set to {escape(native_name)}.
                 </div>
                 <div id="bug-list"></div>
                 <button class="add-bug-btn" onclick="addBugReport()">+ Add Bug Report</button>
@@ -622,9 +629,9 @@ def generate_html(lang: str, translations: dict) -> str:
                             <span class="bug-number"></span>
                             <select class="bug-severity">
                                 <option value="">Severity...</option>
-                                <option value="minor">Minor — cosmetic / wording</option>
-                                <option value="moderate">Moderate — confusing or awkward</option>
-                                <option value="major">Major — blocks workflow or loses data</option>
+                                <option value="minor">Minor: cosmetic / wording</option>
+                                <option value="moderate">Moderate: confusing or awkward</option>
+                                <option value="major">Major: blocks workflow or loses data</option>
                             </select>
                             <button class="bug-remove-btn" onclick="removeBugReport(this)" title="Remove this bug report">&times;</button>
                         </div>
@@ -759,8 +766,8 @@ def generate_html(lang: str, translations: dict) -> str:
             document.getElementById('progress-fill').style.width = pct + '%';
             document.getElementById('progress-text').textContent = reviewed + ' of ' + TOTAL + ' items reviewed (' + pct + '%)';
 
-            // Show backup banner once any review activity exists
-            if (reviewed > 0) showBackupBanner();
+            // Show save hint once any review activity exists
+            if (reviewed > 0) showSaveHint();
 
             // Check 50% milestone
             checkMilestone(reviewed);
@@ -784,15 +791,16 @@ def generate_html(lang: str, translations: dict) -> str:
 
         // --- Backup banner & milestone ---
 
-        let bannerShown = false;
+        let hintShown = false;
         let milestoneShown = false;
         const MILESTONE_KEY = STORAGE_KEY + '_milestone50';
 
-        function showBackupBanner() {{
-            if (bannerShown) return;
-            bannerShown = true;
-            document.getElementById('backup-banner').classList.add('visible');
-            // Adjust nav sticky position to account for banner height
+        function showSaveHint() {{
+            if (hintShown) return;
+            hintShown = true;
+            const hint = document.getElementById('save-hint');
+            hint.textContent = 'This form does not send data to a server. Progress is saved in your browser only. Use Export Review to download and back up your work.';
+            hint.classList.add('visible');
             requestAnimationFrame(syncHeaderHeight);
         }}
 
@@ -810,6 +818,47 @@ def generate_html(lang: str, translations: dict) -> str:
             document.getElementById('milestone-toast').classList.remove('visible');
             try {{ localStorage.setItem(MILESTONE_KEY, '1'); }} catch(e) {{}}
         }};
+
+        // --- Next unreviewed & auto-scroll ---
+
+        function findNextUnreviewed(afterEl) {{
+            const items = Array.from(document.querySelectorAll('.review-item'));
+            const startIdx = afterEl ? items.indexOf(afterEl) + 1 : 0;
+            // Search from current position to end, then wrap around
+            for (let i = 0; i < items.length; i++) {{
+                const item = items[(startIdx + i) % items.length];
+                if (item.style.display === 'none') continue;
+                if (!item.querySelector('input[type="radio"]:checked')) return item;
+            }}
+            return null;
+        }}
+
+        function scrollToItem(item) {{
+            if (!item) return;
+            item.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+            item.style.boxShadow = '0 0 0 3px rgba(45,106,79,0.3)';
+            setTimeout(() => {{ item.style.boxShadow = ''; }}, 1500);
+        }}
+
+        window.goToNextUnreviewed = function() {{
+            const next = findNextUnreviewed(null);
+            if (next) scrollToItem(next);
+        }};
+
+        function updateNextButton() {{
+            const btn = document.getElementById('next-unreviewed');
+            const next = findNextUnreviewed(null);
+            btn.disabled = !next;
+            btn.textContent = next ? 'Next unreviewed \u2193' : 'All reviewed \u2713';
+        }}
+
+        function autoScrollToNext(currentItem) {{
+            setTimeout(() => {{
+                const next = findNextUnreviewed(currentItem);
+                if (next) scrollToItem(next);
+                updateNextButton();
+            }}, 300);
+        }}
 
         // --- Filter ---
 
@@ -896,7 +945,7 @@ def generate_html(lang: str, translations: dict) -> str:
                         const bugMsg = data.bugs ? ', ' + data.bugs.length + ' bug reports' : '';
                         alert('Review loaded: ' + Object.keys(data.items).length + ' items' + bugMsg + '.');
                     }} else {{
-                        alert('Invalid review file — no items found.');
+                        alert('Invalid review file: no items found.');
                     }}
                 }} catch(err) {{
                     alert('Error reading file: ' + err.message);
@@ -980,6 +1029,10 @@ def generate_html(lang: str, translations: dict) -> str:
                 if (item) updateItemAppearance(item);
                 updateProgress();
                 autoSave();
+                // Auto-scroll to next unreviewed after marking via radio button
+                if (e.target.matches('input[type="radio"]') && item) {{
+                    autoScrollToNext(item);
+                }}
             }}
             // Bug report fields
             if (e.target.matches('.bug-severity')) {{
@@ -1043,9 +1096,7 @@ def generate_html(lang: str, translations: dict) -> str:
         // Measure header and set CSS variable so nav sticks below it
         function syncHeaderHeight() {{
             const h = document.querySelector('.header').offsetHeight;
-            const banner = document.getElementById('backup-banner');
-            const bh = banner.classList.contains('visible') ? banner.offsetHeight : 0;
-            document.documentElement.style.setProperty('--header-h', (h + bh) + 'px');
+            document.documentElement.style.setProperty('--header-h', h + 'px');
         }}
         syncHeaderHeight();
         window.addEventListener('resize', syncHeaderHeight);
@@ -1053,6 +1104,7 @@ def generate_html(lang: str, translations: dict) -> str:
         // Init
         autoLoad();
         updateProgress();
+        updateNextButton();
         // Defer textarea sizing until layout is complete
         requestAnimationFrame(sizeTextareas);
     }})();
