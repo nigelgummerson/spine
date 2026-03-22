@@ -457,11 +457,15 @@ const App = () => {
         ch.onmessage = (e) => {
             const msg = e.data;
             // Version mismatch - ignore sync from older/newer app versions
+            if (!msg.appVersion) {
+                console.warn('Sync: ignoring message without appVersion', msg);
+                return;
+            }
             if (msg.appVersion !== CURRENT_VERSION) {
                 if (!syncVersionMismatchRef.current) {
                     syncVersionMismatchRef.current = true;
-                    console.warn('Sync version mismatch:', { received: msg.appVersion, expected: CURRENT_VERSION, msgType: msg.type, msg });
-                    showToast(`Another window is running ${msg.appVersion || 'an unknown version'} — please reload all windows to sync.`, 'error');
+                    console.warn('Sync version mismatch:', { received: msg.appVersion, expected: CURRENT_VERSION, msgType: msg.type });
+                    showToast(`Another window is running ${msg.appVersion} — please reload all windows to sync.`, 'error');
                 }
                 return;
             }
