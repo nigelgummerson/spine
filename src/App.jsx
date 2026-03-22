@@ -60,7 +60,6 @@ const App = () => {
         setCurrentLangState(code);
         document.documentElement.lang = code;
         localStorage.setItem('spine_planner_lang', code);
-        if (!isDisclaimerAccepted(code)) setDisclaimerAccepted(false);
     };
 
     const changeTheme = (id) => {
@@ -96,18 +95,15 @@ const App = () => {
     
     const [confirmNewPatient, setConfirmNewPatient] = useState(false);
     const [exportPicker, setExportPicker] = useState(null); // 'jpg' or 'pdf'
-    const [disclaimerAccepted, setDisclaimerAccepted] = useState(() => isDisclaimerAccepted(detectLanguage()));
+    // Disclaimer: derive from sessionStorage on every render, use counter to force re-render on accept
+    const [disclaimerTick, setDisclaimerTick] = useState(0);
+    const disclaimerAccepted = isDisclaimerAccepted(currentLang);
 
-    // Re-check disclaimer on language change and at half-day boundary (AM/PM)
+    // Re-check disclaimer at half-day boundary (AM/PM)
     useEffect(() => {
-        if (!isDisclaimerAccepted(currentLang)) setDisclaimerAccepted(false);
-    }, [currentLang]);
-    useEffect(() => {
-        const interval = setInterval(() => {
-            if (!isDisclaimerAccepted(currentLang)) setDisclaimerAccepted(false);
-        }, 60000); // check every minute
+        const interval = setInterval(() => setDisclaimerTick(n => n + 1), 60000);
         return () => clearInterval(interval);
-    }, [currentLang]);
+    }, []);
 
     // TOAST NOTIFICATIONS
     const [toasts, setToasts] = useState([]);
@@ -1379,7 +1375,7 @@ const App = () => {
                     </div>
                 ))}
             </div>}
-            {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerAccepted(true); }} />}
+            {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerTick(n => n + 1); }} />}
         </div>
     );
 };
