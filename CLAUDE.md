@@ -4,49 +4,74 @@
 A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 14 European languages.
 
 ## Current Status
-- **Version:** v2.0.2-beta
-- **Last Updated:** 2026-03-21
+- **Version:** v2.1.0-beta
+- **Last Updated:** 2026-03-22
 - **License:** GNU GPLv3
 
 ## Project Structure
 ```
-spine-surgery/planning/spine-planner/
-├── index.html          # Single-file app (React 18 + Tailwind via CDN), ~6200 lines
-├── tests/
-│   ├── i18n-completeness.html    # Layer 1: translation key completeness
-│   ├── i18n-clinical.html        # Layer 2: clinical terminology vs glossary
-│   ├── i18n-overflow.html        # Layer 3: string length overflow detection
-│   └── translation-glossary.json # Reference clinical terms with sources
-├── review-forms/           # Per-language review HTML (sent) and JSON responses (received)
-│   ├── {lang}/
-│   │   ├── {lang}-review.html    # Generated review form
-│   │   └── responses/            # Reviewer JSON files
-├── tools/
-│   ├── generate-review-forms.py    # Generates per-language HTML review forms → review-forms/
-│   ├── import-reviews.py           # Imports reviewer JSON, reports & applies corrections
-│   ├── TRANSLATION-REVIEW-GUIDE.md   # Instructions for reviewers and developers
-│   └── TRANSLATION-REVIEW-WORKFLOW.md # Developer workflow for review pipeline
-├── data/ -> Dropbox    # Symlink: PDFs, reference images, rod data
-├── docs/ -> Dropbox    # Symlink: specs (SPECIFICATION.md, PHASE-0-SPEC.md), plans
-├── alpha-notes.txt     # Development context and version notes
-├── CLAUDE.md           # This file (Claude-specific collaboration tracking)
-├── README.md           # GitHub README
-└── .git/               # Git repository
+spine-planner/
+├── index.html              # Vite entry point (minimal)
+├── vite.config.js          # Vite + vite-plugin-singlefile config
+├── postcss.config.js       # Tailwind v4 PostCSS
+├── package.json            # npm dependencies and scripts
+├── src/
+│   ├── main.jsx            # React root mount + font imports
+│   ├── App.jsx             # Main app component (~1,370 lines)
+│   ├── styles.css          # Global CSS + Tailwind import
+│   ├── inter-subset.css    # Inter font (WOFF2, Latin/Greek subsets)
+│   ├── source-serif-4-subset.css  # Source Serif 4 (WOFF2, Latin/Greek)
+│   ├── i18n/
+│   │   ├── translations.json    # All translations (14 languages × 253 keys)
+│   │   ├── languages.json       # SUPPORTED_LANGUAGES array
+│   │   └── i18n.js              # t(), detectLanguage(), lang state
+│   ├── data/
+│   │   ├── anatomy.js           # VERTEBRA_ANATOMY, REGIONS, coordinate functions
+│   │   ├── implants.js          # IMPLANT_COMPANIES, SCREW_SYSTEMS, sizing
+│   │   ├── clinical.js          # CAGE_PERMISSIBILITY, osteotomy/force types
+│   │   ├── themes.js            # COLOUR_SCHEMES, company theme mapping
+│   │   └── changelog.js         # CURRENT_VERSION, CHANGE_LOG
+│   ├── components/
+│   │   ├── icons.jsx            # 13 SVG icon components
+│   │   ├── ImplantInventory.jsx # Grouped inventory counts
+│   │   ├── ScrewSystemCombo.jsx # Manufacturer screw system dropdown
+│   │   ├── CreditsFooter.jsx    # Version, credits, license footer
+│   │   ├── modals/              # ScrewModal, CageModal, OsteotomyModal,
+│   │   │                        # ForceModal, NoteModal, HelpModal, ChangeLogModal
+│   │   └── chart/               # ChartPaper, LevelRow, SpineVertebra,
+│   │                            # InstrumentIcon, CageVisualization
+│   ├── hooks/
+│   │   └── usePortrait.js       # Orientation detection hook
+│   └── utils/
+│       └── id.js                # Unique ID generator
+├── dist/                   # Build output (single index.html, ~1.9MB)
+├── tests/                  # i18n verification (read from src/i18n/*.json)
+├── tools/                  # Translation review tools (read/write src/i18n/translations.json)
+├── review-forms/           # Per-language review HTML + responses
+├── .github/workflows/deploy.yml  # GitHub Actions: build + deploy to Pages
+├── data/ -> Dropbox        # Symlink: PDFs, reference images, rod data
+├── docs/ -> Dropbox        # Symlink: specs, plans
+└── .gitignore              # + node_modules/, dist/
 ```
 
 ## GitHub & Deployment
 - **Repository:** github.com/nigelgummerson/spine-planner
 - **Live Site:** nigelgummerson.github.io/spine-planner (GitHub Pages)
-- **Branches:** `main` (v1.2.0-beta)
+- **Deployment:** GitHub Actions — `npm ci && npm run build`, deploys `dist/` on push to main
 
 ## Tech Stack
-- React 18 production builds (via CDN - unpkg)
-- Tailwind CSS (via CDN)
-- html-to-image (PDF/JPG export via SVG foreignObject — pixel-perfect browser-native rendering)
-- jsPDF (PDF export)
-- All dependencies loaded via CDN for offline hospital use
+- **Build:** Vite + vite-plugin-singlefile (outputs single HTML file with everything inlined)
+- **Framework:** React 19 (npm, pre-compiled JSX — no in-browser transpilation)
+- **Styling:** Tailwind CSS v4 (PostCSS)
+- **Fonts:** Inter + Source Serif 4 via fontsource (WOFF2, Latin/Greek subsets, embedded as base64)
+- **Export:** html-to-image (SVG foreignObject) + jsPDF
+- **All dependencies bundled** — no CDN calls, fully offline
 
 ## Version History (Recent)
+- **v2.1.0-beta** (2026-03-22): Vite build system — modular source (26 files), pre-compiled JSX, single-file output via vite-plugin-singlefile. Fully offline with embedded fonts (Inter, Source Serif 4). Translations externalised to JSON. Translation tools and tests updated to read JSON directly. GitHub Actions deployment.
+- **v2.0.3-beta** (2026-03-22): Review form UX — persistent backup banner, auto-scroll to next unreviewed, larger touch targets, guide page.
+- **v2.0.2-beta** (2026-03-22): Clinical translation audit — Greek, Polish fixes. Localised ghost placement terminology.
+- **v2.0.1-beta** (2026-03-21): Translated 8 hardcoded strings. Sync race condition fix. One-implant-per-zone enforcement. App version check on sync.
 - **v2.0.0-beta** (2026-03-21): JSON format v4 — spinal-instrumentation schema. Unified elements array with typed sub-objects (screw, hook, cage, osteotomy, fixation, connector). Forces separated from implants. Structured screw data (diameter/length as numbers). Rod objects with material/diameter/profile fields. Document metadata (UUID, timestamps, institution, language). Schema self-description for interoperability. Clinical terminology throughout. Backward-compatible — loads v2/v3 files. JSON Schema spec at docs/spinal-instrumentation-schema-v4.json.
 - **v1.3.1-beta** (2026-03-21): Expert review polish. Active chart accent border + 20% inactive overlay. Uniform vertebral body fill (#f1f5f9). Osteotomy colour red→amber (red reserved for destructive actions). Custom New Patient confirmation modal (replaces browser confirm). Export picker — choose Plan or Final Record before JPG/PDF. Export timestamp footer. Pedicle vertical position based on pedicle height. Force zones always open ForceModal regardless of tool. Note preset labels sentence case. Linked Screens help entry (14 languages). Dark theme button borders improved.
 - **v1.3.0-beta** (2026-03-21): Major design overhaul following Apple HIG review. Light sidebar with corporate brand accents — Medtronic (navy title bar, electric blue), DePuy (dark red, crimson), Stryker (black, gold), VB Spine (purple), Globus (midnight blue, red). Dark themes available for preference. Sidebar and portrait toolbar reordered by workflow frequency (tools first). Click inactive chart to switch editing side in landscape. 10px minimum font size (Inter). Help and Changelog modals: two-column landscape layout, wider, Escape to close. Changelog consolidated to date-based entries. Pedicle proportions at full anatomical scale. Theme swatch borders and tool palette icons adapt to light/dark themes.
@@ -66,8 +91,8 @@ spine-surgery/planning/spine-planner/
 - **v0.9.4-alpha** (2026-03-01): Replaced html2canvas with html-to-image for pixel-perfect export.
 - **v0.9.3-alpha** (2026-03-01): Anatomical proportions (T1-S1), pedicle data, variable disc heights, auto-scale solver.
 
-## Key Architecture (v1.1.0)
-- **i18n:** Flat `TRANSLATIONS` object (~220 keys × 14 languages), `t(key, replacements)` function with `??` fallback chain. `_currentLang` module-level variable synced with React state via `changeLang()`.
+## Key Architecture (v2.1.0)
+- **i18n:** `src/i18n/translations.json` (~253 keys × 14 languages), `t(key, replacements)` function with `??` fallback chain in `src/i18n/i18n.js`. Module-level `_currentLang` synced with React state via `changeLang()`.
 - **Supported languages:** en, de, fr, es, it, pt, sv, nb, da, fi, nl, pl, el, tr
 - **Language detection:** `detectLanguage()` checks `localStorage('spine_planner_lang')` → `navigator.language` → `'en'`. `LANG_ALIASES` maps `no`/`nn` → `nb`.
 - **Export container:** Fixed 1485x1050px, 3 columns: patient info (370px) + Plan (flex-4) + Construct (flex-3)
@@ -117,15 +142,15 @@ spine-surgery/planning/spine-planner/
 - [x] **Ghost placements:** Plan data as confirmable ghosts on construct view (portrait), merged in v1.2.0-beta
 - [ ] **Cervical spine proportions:** Extend VERTEBRA_ANATOMY to cervical levels (deferred)
 - [ ] **Barcode scanning:** Integrate html5-qrcode for GS1 DataMatrix scanning from implant packages
-- [ ] **Offline bundling:** Embed all JS libraries directly into HTML to bypass hospital firewalls
+- [x] **Offline bundling:** Vite + vite-plugin-singlefile embeds all JS, CSS, and fonts into single HTML file (v2.1.0)
 - [ ] **User testing:** Get feedback from theatre staff on current workflow
 - [ ] **Specification sync:** SPECIFICATION.md updated to v0.9.0
 - [x] **i18n review tooling:** Python generator + import pipeline for native-speaker translation review
 - [ ] **i18n Tier C:** Awaiting feedback from native-speaking reviewers (surgeons & industry professionals)
 
 ## Key Constraints
-- **Must remain single .html file** - No build process, no npm, no installation
-- **Offline-first** - Should work without internet access
+- **Must remain single .html file** - Vite build produces one self-contained HTML file via vite-plugin-singlefile
+- **Offline-first** - All dependencies and fonts embedded, no network required
 - **Hospital environment** - Assumes locked-down Windows machines with restricted permissions
 - **Print-friendly** - PDF export must be high quality for clinical records
 
@@ -135,13 +160,17 @@ spine-surgery/planning/spine-planner/
 
 ## Development Workflow
 ```bash
-# Test locally
-open index.html                # Opens in browser
+# Development (hot module replacement)
+npm run dev                   # Starts Vite dev server (http://localhost:5173)
+
+# Build single-file output
+npm run build                 # Produces dist/index.html (~1.9MB, fully offline)
+open dist/index.html          # Test built output from file://
 
 # Deploy to GitHub Pages
-git push origin main          # Auto-deploys via GitHub Pages
+git push origin main          # GitHub Actions builds and deploys automatically
 
-# Run i18n verification tests
+# Run i18n verification tests (start dev server first, or use any HTTP server)
 open tests/i18n-completeness.html   # Check all keys present
 open tests/i18n-clinical.html       # Check against glossary
 open tests/i18n-overflow.html       # Check string lengths
@@ -149,9 +178,9 @@ open tests/i18n-overflow.html       # Check string lengths
 # Translation review workflow
 python tools/generate-review-forms.py           # Generate HTML review forms (review-forms/)
 # Email {lang}-review.html + TRANSLATION-REVIEW-GUIDE.md to reviewers
-# Reviewer exports JSON, emails to nigelgummerson@mac.com
+# Reviewer exports JSON, emails to skeletalsurgery@icloud.com
 python tools/import-reviews.py review-file.json          # Report corrections
-python tools/import-reviews.py --apply review-file.json  # Apply corrections to index.html
+python tools/import-reviews.py --apply review-file.json  # Apply corrections to translations.json
 python tools/generate-review-forms.py                     # Regenerate forms with updated translations
 ```
 
