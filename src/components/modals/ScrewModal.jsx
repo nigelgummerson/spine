@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { t } from '../../i18n/i18n';
 import { DIAMETER_OPTIONS, LENGTH_OPTIONS } from '../../data/implants';
 import { HOOK_TYPES, NO_SIZE_TYPES } from '../../data/clinical';
+import { InstrumentIcon } from '../chart/InstrumentIcon';
+import { IconTrash, IconX } from '../icons';
 
 export const modalKeyHandler = ({ onSubmit, onClose, onDelete, isEditing }) => (e) => {
     const tag = e.target.tagName;

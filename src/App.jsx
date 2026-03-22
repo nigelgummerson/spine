@@ -27,6 +27,7 @@ import { ScrewSystemCombo } from './components/ScrewSystemCombo';
 import { CreditsFooter } from './components/CreditsFooter';
 import { ImplantInventory } from './components/ImplantInventory';
 import { ChartPaper } from './components/chart/ChartPaper';
+import { InstrumentIcon } from './components/chart/InstrumentIcon';
 
 const App = () => {
     const [selectedTool, setSelectedTool] = useState('implant');

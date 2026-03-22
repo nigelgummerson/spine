@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { t } from '../../i18n/i18n';
 import { genId } from '../../utils/id';
-import { getDiscHeight, getLevelHeight, VERT_SVG_SCALE, VERT_PAD } from '../../data/anatomy';
+import { getDiscHeight, getLevelHeight, VERT_SVG_SCALE, VERT_PAD , DISC_MIN_PX} from '../../data/anatomy';
 import { CAGE_TYPES, HOOK_TYPES, NO_SIZE_TYPES, FORCE_TYPES, getDiscLabel } from '../../data/clinical';
 import { InstrumentIcon } from './InstrumentIcon';
 import { SpineVertebra } from './SpineVertebra';
 import { CageVisualization } from './CageVisualization';
+import { IconCardinal } from '../icons';
 
 export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tools, onPlacementClick, onGhostClick, readOnly, showForces, heightScale, onDiscClick, cages, levels, viewMode, forcePlacements, ghostCages, onGhostCageClick }) => {
     const getItems = (z) => {

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { t } from '../../i18n/i18n';
 import { CAGE_TYPES, CAGE_PERMISSIBILITY, APPROACH_GROUPS, getDiscLabel } from '../../data/clinical';
 import { modalKeyHandler } from './ScrewModal';
+import { IconTrash, IconX } from '../icons';
 
 export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, levelId, levels }) => {
     if (!isOpen) return null;

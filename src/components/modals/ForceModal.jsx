@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { t } from '../../i18n/i18n';
 import { FORCE_TYPES } from '../../data/clinical';
+import { InstrumentIcon } from '../chart/InstrumentIcon';
+import { IconX } from '../icons';
+import { modalKeyHandler } from './ScrewModal';
 
 export const ForceModal = ({ isOpen, onClose, onConfirm }) => {
     if (!isOpen) return null;

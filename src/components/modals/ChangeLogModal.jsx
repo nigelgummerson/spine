@@ -1,7 +1,7 @@
 import React from 'react';
 import { t } from '../../i18n/i18n';
 import { CURRENT_VERSION, CHANGE_LOG, formatDate } from '../../data/changelog';
-import { IconX } from '../icons';
+import { IconX , IconHistory} from '../icons';
 
 export const ChangeLogModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;

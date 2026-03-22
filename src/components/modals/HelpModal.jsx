@@ -1,7 +1,8 @@
 import React from 'react';
 import { t } from '../../i18n/i18n';
 import { CURRENT_VERSION } from '../../data/changelog';
-import { IconX } from '../icons';
+import { IconX , IconCopy, IconSave, IconCC, IconLink} from '../icons';
+import { InstrumentIcon } from '../chart/InstrumentIcon';
 
 const IconCage = () => (
     <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none">

@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useCallback } from 'react';
 import { t } from '../../i18n/i18n';
 import { ALL_LEVELS, VERT_SVG_SCALE, VERT_PAD, getLevelHeight, getDiscHeight,
          calculateAutoScale, yNormToRenderedY, renderedYToYNorm,
-         CHART_CONTENT_HEIGHT } from '../../data/anatomy';
+         CHART_CONTENT_HEIGHT, buildHeightMap } from '../../data/anatomy';
 import { FORCE_TYPES } from '../../data/clinical';
 import { InstrumentIcon } from './InstrumentIcon';
 import { LevelRow } from './LevelRow';

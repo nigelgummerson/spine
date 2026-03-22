@@ -1,5 +1,5 @@
 import React from 'react';
-import { getVertSvgGeometry, VERT_SVG_SCALE, VERT_PAD, getLevelHeight } from '../../data/anatomy';
+import { getVertSvgGeometry, VERT_SVG_SCALE, VERT_PAD, getLevelHeight , REGIONS} from '../../data/anatomy';
 
 export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale = 1 }) => {
     const common = { fill: REGIONS[type].color, stroke: "#475569", strokeWidth: "1.5" };

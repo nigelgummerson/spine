@@ -1,5 +1,6 @@
 import React from 'react';
 import { t } from '../../i18n/i18n';
+import { getVertSvgGeometry } from '../../data/anatomy';
 
 export const CageVisualization = ({ cageType, heightScale, levelId }) => {
     const h = 12 * heightScale;

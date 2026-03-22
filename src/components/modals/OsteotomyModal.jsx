@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { t } from '../../i18n/i18n';
 import { modalKeyHandler } from './ScrewModal';
+import { IconTrash, IconX } from '../icons';
 
 export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, defaultType, defaultAngle, discLevelOnly }) => {
     if (!isOpen) return null;

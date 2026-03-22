@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { t } from '../../i18n/i18n';
 import { NOTE_PRESET_KEYS } from '../../data/clinical';
 import { modalKeyHandler } from './ScrewModal';
+import { IconTrash, IconX } from '../icons';
 
 export const NoteModal = ({ isOpen, onClose, onConfirm, onDelete, initialText, initialShowArrow, isEditing }) => {
     if (!isOpen) return null;
