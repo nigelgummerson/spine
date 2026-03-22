@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { t } from '../i18n/i18n';
 import { INVENTORY_CATEGORIES, getDiscLabel } from '../data/clinical';
 

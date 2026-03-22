@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { t } from '../i18n/i18n';
 import { SCREW_SYSTEMS } from '../data/implants';
 
