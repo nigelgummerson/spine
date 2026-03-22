@@ -934,7 +934,7 @@ def generate_html(lang: str, translations: dict) -> str:
             if (hintShown) return;
             hintShown = true;
             const hint = document.getElementById('save-hint');
-            hint.textContent = 'This form does not send data to a server. Progress is saved in your browser only. Use Export Review to download your work.';
+            hint.textContent = 'This form does not send data to a server. Progress is saved in your browser only. Use Export Review to download and backup your work.';
             hint.classList.add('visible');
         }}
 
