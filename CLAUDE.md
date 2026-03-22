@@ -1,10 +1,10 @@
 # Spinal Instrumentation Plan & Record
 
 ## What This Project Is
-A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 14 European languages.
+A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 16 languages (14 European + Ukrainian and Russian).
 
 ## Current Status
-- **Version:** v2.1.3-beta
+- **Version:** v2.1.4-beta
 - **Last Updated:** 2026-03-22
 - **License:** GNU GPLv3
 
@@ -68,6 +68,7 @@ spine-planner/
 - **All dependencies bundled** — no CDN calls, fully offline
 
 ## Version History (Recent)
+- **v2.1.4-beta** (2026-03-22): Ukrainian and Russian translations (263 keys each, 16 languages total). Clinical glossary extended with AO Spine Ukraine and RASS terminology. Review forms generated for native-speaker review. Language count updated across all existing translations.
 - **v2.1.3-beta** (2026-03-22): Vite build system — modular source, single-file output, embedded fonts, GitHub Actions deployment with auto-regenerated review forms. Custom domain plan.skeletalsurgery.com/spine/. Important Notice disclaimer modal on startup (half-day session expiry, language-aware, syncs acceptance between dual windows). Version shown in portrait toolbar. Force columns widened for i18n. Landing page with SEO and structured data.
 - **v2.0.3-beta** (2026-03-22): Review form UX — persistent backup banner, auto-scroll to next unreviewed, larger touch targets, guide page.
 - **v2.0.2-beta** (2026-03-22): Clinical translation audit — Greek, Polish fixes. Localised ghost placement terminology.
@@ -92,8 +93,8 @@ spine-planner/
 - **v0.9.3-alpha** (2026-03-01): Anatomical proportions (T1-S1), pedicle data, variable disc heights, auto-scale solver.
 
 ## Key Architecture (v2.1.0)
-- **i18n:** `src/i18n/translations.json` (~253 keys × 14 languages), `t(key, replacements)` function with `??` fallback chain in `src/i18n/i18n.js`. Module-level `_currentLang` synced with React state via `changeLang()`.
-- **Supported languages:** en, de, fr, es, it, pt, sv, nb, da, fi, nl, pl, el, tr
+- **i18n:** `src/i18n/translations.json` (~263 keys × 16 languages), `t(key, replacements)` function with `??` fallback chain in `src/i18n/i18n.js`. Module-level `_currentLang` synced with React state via `changeLang()`.
+- **Supported languages:** en, de, fr, es, it, pt, sv, nb, da, fi, nl, pl, el, tr, ru, uk
 - **Language detection:** `detectLanguage()` checks `localStorage('spine_planner_lang')` → `navigator.language` → `'en'`. `LANG_ALIASES` maps `no`/`nn` → `nb`.
 - **Export container:** Fixed 1485x1050px, 3 columns: patient info (370px) + Plan (flex-4) + Construct (flex-3)
 - **Sidebar:** w-[340px] in landscape, colour-themed per company (10 schemes), tool palette, export controls
@@ -117,7 +118,7 @@ spine-planner/
 - **Tier B (current):** Machine translation verified against clinical glossary (~48 terms × 13 languages)
 - **Tier C (future):** Native-speaker review via disclaimer feedback email
 - **Verification tests:** 3 browser-based HTML test suites in `tests/`
-- **Glossary sources:** AO Spine, DWG, SFCR, GEER, SICV&GIS, SPP, NVWC, NOV, PTOiTr, HOA, TOTBİD
+- **Glossary sources:** AO Spine, DWG, SFCR, GEER, SICV&GIS, SPP, NVWC, NOV, PTOiTr, HOA, TOTBİD, AO Spine Ukraine, RASS
 - **What stays English:** Vertebral labels, company/screw names, international abbreviations (ACDF, PLIF, etc.), Schwab grades, changelog, "Designed in Leeds" origin line
 
 ## Data Model (v0.9.7)

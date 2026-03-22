@@ -7,10 +7,10 @@ export const LOCALE_MAP = {
     en: 'en-GB', fr: 'fr-FR', de: 'de-DE', es: 'es-ES',
     pt: 'pt-PT', it: 'it-IT', nl: 'nl-NL', pl: 'pl-PL',
     tr: 'tr-TR', nb: 'nb-NO', da: 'da-DK', sv: 'sv-SE',
-    el: 'el-GR', fi: 'fi-FI',
+    el: 'el-GR', fi: 'fi-FI', ru: 'ru-RU', uk: 'uk-UA',
 };
 
-export const LANG_ALIASES = { no: 'nb', nn: 'nb' };
+export const LANG_ALIASES = { no: 'nb', nn: 'nb', ua: 'uk' };
 
 export const detectLanguage = () => {
     const stored = localStorage.getItem('spine_planner_lang');

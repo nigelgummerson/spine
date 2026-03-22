@@ -1,8 +1,13 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION = "v2.1.3-beta";
+export const CURRENT_VERSION = "v2.1.4-beta";
 
 export const CHANGE_LOG = [
+    { version: "v2.1.4-beta", date: "2026-03-22", changes: [
+        "Added Ukrainian and Russian translations (263 keys each) - 16 languages now supported.",
+        "Clinical glossary extended with Ukrainian (AO Spine Ukraine) and Russian (RASS/AO Spine) terminology.",
+        "Review forms generated for Ukrainian and Russian native-speaker review.",
+    ]},
     { version: "v2.1.3-beta", date: "2026-03-22", changes: [
         "Vite build system — modular source code (26 files), pre-compiled JSX, single-file output via vite-plugin-singlefile. No more in-browser Babel transpilation.",
         "Fully offline — all fonts (Inter, Source Serif 4) and dependencies embedded. No CDN calls in production build.",

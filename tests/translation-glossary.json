@@ -1,1060 +1,4496 @@
 {
   "meta": {
     "description": "Reference glossary for spinal surgery terminology verification",
-    "sources": ["AO Spine", "DWG", "SFCR", "GEER", "SICV&GIS", "SPP", "NVWC", "NOV"],
+    "sources": [
+      "AO Spine",
+      "DWG",
+      "SFCR",
+      "GEER",
+      "SICV&GIS",
+      "SPP",
+      "NVWC",
+      "NOV",
+      "AO Spine Ukraine",
+      "RASS"
+    ],
     "last_updated": "2026-03-20",
     "notes": "All translations marked verified: false pending review by native-speaking spine surgeons. Sources indicate the national/international society whose published terminology was referenced."
   },
   "allowlist": [
-    "JPG", "PDF", "ACDF", "PLIF", "TLIF", "XLIF/LLIF", "OLIF", "ALIF",
-    "PSO", "VCR", "DBM", "BMP",
-    "Schwab Grade 1", "Schwab Grade 2", "Schwab Grade 3", "Schwab Grade 4",
-    "Schwab Grade 5", "Schwab Grade 6", "Ponte / Smith Petersen"
+    "JPG",
+    "PDF",
+    "ACDF",
+    "PLIF",
+    "TLIF",
+    "XLIF/LLIF",
+    "OLIF",
+    "ALIF",
+    "PSO",
+    "VCR",
+    "DBM",
+    "BMP",
+    "Schwab Grade 1",
+    "Schwab Grade 2",
+    "Schwab Grade 3",
+    "Schwab Grade 4",
+    "Schwab Grade 5",
+    "Schwab Grade 6",
+    "Ponte / Smith Petersen"
   ],
   "terms": [
     {
       "key": "clinical.osteotomy.facet.label",
       "en": "Facet Joint release",
       "translations": {
-        "de": { "expected": "Facettengelenklösung", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Libération articulaire facettaire", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Liberación de articulación facetaria", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Rilascio dell'articolazione faccettaria", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Libertação da articulação facetária", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Facettledsfrigöring", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Fasettleddsfrigjøring", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Facetledsfrigørelse", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Fasettinikvelten vapautus", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Facetgewrichtsvrijgave", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Uwolnienie stawu międzykręgowego", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Απελευθέρωση αρθρώσεων ζυγοαποφύσεων", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Faset eklem serbestleştirmesi", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Facettengelenklösung",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Libération articulaire facettaire",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Liberación de articulación facetaria",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Rilascio dell'articolazione faccettaria",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Libertação da articulação facetária",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Facettledsfrigöring",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Fasettleddsfrigjøring",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Facetledsfrigørelse",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Fasettinikvelten vapautus",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Facetgewrichtsvrijgave",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Uwolnienie stawu międzykręgowego",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Απελευθέρωση αρθρώσεων ζυγοαποφύσεων",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Faset eklem serbestleştirmesi",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Вивільнення фасеткового суглоба",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Релиз фасеточного сустава",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.facet.schwab",
       "en": "Schwab Grade 1",
       "translations": {
-        "de": { "expected": "Schwab Grad 1", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Schwab Grade 1", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Schwab Grado 1", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Schwab Grado 1", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Schwab Grau 1", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Schwab Grad 1", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Schwab Grad 1", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Schwab Grad 1", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Schwab Aste 1", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Schwab Graad 1", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Schwab Stopień 1", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Schwab Βαθμός 1", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Schwab Derece 1", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Schwab Grad 1",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Schwab Grade 1",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Schwab Grado 1",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Schwab Grado 1",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Schwab Grau 1",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Schwab Grad 1",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Schwab Grad 1",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Schwab Grad 1",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Schwab Aste 1",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Schwab Graad 1",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Schwab Stopień 1",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Schwab Βαθμός 1",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Schwab Derece 1",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Schwab ступінь 1",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Schwab степень 1",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.facet.desc",
       "en": "Inferior facet resection; joint capsule removal.",
       "translations": {
-        "de": { "expected": "Resektion der unteren Facette; Kapselentfernung.", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Résection de la facette inférieure; ablation de la capsule articulaire.", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Resección de la faceta inferior; extirpación de la cápsula articular.", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Resezione della faccetta inferiore; rimozione della capsula articolare.", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Resseção da faceta inferior; remoção da cápsula articular.", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Resektion av nedre facett; avlägsnande av ledkapsel.", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Reseksjon av nedre fasett; fjerning av leddkapsel.", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Resektion af nedre facet; fjernelse af ledkapsel.", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Alemman fasettin resektio; nivelkapselin poisto.", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Resectie van het inferieure facet; verwijdering van het gewrichtskapsel.", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Resekcja dolnej powierzchni stawowej; usunięcie torebki stawowej.", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Εκτομή κάτω ζυγοαπόφυσης· αφαίρεση αρθρικού θυλάκου.", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "İnferior faset rezeksiyonu; eklem kapsülü çıkarılması.", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Resektion der unteren Facette; Kapselentfernung.",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Résection de la facette inférieure; ablation de la capsule articulaire.",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Resección de la faceta inferior; extirpación de la cápsula articular.",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Resezione della faccetta inferiore; rimozione della capsula articolare.",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Resseção da faceta inferior; remoção da cápsula articular.",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Resektion av nedre facett; avlägsnande av ledkapsel.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Reseksjon av nedre fasett; fjerning av leddkapsel.",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Resektion af nedre facet; fjernelse af ledkapsel.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Alemman fasettin resektio; nivelkapselin poisto.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Resectie van het inferieure facet; verwijdering van het gewrichtskapsel.",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Resekcja dolnej powierzchni stawowej; usunięcie torebki stawowej.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Εκτομή κάτω ζυγοαπόφυσης· αφαίρεση αρθρικού θυλάκου.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "İnferior faset rezeksiyonu; eklem kapsülü çıkarılması.",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Резекція нижньої фасетки; видалення суглобової капсули.",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Резекция нижней фасетки; удаление суставной капсулы.",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.ponte.label",
       "en": "Ponte / Smith Petersen",
       "translations": {
-        "de": { "expected": "Ponte / Smith Petersen", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Ponte / Smith Petersen", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Ponte / Smith Petersen", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Ponte / Smith Petersen", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Ponte / Smith Petersen", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Ponte / Smith Petersen", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Ponte / Smith Petersen", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Ponte / Smith Petersen", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Ponte / Smith Petersen", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Ponte / Smith Petersen", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Ponte / Smith Petersen", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Ponte / Smith Petersen", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Ponte / Smith Petersen", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.ponte.schwab",
       "en": "Schwab Grade 2",
       "translations": {
-        "de": { "expected": "Schwab Grad 2", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Schwab Grade 2", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Schwab Grado 2", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Schwab Grado 2", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Schwab Grau 2", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Schwab Grad 2", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Schwab Grad 2", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Schwab Grad 2", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Schwab Aste 2", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Schwab Graad 2", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Schwab Stopień 2", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Schwab Βαθμός 2", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Schwab Derece 2", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Schwab Grad 2",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Schwab Grade 2",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Schwab Grado 2",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Schwab Grado 2",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Schwab Grau 2",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Schwab Grad 2",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Schwab Grad 2",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Schwab Grad 2",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Schwab Aste 2",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Schwab Graad 2",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Schwab Stopień 2",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Schwab Βαθμός 2",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Schwab Derece 2",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Schwab ступінь 2",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Schwab степень 2",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.ponte.desc",
       "en": "Complete facetectomy; ligamentum flavum + lamina.",
       "translations": {
-        "de": { "expected": "Komplette Facettektomie; Lig. flavum + Lamina.", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Facetectomie complète; ligamentum flavum + lame.", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Facetectomía completa; ligamentum flavum + lámina.", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Facetectomia completa; ligamentum flavum + lamina.", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Facetectomia completa; ligamentum flavum + lâmina.", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Komplett facetektomi; ligamentum flavum + lamina.", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Komplett fasettektomi; ligamentum flavum + lamina.", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Komplet facetektomi; ligamentum flavum + lamina.", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Täydellinen fasetektomia; ligamentum flavum + lamina.", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Volledige facetectomie; ligamentum flavum + lamina.", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Całkowita facetektomia; ligamentum flavum + blaszka łuku.", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Πλήρης εκτομή ζυγοαπόφυσης· σύνδεσμος flavum + πέταλο.", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Tam fasetektomi; ligamentum flavum + lamina.", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Komplette Facettektomie; Lig. flavum + Lamina.",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Facetectomie complète; ligamentum flavum + lame.",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Facetectomía completa; ligamentum flavum + lámina.",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Facetectomia completa; ligamentum flavum + lamina.",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Facetectomia completa; ligamentum flavum + lâmina.",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Komplett facetektomi; ligamentum flavum + lamina.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Komplett fasettektomi; ligamentum flavum + lamina.",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Komplet facetektomi; ligamentum flavum + lamina.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Täydellinen fasetektomia; ligamentum flavum + lamina.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Volledige facetectomie; ligamentum flavum + lamina.",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Całkowita facetektomia; ligamentum flavum + blaszka łuku.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Πλήρης εκτομή ζυγοαπόφυσης· σύνδεσμος flavum + πέταλο.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Tam fasetektomi; ligamentum flavum + lamina.",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Повна фасетектомія; жовта зв'язка + пластинка.",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Полная фасетэктомия; жёлтая связка + пластинка.",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.pso.label",
       "en": "Standard PSO",
       "translations": {
-        "de": { "expected": "Standard-PSO", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "PSO standard", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "PSO estándar", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "PSO standard", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "PSO padrão", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Standard-PSO", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Standard PSO", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Standard PSO", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Tavallinen PSO", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Standaard PSO", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Standardowe PSO", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Τυπική PSO", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Standart PSO", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Standard-PSO",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "PSO standard",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "PSO estándar",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "PSO standard",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "PSO padrão",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Standard-PSO",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Standard PSO",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Standard PSO",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Tavallinen PSO",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Standaard PSO",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Standardowe PSO",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Τυπική PSO",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Standart PSO",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Стандартна PSO",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Стандартная PSO",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.pso.schwab",
       "en": "Schwab Grade 3",
       "translations": {
-        "de": { "expected": "Schwab Grad 3", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Schwab Grade 3", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Schwab Grado 3", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Schwab Grado 3", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Schwab Grau 3", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Schwab Grad 3", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Schwab Grad 3", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Schwab Grad 3", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Schwab Aste 3", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Schwab Graad 3", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Schwab Stopień 3", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Schwab Βαθμός 3", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Schwab Derece 3", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Schwab Grad 3",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Schwab Grade 3",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Schwab Grado 3",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Schwab Grado 3",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Schwab Grau 3",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Schwab Grad 3",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Schwab Grad 3",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Schwab Grad 3",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Schwab Aste 3",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Schwab Graad 3",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Schwab Stopień 3",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Schwab Βαθμός 3",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Schwab Derece 3",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Schwab ступінь 3",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Schwab степень 3",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.pso.desc",
       "en": "Pedicle subtraction; partial body wedge.",
       "translations": {
-        "de": { "expected": "Pedikelsubtraktionsosteotomie; partielle Wirbelkörperkeilresektion.", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Soustraction pédiculaire; coin corporéal partiel.", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Sustracción pedicular; cuña corporal parcial.", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Sottrazione peduncolare; cuneo corporeo parziale.", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Subtração pedicular; cunha corporal parcial.", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Pedikelsubtraktion; partiell kotkroppskil.", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Pedikkelsubtraksjon; delvis korpuskil.", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Pedikelsubtraktion; delvis korpuskile.", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Pedikkelisubtraktio; osittainen nikamakiilaresektio.", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Pedikelsubtractie; partiële wervellichaamwig.", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Subtrakcja nasady łuku; częściowy klin trzonu.", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Αφαίρεση μίσχου· μερικός σωματικός σφήνα.", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Pedikül subtraksiyonu; kısmi korpus kama rezeksiyonu.", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Pedikelsubtraktionsosteotomie; partielle Wirbelkörperkeilresektion.",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Soustraction pédiculaire; coin corporéal partiel.",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Sustracción pedicular; cuña corporal parcial.",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Sottrazione peduncolare; cuneo corporeo parziale.",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Subtração pedicular; cunha corporal parcial.",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Pedikelsubtraktion; partiell kotkroppskil.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Pedikkelsubtraksjon; delvis korpuskil.",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Pedikelsubtraktion; delvis korpuskile.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Pedikkelisubtraktio; osittainen nikamakiilaresektio.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Pedikelsubtractie; partiële wervellichaamwig.",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Subtrakcja nasady łuku; częściowy klin trzonu.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Αφαίρεση μίσχου· μερικός σωματικός σφήνα.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Pedikül subtraksiyonu; kısmi korpus kama rezeksiyonu.",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Педикулярна субтракція; частковий клин тіла.",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Педикулярная субтракция; частичный клин тела.",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.extpso.label",
       "en": "Extended PSO",
       "translations": {
-        "de": { "expected": "Erweiterte PSO", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "PSO étendue", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "PSO extendida", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "PSO estesa", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "PSO alargada", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Utökad PSO", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Utvidet PSO", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Udvidet PSO", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Laajennettu PSO", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Uitgebreide PSO", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Rozszerzone PSO", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Εκτεταμένη PSO", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Genişletilmiş PSO", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Erweiterte PSO",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "PSO étendue",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "PSO extendida",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "PSO estesa",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "PSO alargada",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Utökad PSO",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Utvidet PSO",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Udvidet PSO",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Laajennettu PSO",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Uitgebreide PSO",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Rozszerzone PSO",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Εκτεταμένη PSO",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Genişletilmiş PSO",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Розширена PSO",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Расширенная PSO",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.extpso.schwab",
       "en": "Schwab Grade 4",
       "translations": {
-        "de": { "expected": "Schwab Grad 4", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Schwab Grade 4", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Schwab Grado 4", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Schwab Grado 4", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Schwab Grau 4", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Schwab Grad 4", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Schwab Grad 4", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Schwab Grad 4", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Schwab Aste 4", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Schwab Graad 4", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Schwab Stopień 4", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Schwab Βαθμός 4", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Schwab Derece 4", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Schwab Grad 4",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Schwab Grade 4",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Schwab Grado 4",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Schwab Grado 4",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Schwab Grau 4",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Schwab Grad 4",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Schwab Grad 4",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Schwab Grad 4",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Schwab Aste 4",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Schwab Graad 4",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Schwab Stopień 4",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Schwab Βαθμός 4",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Schwab Derece 4",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Schwab ступінь 4",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Schwab степень 4",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.extpso.desc",
       "en": "PSO + resection of adjacent disc.",
       "translations": {
-        "de": { "expected": "PSO + Resektion der angrenzenden Bandscheibe.", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "PSO + résection du disque adjacent.", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "PSO + resección del disco adyacente.", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "PSO + resezione del disco adiacente.", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "PSO + resseção do disco adjacente.", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "PSO + resektion av angränsande disk.", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "PSO + reseksjon av tilstøtende skive.", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "PSO + resektion af tilstødende diskus.", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "PSO + viereisen välilevyn resektio.", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "PSO + resectie van aangrenzende discus.", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "PSO + resekcja przyległego dysku.", "source": "AO Spine", "verified": false },
-        "el": { "expected": "PSO + εκτομή παρακείμενου δίσκου.", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "PSO + komşu disk rezeksiyonu.", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "PSO + Resektion der angrenzenden Bandscheibe.",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "PSO + résection du disque adjacent.",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "PSO + resección del disco adyacente.",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "PSO + resezione del disco adiacente.",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "PSO + resseção do disco adjacente.",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "PSO + resektion av angränsande disk.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "PSO + reseksjon av tilstøtende skive.",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "PSO + resektion af tilstødende diskus.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "PSO + viereisen välilevyn resektio.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "PSO + resectie van aangrenzende discus.",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "PSO + resekcja przyległego dysku.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "PSO + εκτομή παρακείμενου δίσκου.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "PSO + komşu disk rezeksiyonu.",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "PSO + резекція суміжного диска.",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "PSO + резекция смежного диска.",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.vcr.label",
       "en": "VCR",
       "translations": {
-        "de": { "expected": "VCR", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "VCR", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "VCR", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "VCR", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "VCR", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "VCR", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "VCR", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "VCR", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "VCR", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "VCR", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "VCR", "source": "AO Spine", "verified": false },
-        "el": { "expected": "VCR", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "VCR", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "VCR",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "VCR",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "VCR",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "VCR",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "VCR",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "VCR",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "VCR",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "VCR",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "VCR",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "VCR",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "VCR",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "VCR",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "VCR",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "VCR",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "VCR",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.vcr.schwab",
       "en": "Schwab Grade 5",
       "translations": {
-        "de": { "expected": "Schwab Grad 5", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Schwab Grade 5", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Schwab Grado 5", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Schwab Grado 5", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Schwab Grau 5", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Schwab Grad 5", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Schwab Grad 5", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Schwab Grad 5", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Schwab Aste 5", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Schwab Graad 5", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Schwab Stopień 5", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Schwab Βαθμός 5", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Schwab Derece 5", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Schwab Grad 5",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Schwab Grade 5",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Schwab Grado 5",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Schwab Grado 5",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Schwab Grau 5",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Schwab Grad 5",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Schwab Grad 5",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Schwab Grad 5",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Schwab Aste 5",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Schwab Graad 5",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Schwab Stopień 5",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Schwab Βαθμός 5",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Schwab Derece 5",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Schwab ступінь 5",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Schwab степень 5",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.vcr.desc",
       "en": "Complete vertebral column resection.",
       "translations": {
-        "de": { "expected": "Komplette Wirbelkörperresektion.", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Résection complète de la colonne vertébrale.", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Resección completa de la columna vertebral.", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Resezione completa della colonna vertebrale.", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Resseção completa da coluna vertebral.", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Komplett kotkroppsresektion.", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Komplett virvelkroppsreseksjon.", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Komplet hvirvelkropsresektion.", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Täydellinen nikamakolonniresektio.", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Volledige wervelkolomresectie.", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Całkowita resekcja kręgu.", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Πλήρης εκτομή σπονδυλικής στήλης.", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Tam vertebral kolon rezeksiyonu.", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Komplette Wirbelkörperresektion.",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Résection complète de la colonne vertébrale.",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Resección completa de la columna vertebral.",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Resezione completa della colonna vertebrale.",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Resseção completa da coluna vertebral.",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Komplett kotkroppsresektion.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Komplett virvelkroppsreseksjon.",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Komplet hvirvelkropsresektion.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Täydellinen nikamakolonniresektio.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Volledige wervelkolomresectie.",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Całkowita resekcja kręgu.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Πλήρης εκτομή σπονδυλικής στήλης.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Tam vertebral kolon rezeksiyonu.",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Повна резекція хребетного стовпа.",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Полная резекция позвоночного столба.",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.mlvcr.label",
       "en": "Multi-level VCR",
       "translations": {
-        "de": { "expected": "Mehrsegmentale VCR", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "VCR multi-niveaux", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "VCR multinivel", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "VCR multilivello", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "VCR multinível", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Flernivå-VCR", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Flernivå-VCR", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Flerniveau-VCR", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Monitasoinen VCR", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Meervoudig-niveau VCR", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Wielopoziomowe VCR", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Πολυεπίπεδη VCR", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Çok seviyeli VCR", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Mehrsegmentale VCR",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "VCR multi-niveaux",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "VCR multinivel",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "VCR multilivello",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "VCR multinível",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Flernivå-VCR",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Flernivå-VCR",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Flerniveau-VCR",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Monitasoinen VCR",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Meervoudig-niveau VCR",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Wielopoziomowe VCR",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Πολυεπίπεδη VCR",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Çok seviyeli VCR",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Багаторівнева VCR",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Многоуровневая VCR",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.mlvcr.schwab",
       "en": "Schwab Grade 6",
       "translations": {
-        "de": { "expected": "Schwab Grad 6", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Schwab Grade 6", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Schwab Grado 6", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Schwab Grado 6", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Schwab Grau 6", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Schwab Grad 6", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Schwab Grad 6", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Schwab Grad 6", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Schwab Aste 6", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Schwab Graad 6", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Schwab Stopień 6", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Schwab Βαθμός 6", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Schwab Derece 6", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Schwab Grad 6",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Schwab Grade 6",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Schwab Grado 6",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Schwab Grado 6",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Schwab Grau 6",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Schwab Grad 6",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Schwab Grad 6",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Schwab Grad 6",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Schwab Aste 6",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Schwab Graad 6",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Schwab Stopień 6",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Schwab Βαθμός 6",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Schwab Derece 6",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Schwab ступінь 6",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Schwab степень 6",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.mlvcr.desc",
       "en": "Resection of multiple vertebrae and discs.",
       "translations": {
-        "de": { "expected": "Resektion mehrerer Wirbel und Bandscheiben.", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Résection de multiples vertèbres et disques.", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Resección de múltiples vértebras y discos.", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Resezione di molteplici vertebre e dischi.", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Resseção de múltiplas vértebras e discos.", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Resektion av flera kotor och diskar.", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Reseksjon av flere virvler og skiver.", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Resektion af flere hvirvler og diske.", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Usean nikaman ja välilevyn resektio.", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Resectie van meerdere wervels en tussenwervelschijven.", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Resekcja wielu kręgów i dysków.", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Εκτομή πολλαπλών σπονδύλων και δίσκων.", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Çoklu vertebra ve disk rezeksiyonu.", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Resektion mehrerer Wirbel und Bandscheiben.",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Résection de multiples vertèbres et disques.",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Resección de múltiples vértebras y discos.",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Resezione di molteplici vertebre e dischi.",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Resseção de múltiplas vértebras e discos.",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Resektion av flera kotor och diskar.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Reseksjon av flere virvler og skiver.",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Resektion af flere hvirvler og diske.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Usean nikaman ja välilevyn resektio.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Resectie van meerdere wervels en tussenwervelschijven.",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Resekcja wielu kręgów i dysków.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Εκτομή πολλαπλών σπονδύλων και δίσκων.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Çoklu vertebra ve disk rezeksiyonu.",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Резекція кількох хребців та дисків.",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Резекция нескольких позвонков и дисков.",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.corpectomy.label",
       "en": "Corpectomy (Anterior)",
       "translations": {
-        "de": { "expected": "Korporektomie (Anterior)", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Corporectomie (Antérieure)", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Corporectomía (Anterior)", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Corporectomia (Anteriore)", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Corporectomia (Anterior)", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Korpektomi (Anterior)", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Korpektomi (Anterior)", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Korpektomi (Anterior)", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Korpektomia (Anteriorinen)", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Corpectomie (Anterieur)", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Korporektomia (Przednia)", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Σωματεκτομή (Πρόσθια)", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Korpektomi (Anterior)", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Korporektomie (Anterior)",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Corporectomie (Antérieure)",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Corporectomía (Anterior)",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Corporectomia (Anteriore)",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Corporectomia (Anterior)",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Korpektomi (Anterior)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Korpektomi (Anterior)",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Korpektomi (Anterior)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Korpektomia (Anteriorinen)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Corpectomie (Anterieur)",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Korporektomia (Przednia)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Σωματεκτομή (Πρόσθια)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Korpektomi (Anterior)",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Корпектомія (передня)",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Корпэктомия (передняя)",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.corpectomy.schwab",
       "en": "Anterior",
       "translations": {
-        "de": { "expected": "Anterior", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Antérieur", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Anterior", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Anteriore", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Anterior", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Anterior", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Anterior", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Anterior", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Anteriorinen", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Anterieur", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Przedni", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Πρόσθιο", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Anterior", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Anterior",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Antérieur",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Anterior",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Anteriore",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Anterior",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Anterior",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Anterior",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Anterior",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Anteriorinen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Anterieur",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Przedni",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Πρόσθιο",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Anterior",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Передній",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Передний",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.osteotomy.corpectomy.desc",
       "en": "Vertebral body removal.",
       "translations": {
-        "de": { "expected": "Wirbelkörperentfernung.", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Ablation du corps vertébral.", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Extirpación del cuerpo vertebral.", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Rimozione del corpo vertebrale.", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Remoção do corpo vertebral.", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Avlägsnande av kotkroppen.", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Fjerning av virvelkroppen.", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Fjernelse af hvirvelkroppen.", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Nikamarungon poisto.", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Verwijdering van het wervellichaam.", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Usunięcie trzonu kręgu.", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Αφαίρεση σπονδυλικού σώματος.", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Vertebra korpusu çıkarılması.", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Wirbelkörperentfernung.",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Ablation du corps vertébral.",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Extirpación del cuerpo vertebral.",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Rimozione del corpo vertebrale.",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Remoção do corpo vertebral.",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Avlägsnande av kotkroppen.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Fjerning av virvelkroppen.",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Fjernelse af hvirvelkroppen.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Nikamarungon poisto.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Verwijdering van het wervellichaam.",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Usunięcie trzonu kręgu.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Αφαίρεση σπονδυλικού σώματος.",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Vertebra korpusu çıkarılması.",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Видалення тіла хребця.",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Удаление тела позвонка.",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.cage.acdf.desc",
       "en": "Anterior Cervical Discectomy & Fusion",
       "translations": {
-        "de": { "expected": "Anteriore zervikale Diskektomie & Fusion (ACDF)", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Discectomie cervicale antérieure et fusion (ACDF)", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Discectomía cervical anterior y fusión (ACDF)", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Discectomia cervicale anteriore e fusione (ACDF)", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Discectomia cervical anterior e fusão (ACDF)", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Anterior cervikal diskektomi och fusion (ACDF)", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Anterior cervikal diskektomi og fusjon (ACDF)", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Anterior cervikal diskektomi og fusion (ACDF)", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Anteriorinen kervikaalinen diskektomia ja fuusio (ACDF)", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Anterieure cervicale discectomie en fusie (ACDF)", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Przednia dyskektomia szyjna z fuzją (ACDF)", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Πρόσθια αυχενική δισκεκτομή και αρθρόδεση (ACDF)", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Anterior servikal diskektomi ve füzyon (ACDF)", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Anteriore zervikale Diskektomie & Fusion (ACDF)",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Discectomie cervicale antérieure et fusion (ACDF)",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Discectomía cervical anterior y fusión (ACDF)",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Discectomia cervicale anteriore e fusione (ACDF)",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Discectomia cervical anterior e fusão (ACDF)",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Anterior cervikal diskektomi och fusion (ACDF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Anterior cervikal diskektomi og fusjon (ACDF)",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Anterior cervikal diskektomi og fusion (ACDF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Anteriorinen kervikaalinen diskektomia ja fuusio (ACDF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Anterieure cervicale discectomie en fusie (ACDF)",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Przednia dyskektomia szyjna z fuzją (ACDF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Πρόσθια αυχενική δισκεκτομή και αρθρόδεση (ACDF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Anterior servikal diskektomi ve füzyon (ACDF)",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Передня шийна дискектомія та спондилодез",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Передняя шейная дискэктомия и спондилодез",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.cage.plif.desc",
       "en": "Posterior Lumbar Interbody Fusion",
       "translations": {
-        "de": { "expected": "Posteriore lumbale interkorporelle Fusion (PLIF)", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Fusion intersomatique lombaire postérieure (PLIF)", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Fusión intersomática lumbar posterior (PLIF)", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Fusione intersomatica lombare posteriore (PLIF)", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Fusão intersomática lombar posterior (PLIF)", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Posterior lumbal interkorporell fusion (PLIF)", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Posterior lumbal interkorporell fusjon (PLIF)", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Posterior lumbal interkorporel fusion (PLIF)", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Posteriorinen lumbaalinen interkorporaalinen fuusio (PLIF)", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Posterieure lumbale intercorporele fusie (PLIF)", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Tylna lędźwiowa fuzja międzytrzonowa (PLIF)", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Οπίσθια οσφυϊκή μεσοσπονδύλια αρθρόδεση (PLIF)", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Posterior lomber interbody füzyon (PLIF)", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Posteriore lumbale interkorporelle Fusion (PLIF)",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Fusion intersomatique lombaire postérieure (PLIF)",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Fusión intersomática lumbar posterior (PLIF)",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Fusione intersomatica lombare posteriore (PLIF)",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Fusão intersomática lombar posterior (PLIF)",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Posterior lumbal interkorporell fusion (PLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Posterior lumbal interkorporell fusjon (PLIF)",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Posterior lumbal interkorporel fusion (PLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Posteriorinen lumbaalinen interkorporaalinen fuusio (PLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Posterieure lumbale intercorporele fusie (PLIF)",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Tylna lędźwiowa fuzja międzytrzonowa (PLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Οπίσθια οσφυϊκή μεσοσπονδύλια αρθρόδεση (PLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Posterior lomber interbody füzyon (PLIF)",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Задній поперековий міжтіловий спондилодез",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Задний поясничный межтеловой спондилодез",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.cage.tlif.desc",
       "en": "Transforaminal Lumbar Interbody Fusion",
       "translations": {
-        "de": { "expected": "Transforaminale lumbale interkorporelle Fusion (TLIF)", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Fusion intersomatique lombaire transforaminale (TLIF)", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Fusión intersomática lumbar transforaminal (TLIF)", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Fusione intersomatica lombare transforaminale (TLIF)", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Fusão intersomática lombar transforaminal (TLIF)", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Transforaminal lumbal interkorporell fusion (TLIF)", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Transforaminal lumbal interkorporell fusjon (TLIF)", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Transforaminal lumbal interkorporel fusion (TLIF)", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Transforaminaalinen lumbaalinen interkorporaalinen fuusio (TLIF)", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Transforaminale lumbale intercorporele fusie (TLIF)", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Przezotwierdzeniowa lędźwiowa fuzja międzytrzonowa (TLIF)", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Διατρηματική οσφυϊκή μεσοσπονδύλια αρθρόδεση (TLIF)", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Transforaminal lomber interbody füzyon (TLIF)", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Transforaminale lumbale interkorporelle Fusion (TLIF)",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Fusion intersomatique lombaire transforaminale (TLIF)",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Fusión intersomática lumbar transforaminal (TLIF)",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Fusione intersomatica lombare transforaminale (TLIF)",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Fusão intersomática lombar transforaminal (TLIF)",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Transforaminal lumbal interkorporell fusion (TLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Transforaminal lumbal interkorporell fusjon (TLIF)",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Transforaminal lumbal interkorporel fusion (TLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Transforaminaalinen lumbaalinen interkorporaalinen fuusio (TLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Transforaminale lumbale intercorporele fusie (TLIF)",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Przezotwierdzeniowa lędźwiowa fuzja międzytrzonowa (TLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Διατρηματική οσφυϊκή μεσοσπονδύλια αρθρόδεση (TLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Transforaminal lomber interbody füzyon (TLIF)",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Трансфорамінальний поперековий міжтіловий спондилодез",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Трансфораминальный поясничный межтеловой спондилодез",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.cage.xlif.desc",
       "en": "Lateral Lumbar Interbody Fusion",
       "translations": {
-        "de": { "expected": "Laterale lumbale interkorporelle Fusion (XLIF)", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Fusion intersomatique lombaire latérale (XLIF)", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Fusión intersomática lumbar lateral (XLIF)", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Fusione intersomatica lombare laterale (XLIF)", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Fusão intersomática lombar lateral (XLIF)", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Lateral lumbal interkorporell fusion (XLIF)", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Lateral lumbal interkorporell fusjon (XLIF)", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Lateral lumbal interkorporel fusion (XLIF)", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Lateraalinen lumbaalinen interkorporaalinen fuusio (XLIF)", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Laterale lumbale intercorporele fusie (XLIF)", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Boczna lędźwiowa fuzja międzytrzonowa (XLIF)", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Πλάγια οσφυϊκή μεσοσπονδύλια αρθρόδεση (XLIF)", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Lateral lomber interbody füzyon (XLIF)", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Laterale lumbale interkorporelle Fusion (XLIF)",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Fusion intersomatique lombaire latérale (XLIF)",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Fusión intersomática lumbar lateral (XLIF)",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Fusione intersomatica lombare laterale (XLIF)",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Fusão intersomática lombar lateral (XLIF)",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Lateral lumbal interkorporell fusion (XLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Lateral lumbal interkorporell fusjon (XLIF)",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Lateral lumbal interkorporel fusion (XLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Lateraalinen lumbaalinen interkorporaalinen fuusio (XLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Laterale lumbale intercorporele fusie (XLIF)",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Boczna lędźwiowa fuzja międzytrzonowa (XLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Πλάγια οσφυϊκή μεσοσπονδύλια αρθρόδεση (XLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Lateral lomber interbody füzyon (XLIF)",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Латеральний поперековий міжтіловий спондилодез",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Латеральный поясничный межтеловой спондилодез",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.cage.olif.desc",
       "en": "Oblique Lumbar Interbody Fusion",
       "translations": {
-        "de": { "expected": "Oblique lumbale interkorporelle Fusion (OLIF)", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Fusion intersomatique lombaire oblique (OLIF)", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Fusión intersomática lumbar oblicua (OLIF)", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Fusione intersomatica lombare obliqua (OLIF)", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Fusão intersomática lombar oblíqua (OLIF)", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Oblik lumbal interkorporell fusion (OLIF)", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Oblik lumbal interkorporell fusjon (OLIF)", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Oblik lumbal interkorporel fusion (OLIF)", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Viisto lumbaalinen interkorporaalinen fuusio (OLIF)", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Oblique lumbale intercorporele fusie (OLIF)", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Skośna lędźwiowa fuzja międzytrzonowa (OLIF)", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Λοξή οσφυϊκή μεσοσπονδύλια αρθρόδεση (OLIF)", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Oblik lomber interbody füzyon (OLIF)", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Oblique lumbale interkorporelle Fusion (OLIF)",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Fusion intersomatique lombaire oblique (OLIF)",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Fusión intersomática lumbar oblicua (OLIF)",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Fusione intersomatica lombare obliqua (OLIF)",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Fusão intersomática lombar oblíqua (OLIF)",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Oblik lumbal interkorporell fusion (OLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Oblik lumbal interkorporell fusjon (OLIF)",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Oblik lumbal interkorporel fusion (OLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Viisto lumbaalinen interkorporaalinen fuusio (OLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Oblique lumbale intercorporele fusie (OLIF)",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Skośna lędźwiowa fuzja międzytrzonowa (OLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Λοξή οσφυϊκή μεσοσπονδύλια αρθρόδεση (OLIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Oblik lomber interbody füzyon (OLIF)",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Косий поперековий міжтіловий спондилодез",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Косой поясничный межтеловой спондилодез",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.cage.alif.desc",
       "en": "Anterior Lumbar Interbody Fusion",
       "translations": {
-        "de": { "expected": "Anteriore lumbale interkorporelle Fusion (ALIF)", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Fusion intersomatique lombaire antérieure (ALIF)", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Fusión intersomática lumbar anterior (ALIF)", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Fusione intersomatica lombare anteriore (ALIF)", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Fusão intersomática lombar anterior (ALIF)", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Anterior lumbal interkorporell fusion (ALIF)", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Anterior lumbal interkorporell fusjon (ALIF)", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Anterior lumbal interkorporel fusion (ALIF)", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Anteriorinen lumbaalinen interkorporaalinen fuusio (ALIF)", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Anterieure lumbale intercorporele fusie (ALIF)", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Przednia lędźwiowa fuzja międzytrzonowa (ALIF)", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Πρόσθια οσφυϊκή μεσοσπονδύλια αρθρόδεση (ALIF)", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Anterior lomber interbody füzyon (ALIF)", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Anteriore lumbale interkorporelle Fusion (ALIF)",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Fusion intersomatique lombaire antérieure (ALIF)",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Fusión intersomática lumbar anterior (ALIF)",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Fusione intersomatica lombare anteriore (ALIF)",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Fusão intersomática lombar anterior (ALIF)",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Anterior lumbal interkorporell fusion (ALIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Anterior lumbal interkorporell fusjon (ALIF)",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Anterior lumbal interkorporel fusion (ALIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Anteriorinen lumbaalinen interkorporaalinen fuusio (ALIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Anterieure lumbale intercorporele fusie (ALIF)",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Przednia lędźwiowa fuzja międzytrzonowa (ALIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Πρόσθια οσφυϊκή μεσοσπονδύλια αρθρόδεση (ALIF)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Anterior lomber interbody füzyon (ALIF)",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Передній поперековий міжтіловий спондилодез",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Передний поясничный межтеловой спондилодез",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.approach.posterior",
       "en": "Posterior",
       "translations": {
-        "de": { "expected": "Posterior", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Postérieur", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Posterior", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Posteriore", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Posterior", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Posterior", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Posterior", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Posterior", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Posteriorinen", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Posterieur", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Tylny", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Οπίσθιο", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Posterior", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Posterior",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Postérieur",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Posterior",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Posteriore",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Posterior",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Posterior",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Posterior",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Posterior",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Posteriorinen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Posterieur",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Tylny",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Οπίσθιο",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Posterior",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Задній",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Задний",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.approach.anterior",
       "en": "Anterior",
       "translations": {
-        "de": { "expected": "Anterior", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Antérieur", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Anterior", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Anteriore", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Anterior", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Anterior", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Anterior", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Anterior", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Anteriorinen", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Anterieur", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Przedni", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Πρόσθιο", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Anterior", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Anterior",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Antérieur",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Anterior",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Anteriore",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Anterior",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Anterior",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Anterior",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Anterior",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Anteriorinen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Anterieur",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Przedni",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Πρόσθιο",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Anterior",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Передній",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Передний",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.approach.lateral",
       "en": "Lateral",
       "translations": {
-        "de": { "expected": "Lateral", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Latéral", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Lateral", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Laterale", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Lateral", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Lateral", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Lateral", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Lateral", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Lateraalinen", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Lateraal", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Boczny", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Πλάγιο", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Lateral", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Lateral",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Latéral",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Lateral",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Laterale",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Lateral",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Lateral",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Lateral",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Lateral",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Lateraalinen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Lateraal",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Boczny",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Πλάγιο",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Lateral",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Латеральний",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Латеральный",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.bone_graft.local_bone",
       "en": "Local Bone",
       "translations": {
-        "de": { "expected": "Lokaler Knochen", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Os local", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Hueso local", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Osso locale", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Osso local", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Lokalt ben", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Lokalt bein", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Lokalt knogle", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Paikallinen luu", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Lokaal bot", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Kość lokalna", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Τοπικό οστό", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Lokal kemik", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Lokaler Knochen",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Os local",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Hueso local",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Osso locale",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Osso local",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Lokalt ben",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Lokalt bein",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Lokalt knogle",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Paikallinen luu",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Lokaal bot",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Kość lokalna",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Τοπικό οστό",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Lokal kemik",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Місцева кістка",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Местная кость",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.bone_graft.autograft",
       "en": "Autograft",
       "translations": {
-        "de": { "expected": "Autograft", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Autogreffe", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Autoinjerto", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Autoinnesto", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Autoenxerto", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Autograft", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Autograft", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Autograft", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Autografti", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Autograft", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Autoprzeszczep", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Αυτομόσχευμα", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Otogreft", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Autograft",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Autogreffe",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Autoinjerto",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Autoinnesto",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Autoenxerto",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Autograft",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Autograft",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Autograft",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Autografti",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Autograft",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Autoprzeszczep",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Αυτομόσχευμα",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Otogreft",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Аутотрансплантат",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Аутотрансплантат",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.bone_graft.allograft",
       "en": "Allograft",
       "translations": {
-        "de": { "expected": "Allograft", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Allogreffe", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Aloinjerto", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Alloinnesto", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Aloenxerto", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Allograft", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Allograft", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Allograft", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Allografti", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Allograft", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Alloprzeszczep", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Αλλομόσχευμα", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Allogreft", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Allograft",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Allogreffe",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Aloinjerto",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Alloinnesto",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Aloenxerto",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Allograft",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Allograft",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Allograft",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Allografti",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Allograft",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Alloprzeszczep",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Αλλομόσχευμα",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Allogreft",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Алотрансплантат",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Аллотрансплантат",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.bone_graft.synthetics",
       "en": "Synthetics",
       "translations": {
-        "de": { "expected": "Synthetisch", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Synthétiques", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Sintéticos", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Sintetici", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Sintéticos", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Syntetiska", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Syntetiske", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Syntetiske", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Synteettiset", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Synthetisch", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Syntetyczne", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Συνθετικά", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Sentetikler", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Synthetisch",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Synthétiques",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Sintéticos",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Sintetici",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Sintéticos",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Syntetiska",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Syntetiske",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Syntetiske",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Synteettiset",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Synthetisch",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Syntetyczne",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Συνθετικά",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Sentetikler",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Синтетики",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Синтетики",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.hook.pedicle_hook",
       "en": "Pedicle",
       "translations": {
-        "de": { "expected": "Pedikel", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Pédicule", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Pedículo", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Peduncolo", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Pedículo", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Pedikel", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Pedikkel", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Pedikel", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Pedikkeli", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Pedikel", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Nasada łuku", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Μίσχος", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Pedikül", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Pedikel",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Pédicule",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Pedículo",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Peduncolo",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Pedículo",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Pedikel",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Pedikkel",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Pedikel",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Pedikkeli",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Pedikel",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Nasada łuku",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Μίσχος",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Pedikül",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Ніжка дуги",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Ножка дуги",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.hook.tp_hook",
       "en": "TP (Down)",
       "translations": {
-        "de": { "expected": "QF (Ab)", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "PT (Bas)", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "PT (Abajo)", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "PT (Giù)", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "PT (Baixo)", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "TP (Ned)", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "TP (Ned)", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "TP (Ned)", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "TP (Alas)", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "TP (Neer)", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "WP (Dół)", "source": "AO Spine", "verified": false },
-        "el": { "expected": "ΕΑ (Κάτω)", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "TP (Aşağı)", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "QF (Ab)",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "PT (Bas)",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "PT (Abajo)",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "PT (Giù)",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "PT (Baixo)",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "TP (Ned)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "TP (Ned)",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "TP (Ned)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "TP (Alas)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "TP (Neer)",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "WP (Dół)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "ΕΑ (Κάτω)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "TP (Aşağı)",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "ПВ (Вниз)",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "ПО (Вниз)",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.hook.tp_hook_up",
       "en": "TP (Up)",
       "translations": {
-        "de": { "expected": "QF (Auf)", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "PT (Haut)", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "PT (Arriba)", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "PT (Su)", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "PT (Cima)", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "TP (Upp)", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "TP (Opp)", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "TP (Op)", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "TP (Ylös)", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "TP (Op)", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "WP (Góra)", "source": "AO Spine", "verified": false },
-        "el": { "expected": "ΕΑ (Πάνω)", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "TP (Yukarı)", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "QF (Auf)",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "PT (Haut)",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "PT (Arriba)",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "PT (Su)",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "PT (Cima)",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "TP (Upp)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "TP (Opp)",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "TP (Op)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "TP (Ylös)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "TP (Op)",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "WP (Góra)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "ΕΑ (Πάνω)",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "TP (Yukarı)",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "ПВ (Вгору)",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "ПО (Вверх)",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.hook.sl_hook",
       "en": "Supra-lam",
       "translations": {
-        "de": { "expected": "Supralaminär", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Supra-lam.", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Supra-lam.", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Sopra-lam.", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Supra-lam.", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Supralaminär", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Supralaminær", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Supralaminær", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Supralaminaarinen", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Supralaminair", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Nadblaszkowy", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Υπερπεταλικός", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Supralaminar", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Supralaminär",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Supra-lam.",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Supra-lam.",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Sopra-lam.",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Supra-lam.",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Supralaminär",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Supralaminær",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Supralaminær",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Supralaminaarinen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Supralaminair",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Nadblaszkowy",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Υπερπεταλικός",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Supralaminar",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Супра-лам",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Супра-лам",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.hook.il_hook",
       "en": "Infra-lam",
       "translations": {
-        "de": { "expected": "Infralaminär", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Infra-lam.", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Infra-lam.", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Infra-lam.", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Infra-lam.", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Infralaminär", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Infralaminær", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Infralaminær", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Infralaminaarinen", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Infralaminair", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Podblaszkowy", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Υποπεταλικός", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "İnfralaminar", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Infralaminär",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Infra-lam.",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Infra-lam.",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Infra-lam.",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Infra-lam.",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Infralaminär",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Infralaminær",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Infralaminær",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Infralaminaarinen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Infralaminair",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Podblaszkowy",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Υποπεταλικός",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "İnfralaminar",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Інфра-лам",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Инфра-лам",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.force.translate_left",
       "en": "Translate Left",
       "translations": {
-        "de": { "expected": "Translation links", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Translation gauche", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Traslación izquierda", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Traslazione sinistra", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Translação esquerda", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Translation vänster", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Translasjon venstre", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Translation venstre", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Translaatio vasemmalle", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Translatie links", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Translacja w lewo", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Μετατόπιση αριστερά", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Translasyon sol", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Translation links",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Translation gauche",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Traslación izquierda",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Traslazione sinistra",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Translação esquerda",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Translation vänster",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Translasjon venstre",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Translation venstre",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Translaatio vasemmalle",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Translatie links",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Translacja w lewo",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Μετατόπιση αριστερά",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Translasyon sol",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Трансляція вліво",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Трансляция влево",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.force.translate_right",
       "en": "Translate Right",
       "translations": {
-        "de": { "expected": "Translation rechts", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Translation droite", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Traslación derecha", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Traslazione destra", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Translação direita", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Translation höger", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Translasjon høyre", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Translation højre", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Translaatio oikealle", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Translatie rechts", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Translacja w prawo", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Μετατόπιση δεξιά", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Translasyon sağ", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Translation rechts",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Translation droite",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Traslación derecha",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Traslazione destra",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Translação direita",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Translation höger",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Translasjon høyre",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Translation højre",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Translaatio oikealle",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Translatie rechts",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Translacja w prawo",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Μετατόπιση δεξιά",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Translasyon sağ",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Трансляція вправо",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Трансляция вправо",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.force.compression",
       "en": "Compression",
       "translations": {
-        "de": { "expected": "Kompression", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Compression", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Compresión", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Compressione", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Compressão", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Kompression", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Kompresjon", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Kompression", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Kompressio", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Compressie", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Kompresja", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Συμπίεση", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Kompresyon", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Kompression",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Compression",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Compresión",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Compressione",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Compressão",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Kompression",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Kompresjon",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Kompression",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Kompressio",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Compressie",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Kompresja",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Συμπίεση",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Kompresyon",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Компресія",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Компрессия",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.force.distraction",
       "en": "Distraction",
       "translations": {
-        "de": { "expected": "Distraktion", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Distraction", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Distracción", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Distrazione", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Distração", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Distraktion", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Distraksjon", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Distraktion", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Distraktio", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Distractie", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Dystrakcja", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Διάταση", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Distraksiyon", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Distraktion",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Distraction",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Distracción",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Distrazione",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Distração",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Distraktion",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Distraksjon",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Distraktion",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Distraktio",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Distractie",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Dystrakcja",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Διάταση",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Distraksiyon",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Дистракція",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Дистракция",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.force.derotate_cw",
       "en": "Derotate CW",
       "translations": {
-        "de": { "expected": "Derotation UZS", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Dérotation HS", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Desrotación HR", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Derotazione OS", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Desrotação HR", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Derotation MV", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Derotasjon MUV", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Derotation MU", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Derotaatio MP", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Derotatie KW", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Derotacja ZW", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Διόρθωση στροφής ΔΡΩ", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Derotasyon SY", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Derotation UZS",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Dérotation HS",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Desrotación HR",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Derotazione OS",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Desrotação HR",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Derotation MV",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Derotasjon MUV",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Derotation MU",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Derotaatio MP",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Derotatie KW",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Derotacja ZW",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Διόρθωση στροφής ΔΡΩ",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Derotasyon SY",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Деротація ЗГС",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Деротация по ЧС",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.force.derotate_ccw",
       "en": "Derotate CCW",
       "translations": {
-        "de": { "expected": "Derotation GUZS", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Dérotation AHS", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Desrotación AHR", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Derotazione AOS", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Desrotação AHR", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Derotation MMV", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Derotasjon MMUV", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Derotation MMU", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Derotaatio VMP", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Derotatie TKW", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Derotacja PZW", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Διόρθωση στροφής ΑΔΡΩ", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Derotasyon SSY", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Derotation GUZS",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Dérotation AHS",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Desrotación AHR",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Derotazione AOS",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Desrotação AHR",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Derotation MMV",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Derotasjon MMUV",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Derotation MMU",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Derotaatio VMP",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Derotatie TKW",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Derotacja PZW",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Διόρθωση στροφής ΑΔΡΩ",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Derotasyon SSY",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Деротація ПГС",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Деротация против ЧС",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "patient.supplier",
       "en": "Implant Supplier",
       "translations": {
-        "de": { "expected": "Implantathersteller", "source": "DWG", "verified": false },
-        "fr": { "expected": "Fournisseur d'implants", "source": "SFCR", "verified": false },
-        "es": { "expected": "Proveedor de implantes", "source": "GEER", "verified": false },
-        "it": { "expected": "Fornitore di impianti", "source": "SICV&GIS", "verified": false },
-        "pt": { "expected": "Fornecedor de implantes", "source": "SPP", "verified": false },
-        "sv": { "expected": "Implantatleverantör", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Implantatleverandør", "source": "NVWC", "verified": false },
-        "da": { "expected": "Implantatleverandør", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Implanttitoimittaja", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Implantaatleverancier", "source": "NOV", "verified": false },
-        "pl": { "expected": "Dostawca implantów", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Προμηθευτής εμφυτευμάτων", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "İmplant tedarikçisi", "source": "TOTBİD", "verified": false }
+        "de": {
+          "expected": "Implantathersteller",
+          "source": "DWG",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Fournisseur d'implants",
+          "source": "SFCR",
+          "verified": false
+        },
+        "es": {
+          "expected": "Proveedor de implantes",
+          "source": "GEER",
+          "verified": false
+        },
+        "it": {
+          "expected": "Fornitore di impianti",
+          "source": "SICV&GIS",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Fornecedor de implantes",
+          "source": "SPP",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Implantatleverantör",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Implantatleverandør",
+          "source": "NVWC",
+          "verified": false
+        },
+        "da": {
+          "expected": "Implantatleverandør",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Implanttitoimittaja",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Implantaatleverancier",
+          "source": "NOV",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Dostawca implantów",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Προμηθευτής εμφυτευμάτων",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "İmplant tedarikçisi",
+          "source": "TOTBİD",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Постачальник імплантів",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Поставщик имплантов",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "patient.screw_system",
       "en": "Screw System",
       "translations": {
-        "de": { "expected": "Schraubensystem", "source": "DWG", "verified": false },
-        "fr": { "expected": "Système de vis", "source": "SFCR", "verified": false },
-        "es": { "expected": "Sistema de tornillos", "source": "GEER", "verified": false },
-        "it": { "expected": "Sistema di viti", "source": "SICV&GIS", "verified": false },
-        "pt": { "expected": "Sistema de parafusos", "source": "SPP", "verified": false },
-        "sv": { "expected": "Skruvsystem", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Skruesystem", "source": "NVWC", "verified": false },
-        "da": { "expected": "Skruesystem", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Ruuvijärjestelmä", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Schroefsysteem", "source": "NOV", "verified": false },
-        "pl": { "expected": "System śrub", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Σύστημα βιδών", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Vida sistemi", "source": "TOTBİD", "verified": false }
+        "de": {
+          "expected": "Schraubensystem",
+          "source": "DWG",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Système de vis",
+          "source": "SFCR",
+          "verified": false
+        },
+        "es": {
+          "expected": "Sistema de tornillos",
+          "source": "GEER",
+          "verified": false
+        },
+        "it": {
+          "expected": "Sistema di viti",
+          "source": "SICV&GIS",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Sistema de parafusos",
+          "source": "SPP",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Skruvsystem",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Skruesystem",
+          "source": "NVWC",
+          "verified": false
+        },
+        "da": {
+          "expected": "Skruesystem",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Ruuvijärjestelmä",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Schroefsysteem",
+          "source": "NOV",
+          "verified": false
+        },
+        "pl": {
+          "expected": "System śrub",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Σύστημα βιδών",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Vida sistemi",
+          "source": "TOTBİD",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Система гвинтів",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Система винтов",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "modal.osteotomy.recon_cage",
       "en": "Reconstruction Cage",
       "translations": {
-        "de": { "expected": "Rekonstruktions-Cage", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Cage de reconstruction", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Caja de reconstrucción", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Cage di ricostruzione", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Cage de reconstrução", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Rekonstruktions-cage", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Rekonstruksjons-cage", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Rekonstruktions-cage", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Rekonstruktiohäkki", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Reconstructie-cage", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Klatka rekonstrukcyjna", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Κλωβός ανακατασκευής", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Rekonstrüksiyon kafesi", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Rekonstruktions-Cage",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Cage de reconstruction",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Caja de reconstrucción",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Cage di ricostruzione",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Cage de reconstrução",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Rekonstruktions-cage",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Rekonstruksjons-cage",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Rekonstruktions-cage",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Rekonstruktiohäkki",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Reconstructie-cage",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Klatka rekonstrukcyjna",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Κλωβός ανακατασκευής",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Rekonstrüksiyon kafesi",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Реконструктивний кейдж",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Реконструктивный кейдж",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "sidebar.session_privacy",
       "en": "Session Privacy",
       "translations": {
-        "de": { "expected": "Sitzungsdatenschutz", "source": "DWG", "verified": false },
-        "fr": { "expected": "Confidentialité de session", "source": "SFCR", "verified": false },
-        "es": { "expected": "Privacidad de sesión", "source": "GEER", "verified": false },
-        "it": { "expected": "Privacy di sessione", "source": "SICV&GIS", "verified": false },
-        "pt": { "expected": "Privacidade de sessão", "source": "SPP", "verified": false },
-        "sv": { "expected": "Sessionsintegritet", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Øktpersonvern", "source": "NVWC", "verified": false },
-        "da": { "expected": "Sessionsbeskyttelse", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Istunnon tietosuoja", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Sessieprivacy", "source": "NOV", "verified": false },
-        "pl": { "expected": "Prywatność sesji", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Απόρρητο συνεδρίας", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Oturum gizliliği", "source": "TOTBİD", "verified": false }
+        "de": {
+          "expected": "Sitzungsdatenschutz",
+          "source": "DWG",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Confidentialité de session",
+          "source": "SFCR",
+          "verified": false
+        },
+        "es": {
+          "expected": "Privacidad de sesión",
+          "source": "GEER",
+          "verified": false
+        },
+        "it": {
+          "expected": "Privacy di sessione",
+          "source": "SICV&GIS",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Privacidade de sessão",
+          "source": "SPP",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Sessionsintegritet",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Øktpersonvern",
+          "source": "NVWC",
+          "verified": false
+        },
+        "da": {
+          "expected": "Sessionsbeskyttelse",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Istunnon tietosuoja",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Sessieprivacy",
+          "source": "NOV",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Prywatność sesji",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Απόρρητο συνεδρίας",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Oturum gizliliği",
+          "source": "TOTBİD",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Конфіденційність сесії",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Конфиденциальность сеанса",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "sidebar.copy_plan",
       "en": "Copy Plan to Construct",
       "translations": {
-        "de": { "expected": "Plan in Konstrukt kopieren", "source": "DWG", "verified": false },
-        "fr": { "expected": "Copier le plan vers le montage", "source": "SFCR", "verified": false },
-        "es": { "expected": "Copiar plan al constructo", "source": "GEER", "verified": false },
-        "it": { "expected": "Copia piano nel costrutto", "source": "SICV&GIS", "verified": false },
-        "pt": { "expected": "Copiar plano para o constructo", "source": "SPP", "verified": false },
-        "sv": { "expected": "Kopiera plan till konstrukt", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Kopier plan til konstrukt", "source": "NVWC", "verified": false },
-        "da": { "expected": "Kopiér plan til konstrukt", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Kopioi suunnitelma rakenteeksi", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Kopieer plan naar construct", "source": "NOV", "verified": false },
-        "pl": { "expected": "Kopiuj plan do konstruktu", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Αντιγραφή σχεδίου στην κατασκευή", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Planı yapıya kopyala", "source": "TOTBİD", "verified": false }
+        "de": {
+          "expected": "Plan in Konstrukt kopieren",
+          "source": "DWG",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Copier le plan vers le montage",
+          "source": "SFCR",
+          "verified": false
+        },
+        "es": {
+          "expected": "Copiar plan al constructo",
+          "source": "GEER",
+          "verified": false
+        },
+        "it": {
+          "expected": "Copia piano nel costrutto",
+          "source": "SICV&GIS",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Copiar plano para o constructo",
+          "source": "SPP",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Kopiera plan till konstrukt",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Kopier plan til konstrukt",
+          "source": "NVWC",
+          "verified": false
+        },
+        "da": {
+          "expected": "Kopiér plan til konstrukt",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Kopioi suunnitelma rakenteeksi",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Kopieer plan naar construct",
+          "source": "NOV",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Kopiuj plan do konstruktu",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Αντιγραφή σχεδίου στην κατασκευή",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Planı yapıya kopyala",
+          "source": "TOTBİD",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Копіювати план у конструкцію",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Копировать план в конструкцию",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.screw.monoaxial",
       "en": "Monoaxial",
       "translations": {
-        "de": { "expected": "Monoaxial", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Monoaxial", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Monoaxial", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Monoassiale", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Monoaxial", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Monoaxial", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Monoaksial", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Monoaksial", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Monoaksiaalinen", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Monoaxiaal", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Monoaksjalny", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Μονοαξονικός", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Monoaksiyal", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Monoaxial",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Monoaxial",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Monoaxial",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Monoassiale",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Monoaxial",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Monoaxial",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Monoaksial",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Monoaksial",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Monoaksiaalinen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Monoaxiaal",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Monoaksjalny",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Μονοαξονικός",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Monoaksiyal",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Моноаксіальний",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Моноаксиальный",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.screw.polyaxial",
       "en": "Polyaxial",
       "translations": {
-        "de": { "expected": "Polyaxial", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Polyaxial", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Poliaxial", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Poliassiale", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Poliaxial", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Polyaxial", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Polyaksial", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Polyaksial", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Polyaksiaalinen", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Polyaxiaal", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Poliaksjalny", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Πολυαξονικός", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Poliaksiyal", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Polyaxial",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Polyaxial",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Poliaxial",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Poliassiale",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Poliaxial",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Polyaxial",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Polyaksial",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Polyaksial",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Polyaksiaalinen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Polyaxiaal",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Poliaksjalny",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Πολυαξονικός",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Poliaksiyal",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Поліаксіальний",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Полиаксиальный",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "clinical.screw.uniplanar",
       "en": "Uniplanar",
       "translations": {
-        "de": { "expected": "Uniplanar", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Uniplanaire", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Uniplanar", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Uniplanare", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Uniplanar", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Uniplanär", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Uniplanær", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Uniplanær", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Uniplanaarinen", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Uniplanair", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Uniplanarny", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Μονοεπίπεδος", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Uniplanar", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Uniplanar",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Uniplanaire",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Uniplanar",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Uniplanare",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Uniplanar",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Uniplanär",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Uniplanær",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Uniplanær",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Uniplanaarinen",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Uniplanair",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Uniplanarny",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Μονοεπίπεδος",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Uniplanar",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Уніпланарний",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Унипланарный",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "patient.bone_graft",
       "en": "Bone Graft",
       "translations": {
-        "de": { "expected": "Knochentransplantat", "source": "DWG/AO Spine", "verified": false },
-        "fr": { "expected": "Greffe osseuse", "source": "SFCR/AO Spine", "verified": false },
-        "es": { "expected": "Injerto óseo", "source": "GEER/AO Spine", "verified": false },
-        "it": { "expected": "Innesto osseo", "source": "SICV&GIS/AO Spine", "verified": false },
-        "pt": { "expected": "Enxerto ósseo", "source": "SPP/AO Spine", "verified": false },
-        "sv": { "expected": "Bentransplantat", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Bentransplantat", "source": "NVWC/AO Spine", "verified": false },
-        "da": { "expected": "Knogletransplantat", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Luusiirre", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Bottransplantaat", "source": "NOV/AO Spine", "verified": false },
-        "pl": { "expected": "Przeszczep kostny", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Οστικό μόσχευμα", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Kemik grefti", "source": "TOTBİD/AO Spine", "verified": false }
+        "de": {
+          "expected": "Knochentransplantat",
+          "source": "DWG/AO Spine",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Greffe osseuse",
+          "source": "SFCR/AO Spine",
+          "verified": false
+        },
+        "es": {
+          "expected": "Injerto óseo",
+          "source": "GEER/AO Spine",
+          "verified": false
+        },
+        "it": {
+          "expected": "Innesto osseo",
+          "source": "SICV&GIS/AO Spine",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Enxerto ósseo",
+          "source": "SPP/AO Spine",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Bentransplantat",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Bentransplantat",
+          "source": "NVWC/AO Spine",
+          "verified": false
+        },
+        "da": {
+          "expected": "Knogletransplantat",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Luusiirre",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Bottransplantaat",
+          "source": "NOV/AO Spine",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Przeszczep kostny",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Οστικό μόσχευμα",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Kemik grefti",
+          "source": "TOTBİD/AO Spine",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Кістковий трансплантат",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Костный трансплантат",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     },
     {
       "key": "export.construct",
       "en": "Final Surgical Construct",
       "translations": {
-        "de": { "expected": "Endgültiges chirurgisches Konstrukt", "source": "DWG", "verified": false },
-        "fr": { "expected": "Montage chirurgical final", "source": "SFCR", "verified": false },
-        "es": { "expected": "Constructo quirúrgico final", "source": "GEER", "verified": false },
-        "it": { "expected": "Costrutto chirurgico finale", "source": "SICV&GIS", "verified": false },
-        "pt": { "expected": "Constructo cirúrgico final", "source": "SPP", "verified": false },
-        "sv": { "expected": "Slutgiltigt kirurgiskt konstrukt", "source": "AO Spine", "verified": false },
-        "nb": { "expected": "Endelig kirurgisk konstrukt", "source": "NVWC", "verified": false },
-        "da": { "expected": "Endeligt kirurgisk konstrukt", "source": "AO Spine", "verified": false },
-        "fi": { "expected": "Lopullinen kirurginen rakenne", "source": "AO Spine", "verified": false },
-        "nl": { "expected": "Definitief chirurgisch construct", "source": "NOV", "verified": false },
-        "pl": { "expected": "Ostateczny konstrukt chirurgiczny", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Τελικό χειρουργικό κατασκεύασμα", "source": "AO Spine", "verified": false },
-        "tr": { "expected": "Nihai cerrahi yapı", "source": "TOTBİD", "verified": false }
+        "de": {
+          "expected": "Endgültiges chirurgisches Konstrukt",
+          "source": "DWG",
+          "verified": false
+        },
+        "fr": {
+          "expected": "Montage chirurgical final",
+          "source": "SFCR",
+          "verified": false
+        },
+        "es": {
+          "expected": "Constructo quirúrgico final",
+          "source": "GEER",
+          "verified": false
+        },
+        "it": {
+          "expected": "Costrutto chirurgico finale",
+          "source": "SICV&GIS",
+          "verified": false
+        },
+        "pt": {
+          "expected": "Constructo cirúrgico final",
+          "source": "SPP",
+          "verified": false
+        },
+        "sv": {
+          "expected": "Slutgiltigt kirurgiskt konstrukt",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nb": {
+          "expected": "Endelig kirurgisk konstrukt",
+          "source": "NVWC",
+          "verified": false
+        },
+        "da": {
+          "expected": "Endeligt kirurgisk konstrukt",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "fi": {
+          "expected": "Lopullinen kirurginen rakenne",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "nl": {
+          "expected": "Definitief chirurgisch construct",
+          "source": "NOV",
+          "verified": false
+        },
+        "pl": {
+          "expected": "Ostateczny konstrukt chirurgiczny",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "el": {
+          "expected": "Τελικό χειρουργικό κατασκεύασμα",
+          "source": "AO Spine",
+          "verified": false
+        },
+        "tr": {
+          "expected": "Nihai cerrahi yapı",
+          "source": "TOTBİD",
+          "verified": false
+        },
+        "uk": {
+          "expected": "Остаточна хірургічна конструкція",
+          "source": "AO Spine Ukraine",
+          "verified": false
+        },
+        "ru": {
+          "expected": "Итоговая хирургическая конструкция",
+          "source": "RASS/AO Spine",
+          "verified": false
+        }
       }
     }
   ]

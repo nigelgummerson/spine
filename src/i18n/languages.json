@@ -10,7 +10,9 @@
   { "code": "nb", "name": "Norsk bokmål" },
   { "code": "pl", "name": "Polski" },
   { "code": "pt", "name": "Português" },
+  { "code": "ru", "name": "Русский" },
   { "code": "fi", "name": "Suomi" },
   { "code": "sv", "name": "Svenska" },
-  { "code": "tr", "name": "Türkçe" }
+  { "code": "tr", "name": "Türkçe" },
+  { "code": "uk", "name": "Українська" }
 ]
