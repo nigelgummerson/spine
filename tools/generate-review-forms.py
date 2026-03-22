@@ -936,6 +936,7 @@ def generate_html(lang: str, translations: dict) -> str:
             const hint = document.getElementById('save-hint');
             hint.textContent = 'This form does not send data to a server. Progress is saved in your browser only. Use Export Review to download and back up your work.';
             hint.classList.add('visible');
+            requestAnimationFrame(syncHeaderHeight);
         }}
 
         function checkMilestone(reviewed) {{
