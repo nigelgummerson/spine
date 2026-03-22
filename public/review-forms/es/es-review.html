@@ -202,7 +202,7 @@
         </div>
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-            <div class="progress-text" id="progress-text">0 of 244 items reviewed (0%)</div>
+            <div class="progress-text" id="progress-text">0 of 254 items reviewed (0%)</div>
             <div class="save-hint" id="save-hint"></div>
         </div>
     </div>
@@ -234,11 +234,11 @@
             <a href="#section-8" class="nav-link" data-section="8">Inventory Panel <span class="nav-count" id="nav-count-8">0/19</span></a>
             <a href="#section-9" class="nav-link" data-section="9">Chart Headers &amp; Diagram Labels <span class="nav-count" id="nav-count-9">0/6</span></a>
             <a href="#section-10" class="nav-link" data-section="10">Linked Screens (Sync) <span class="nav-count" id="nav-count-10">0/2</span></a>
-            <a href="#section-11" class="nav-link" data-section="11">Export &amp; Column Headers <span class="nav-count" id="nav-count-11">0/3</span></a>
-            <a href="#section-12" class="nav-link" data-section="12">Help Modal <span class="nav-count" id="nav-count-12">0/19</span></a>
+            <a href="#section-11" class="nav-link" data-section="11">Export &amp; Column Headers <span class="nav-count" id="nav-count-11">0/4</span></a>
+            <a href="#section-12" class="nav-link" data-section="12">Help Modal <span class="nav-count" id="nav-count-12">0/21</span></a>
             <a href="#section-13" class="nav-link" data-section="13">Common Buttons &amp; Shortcuts <span class="nav-count" id="nav-count-13">0/7</span></a>
             <a href="#section-14" class="nav-link" data-section="14">Alerts &amp; Confirmations <span class="nav-count" id="nav-count-14">0/10</span></a>
-            <a href="#section-15" class="nav-link" data-section="15">Credits &amp; Disclaimer <span class="nav-count" id="nav-count-15">0/5</span></a>
+            <a href="#section-15" class="nav-link" data-section="15">Credits &amp; Disclaimer <span class="nav-count" id="nav-count-15">0/12</span></a>
             <a href="#section-16" class="nav-link" data-section="16">Version History Modal <span class="nav-count" id="nav-count-16">0/1</span></a>
                 <div class="nav-divider"></div>
                 <a href="#section-bugs" class="nav-link nav-link-bugs" data-section="bugs">Bug Reports <span class="nav-count" id="nav-count-bugs">0</span></a>
@@ -6966,6 +6966,39 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="export.disclaimer" data-section="11" id="item-export.disclaimer">
+            <div class="item-header">
+                <code class="key-label">export.disclaimer</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Documentation aid only — not a medical device</div>
+                </div>
+                <div class="col-translation">
+                    <label>Español</label>
+                    <textarea class="translation-field" data-key="export.disclaimer" data-original="Solo herramienta de documentación — no es un dispositivo médico">Solo herramienta de documentación — no es un dispositivo médico</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-export.disclaimer" value="correct" data-key="export.disclaimer">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-export.disclaimer" value="corrected" data-key="export.disclaimer">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="export.disclaimer" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="export.plan" data-section="11" id="item-export.plan">
             <div class="item-header">
                 <code class="key-label">export.plan</code>
@@ -7168,6 +7201,72 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="help.copy_plan.title" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="help.disclaimer.body" data-section="12" id="item-help.disclaimer.body">
+            <div class="item-header">
+                <code class="key-label">help.disclaimer.body</code>
+                <span class="hint html-hint">Contains HTML: preserve tags</span>
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">This tool is a &lt;strong&gt;documentation and communication aid&lt;/strong&gt; for surgical planning. It is not a medical device and has not been approved, cleared, or certified by any regulatory body (including MHRA, EU MDR, or FDA).&lt;br/&gt;&lt;br/&gt;It does not provide clinical decision support, diagnostic information, or treatment recommendations. The &lt;strong&gt;operating surgeon bears full responsibility&lt;/strong&gt; for all clinical decisions, including implant selection, placement, and verification at the point of use (WHO Surgical Safety Checklist).&lt;br/&gt;&lt;br/&gt;The surgical record produced by this tool is only as accurate as the information entered. The surgeon is responsible for ensuring the record reflects the actual procedure performed.&lt;br/&gt;&lt;br/&gt;All patient data remains on the local device. No data is transmitted to any server. There is no analytics or telemetry. The user is responsible for data handling under their local regulations (e.g. GDPR, HIPAA, Caldicott).&lt;br/&gt;&lt;br/&gt;This software is provided as-is under the GNU GPLv3 licence, with no warranty of any kind. See the &lt;a href=&quot;https://www.gnu.org/licenses/gpl-3.0.en.html&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; class=&quot;underline&quot;&gt;full licence&lt;/a&gt; for details.</div>
+                </div>
+                <div class="col-translation">
+                    <label>Español</label>
+                    <textarea class="translation-field" data-key="help.disclaimer.body" data-original="Esta herramienta es un &lt;strong&gt;instrumento de documentación y comunicación&lt;/strong&gt; para la planificación quirúrgica. No es un dispositivo médico y no ha sido aprobado, autorizado o certificado por ningún organismo regulador (incluyendo MHRA, MDR de la UE o FDA).&lt;br/&gt;&lt;br/&gt;No proporciona soporte de decisión clínica, información diagnóstica ni recomendaciones de tratamiento. El &lt;strong&gt;cirujano operador asume toda la responsabilidad&lt;/strong&gt; de todas las decisiones clínicas, incluyendo la selección, colocación y verificación de implantes en el punto de uso (Lista de verificación de seguridad quirúrgica de la OMS).&lt;br/&gt;&lt;br/&gt;El registro quirúrgico producido por esta herramienta es tan preciso como la información introducida. El cirujano es responsable de asegurar que el registro refleje el procedimiento realmente realizado.&lt;br/&gt;&lt;br/&gt;Todos los datos del paciente permanecen en el dispositivo local. No se transmiten datos a ningún servidor. No hay analítica ni telemetría. El usuario es responsable del manejo de datos según sus regulaciones locales (ej. RGPD).&lt;br/&gt;&lt;br/&gt;Este software se proporciona tal cual bajo la licencia GNU GPLv3, sin garantía de ningún tipo. Consulte la &lt;a href=&quot;https://www.gnu.org/licenses/gpl-3.0.en.html&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; class=&quot;underline&quot;&gt;licencia completa&lt;/a&gt; para más detalles.">Esta herramienta es un &lt;strong&gt;instrumento de documentación y comunicación&lt;/strong&gt; para la planificación quirúrgica. No es un dispositivo médico y no ha sido aprobado, autorizado o certificado por ningún organismo regulador (incluyendo MHRA, MDR de la UE o FDA).&lt;br/&gt;&lt;br/&gt;No proporciona soporte de decisión clínica, información diagnóstica ni recomendaciones de tratamiento. El &lt;strong&gt;cirujano operador asume toda la responsabilidad&lt;/strong&gt; de todas las decisiones clínicas, incluyendo la selección, colocación y verificación de implantes en el punto de uso (Lista de verificación de seguridad quirúrgica de la OMS).&lt;br/&gt;&lt;br/&gt;El registro quirúrgico producido por esta herramienta es tan preciso como la información introducida. El cirujano es responsable de asegurar que el registro refleje el procedimiento realmente realizado.&lt;br/&gt;&lt;br/&gt;Todos los datos del paciente permanecen en el dispositivo local. No se transmiten datos a ningún servidor. No hay analítica ni telemetría. El usuario es responsable del manejo de datos según sus regulaciones locales (ej. RGPD).&lt;br/&gt;&lt;br/&gt;Este software se proporciona tal cual bajo la licencia GNU GPLv3, sin garantía de ningún tipo. Consulte la &lt;a href=&quot;https://www.gnu.org/licenses/gpl-3.0.en.html&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; class=&quot;underline&quot;&gt;licencia completa&lt;/a&gt; para más detalles.</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-help.disclaimer.body" value="correct" data-key="help.disclaimer.body">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-help.disclaimer.body" value="corrected" data-key="help.disclaimer.body">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="help.disclaimer.body" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="help.disclaimer.title" data-section="12" id="item-help.disclaimer.title">
+            <div class="item-header">
+                <code class="key-label">help.disclaimer.title</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Disclaimer</div>
+                </div>
+                <div class="col-translation">
+                    <label>Español</label>
+                    <textarea class="translation-field" data-key="help.disclaimer.title" data-original="Aviso legal">Aviso legal</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-help.disclaimer.title" value="correct" data-key="help.disclaimer.title">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-help.disclaimer.title" value="corrected" data-key="help.disclaimer.title">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="help.disclaimer.title" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -8380,6 +8479,237 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="disclaimer.accepted_label" data-section="15" id="item-disclaimer.accepted_label">
+            <div class="item-header">
+                <code class="key-label">disclaimer.accepted_label</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Notice accepted</div>
+                </div>
+                <div class="col-translation">
+                    <label>Español</label>
+                    <textarea class="translation-field" data-key="disclaimer.accepted_label" data-original="Aviso aceptado">Aviso aceptado</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-disclaimer.accepted_label" value="correct" data-key="disclaimer.accepted_label">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-disclaimer.accepted_label" value="corrected" data-key="disclaimer.accepted_label">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="disclaimer.accepted_label" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="disclaimer.clinical" data-section="15" id="item-disclaimer.clinical">
+            <div class="item-header">
+                <code class="key-label">disclaimer.clinical</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">This is a documentation and communication aid, not a medical device. It is not CE marked, FDA cleared, or approved by any regulatory body. The operating surgeon is responsible for all clinical decisions, implant verification, and record accuracy.</div>
+                </div>
+                <div class="col-translation">
+                    <label>Español</label>
+                    <textarea class="translation-field" data-key="disclaimer.clinical" data-original="Esta es una herramienta de documentación y comunicación, no un dispositivo médico. No tiene marcado CE, autorización de la FDA ni aprobación de ningún organismo regulador. El cirujano operador es responsable de todas las decisiones clínicas, la verificación de implantes y la exactitud del registro.">Esta es una herramienta de documentación y comunicación, no un dispositivo médico. No tiene marcado CE, autorización de la FDA ni aprobación de ningún organismo regulador. El cirujano operador es responsable de todas las decisiones clínicas, la verificación de implantes y la exactitud del registro.</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-disclaimer.clinical" value="correct" data-key="disclaimer.clinical">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-disclaimer.clinical" value="corrected" data-key="disclaimer.clinical">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="disclaimer.clinical" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="disclaimer.clinical_short" data-section="15" id="item-disclaimer.clinical_short">
+            <div class="item-header">
+                <code class="key-label">disclaimer.clinical_short</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Documentation aid — not a medical device. Surgeon responsible for all clinical decisions and record accuracy.</div>
+                </div>
+                <div class="col-translation">
+                    <label>Español</label>
+                    <textarea class="translation-field" data-key="disclaimer.clinical_short" data-original="Herramienta de documentación — no es un dispositivo médico. El cirujano es responsable de todas las decisiones clínicas y la exactitud del registro.">Herramienta de documentación — no es un dispositivo médico. El cirujano es responsable de todas las decisiones clínicas y la exactitud del registro.</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-disclaimer.clinical_short" value="correct" data-key="disclaimer.clinical_short">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-disclaimer.clinical_short" value="corrected" data-key="disclaimer.clinical_short">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="disclaimer.clinical_short" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="disclaimer.modal_accept" data-section="15" id="item-disclaimer.modal_accept">
+            <div class="item-header">
+                <code class="key-label">disclaimer.modal_accept</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">I understand</div>
+                </div>
+                <div class="col-translation">
+                    <label>Español</label>
+                    <textarea class="translation-field" data-key="disclaimer.modal_accept" data-original="Entiendo">Entiendo</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-disclaimer.modal_accept" value="correct" data-key="disclaimer.modal_accept">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-disclaimer.modal_accept" value="corrected" data-key="disclaimer.modal_accept">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="disclaimer.modal_accept" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="disclaimer.modal_body" data-section="15" id="item-disclaimer.modal_body">
+            <div class="item-header">
+                <code class="key-label">disclaimer.modal_body</code>
+                <span class="hint html-hint">Contains HTML: preserve tags</span>
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">This tool is a &lt;strong&gt;documentation and communication aid&lt;/strong&gt; for surgical planning. It is not a medical device and has not been approved by any regulatory body (MHRA, EU MDR, FDA).&lt;br/&gt;&lt;br/&gt;It does not provide clinical decision support or treatment recommendations. The &lt;strong&gt;operating surgeon is responsible&lt;/strong&gt; for all clinical decisions, implant verification (WHO Surgical Safety Checklist), and ensuring the record accurately reflects the procedure performed.&lt;br/&gt;&lt;br/&gt;All data remains on this device. Nothing is transmitted to any server.</div>
+                </div>
+                <div class="col-translation">
+                    <label>Español</label>
+                    <textarea class="translation-field" data-key="disclaimer.modal_body" data-original="Esta herramienta es un &lt;strong&gt;instrumento de documentación y comunicación&lt;/strong&gt; para la planificación quirúrgica. No es un dispositivo médico y no ha sido aprobado por ningún organismo regulador (MHRA, MDR UE, FDA).&lt;br/&gt;&lt;br/&gt;No proporciona soporte de decisión clínica ni recomendaciones de tratamiento. El &lt;strong&gt;cirujano operador es responsable&lt;/strong&gt; de todas las decisiones clínicas, la verificación de implantes (Lista de verificación de seguridad quirúrgica de la OMS) y de asegurar que el registro refleje con precisión el procedimiento realizado.&lt;br/&gt;&lt;br/&gt;Todos los datos permanecen en este dispositivo. Nada se transmite a ningún servidor.">Esta herramienta es un &lt;strong&gt;instrumento de documentación y comunicación&lt;/strong&gt; para la planificación quirúrgica. No es un dispositivo médico y no ha sido aprobado por ningún organismo regulador (MHRA, MDR UE, FDA).&lt;br/&gt;&lt;br/&gt;No proporciona soporte de decisión clínica ni recomendaciones de tratamiento. El &lt;strong&gt;cirujano operador es responsable&lt;/strong&gt; de todas las decisiones clínicas, la verificación de implantes (Lista de verificación de seguridad quirúrgica de la OMS) y de asegurar que el registro refleje con precisión el procedimiento realizado.&lt;br/&gt;&lt;br/&gt;Todos los datos permanecen en este dispositivo. Nada se transmite a ningún servidor.</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-disclaimer.modal_body" value="correct" data-key="disclaimer.modal_body">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-disclaimer.modal_body" value="corrected" data-key="disclaimer.modal_body">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="disclaimer.modal_body" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="disclaimer.modal_title" data-section="15" id="item-disclaimer.modal_title">
+            <div class="item-header">
+                <code class="key-label">disclaimer.modal_title</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Important Notice</div>
+                </div>
+                <div class="col-translation">
+                    <label>Español</label>
+                    <textarea class="translation-field" data-key="disclaimer.modal_title" data-original="Aviso importante">Aviso importante</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-disclaimer.modal_title" value="correct" data-key="disclaimer.modal_title">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-disclaimer.modal_title" value="corrected" data-key="disclaimer.modal_title">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="disclaimer.modal_title" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="disclaimer.privacy_note" data-section="15" id="item-disclaimer.privacy_note">
+            <div class="item-header">
+                <code class="key-label">disclaimer.privacy_note</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">All data remains on your device. No information is transmitted to any server. No analytics or telemetry. You are responsible for data handling under your local regulations.</div>
+                </div>
+                <div class="col-translation">
+                    <label>Español</label>
+                    <textarea class="translation-field" data-key="disclaimer.privacy_note" data-original="Todos los datos permanecen en su dispositivo. No se transmite información a ningún servidor. Sin analítica ni telemetría. Usted es responsable del manejo de datos según sus regulaciones locales.">Todos los datos permanecen en su dispositivo. No se transmite información a ningún servidor. Sin analítica ni telemetría. Usted es responsable del manejo de datos según sus regulaciones locales.</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-disclaimer.privacy_note" value="correct" data-key="disclaimer.privacy_note">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-disclaimer.privacy_note" value="corrected" data-key="disclaimer.privacy_note">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="disclaimer.privacy_note" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="disclaimer.text" data-section="15" id="item-disclaimer.text">
             <div class="item-header">
                 <code class="key-label">disclaimer.text</code>
@@ -8498,7 +8828,7 @@
     (function() {
         const LANG = "es";
         const STORAGE_KEY = "spine_review_" + LANG;
-        const TOTAL = 244;
+        const TOTAL = 254;
 
         // --- Reviewer details ---
 

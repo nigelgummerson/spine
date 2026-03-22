@@ -22,7 +22,11 @@ jobs:
         with:
           node-version: 20
           cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - run: npm ci
+      - run: python tools/generate-review-forms.py
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
