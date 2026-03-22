@@ -384,6 +384,7 @@ const App = () => {
             setPatientData(pd);
             if (json.ui?.viewMode) setViewMode(json.ui.viewMode);
             if (json.ui?.colourScheme) changeTheme(json.ui.colourScheme);
+            if (json.document?.language) changeLang(json.document.language);
             return;
         }
         // v3 / v2 legacy format
