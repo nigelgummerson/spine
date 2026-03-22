@@ -22,7 +22,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_DIR = SCRIPT_DIR.parent
 TRANSLATIONS_FILE = PROJECT_DIR / "src" / "i18n" / "translations.json"
-REVIEW_DIR = PROJECT_DIR / "review-forms"
+REVIEW_DIR = PROJECT_DIR / "public" / "review-forms"
 
 
 def process_review(filepath: Path) -> dict:

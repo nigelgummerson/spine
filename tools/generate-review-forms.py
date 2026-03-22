@@ -23,7 +23,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_DIR = SCRIPT_DIR.parent
 TRANSLATIONS_FILE = PROJECT_DIR / "src" / "i18n" / "translations.json"
-OUTPUT_DIR = PROJECT_DIR / "review-forms"
+OUTPUT_DIR = PROJECT_DIR / "public" / "review-forms"
 
 # Language metadata: code -> (English name, native name)
 LANG_NAMES = {
