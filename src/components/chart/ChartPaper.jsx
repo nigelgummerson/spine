@@ -95,18 +95,18 @@ export const ChartPaper = ({ title, placements, ghostPlacements, onZoneClick, on
     return (
     <div className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative"><div className={`${forcePlacements ? 'px-2 py-1' : 'p-2'} bg-slate-50 border-b border-slate-200 text-center`}><div className="font-bold text-sm text-slate-800 uppercase tracking-wider">{title}</div>{forcePlacements && <div className="text-[10px] font-normal text-blue-400 italic -mt-0.5">{t('chart.force_plan_only')}</div>}</div><div className="flex-1 relative flex flex-col pt-8 px-2 justify-center">
         <div className="flex w-full absolute top-1 left-0 right-0 px-2 text-xs font-bold uppercase tracking-tighter text-center pointer-events-none z-10">
-            {showForces && <div className="w-10 text-blue-400 text-left overflow-hidden">{t('chart.header.force')}</div>}
+            {showForces && <div className="w-14 text-blue-400 text-left">{t('chart.header.force')}</div>}
             <div className="flex-1 text-right pr-4 text-slate-500">{t('chart.header.left')}</div>
             <div style={{ width: `${scaledWidth}px` }}></div>
             <div className="flex-1 text-left pl-4 text-slate-500">{t('chart.header.right')}</div>
-            {showForces && <div className="w-10 text-blue-400 text-right overflow-hidden">{t('chart.header.force')}</div>}
+            {showForces && <div className="w-14 text-blue-400 text-right">{t('chart.header.force')}</div>}
         </div>
         {rodHeader && <div className="flex w-full absolute top-4 left-0 right-0 px-2 z-10">
-            {showForces && <div className="w-10"></div>}
+            {showForces && <div className="w-14"></div>}
             <div className="flex-1 flex justify-end pr-1">{React.Children.toArray(rodHeader.props.children)[0]}</div>
             <div style={{ width: `${scaledWidth * 0.5}px` }}></div>
             <div className="flex-1 flex justify-start pl-0">{React.Children.toArray(rodHeader.props.children)[1]}</div>
-            {showForces && <div className="w-10"></div>}
+            {showForces && <div className="w-14"></div>}
         </div>}
         <div ref={contentRef} className="flex flex-col w-full relative">
             {levels.map(lvl => <LevelRow key={lvl.id} level={lvl} placements={placements} ghostPlacements={ghostPlacements} onZoneClick={onZoneClick} onPlacementClick={onPlacementClick} onGhostClick={onGhostClick} tools={tools} readOnly={readOnly} showForces={showForces} heightScale={heightScale} cages={cages} onDiscClick={onDiscClick} levels={levels} viewMode={viewMode} forcePlacements={forcePlacements} ghostCages={ghostCages} onGhostCageClick={onGhostCageClick} />)}

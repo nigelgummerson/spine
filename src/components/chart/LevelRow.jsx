@@ -187,7 +187,7 @@ export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tool
     return (
         <div data-zone-click="true" className="flex flex-col w-full relative border-b border-slate-100">
             <div className="flex w-full relative z-20" style={{ height: `${rowHeight}px` }}>
-                {showForces && <div className={`w-10 border-r border-slate-100/50 bg-blue-50/20 ${!readOnly && !forcePlacements ? 'hover:bg-blue-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && !forcePlacements && onZoneClick(level.id, 'force_left')}><ZoneContent zone="force_left" align="center"/></div>}
+                {showForces && <div className={`w-14 border-r border-slate-100/50 bg-blue-50/20 ${!readOnly && !forcePlacements ? 'hover:bg-blue-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && !forcePlacements && onZoneClick(level.id, 'force_left')}><ZoneContent zone="force_left" align="center"/></div>}
                 <div className={`flex-1 overflow-visible min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><div className="flex items-center h-full">{reconCageText && <span className="font-bold text-sky-700 bg-sky-50 border border-sky-200 px-1 rounded shadow-sm whitespace-nowrap ml-1 shrink-0" style={{ fontSize: Math.max(8, cageLabelPx) + 'px' }}>{reconCageText}</span>}<div className="flex-1 h-full"><ZoneContent zone="left" align="left"/></div></div></div>
 
                 <div style={{ width: `${scaledWidth}px` }} className={`relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}>
@@ -256,7 +256,7 @@ export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tool
                 </div>
 
                 <div className={`flex-1 overflow-visible min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'right')}><ZoneContent zone="right" align="right"/></div>
-                {showForces && <div className={`w-10 border-l border-slate-100/50 bg-blue-50/20 ${!readOnly && !forcePlacements ? 'hover:bg-blue-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && !forcePlacements && onZoneClick(level.id, 'force_right')}><ZoneContent zone="force_right" align="center"/></div>}
+                {showForces && <div className={`w-14 border-l border-slate-100/50 bg-blue-50/20 ${!readOnly && !forcePlacements ? 'hover:bg-blue-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && !forcePlacements && onZoneClick(level.id, 'force_right')}><ZoneContent zone="force_right" align="center"/></div>}
             </div>
 
             {/* INTERBODY DISC ZONE (Except after Pelvis or C1) */}
