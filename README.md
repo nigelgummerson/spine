@@ -56,7 +56,7 @@ This software is provided as-is under the GNU GPLv3 licence, with no warranty of
 
 ## Author
 
-Nigel Gummerson, Spinal Surgeon, Leeds Teaching Hospitals NHS Trust
+Nigel Gummerson FRCS (Tr & Orth), Spinal Surgeon, Leeds, UK
 
 ## Contributors
 
