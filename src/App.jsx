@@ -1202,7 +1202,7 @@ const App = () => {
                             <div className="flex-[3] flex flex-col h-full">
                                 <ChartPaper title={t('export.construct')} placements={completedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={() => {}} connectors={completedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={completedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.leftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.rightRod}</span></div></React.Fragment>} />
                             </div>
-                            <div className="absolute bottom-1 right-2 text-[8px] text-slate-300 font-mono">{new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
+                            <div className="absolute bottom-1 right-2 text-[8px] text-slate-300 font-mono">{t('export.disclaimer')} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
                         </div>
                     </div>
                 )}
@@ -1350,7 +1350,7 @@ const App = () => {
                                 {constructChart}
                                 {activeChart !== 'completed' && !isPortrait && <div className="absolute inset-0 bg-slate-400/20 cursor-pointer z-20" data-export-hide="true" />}
                             </div>
-                            <div className="absolute bottom-1 right-2 text-[8px] text-slate-300 font-mono">{new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
+                            <div className="absolute bottom-1 right-2 text-[8px] text-slate-300 font-mono">{t('export.disclaimer')} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
                         </div>
                     </div>
                 </div>

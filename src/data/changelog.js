@@ -1,8 +1,13 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION = "v2.1.0-beta";
+export const CURRENT_VERSION = "v2.1.1-beta";
 
 export const CHANGE_LOG = [
+    { version: "v2.1.1-beta", date: "2026-03-22", changes: [
+        "Custom domain — app now served at plan.skeletalsurgery.com/spine/. Old URLs redirect automatically.",
+        "Legal disclaimer added to help modal, app footer, and PDF/JPG export — translated in all 14 languages. Not a medical device; surgeon responsible for all clinical decisions and record accuracy.",
+        "Landing page at plan.skeletalsurgery.com with SEO, structured data, and full disclaimer.",
+    ]},
     { version: "v2.1.0-beta", date: "2026-03-22", changes: [
         "Vite build system — modular source code (26 files), pre-compiled JSX, single-file output via vite-plugin-singlefile. No more in-browser Babel transpilation.",
         "Fully offline — all fonts (Inter, Source Serif 4) and dependencies embedded. No CDN calls in production build.",

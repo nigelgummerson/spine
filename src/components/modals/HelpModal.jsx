@@ -62,6 +62,10 @@ export const HelpModal = ({ isOpen, onClose }) => {
                         <div className="min-w-[40px] pt-1"><span className="text-lg">&#x2328;</span></div>
                         <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.shortcuts.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.shortcuts.body')}} /></div>
                     </div>
+                    <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
+                        <div className="min-w-[40px] pt-1"><span className="text-lg">&#x2696;</span></div>
+                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.disclaimer.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.disclaimer.body')}} /></div>
+                    </div>
                     <div className="border-t border-slate-200 pt-4 mt-2" style={{ breakInside: 'avoid', columnSpan: 'all' }}>
                         <p className="text-xs text-slate-700 leading-relaxed">
                             <span className="font-bold text-slate-900">{t('credits.app_name')}</span> {CURRENT_VERSION}<br/>

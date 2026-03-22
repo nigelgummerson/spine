@@ -239,6 +239,12 @@
     "credits.quick_reference": "Quick Reference Guide (14 languages)",
     "disclaimer.text": "Translation unverified",
     "disclaimer.review": "Help improve this translation",
+    "disclaimer.clinical": "This is a documentation and communication aid, not a medical device. It is not CE marked, FDA cleared, or approved by any regulatory body. The operating surgeon is responsible for all clinical decisions, implant verification, and record accuracy.",
+    "disclaimer.clinical_short": "Documentation aid — not a medical device. Surgeon responsible for all clinical decisions and record accuracy.",
+    "disclaimer.privacy_note": "All data remains on your device. No information is transmitted to any server. No analytics or telemetry. You are responsible for data handling under your local regulations.",
+    "help.disclaimer.title": "Disclaimer",
+    "help.disclaimer.body": "This tool is a <strong>documentation and communication aid</strong> for surgical planning. It is not a medical device and has not been approved, cleared, or certified by any regulatory body (including MHRA, EU MDR, or FDA).<br/><br/>It does not provide clinical decision support, diagnostic information, or treatment recommendations. The <strong>operating surgeon bears full responsibility</strong> for all clinical decisions, including implant selection, placement, and verification at the point of use (WHO Surgical Safety Checklist).<br/><br/>The surgical record produced by this tool is only as accurate as the information entered. The surgeon is responsible for ensuring the record reflects the actual procedure performed.<br/><br/>All patient data remains on the local device. No data is transmitted to any server. There is no analytics or telemetry. The user is responsible for data handling under their local regulations (e.g. GDPR, HIPAA, Caldicott).<br/><br/>This software is provided as-is under the GNU GPLv3 licence, with no warranty of any kind. See the <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">full licence</a> for details.",
+    "export.disclaimer": "Documentation aid only — not a medical device",
     "modal.changelog.title": "Version History",
     "portrait.tab.demographics": "Demographics",
     "portrait.tab.plan": "Plan",
@@ -494,6 +500,12 @@
     "credits.quick_reference": "Kurzanleitung (14 Sprachen)",
     "disclaimer.text": "Übersetzung nicht verifiziert",
     "disclaimer.review": "Helfen Sie, diese Übersetzung zu verbessern",
+    "disclaimer.clinical": "Dies ist ein Dokumentations- und Kommunikationshilfsmittel, kein Medizinprodukt. Es ist nicht CE-gekennzeichnet, FDA-zugelassen oder von einer Aufsichtsbehörde genehmigt. Der operierende Chirurg ist für alle klinischen Entscheidungen, die Implantatverifizierung und die Genauigkeit der Dokumentation verantwortlich.",
+    "disclaimer.clinical_short": "Dokumentationshilfe — kein Medizinprodukt. Der Chirurg ist für alle klinischen Entscheidungen und die Dokumentationsgenauigkeit verantwortlich.",
+    "disclaimer.privacy_note": "Alle Daten verbleiben auf Ihrem Gerät. Es werden keine Informationen an einen Server übertragen. Keine Analytik oder Telemetrie. Sie sind für die Datenverarbeitung gemäß Ihren lokalen Vorschriften verantwortlich.",
+    "help.disclaimer.title": "Haftungsausschluss",
+    "help.disclaimer.body": "Dieses Tool ist ein <strong>Dokumentations- und Kommunikationshilfsmittel</strong> für die Operationsplanung. Es ist kein Medizinprodukt und wurde von keiner Aufsichtsbehörde (einschließlich MHRA, EU-MDR oder FDA) zugelassen oder zertifiziert.<br/><br/>Es bietet keine klinische Entscheidungsunterstützung, diagnostische Informationen oder Behandlungsempfehlungen. Der <strong>operierende Chirurg trägt die volle Verantwortung</strong> für alle klinischen Entscheidungen, einschließlich Implantatauswahl, -platzierung und -verifizierung am Einsatzort (WHO-Checkliste für chirurgische Sicherheit).<br/><br/>Die mit diesem Tool erstellte Operationsdokumentation ist nur so genau wie die eingegebenen Informationen. Der Chirurg ist dafür verantwortlich, dass die Dokumentation den tatsächlich durchgeführten Eingriff widerspiegelt.<br/><br/>Alle Patientendaten verbleiben auf dem lokalen Gerät. Es werden keine Daten an einen Server übertragen. Es gibt keine Analytik oder Telemetrie. Der Benutzer ist für die Datenverarbeitung gemäß seinen lokalen Vorschriften (z.B. DSGVO) verantwortlich.<br/><br/>Diese Software wird im Ist-Zustand unter der GNU GPLv3-Lizenz bereitgestellt, ohne jegliche Gewährleistung. Siehe die <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">vollständige Lizenz</a> für Details.",
+    "export.disclaimer": "Nur Dokumentationshilfe — kein Medizinprodukt",
     "modal.changelog.title": "Versionshistorie",
     "portrait.tab.demographics": "Demografie",
     "portrait.tab.plan": "Plan",
@@ -762,7 +774,13 @@
     "chart.corpectomy": "Corporectomie",
     "sync.linked": "Lié à une autre fenêtre",
     "sync.no_peer": "Aucune autre fenêtre détectée",
-    "sidebar.view.whole_short": "Tout"
+    "sidebar.view.whole_short": "Tout",
+    "disclaimer.clinical": "Ceci est un outil de documentation et de communication, pas un dispositif médical. Il n'est pas marqué CE, approuvé par la FDA, ni agréé par aucun organisme de réglementation. Le chirurgien opérateur est responsable de toutes les décisions cliniques, de la vérification des implants et de l'exactitude du dossier.",
+    "disclaimer.clinical_short": "Outil de documentation — pas un dispositif médical. Le chirurgien est responsable de toutes les décisions cliniques et de l'exactitude du dossier.",
+    "disclaimer.privacy_note": "Toutes les données restent sur votre appareil. Aucune information n'est transmise à un serveur. Pas d'analyse ni de télémétrie. Vous êtes responsable du traitement des données conformément à vos réglementations locales.",
+    "help.disclaimer.title": "Avertissement",
+    "help.disclaimer.body": "Cet outil est un <strong>outil de documentation et de communication</strong> pour la planification chirurgicale. Ce n'est pas un dispositif médical et il n'a été approuvé, autorisé ou certifié par aucun organisme de réglementation (y compris MHRA, MDR UE ou FDA).<br/><br/>Il ne fournit pas d'aide à la décision clinique, d'informations diagnostiques ou de recommandations thérapeutiques. Le <strong>chirurgien opérateur assume l'entière responsabilité</strong> de toutes les décisions cliniques, y compris la sélection, le placement et la vérification des implants au point d'utilisation (Checklist OMS pour la sécurité chirurgicale).<br/><br/>Le dossier chirurgical produit par cet outil est aussi précis que les informations saisies. Le chirurgien est responsable de s'assurer que le dossier reflète l'intervention réellement effectuée.<br/><br/>Toutes les données patient restent sur l'appareil local. Aucune donnée n'est transmise à un serveur. Il n'y a pas d'analyse ni de télémétrie. L'utilisateur est responsable du traitement des données conformément à ses réglementations locales (ex. RGPD).<br/><br/>Ce logiciel est fourni en l'état sous licence GNU GPLv3, sans aucune garantie. Voir la <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">licence complète</a> pour les détails.",
+    "export.disclaimer": "Outil de documentation uniquement — pas un dispositif médical"
   },
   "es": {
     "sidebar.title": "Instrumentación espinal",
@@ -1017,7 +1035,13 @@
     "chart.corpectomy": "Corporectomía",
     "sync.linked": "Enlazado a otra ventana",
     "sync.no_peer": "No se detectó otra ventana",
-    "sidebar.view.whole_short": "Todo"
+    "sidebar.view.whole_short": "Todo",
+    "disclaimer.clinical": "Esta es una herramienta de documentación y comunicación, no un dispositivo médico. No tiene marcado CE, autorización de la FDA ni aprobación de ningún organismo regulador. El cirujano operador es responsable de todas las decisiones clínicas, la verificación de implantes y la exactitud del registro.",
+    "disclaimer.clinical_short": "Herramienta de documentación — no es un dispositivo médico. El cirujano es responsable de todas las decisiones clínicas y la exactitud del registro.",
+    "disclaimer.privacy_note": "Todos los datos permanecen en su dispositivo. No se transmite información a ningún servidor. Sin analítica ni telemetría. Usted es responsable del manejo de datos según sus regulaciones locales.",
+    "help.disclaimer.title": "Aviso legal",
+    "help.disclaimer.body": "Esta herramienta es un <strong>instrumento de documentación y comunicación</strong> para la planificación quirúrgica. No es un dispositivo médico y no ha sido aprobado, autorizado o certificado por ningún organismo regulador (incluyendo MHRA, MDR de la UE o FDA).<br/><br/>No proporciona soporte de decisión clínica, información diagnóstica ni recomendaciones de tratamiento. El <strong>cirujano operador asume toda la responsabilidad</strong> de todas las decisiones clínicas, incluyendo la selección, colocación y verificación de implantes en el punto de uso (Lista de verificación de seguridad quirúrgica de la OMS).<br/><br/>El registro quirúrgico producido por esta herramienta es tan preciso como la información introducida. El cirujano es responsable de asegurar que el registro refleje el procedimiento realmente realizado.<br/><br/>Todos los datos del paciente permanecen en el dispositivo local. No se transmiten datos a ningún servidor. No hay analítica ni telemetría. El usuario es responsable del manejo de datos según sus regulaciones locales (ej. RGPD).<br/><br/>Este software se proporciona tal cual bajo la licencia GNU GPLv3, sin garantía de ningún tipo. Consulte la <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">licencia completa</a> para más detalles.",
+    "export.disclaimer": "Solo herramienta de documentación — no es un dispositivo médico"
   },
   "it": {
     "sidebar.title": "Strumentazione vertebrale",
@@ -1272,7 +1296,13 @@
     "chart.corpectomy": "Corporectomia",
     "sync.linked": "Collegato a un'altra finestra",
     "sync.no_peer": "Nessun'altra finestra rilevata",
-    "sidebar.view.whole_short": "Tutto"
+    "sidebar.view.whole_short": "Tutto",
+    "disclaimer.clinical": "Questo è uno strumento di documentazione e comunicazione, non un dispositivo medico. Non è marcato CE, approvato dalla FDA né autorizzato da alcun ente regolatorio. Il chirurgo operatore è responsabile di tutte le decisioni cliniche, della verifica degli impianti e dell'accuratezza della documentazione.",
+    "disclaimer.clinical_short": "Strumento di documentazione — non un dispositivo medico. Il chirurgo è responsabile di tutte le decisioni cliniche e dell'accuratezza della documentazione.",
+    "disclaimer.privacy_note": "Tutti i dati rimangono sul dispositivo. Nessuna informazione viene trasmessa a un server. Nessuna analisi o telemetria. L'utente è responsabile della gestione dei dati secondo le proprie normative locali.",
+    "help.disclaimer.title": "Avvertenza",
+    "help.disclaimer.body": "Questo strumento è un <strong>ausilio per la documentazione e la comunicazione</strong> nella pianificazione chirurgica. Non è un dispositivo medico e non è stato approvato, autorizzato o certificato da alcun ente regolatorio (inclusi MHRA, MDR UE o FDA).<br/><br/>Non fornisce supporto decisionale clinico, informazioni diagnostiche o raccomandazioni terapeutiche. Il <strong>chirurgo operatore è pienamente responsabile</strong> di tutte le decisioni cliniche, inclusa la selezione, il posizionamento e la verifica degli impianti al punto di utilizzo (Checklist OMS per la sicurezza chirurgica).<br/><br/>La documentazione chirurgica prodotta da questo strumento è accurata solo quanto le informazioni inserite. Il chirurgo è responsabile di assicurare che la documentazione rifletta la procedura effettivamente eseguita.<br/><br/>Tutti i dati del paziente rimangono sul dispositivo locale. Nessun dato viene trasmesso a un server. Non ci sono analisi o telemetria. L'utente è responsabile della gestione dei dati secondo le proprie normative locali (es. GDPR).<br/><br/>Questo software è fornito così com'è sotto licenza GNU GPLv3, senza alcuna garanzia. Vedere la <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">licenza completa</a> per i dettagli.",
+    "export.disclaimer": "Solo strumento di documentazione — non un dispositivo medico"
   },
   "pt": {
     "sidebar.title": "Instrumentação vertebral",
@@ -1527,7 +1557,13 @@
     "chart.corpectomy": "Corporectomia",
     "sync.linked": "Ligado a outra janela",
     "sync.no_peer": "Nenhuma outra janela detectada",
-    "sidebar.view.whole_short": "Tudo"
+    "sidebar.view.whole_short": "Tudo",
+    "disclaimer.clinical": "Esta é uma ferramenta de documentação e comunicação, não um dispositivo médico. Não possui marcação CE, aprovação da FDA nem autorização de qualquer entidade reguladora. O cirurgião operador é responsável por todas as decisões clínicas, verificação de implantes e precisão do registo.",
+    "disclaimer.clinical_short": "Ferramenta de documentação — não é um dispositivo médico. O cirurgião é responsável por todas as decisões clínicas e pela precisão do registo.",
+    "disclaimer.privacy_note": "Todos os dados permanecem no seu dispositivo. Nenhuma informação é transmitida para qualquer servidor. Sem análise ou telemetria. O utilizador é responsável pelo tratamento de dados de acordo com as suas regulamentações locais.",
+    "help.disclaimer.title": "Aviso legal",
+    "help.disclaimer.body": "Esta ferramenta é um <strong>instrumento de documentação e comunicação</strong> para planeamento cirúrgico. Não é um dispositivo médico e não foi aprovado, autorizado ou certificado por qualquer entidade reguladora (incluindo MHRA, MDR da UE ou FDA).<br/><br/>Não fornece apoio à decisão clínica, informação diagnóstica ou recomendações de tratamento. O <strong>cirurgião operador assume total responsabilidade</strong> por todas as decisões clínicas, incluindo seleção, colocação e verificação de implantes no ponto de utilização (Lista de Verificação de Segurança Cirúrgica da OMS).<br/><br/>O registo cirúrgico produzido por esta ferramenta é tão preciso quanto a informação introduzida. O cirurgião é responsável por garantir que o registo reflita o procedimento efetivamente realizado.<br/><br/>Todos os dados do paciente permanecem no dispositivo local. Nenhum dado é transmitido para qualquer servidor. Não há análise ou telemetria. O utilizador é responsável pelo tratamento de dados de acordo com as suas regulamentações locais (ex. RGPD).<br/><br/>Este software é fornecido tal como está sob a licença GNU GPLv3, sem qualquer garantia. Consulte a <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">licença completa</a> para detalhes.",
+    "export.disclaimer": "Apenas ferramenta de documentação — não é um dispositivo médico"
   },
   "sv": {
     "sidebar.title": "Spinal instrumentering",
@@ -1782,7 +1818,13 @@
     "chart.corpectomy": "Korpektomi",
     "sync.linked": "Länkat till ett annat fönster",
     "sync.no_peer": "Inget annat fönster upptäckt",
-    "sidebar.view.whole_short": "Alla"
+    "sidebar.view.whole_short": "Alla",
+    "disclaimer.clinical": "Detta är ett dokumentations- och kommunikationsverktyg, inte en medicinteknisk produkt. Det är inte CE-märkt, FDA-godkänt eller godkänt av något tillsynsorgan. Den opererande kirurgen ansvarar för alla kliniska beslut, implantatverifiering och dokumentationens riktighet.",
+    "disclaimer.clinical_short": "Dokumentationshjälpmedel — inte en medicinteknisk produkt. Kirurgen ansvarar för alla kliniska beslut och dokumentationens riktighet.",
+    "disclaimer.privacy_note": "All data stannar på din enhet. Ingen information överförs till någon server. Ingen analys eller telemetri. Du ansvarar för datahantering enligt dina lokala bestämmelser.",
+    "help.disclaimer.title": "Ansvarsfriskrivning",
+    "help.disclaimer.body": "Detta verktyg är ett <strong>dokumentations- och kommunikationshjälpmedel</strong> för kirurgisk planering. Det är inte en medicinteknisk produkt och har inte godkänts eller certifierats av något tillsynsorgan (inklusive MHRA, EU MDR eller FDA).<br/><br/>Det ger inget kliniskt beslutsstöd, diagnostisk information eller behandlingsrekommendationer. Den <strong>opererande kirurgen bär det fulla ansvaret</strong> för alla kliniska beslut, inklusive val, placering och verifiering av implantat vid användningspunkten (WHO:s checklista för säker kirurgi).<br/><br/>Den operationsdokumentation som produceras av detta verktyg är bara så noggrann som den information som matas in. Kirurgen ansvarar för att dokumentationen återspeglar det faktiskt utförda ingreppet.<br/><br/>All patientdata stannar på den lokala enheten. Inga data överförs till någon server. Det finns ingen analys eller telemetri. Användaren ansvarar för datahantering enligt sina lokala bestämmelser (t.ex. GDPR).<br/><br/>Denna programvara tillhandahålls i befintligt skick under GNU GPLv3-licens, utan garanti av något slag. Se den <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">fullständiga licensen</a> för detaljer.",
+    "export.disclaimer": "Endast dokumentationshjälpmedel — inte en medicinteknisk produkt"
   },
   "nb": {
     "sidebar.title": "Spinal instrumentering",
@@ -2037,7 +2079,13 @@
     "chart.corpectomy": "Korpektomi",
     "sync.linked": "Koblet til et annet vindu",
     "sync.no_peer": "Ingen andre vinduer oppdaget",
-    "sidebar.view.whole_short": "Alle"
+    "sidebar.view.whole_short": "Alle",
+    "disclaimer.clinical": "Dette er et dokumentasjons- og kommunikasjonsverktøy, ikke et medisinsk utstyr. Det er ikke CE-merket, FDA-godkjent eller godkjent av noe tilsynsorgan. Den opererende kirurgen er ansvarlig for alle kliniske beslutninger, implantatverifisering og dokumentasjonens nøyaktighet.",
+    "disclaimer.clinical_short": "Dokumentasjonshjelpemiddel — ikke medisinsk utstyr. Kirurgen er ansvarlig for alle kliniske beslutninger og dokumentasjonens nøyaktighet.",
+    "disclaimer.privacy_note": "Alle data forblir på enheten din. Ingen informasjon overføres til noen server. Ingen analyse eller telemetri. Du er ansvarlig for datahåndtering i henhold til dine lokale forskrifter.",
+    "help.disclaimer.title": "Ansvarsfraskrivelse",
+    "help.disclaimer.body": "Dette verktøyet er et <strong>dokumentasjons- og kommunikasjonshjelpemiddel</strong> for kirurgisk planlegging. Det er ikke medisinsk utstyr og har ikke blitt godkjent eller sertifisert av noe tilsynsorgan (inkludert MHRA, EU MDR eller FDA).<br/><br/>Det gir ikke klinisk beslutningsstøtte, diagnostisk informasjon eller behandlingsanbefalinger. Den <strong>opererende kirurgen bærer det fulle ansvaret</strong> for alle kliniske beslutninger, inkludert valg, plassering og verifisering av implantater ved brukspunktet (WHOs sjekkliste for trygg kirurgi).<br/><br/>Den kirurgiske dokumentasjonen produsert av dette verktøyet er bare så nøyaktig som informasjonen som legges inn. Kirurgen er ansvarlig for å sikre at dokumentasjonen gjenspeiler det faktisk utførte inngrepet.<br/><br/>Alle pasientdata forblir på den lokale enheten. Ingen data overføres til noen server. Det er ingen analyse eller telemetri. Brukeren er ansvarlig for datahåndtering i henhold til sine lokale forskrifter (f.eks. GDPR).<br/><br/>Denne programvaren leveres som den er under GNU GPLv3-lisens, uten garanti av noe slag. Se den <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">fullstendige lisensen</a> for detaljer.",
+    "export.disclaimer": "Kun dokumentasjonshjelpemiddel — ikke medisinsk utstyr"
   },
   "da": {
     "sidebar.title": "Spinal instrumentering",
@@ -2292,7 +2340,13 @@
     "chart.corpectomy": "Korpektomi",
     "sync.linked": "Forbundet til et andet vindue",
     "sync.no_peer": "Intet andet vindue fundet",
-    "sidebar.view.whole_short": "Alle"
+    "sidebar.view.whole_short": "Alle",
+    "disclaimer.clinical": "Dette er et dokumentations- og kommunikationsværktøj, ikke et medicinsk udstyr. Det er ikke CE-mærket, FDA-godkendt eller godkendt af nogen tilsynsmyndighed. Den opererende kirurg er ansvarlig for alle kliniske beslutninger, implantatverificering og dokumentationens nøjagtighed.",
+    "disclaimer.clinical_short": "Dokumentationshjælpemiddel — ikke medicinsk udstyr. Kirurgen er ansvarlig for alle kliniske beslutninger og dokumentationens nøjagtighed.",
+    "disclaimer.privacy_note": "Alle data forbliver på din enhed. Ingen information overføres til nogen server. Ingen analyse eller telemetri. Du er ansvarlig for datahåndtering i henhold til dine lokale regler.",
+    "help.disclaimer.title": "Ansvarsfraskrivelse",
+    "help.disclaimer.body": "Dette værktøj er et <strong>dokumentations- og kommunikationshjælpemiddel</strong> til kirurgisk planlægning. Det er ikke medicinsk udstyr og er ikke blevet godkendt eller certificeret af nogen tilsynsmyndighed (herunder MHRA, EU MDR eller FDA).<br/><br/>Det giver ikke klinisk beslutningsstøtte, diagnostisk information eller behandlingsanbefalinger. Den <strong>opererende kirurg bærer det fulde ansvar</strong> for alle kliniske beslutninger, herunder valg, placering og verificering af implantater ved brugspunktet (WHO's tjekliste for sikker kirurgi).<br/><br/>Den kirurgiske dokumentation, der produceres af dette værktøj, er kun så nøjagtig som de indtastede oplysninger. Kirurgen er ansvarlig for at sikre, at dokumentationen afspejler det faktisk udførte indgreb.<br/><br/>Alle patientdata forbliver på den lokale enhed. Ingen data overføres til nogen server. Der er ingen analyse eller telemetri. Brugeren er ansvarlig for datahåndtering i henhold til sine lokale regler (f.eks. GDPR).<br/><br/>Denne software leveres som den er under GNU GPLv3-licens, uden garanti af nogen art. Se den <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">fuldstændige licens</a> for detaljer.",
+    "export.disclaimer": "Kun dokumentationshjælpemiddel — ikke medicinsk udstyr"
   },
   "fi": {
     "sidebar.title": "Spinaalinen instrumentointi",
@@ -2547,7 +2601,13 @@
     "chart.corpectomy": "Korporektomia",
     "sync.linked": "Yhdistetty toiseen ikkunaan",
     "sync.no_peer": "Toista ikkunaa ei havaittu",
-    "sidebar.view.whole_short": "Kaikki"
+    "sidebar.view.whole_short": "Kaikki",
+    "disclaimer.clinical": "Tämä on dokumentointi- ja viestintätyökalu, ei lääkinnällinen laite. Sillä ei ole CE-merkintää, FDA-hyväksyntää eikä minkään valvontaviranomaisen hyväksyntää. Leikkaava kirurgi vastaa kaikista kliinisistä päätöksistä, implanttien tarkistamisesta ja dokumentaation oikeellisuudesta.",
+    "disclaimer.clinical_short": "Dokumentointityökalu — ei lääkinnällinen laite. Kirurgi vastaa kaikista kliinisistä päätöksistä ja dokumentaation oikeellisuudesta.",
+    "disclaimer.privacy_note": "Kaikki tiedot pysyät laitteellasi. Mitään tietoja ei lähetetä palvelimelle. Ei analytiikkaa eikä telemetriaa. Käyttäjä vastaa tietojen käsittelystä paikallisten säädöstensä mukaisesti.",
+    "help.disclaimer.title": "Vastuuvapauslauseke",
+    "help.disclaimer.body": "Tämä työkalu on <strong>dokumentointi- ja viestintäapuväline</strong> kirurgiseen suunnitteluun. Se ei ole lääkinnällinen laite eikä sitä ole hyväksynyt tai sertifioinut mikään valvontaviranomainen (mukaan lukien MHRA, EU MDR tai FDA).<br/><br/>Se ei tarjoa kliinistä päätöksentukea, diagnostista tietoa eikä hoitosuosituksia. <strong>Leikkaava kirurgi kantaa täyden vastuun</strong> kaikista kliinisistä päätöksistä, mukaan lukien implanttien valinta, asettaminen ja tarkistaminen käyttöpisteessä (WHO:n kirurgisen turvallisuuden tarkistuslista).<br/><br/>Tämän työkalun tuottama kirurginen dokumentaatio on vain niin tarkka kuin syötetyt tiedot. Kirurgi vastaa siitä, että dokumentaatio vastaa todella suoritettua toimenpidetä.<br/><br/>Kaikki potilastiedot pysyät paikallisella laitteella. Mitään tietoja ei lähetetä palvelimelle. Analytiikkaa tai telemetriaa ei ole. Käyttäjä vastaa tietojen käsittelystä paikallisten säädöstensä mukaisesti (esim. GDPR).<br/><br/>Tämä ohjelmisto toimitetaan sellaisenaan GNU GPLv3 -lisenssin alaisena, ilman minkäänlaista takuuta. Katso <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">täydellinen lisenssi</a> lisätietoja varten.",
+    "export.disclaimer": "Vain dokumentointityökalu — ei lääkinnällinen laite"
   },
   "nl": {
     "sidebar.title": "Spinale instrumentatie",
@@ -2802,7 +2862,13 @@
     "chart.corpectomy": "Corpectomie",
     "sync.linked": "Verbonden met een ander venster",
     "sync.no_peer": "Geen ander venster gedetecteerd",
-    "sidebar.view.whole_short": "Alles"
+    "sidebar.view.whole_short": "Alles",
+    "disclaimer.clinical": "Dit is een documentatie- en communicatiehulpmiddel, geen medisch hulpmiddel. Het is niet CE-gemarkeerd, FDA-goedgekeurd of goedgekeurd door enig toezichthoudend orgaan. De opererende chirurg is verantwoordelijk voor alle klinische beslissingen, implantatverificatie en de nauwkeurigheid van de documentatie.",
+    "disclaimer.clinical_short": "Documentatiehulpmiddel — geen medisch hulpmiddel. De chirurg is verantwoordelijk voor alle klinische beslissingen en de nauwkeurigheid van de documentatie.",
+    "disclaimer.privacy_note": "Alle gegevens blijven op uw apparaat. Er wordt geen informatie naar een server verzonden. Geen analyse of telemetrie. U bent verantwoordelijk voor gegevensverwerking volgens uw lokale regelgeving.",
+    "help.disclaimer.title": "Disclaimer",
+    "help.disclaimer.body": "Dit hulpmiddel is een <strong>documentatie- en communicatiehulpmiddel</strong> voor chirurgische planning. Het is geen medisch hulpmiddel en is niet goedgekeurd of gecertificeerd door enig toezichthoudend orgaan (inclusief MHRA, EU MDR of FDA).<br/><br/>Het biedt geen klinische beslissingsondersteuning, diagnostische informatie of behandelaanbevelingen. De <strong>opererende chirurg draagt de volledige verantwoordelijkheid</strong> voor alle klinische beslissingen, inclusief selectie, plaatsing en verificatie van implantaten op het punt van gebruik (WHO-checklist voor chirurgische veiligheid).<br/><br/>De chirurgische documentatie die door dit hulpmiddel wordt geproduceerd is slechts zo nauwkeurig als de ingevoerde informatie. De chirurg is verantwoordelijk voor het waarborgen dat de documentatie de daadwerkelijk uitgevoerde procedure weerspiegelt.<br/><br/>Alle patiëntgegevens blijven op het lokale apparaat. Er worden geen gegevens naar een server verzonden. Er is geen analyse of telemetrie. De gebruiker is verantwoordelijk voor gegevensverwerking volgens zijn lokale regelgeving (bijv. AVG).<br/><br/>Deze software wordt geleverd in de huidige staat onder de GNU GPLv3-licentie, zonder enige garantie. Zie de <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">volledige licentie</a> voor details.",
+    "export.disclaimer": "Alleen documentatiehulpmiddel — geen medisch hulpmiddel"
   },
   "pl": {
     "sidebar.title": "Instrumentacja kręgosłupa",
@@ -3057,7 +3123,13 @@
     "chart.corpectomy": "Korporektomia",
     "sync.linked": "Połączono z innym oknem",
     "sync.no_peer": "Nie wykryto innego okna",
-    "sidebar.view.whole_short": "Wszystko"
+    "sidebar.view.whole_short": "Wszystko",
+    "disclaimer.clinical": "Jest to narzędzie dokumentacyjne i komunikacyjne, a nie wyrób medyczny. Nie posiada oznakowania CE, zatwierdzenia FDA ani żadnego organu regulacyjnego. Operujący chirurg jest odpowiedzialny za wszystkie decyzje kliniczne, weryfikację implantów oraz dokładność dokumentacji.",
+    "disclaimer.clinical_short": "Narzędzie dokumentacyjne — nie jest wyrobem medycznym. Chirurg jest odpowiedzialny za wszystkie decyzje kliniczne i dokładność dokumentacji.",
+    "disclaimer.privacy_note": "Wszystkie dane pozostają na Twoim urządzeniu. Żadne informacje nie są przesyłane na serwer. Brak analityki i telemetrii. Użytkownik jest odpowiedzialny za przetwarzanie danych zgodnie z lokalnymi przepisami.",
+    "help.disclaimer.title": "Zastrzeżenia prawne",
+    "help.disclaimer.body": "To narzędzie jest <strong>pomocą dokumentacyjną i komunikacyjną</strong> do planowania chirurgicznego. Nie jest wyrobem medycznym i nie zostało zatwierdzone ani certyfikowane przez żaden organ regulacyjny (w tym MHRA, EU MDR ani FDA).<br/><br/>Nie zapewnia wsparcia decyzji klinicznych, informacji diagnostycznych ani zaleceń terapeutycznych. <strong>Operujący chirurg ponosi pełną odpowiedzialność</strong> za wszystkie decyzje kliniczne, w tym wybór, umieszczenie i weryfikację implantów w miejscu użycia (Lista kontrolna bezpieczeństwa chirurgicznego WHO).<br/><br/>Dokumentacja chirurgiczna wytworzona przez to narzędzie jest tylko tak dokładna, jak wprowadzone informacje. Chirurg jest odpowiedzialny za zapewnienie, że dokumentacja odzwierciedla faktycznie wykonany zabieg.<br/><br/>Wszystkie dane pacjenta pozostają na lokalnym urządzeniu. Żadne dane nie są przesyłane na serwer. Nie ma analityki ani telemetrii. Użytkownik jest odpowiedzialny za przetwarzanie danych zgodnie z lokalnymi przepisami (np. RODO).<br/><br/>To oprogramowanie jest dostarczane w stanie, w jakim jest, na licencji GNU GPLv3, bez jakiejkolwiek gwarancji. Zobacz <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">pełną licencję</a> po szczegóły.",
+    "export.disclaimer": "Tylko narzędzie dokumentacyjne — nie jest wyrobem medycznym"
   },
   "el": {
     "sidebar.title": "Σπονδυλική οργανοληψία",
@@ -3312,7 +3384,13 @@
     "chart.corpectomy": "Σωματεκτομή",
     "sync.linked": "Συνδεδεμένο σε άλλο παράθυρο",
     "sync.no_peer": "Δεν εντοπίστηκε άλλο παράθυρο",
-    "sidebar.view.whole_short": "Όλα"
+    "sidebar.view.whole_short": "Όλα",
+    "disclaimer.clinical": "Αυτό είναι ένα εργαλείο τεκμηρίωσης και επικοινωνίας, όχι ιατροτεχνολογικό προϊόν. Δεν φέρει σήμανση CE, έγκριση FDA ούτε έγκριση από κανέναν ρυθμιστικό φορέα. Ο χειρουργός που εκτελεί την επέμβαση είναι υπεύθυνος για όλες τις κλινικές αποφάσεις, την επαλήθευση εμφυτευμάτων και την ακρίβεια του αρχείου.",
+    "disclaimer.clinical_short": "Εργαλείο τεκμηρίωσης — δεν είναι ιατροτεχνολογικό προϊόν. Ο χειρουργός είναι υπεύθυνος για όλες τις κλινικές αποφάσεις και την ακρίβεια του αρχείου.",
+    "disclaimer.privacy_note": "Όλα τα δεδομένα παραμένουν στη συσκευή σας. Δεν μεταδίδονται πληροφορίες σε κανέναν διακομιστή. Χωρίς αναλυτικά στοιχεία ή τηλεμετρία. Είστε υπεύθυνοι για τη διαχείριση δεδομένων σύμφωνα με τους τοπικούς κανονισμούς σας.",
+    "help.disclaimer.title": "Αποποίηση ευθυνών",
+    "help.disclaimer.body": "Αυτό το εργαλείο είναι ένα <strong>βοήθημα τεκμηρίωσης και επικοινωνίας</strong> για χειρουργικό σχεδιασμό. Δεν είναι ιατροτεχνολογικό προϊόν και δεν έχει εγκριθεί ή πιστοποιηθεί από κανέναν ρυθμιστικό φορέα (συμπεριλαμβανομένων MHRA, EU MDR ή FDA).<br/><br/>Δεν παρέχει υποστήριξη κλινικών αποφάσεων, διαγνωστικές πληροφορίες ή θεραπευτικές συστάσεις. Ο <strong>χειρουργός που εκτελεί την επέμβαση φέρει την πλήρη ευθύνη</strong> για όλες τις κλινικές αποφάσεις, συμπεριλαμβανομένης της επιλογής, τοποθέτησης και επαλήθευσης εμφυτευμάτων στο σημείο χρήσης (Λίστα ελέγχου χειρουργικής ασφάλειας του ΠΟΥ).<br/><br/>Το χειρουργικό αρχείο που παράγεται από αυτό το εργαλείο είναι τόσο ακριβές όσο οι πληροφορίες που εισάγονται. Ο χειρουργός είναι υπεύθυνος να διασφαλίσει ότι το αρχείο αντικατοπτρίζει την πραγματικά εκτελεσθείσα επέμβαση.<br/><br/>Όλα τα δεδομένα ασθενών παραμένουν στην τοπική συσκευή. Δεν μεταδίδονται δεδομένα σε κανέναν διακομιστή. Δεν υπάρχουν αναλυτικά στοιχεία ή τηλεμετρία. Ο χρήστης είναι υπεύθυνος για τη διαχείριση δεδομένων σύμφωνα με τους τοπικούς κανονισμούς του (π.χ. ΓΚΠΔ).<br/><br/>Αυτό το λογισμικό παρέχεται ως έχει υπό την άδεια GNU GPLv3, χωρίς καμία εγγύηση. Δείτε την <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">πλήρη άδεια</a> για λεπτομέρειες.",
+    "export.disclaimer": "Μόνο εργαλείο τεκμηρίωσης — δεν είναι ιατροτεχνολογικό προϊόν"
   },
   "tr": {
     "sidebar.title": "Spinal enstrümantasyon",
@@ -3567,6 +3645,12 @@
     "chart.corpectomy": "Korpektomi",
     "sync.linked": "Başka bir pencereye bağlı",
     "sync.no_peer": "Başka pencere algılanmadı",
-    "sidebar.view.whole_short": "Tümü"
+    "sidebar.view.whole_short": "Tümü",
+    "disclaimer.clinical": "Bu bir dokümantasyon ve iletişim aracıdır, tıbbi cihaz değildir. CE işareti, FDA onayı veya herhangi bir düzenleyici kuruluş onayı yoktur. Ameliyatı yapan cerrah tüm klinik kararlardan, implant doğrulamasından ve kayıt doğruluğundan sorumludur.",
+    "disclaimer.clinical_short": "Dokümantasyon aracı — tıbbi cihaz değildir. Cerrah tüm klinik kararlardan ve kayıt doğruluğundan sorumludur.",
+    "disclaimer.privacy_note": "Tüm veriler cihazınızda kalır. Hiçbir bilgi herhangi bir sunucuya iletilmez. Analitik veya telemetri yoktur. Yerel düzenlemelerinize göre veri işlemeden siz sorumlusunuz.",
+    "help.disclaimer.title": "Sorumluluk reddi",
+    "help.disclaimer.body": "Bu araç, cerrahi planlama için bir <strong>dokümantasyon ve iletişim yardımcısıdır</strong>. Tıbbi cihaz değildir ve herhangi bir düzenleyici kuruluş (MHRA, AB MDR veya FDA dahil) tarafından onaylanmamış veya sertifikalandırılmamıştır.<br/><br/>Klinik karar desteği, tanısal bilgi veya tedavi önerileri sağlamaz. <strong>Ameliyatı yapan cerrah</strong>, implant seçimi, yerleştirmesi ve kullanım noktasında doğrulanması dahil tüm klinik kararlar için <strong>tam sorumluluk taşır</strong> (DSÖ Cerrahi Güvenlik Kontrol Listesi).<br/><br/>Bu araç tarafından üretilen cerrahi kayıt, yalnızca girilen bilgiler kadar doğrudur. Cerrah, kaydın gerçekten gerçekleştirilen prosüdürü yansıtmasını sağlamaktan sorumludur.<br/><br/>Tüm hasta verileri yerel cihazda kalır. Hiçbir veri herhangi bir sunucuya iletilmez. Analitik veya telemetri yoktur. Kullanıcı, yerel düzenlemelerine göre (ör. KVKK) veri işlemeden sorumludur.<br/><br/>Bu yazılım GNU GPLv3 lisansı altında olduğu gibi sağlanmaktadır, herhangi bir garanti olmaksızın. Ayrıntılar için <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline\">tam lisansa</a> bakın.",
+    "export.disclaimer": "Yalnızca dokümantasyon aracı — tıbbi cihaz değildir"
   }
 }

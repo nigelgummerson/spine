@@ -11,6 +11,9 @@ export const CreditsFooter = ({ lang }) => (
         <p className="text-[10px] text-slate-400 leading-tight text-center mt-0.5">
             Designed in Leeds · Yorkshire · England
         </p>
+        <p className="text-[9px] text-slate-400 leading-tight text-center mt-1">
+            {t('disclaimer.clinical_short')}
+        </p>
         {lang !== 'en' && (
             <div className="text-[10px] text-amber-600 leading-tight text-center mt-1 italic">
                 <div>{t('disclaimer.text')}</div>

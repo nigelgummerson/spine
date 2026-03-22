@@ -44,6 +44,16 @@ Open `index.html` in a browser, or visit the [live site](https://plan.skeletalsu
 
 See the [Quick Reference Guide](https://plan.skeletalsurgery.com/spine/quick-reference.html) for a translated quick-start guide (14 languages).
 
+## Disclaimer
+
+This tool is a documentation and communication aid for surgical planning. It is not a medical device and has not been approved, cleared, or certified by any regulatory body (including MHRA, EU MDR, or FDA). It does not provide clinical decision support, diagnostic information, or treatment recommendations.
+
+The operating surgeon bears full responsibility for all clinical decisions, including implant selection, placement, and verification at the point of use (WHO Surgical Safety Checklist). The surgical record produced by this tool is only as accurate as the information entered.
+
+All patient data remains on the local device. No data is transmitted to any server. There is no analytics or telemetry.
+
+This software is provided as-is under the GNU GPLv3 licence, with no warranty of any kind.
+
 ## Author
 
 Nigel Gummerson, Spinal Surgeon, Leeds Teaching Hospitals NHS Trust
