@@ -2,7 +2,7 @@
 
 A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instrumentation diagrams with a visual, exportable chart that documents the pre-operative plan and post-operative construct. Runs offline on hospital computers as a single HTML file — no installation required.
 
-**Version:** v2.0.2-beta | **License:** GNU GPLv3
+**Version:** v2.1.3-beta | **License:** GNU GPLv3
 **Live:** [plan.skeletalsurgery.com/spine](https://plan.skeletalsurgery.com/spine/)
 
 ## Features
@@ -31,12 +31,12 @@ A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instru
 ## Requirements
 
 - **No install required** — single HTML file, runs in any modern browser
-- **Offline capable** — works without internet once loaded (CDN dependencies cached)
+- **Fully offline** — all dependencies and fonts embedded, no network required
 - **Hospital friendly** — designed for locked-down NHS workstations
 
 ## Tech Stack
 
-React 18, Tailwind CSS, html-to-image, jsPDF — all via CDN. No build process, no npm, no installation.
+Built with Vite, React 19, Tailwind CSS v4, html-to-image, jsPDF. All dependencies bundled into a single HTML file via vite-plugin-singlefile.
 
 ## Usage
 
@@ -57,3 +57,8 @@ This software is provided as-is under the GNU GPLv3 licence, with no warranty of
 ## Author
 
 Nigel Gummerson, Spinal Surgeon, Leeds Teaching Hospitals NHS Trust
+
+## Contributors
+
+- **Gemini** — co-developed the initial prototype through v0.7.0-alpha (V12 to cage permissibility), and v2.0.2-beta clinical translation audit
+- **Claude** — co-developed from v0.8.0-alpha onwards (company/screw systems, internationalisation, portrait mode, accessibility, JSON v4, Vite migration)
