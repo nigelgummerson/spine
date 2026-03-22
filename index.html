@@ -1303,8 +1303,8 @@
                 'tool.translate_right': 'Trans. der.',
                 'tool.compression': 'Compresión',
                 'tool.distraction': 'Distracción',
-                'tool.derotate_cw': 'Derrotación',
-                'tool.derotate_ccw': 'Derrotación',
+                'tool.derotate_cw': 'Desrotación',
+                'tool.derotate_ccw': 'Desrotación',
                 'tool.note': 'Nota',
 
                 // --- Inventory titles ---
@@ -3164,7 +3164,7 @@
                 'tool.connector': 'Poikittaisyhdistin',
                 'tool.unstable': 'Epästabiili',
                 'tool.osteotomy': 'Osteotomia',
-                'tool.corpectomy': 'Korpektomia',
+                'tool.corpectomy': 'Korporektomia',
                 'tool.translate_left': 'Trans. vasen',
                 'tool.translate_right': 'Trans. oikea',
                 'tool.compression': 'Kompressio',
@@ -3273,7 +3273,7 @@
                 'inventory.rod_right': 'O:',
                 'chart.cervical_cage_hint': 'Kervikaalinen häkki — käytä Kervikaalinäkymää',
                 'clinical.osteotomy.fallback': 'Osteo',
-                'chart.corpectomy': 'Korpektomia',
+                'chart.corpectomy': 'Korporektomia',
                 'sync.linked': 'Yhdistetty toiseen ikkunaan',
                 'sync.no_peer': 'Toista ikkunaa ei havaittu',
                 'sidebar.view.whole_short': 'Kaikki',
@@ -3786,7 +3786,7 @@
                 'tool.connector': 'Łącznik poprzeczny',
                 'tool.unstable': 'Niestabilny',
                 'tool.osteotomy': 'Osteotomia',
-                'tool.corpectomy': 'Korpektomia',
+                'tool.corpectomy': 'Korporektomia',
                 'tool.translate_left': 'Trans. lewo',
                 'tool.translate_right': 'Trans. prawo',
                 'tool.compression': 'Kompresja',
@@ -3895,7 +3895,7 @@
                 'inventory.rod_right': 'P:',
                 'chart.cervical_cage_hint': 'Klatka szyjna — użyj widoku Szyjnego',
                 'clinical.osteotomy.fallback': 'Osteo',
-                'chart.corpectomy': 'Korpektomia',
+                'chart.corpectomy': 'Korporektomia',
                 'sync.linked': 'Połączono z innym oknem',
                 'sync.no_peer': 'Nie wykryto innego okna',
                 'sidebar.view.whole_short': 'Wszystko',
@@ -4062,9 +4062,9 @@
                 'clinical.force.translate_left': 'Μετατόπιση αριστερά',
                 'clinical.force.translate_right': 'Μετατόπιση δεξιά',
                 'clinical.force.compression': 'Συμπίεση',
-                'clinical.force.distraction': 'Διάσπαση',
-                'clinical.force.derotate_cw': 'Αποστροφή ΔΡΩ',
-                'clinical.force.derotate_ccw': 'Αποστροφή ΑΔΡΩ',
+                'clinical.force.distraction': 'Διάταση',
+                'clinical.force.derotate_cw': 'Διόρθωση στροφής ΔΡΩ',
+                'clinical.force.derotate_ccw': 'Διόρθωση στροφής ΑΔΡΩ',
 
                 // --- Note modal ---
                 'modal.note.title_new': 'Προσθήκη σημείωσης',
@@ -4101,9 +4101,9 @@
                 'tool.translate_left': 'Μετατ. αριστ.',
                 'tool.translate_right': 'Μετατ. δεξιά',
                 'tool.compression': 'Συμπίεση',
-                'tool.distraction': 'Διάσπαση',
-                'tool.derotate_cw': 'Αποστροφή',
-                'tool.derotate_ccw': 'Αποστροφή',
+                'tool.distraction': 'Διάταση',
+                'tool.derotate_cw': 'Διόρθωση στροφής',
+                'tool.derotate_ccw': 'Διόρθωση στροφής',
                 'tool.note': 'Σημείωση',
 
                 // --- Inventory titles ---
@@ -4541,9 +4541,14 @@
         // SECTION 0: VERSION & CHANGE LOG
         // ==========================================
         
-        const CURRENT_VERSION = "v2.0.1-beta";
+        const CURRENT_VERSION = "v2.0.2-beta";
 
         const CHANGE_LOG = [
+            { version: "v2.0.2-beta", date: "2026-03-22", changes: [
+                "Audit and correction of clinical translations across 14 languages — fixed Greek distraction/derotation terms and Polish surgical terminology.",
+                "Localized 'Ghost placements' to more idiomatic clinical terms (Phantomplatzierungen, Pozycje widmo, etc.).",
+                "Updated translation glossary and regenerated clinical review forms.",
+            ]},
             { version: "v2.0.1-beta", date: "2026-03-21", changes: [
                 "Translated 8 hardcoded English UI strings across all 14 languages — rod inventory labels, cervical cage hint, osteotomy fallback, corpectomy label, sync tooltips, whole-spine button.",
                 "Fixed dual-window sync race condition — stale state no longer overwrites deletions. Incoming sync cancels pending outbound debounce.",

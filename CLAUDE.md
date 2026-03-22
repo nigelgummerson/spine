@@ -4,7 +4,7 @@
 A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 14 European languages.
 
 ## Current Status
-- **Version:** v2.0.1-beta
+- **Version:** v2.0.2-beta
 - **Last Updated:** 2026-03-21
 - **License:** GNU GPLv3
 

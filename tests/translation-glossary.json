@@ -825,7 +825,7 @@
         "fi": { "expected": "Distraktio", "source": "AO Spine", "verified": false },
         "nl": { "expected": "Distractie", "source": "NOV/AO Spine", "verified": false },
         "pl": { "expected": "Dystrakcja", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Διάσπαση", "source": "AO Spine", "verified": false },
+        "el": { "expected": "Διάταση", "source": "AO Spine", "verified": false },
         "tr": { "expected": "Distraksiyon", "source": "TOTBİD/AO Spine", "verified": false }
       }
     },
@@ -844,7 +844,7 @@
         "fi": { "expected": "Derotaatio MP", "source": "AO Spine", "verified": false },
         "nl": { "expected": "Derotatie KW", "source": "NOV/AO Spine", "verified": false },
         "pl": { "expected": "Derotacja ZW", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Αποστροφή ΔΡΩ", "source": "AO Spine", "verified": false },
+        "el": { "expected": "Διόρθωση στροφής ΔΡΩ", "source": "AO Spine", "verified": false },
         "tr": { "expected": "Derotasyon SY", "source": "TOTBİD/AO Spine", "verified": false }
       }
     },
@@ -863,7 +863,7 @@
         "fi": { "expected": "Derotaatio VMP", "source": "AO Spine", "verified": false },
         "nl": { "expected": "Derotatie TKW", "source": "NOV/AO Spine", "verified": false },
         "pl": { "expected": "Derotacja PZW", "source": "AO Spine", "verified": false },
-        "el": { "expected": "Αποστροφή ΑΔΡΩ", "source": "AO Spine", "verified": false },
+        "el": { "expected": "Διόρθωση στροφής ΑΔΡΩ", "source": "AO Spine", "verified": false },
         "tr": { "expected": "Derotasyon SSY", "source": "TOTBİD/AO Spine", "verified": false }
       }
     },
