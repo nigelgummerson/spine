@@ -1,17 +1,19 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION = "v2.1.2-beta";
+export const CURRENT_VERSION = "v2.1.3-beta";
 
 export const CHANGE_LOG = [
-    { version: "v2.1.2-beta", date: "2026-03-22", changes: [
+    { version: "v2.1.3-beta", date: "2026-03-22", changes: [
         "Vite build system — modular source code (26 files), pre-compiled JSX, single-file output via vite-plugin-singlefile. No more in-browser Babel transpilation.",
         "Fully offline — all fonts (Inter, Source Serif 4) and dependencies embedded. No CDN calls in production build.",
         "Translations externalised to JSON — simpler tooling, easier review workflow. Python tools and i18n tests updated.",
-        "GitHub Actions deployment — automated build and deploy to GitHub Pages on push to main.",
+        "GitHub Actions deployment — automated build and deploy to GitHub Pages on push to main. Review forms auto-regenerated on deploy.",
         "Custom domain — app now served at plan.skeletalsurgery.com/spine/. Old URLs redirect automatically.",
         "Landing page at plan.skeletalsurgery.com with SEO, structured data, and full disclaimer.",
-        "Important Notice modal on startup — must accept before use, re-prompts each half-day (AM/PM session). Acceptance timestamp recorded on PDF/JPG exports.",
+        "Important Notice modal on startup — must accept before use, re-prompts each half-day (AM/PM session). Acceptance timestamp recorded on PDF/JPG exports. Language selector in modal. Changing language re-prompts the modal. Language syncs to other window only after acceptance.",
         "Version number shown in portrait mode toolbar.",
+        "Force column headers widened for longer translations (Greek, Spanish). Left/right alignment prevents overflow.",
+        "Stale sync messages from cached code silently ignored instead of showing error toast.",
     ]},
     { version: "v2.0.3-beta", date: "2026-03-22", changes: [
         "Translation disclaimer now links to language-specific review form on GitHub Pages. Reviewers always see the latest translations.",
