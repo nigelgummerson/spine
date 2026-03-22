@@ -60,6 +60,7 @@ const App = () => {
         setCurrentLangState(code);
         document.documentElement.lang = code;
         localStorage.setItem('spine_planner_lang', code);
+        if (!isDisclaimerAccepted(code)) setDisclaimerAccepted(false);
     };
 
     const changeTheme = (id) => {
@@ -95,12 +96,12 @@ const App = () => {
     
     const [confirmNewPatient, setConfirmNewPatient] = useState(false);
     const [exportPicker, setExportPicker] = useState(null); // 'jpg' or 'pdf'
-    const [disclaimerAccepted, setDisclaimerAccepted] = useState(() => isDisclaimerAccepted());
+    const [disclaimerAccepted, setDisclaimerAccepted] = useState(() => isDisclaimerAccepted(detectLanguage()));
 
     // Re-check disclaimer at half-day boundary (AM/PM)
     useEffect(() => {
         const interval = setInterval(() => {
-            if (!isDisclaimerAccepted()) setDisclaimerAccepted(false);
+            if (!isDisclaimerAccepted(currentLang)) setDisclaimerAccepted(false);
         }, 60000); // check every minute
         return () => clearInterval(interval);
     }, []);
@@ -1375,7 +1376,7 @@ const App = () => {
                     </div>
                 ))}
             </div>}
-            {!disclaimerAccepted && <DisclaimerModal onAccept={() => { acceptDisclaimer(); setDisclaimerAccepted(true); }} />}
+            {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerAccepted(true); }} />}
         </div>
     );
 };
