@@ -321,7 +321,7 @@ const App = () => {
         const planChart = internalToV4Chart(plannedPlacements, plannedCages, plannedConnectors, plannedNotes, { left: patientData.planLeftRod, right: patientData.planRightRod });
         const constChart = internalToV4Chart(completedPlacements, completedCages, completedConnectors, completedNotes, { left: patientData.leftRod, right: patientData.rightRod });
         return {
-            schema: { format: 'spinal-instrumentation', version: 4, schemaUrl: 'https://spine-planner.org/schema/v4/spinal-instrumentation.json', generator: { name: 'Spinal Instrumentation Plan & Record', version: CURRENT_VERSION, url: 'https://nigelgummerson.github.io/spine-planner' } },
+            schema: { format: 'spinal-instrumentation', version: 4, schemaUrl: 'https://spine-planner.org/schema/v4/spinal-instrumentation.json', generator: { name: 'Spinal Instrumentation Plan & Record', version: CURRENT_VERSION, url: 'https://plan.skeletalsurgery.com/spine' } },
             document: { id: documentId, created: documentCreated, modified: new Date().toISOString(), language: currentLang },
             patient: { name: patientData.name, identifier: patientData.id },
             case: { date: patientData.date, surgeon: patientData.surgeon, location: patientData.location || '' },

@@ -14,7 +14,7 @@ export const CreditsFooter = ({ lang }) => (
         {lang !== 'en' && (
             <div className="text-[10px] text-amber-600 leading-tight text-center mt-1 italic">
                 <div>{t('disclaimer.text')}</div>
-                <a href={`https://nigelgummerson.github.io/spine-planner/review-forms/${lang}/${lang}-review.html`} target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-800">{t('disclaimer.review')}</a>
+                <a href={`https://plan.skeletalsurgery.com/spine/review-forms/${lang}/${lang}-review.html`} target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-800">{t('disclaimer.review')}</a>
             </div>
         )}
     </div>
