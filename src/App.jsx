@@ -460,7 +460,8 @@ const App = () => {
             if (msg.appVersion !== CURRENT_VERSION) {
                 if (!syncVersionMismatchRef.current) {
                     syncVersionMismatchRef.current = true;
-                    showToast(`Another window is running ${msg.appVersion} - please reload all windows to sync.`, 'error');
+                    console.warn('Sync version mismatch:', { received: msg.appVersion, expected: CURRENT_VERSION, msgType: msg.type, msg });
+                    showToast(`Another window is running ${msg.appVersion || 'an unknown version'} — please reload all windows to sync.`, 'error');
                 }
                 return;
             }

@@ -5,23 +5,23 @@ function getHalfDayKey() {
     const now = new Date();
     const date = now.toISOString().slice(0, 10);
     const half = now.getHours() < 12 ? 'AM' : 'PM';
-    return `disclaimer_${date}_${half}`;
+    return `spine_disclaimer_${date}_${half}`;
 }
 
 export function isDisclaimerAccepted(lang) {
-    return sessionStorage.getItem(getHalfDayKey()) === 'accepted'
-        && sessionStorage.getItem(getHalfDayKey() + '_lang') === lang;
+    return localStorage.getItem(getHalfDayKey()) === 'accepted'
+        && localStorage.getItem(getHalfDayKey() + '_lang') === lang;
 }
 
 export function getDisclaimerTimestamp() {
-    return sessionStorage.getItem(getHalfDayKey() + '_ts') || null;
+    return localStorage.getItem(getHalfDayKey() + '_ts') || null;
 }
 
 export function acceptDisclaimer(lang) {
     const key = getHalfDayKey();
-    sessionStorage.setItem(key, 'accepted');
-    sessionStorage.setItem(key + '_lang', lang);
-    sessionStorage.setItem(key + '_ts', new Date().toISOString().replace('T', ' ').substring(0, 19));
+    localStorage.setItem(key, 'accepted');
+    localStorage.setItem(key + '_lang', lang);
+    localStorage.setItem(key + '_ts', new Date().toISOString().replace('T', ' ').substring(0, 19));
 }
 
 export const DisclaimerModal = ({ lang, onLangChange, onAccept }) => (
