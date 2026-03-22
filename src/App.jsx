@@ -81,6 +81,7 @@ const App = () => {
     const syncVersionMismatchRef = useRef(false);
     const serializeRef = useRef(null);
     const deserializeRef = useRef(null);
+    const changeLangRef = useRef(null);
 
     // MODALS
     const [screwModalOpen, setScrewModalOpen] = useState(false);
@@ -384,7 +385,6 @@ const App = () => {
             setPatientData(pd);
             if (json.ui?.viewMode) setViewMode(json.ui.viewMode);
             if (json.ui?.colourScheme) changeTheme(json.ui.colourScheme);
-            if (json.document?.language) changeLang(json.document.language);
             return;
         }
         // v3 / v2 legacy format
@@ -406,6 +406,7 @@ const App = () => {
     };
     serializeRef.current = serializeState;
     deserializeRef.current = deserializeState;
+    changeLangRef.current = changeLang;
 
     // AUTO-LOAD
     // SYNC LANGUAGE ON MOUNT
@@ -479,6 +480,13 @@ const App = () => {
                     clearTimeout(syncTimerRef.current);
                     receivingSync.current = true;
                     deserializeRef.current(msg.payload);
+                }
+            } else if (msg.type === 'lang_accepted') {
+                // Other window accepted disclaimer in a new language — apply language + acceptance
+                if (msg.lang) {
+                    acceptDisclaimer(msg.lang);
+                    changeLangRef.current(msg.lang);
+                    setDisclaimerTick(n => n + 1);
                 }
             }
         };
@@ -1218,7 +1226,7 @@ const App = () => {
                         </div>
                     </div>
                 )}
-            {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerTick(n => n + 1); }} />}
+            {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerTick(n => n + 1); if (syncChannelRef.current) syncChannelRef.current.postMessage({ type: 'lang_accepted', appVersion: CURRENT_VERSION, lang: currentLang }); }} />}
             </div>
         );
     }
@@ -1377,7 +1385,7 @@ const App = () => {
                     </div>
                 ))}
             </div>}
-            {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerTick(n => n + 1); }} />}
+            {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerTick(n => n + 1); if (syncChannelRef.current) syncChannelRef.current.postMessage({ type: 'lang_accepted', appVersion: CURRENT_VERSION, lang: currentLang }); }} />}
         </div>
     );
 };
