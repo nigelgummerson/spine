@@ -149,14 +149,9 @@
         .bug-grid textarea { resize: vertical; min-height: 60px; }
         .nav-link-bugs { color: #b45309 !important; font-weight: 500; }
 
-        /* Backup banner: persistent, below header */
-        .backup-banner { display: none; background: #f0f4f8; border-bottom: 1px solid #d1d5db;
-                          padding: 6px 24px; font-size: 12px; color: #555; text-align: center;
-                          position: sticky; top: var(--header-h, 80px); z-index: 99; }
-        .backup-banner.visible { display: flex; align-items: center; justify-content: center; gap: 12px; }
-        .backup-banner .backup-btn { background: #2d6a4f; color: white; border: none; padding: 3px 10px;
-                                      border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500; }
-        .backup-banner .backup-btn:hover { background: #40916c; }
+        /* Save hint: small note under progress bar */
+        .save-hint { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; display: none; }
+        .save-hint.visible { display: block; }
 
         /* Next unreviewed button */
         .next-unreviewed { position: fixed; bottom: 24px; left: 24px; z-index: 150;
@@ -208,12 +203,8 @@
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
             <div class="progress-text" id="progress-text">0 of 244 items reviewed (0%)</div>
+            <div class="save-hint" id="save-hint"></div>
         </div>
-    </div>
-
-    <div class="backup-banner" id="backup-banner">
-        <span>Your progress is saved in this browser. To continue on another device, download a backup.</span>
-        <button class="backup-btn" onclick="exportReview()">Download backup</button>
     </div>
 
     <div class="milestone-toast" id="milestone-toast">
@@ -8618,8 +8609,8 @@
             document.getElementById('progress-fill').style.width = pct + '%';
             document.getElementById('progress-text').textContent = reviewed + ' of ' + TOTAL + ' items reviewed (' + pct + '%)';
 
-            // Show backup banner once any review activity exists
-            if (reviewed > 0) showBackupBanner();
+            // Show save hint once any review activity exists
+            if (reviewed > 0) showSaveHint();
 
             // Check 50% milestone
             checkMilestone(reviewed);
@@ -8643,16 +8634,16 @@
 
         // --- Backup banner & milestone ---
 
-        let bannerShown = false;
+        let hintShown = false;
         let milestoneShown = false;
         const MILESTONE_KEY = STORAGE_KEY + '_milestone50';
 
-        function showBackupBanner() {
-            if (bannerShown) return;
-            bannerShown = true;
-            document.getElementById('backup-banner').classList.add('visible');
-            // Adjust nav sticky position to account for banner height
-            requestAnimationFrame(syncHeaderHeight);
+        function showSaveHint() {
+            if (hintShown) return;
+            hintShown = true;
+            const hint = document.getElementById('save-hint');
+            hint.textContent = 'Progress saved in this browser. Use Export Review to keep a backup.';
+            hint.classList.add('visible');
         }
 
         function checkMilestone(reviewed) {
@@ -8947,9 +8938,7 @@
         // Measure header and set CSS variable so nav sticks below it
         function syncHeaderHeight() {
             const h = document.querySelector('.header').offsetHeight;
-            const banner = document.getElementById('backup-banner');
-            const bh = banner.classList.contains('visible') ? banner.offsetHeight : 0;
-            document.documentElement.style.setProperty('--header-h', (h + bh) + 'px');
+            document.documentElement.style.setProperty('--header-h', h + 'px');
         }
         syncHeaderHeight();
         window.addEventListener('resize', syncHeaderHeight);
