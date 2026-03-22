@@ -98,13 +98,16 @@ const App = () => {
     const [exportPicker, setExportPicker] = useState(null); // 'jpg' or 'pdf'
     const [disclaimerAccepted, setDisclaimerAccepted] = useState(() => isDisclaimerAccepted(detectLanguage()));
 
-    // Re-check disclaimer at half-day boundary (AM/PM)
+    // Re-check disclaimer on language change and at half-day boundary (AM/PM)
+    useEffect(() => {
+        if (!isDisclaimerAccepted(currentLang)) setDisclaimerAccepted(false);
+    }, [currentLang]);
     useEffect(() => {
         const interval = setInterval(() => {
             if (!isDisclaimerAccepted(currentLang)) setDisclaimerAccepted(false);
         }, 60000); // check every minute
         return () => clearInterval(interval);
-    }, []);
+    }, [currentLang]);
 
     // TOAST NOTIFICATIONS
     const [toasts, setToasts] = useState([]);
