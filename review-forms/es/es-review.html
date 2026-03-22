@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Translation Review — Spanish (Español)</title>
+    <title>Translation Review: Spanish (Español)</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -81,11 +81,16 @@
 
         .col-status { grid-column: 1; }
         .col-comment { grid-column: 2; }
-        .status-radios { display: flex; gap: 12px; }
-        .radio-label { display: flex; align-items: center; gap: 4px; font-size: 13px; cursor: pointer; }
-        .radio-label input { cursor: pointer; }
-        .correct-label span { color: #2d6a4f; }
-        .corrected-label span { color: #e76f51; }
+        .status-radios { display: flex; gap: 8px; }
+        .radio-label { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;
+                        padding: 6px 14px; border: 1px solid #ddd; border-radius: 6px; transition: all 0.15s; }
+        .radio-label:hover { background: #f5f5f5; }
+        .radio-label input { cursor: pointer; width: 16px; height: 16px; accent-color: currentColor; }
+        .radio-label input:checked + span { font-weight: 600; }
+        .correct-label { color: #2d6a4f; }
+        .correct-label:has(input:checked) { background: #f0f8f4; border-color: #2d6a4f; }
+        .corrected-label { color: #e76f51; }
+        .corrected-label:has(input:checked) { background: #fff8f0; border-color: #e76f51; }
         .comment-field { font-size: 13px; width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; }
         .comment-field:focus { outline: none; border-color: #2d6a4f; }
 
@@ -144,7 +149,7 @@
         .bug-grid textarea { resize: vertical; min-height: 60px; }
         .nav-link-bugs { color: #b45309 !important; font-weight: 500; }
 
-        /* Backup banner — persistent, below header */
+        /* Backup banner: persistent, below header */
         .backup-banner { display: none; background: #f0f4f8; border-bottom: 1px solid #d1d5db;
                           padding: 6px 24px; font-size: 12px; color: #555; text-align: center;
                           position: sticky; top: var(--header-h, 80px); z-index: 99; }
@@ -153,7 +158,15 @@
                                       border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500; }
         .backup-banner .backup-btn:hover { background: #40916c; }
 
-        /* Milestone toast — 50% prompt */
+        /* Next unreviewed button */
+        .next-unreviewed { position: fixed; bottom: 24px; left: 24px; z-index: 150;
+                            background: #1a1a2e; color: white; border: none; padding: 10px 18px;
+                            border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: background 0.15s; }
+        .next-unreviewed:hover { background: #2d3a5e; }
+        .next-unreviewed:disabled { opacity: 0.4; cursor: default; }
+
+        /* Milestone toast: 50% prompt */
         .milestone-toast { display: none; position: fixed; bottom: 24px; right: 24px; z-index: 200;
                             background: #1a1a2e; color: white; padding: 16px 20px; border-radius: 10px;
                             box-shadow: 0 8px 24px rgba(0,0,0,0.25); max-width: 340px; font-size: 13px;
@@ -181,10 +194,11 @@
     <div class="header">
         <div class="header-top">
             <div>
-                <h1>Spinal Instrumentation Plan & Record — Translation Review</h1>
-                <span class="lang-badge">Spanish — Español (es)</span>
+                <h1>Spinal Instrumentation Plan & Record: Translation Review</h1>
+                <span class="lang-badge">Spanish / Español (es)</span>
             </div>
             <div class="header-actions">
+                <a href="guide.html" target="_blank" style="color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: none; padding: 6px 10px;" title="How to use this form">Guide</a>
                 <button onclick="resetReview()" class="btn-reset" title="Clear all progress and start over">Reset</button>
                 <button onclick="importReview()" title="Load a previously saved review">Import</button>
                 <button class="btn-export" onclick="exportReview()" title="Download review as JSON">Export Review</button>
@@ -211,6 +225,8 @@
         </div>
     </div>
 
+    <button class="next-unreviewed" id="next-unreviewed" onclick="goToNextUnreviewed()" title="Jump to next unreviewed item">Next unreviewed &#x2193;</button>
+
     <div class="layout">
         <nav class="nav" id="nav">
             <a href="#reviewer-panel" class="nav-link-reviewer">Your Details</a>
@@ -218,8 +234,8 @@
             <div class="nav-sections">
                 <a href="#section-0" class="nav-link" data-section="0">App Header &amp; Sidebar <span class="nav-count" id="nav-count-0">0/30</span></a>
             <a href="#section-1" class="nav-link" data-section="1">Patient Demographics <span class="nav-count" id="nav-count-1">0/21</span></a>
-            <a href="#section-2" class="nav-link" data-section="2">Implant Modal — Screws, Hooks &amp; Bands <span class="nav-count" id="nav-count-2">0/28</span></a>
-            <a href="#section-3" class="nav-link" data-section="3">Cage Modal — Interbody Cages <span class="nav-count" id="nav-count-3">0/23</span></a>
+            <a href="#section-2" class="nav-link" data-section="2">Implant Modal: Screws, Hooks &amp; Bands <span class="nav-count" id="nav-count-2">0/28</span></a>
+            <a href="#section-3" class="nav-link" data-section="3">Cage Modal: Interbody Cages <span class="nav-count" id="nav-count-3">0/23</span></a>
             <a href="#section-4" class="nav-link" data-section="4">Osteotomy Modal <span class="nav-count" id="nav-count-4">0/29</span></a>
             <a href="#section-5" class="nav-link" data-section="5">Force Modal <span class="nav-count" id="nav-count-5">0/7</span></a>
             <a href="#section-6" class="nav-link" data-section="6">Note Modal <span class="nav-count" id="nav-count-6">0/11</span></a>
@@ -1976,7 +1992,7 @@
     </div>
 
     <div class="section" id="section-2">
-        <h2 class="section-title">Implant Modal — Screws, Hooks &amp; Bands</h2>
+        <h2 class="section-title">Implant Modal: Screws, Hooks &amp; Bands</h2>
         <div class="section-guidance">Click any pedicle marker (small circle on either side of a vertebra) to open this modal. It has a three-tier visual hierarchy: SCREWS (top, with Monoaxial/Polyaxial/Uniplanar buttons), HOOKS (middle, with 5 hook types: Pedicle, TP Down, TP Up, Supra-laminar, Infra-laminar), and BANDS &amp; OTHERS (bottom, with Band/Wire/Cable). Screws offer three sizing modes: Standard (dropdown), Custom (free text), and No Size. Screws and hooks have an Annotation field (e.g. fenestrated, cortical, revision). Bands/wires/cables have a free-text Description field. Clicking an occupied zone opens the edit modal (not a duplicate).</div>
         <div class="section-items">
         <div class="review-item" data-key="clinical.fixation.band" data-section="2" id="item-clinical.fixation.band">
@@ -2581,11 +2597,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Hook placement — no sizing.</div>
+                    <div class="english-text">Hook placement - no sizing.</div>
                 </div>
                 <div class="col-translation">
                     <label>Español</label>
-                    <textarea class="translation-field" data-key="modal.screw.hook_no_sizing" data-original="Colocación de gancho — sin dimensionamiento.">Colocación de gancho — sin dimensionamiento.</textarea>
+                    <textarea class="translation-field" data-key="modal.screw.hook_no_sizing" data-original="Colocación de gancho - sin dimensionamiento.">Colocación de gancho - sin dimensionamiento.</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -2907,7 +2923,7 @@
     </div>
 
     <div class="section" id="section-3">
-        <h2 class="section-title">Cage Modal — Interbody Cages</h2>
+        <h2 class="section-title">Cage Modal: Interbody Cages</h2>
         <div class="section-guidance">Click a disc space (gap between vertebrae) on the spine diagram to open this modal. Cage types are grouped by surgical approach: Posterior (PLIF, TLIF), Anterior (ACDF, ALIF), Lateral (XLIF/LLIF, OLIF). Important: ALIF only appears at L4-S1 disc spaces; ACDF only at cervical levels (C2-C7). Switch the Region View to &#x27;Cervical&#x27; or &#x27;Lumbar&#x27; to access all types. Each cage type shows Side (Left/Right/Bilateral/Midline), Height, Lordosis, Length, and Width fields. At disc levels that support osteotomies (Schwab 1-2), a picker offers Interbody Cage or Osteotomy.</div>
         <div class="section-items">
         <div class="review-item" data-key="clinical.approach.anterior" data-section="3" id="item-clinical.approach.anterior">
@@ -3674,7 +3690,7 @@
 
     <div class="section" id="section-4">
         <h2 class="section-title">Osteotomy Modal</h2>
-        <div class="section-guidance">Schwab 1-2 (Facet, Ponte) are placed at the disc level — click between vertebrae. Schwab 3+ (PSO, VCR, etc.) are placed on the vertebral body — click midline. The dropdown shows two groups: Posterior (Schwab Grades 1-6: Facet release, Ponte, Standard PSO, Extended PSO, VCR, Multi-level VCR) and Anterior (Corpectomy). Each osteotomy type has a label, Schwab grade, and description. VCR, Multi-level VCR, and Corpectomy also show a Reconstruction Cage text field. Correction angle is optional — defaults to empty with placeholder hints showing typical values. Osteotomies render as amber-coloured markers (red is reserved for destructive actions).</div>
+        <div class="section-guidance">Schwab 1-2 (Facet, Ponte) are placed at the disc level: click between vertebrae. Schwab 3+ (PSO, VCR, etc.) are placed on the vertebral body: click midline. The dropdown shows two groups: Posterior (Schwab Grades 1-6: Facet release, Ponte, Standard PSO, Extended PSO, VCR, Multi-level VCR) and Anterior (Corpectomy). Each osteotomy type has a label, Schwab grade, and description. VCR, Multi-level VCR, and Corpectomy also show a Reconstruction Cage text field. Correction angle is optional, defaults to empty with placeholder hints showing typical values. Osteotomies render as amber-coloured markers (red is reserved for destructive actions).</div>
         <div class="section-items">
         <div class="review-item" data-key="clinical.osteotomy.corpectomy.desc" data-section="4" id="item-clinical.osteotomy.corpectomy.desc">
             <div class="item-header">
@@ -4638,7 +4654,7 @@
 
     <div class="section" id="section-5">
         <h2 class="section-title">Force Modal</h2>
-        <div class="section-guidance">Click the left or right edge zone of a vertebral level to open the Force modal. Six force/correction types are shown as clickable buttons: Translate Left, Translate Right, Compression, Distraction, Derotate CW, Derotate CCW. Forces use blue colour scheme (biomechanics convention for corrective vectors). Forces can only be placed on the Plan — on the Construct tab they appear read-only. Force zones always open the ForceModal regardless of which tool is selected.</div>
+        <div class="section-guidance">Click the left or right edge zone of a vertebral level to open the Force modal. Six force/correction types are shown as clickable buttons: Translate Left, Translate Right, Compression, Distraction, Derotate CW, Derotate CCW. Forces use blue colour scheme (biomechanics convention for corrective vectors). Forces can only be placed on the Plan. On the Construct tab they appear read-only. Force zones always open the ForceModal regardless of which tool is selected.</div>
         <div class="section-items">
         <div class="review-item" data-key="clinical.force.compression" data-section="5" id="item-clinical.force.compression">
             <div class="item-header">
@@ -6646,7 +6662,7 @@
 
     <div class="section" id="section-9">
         <h2 class="section-title">Chart Headers &amp; Diagram Labels</h2>
-        <div class="section-guidance">The column headers on each spine chart: Left, Right, and Force. &#x27;Forces — edit in Plan&#x27; appears as a hint on the Construct chart (in portrait mode and in the export) indicating that forces are read-only on the Construct side. The cervical cage hint and corpectomy label appear on the diagram itself. Region view short label (&#x27;All&#x27;) appears in compact contexts.</div>
+        <div class="section-guidance">The column headers on each spine chart: Left, Right, and Force. &#x27;Forces - edit in Plan&#x27; appears as a hint on the Construct chart (in portrait mode and in the export) indicating that forces are read-only on the Construct side. The cervical cage hint and corpectomy label appear on the diagram itself. Region view short label (&#x27;All&#x27;) appears in compact contexts.</div>
         <div class="section-items">
         <div class="review-item" data-key="chart.cervical_cage_hint" data-section="9" id="item-chart.cervical_cage_hint">
             <div class="item-header">
@@ -6656,11 +6672,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Cervical cage — use Cervical view</div>
+                    <div class="english-text">Cervical cage - use Cervical view</div>
                 </div>
                 <div class="col-translation">
                     <label>Español</label>
-                    <textarea class="translation-field" data-key="chart.cervical_cage_hint" data-original="Cage cervical — usar vista Cervical">Cage cervical — usar vista Cervical</textarea>
+                    <textarea class="translation-field" data-key="chart.cervical_cage_hint" data-original="Cage cervical - usar vista Cervical">Cage cervical - usar vista Cervical</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -6722,11 +6738,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Forces — edit in Plan</div>
+                    <div class="english-text">Forces - edit in Plan</div>
                 </div>
                 <div class="col-translation">
                     <label>Español</label>
-                    <textarea class="translation-field" data-key="chart.force_plan_only" data-original="Fuerzas — editar en el Plan">Fuerzas — editar en el Plan</textarea>
+                    <textarea class="translation-field" data-key="chart.force_plan_only" data-original="Fuerzas - editar en el Plan">Fuerzas - editar en el Plan</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -6851,7 +6867,7 @@
 
     <div class="section" id="section-10">
         <h2 class="section-title">Linked Screens (Sync)</h2>
-        <div class="section-guidance">Open the app in two windows of the same browser on a dual-screen setup. Changes sync automatically via BroadcastChannel — one screen can show the Plan while the other shows Demographics with live inventory. A green link icon in the sidebar indicates active sync. These strings are the tooltip text for the sync status indicator.</div>
+        <div class="section-guidance">Open the app in two windows of the same browser on a dual-screen setup. Changes sync automatically via BroadcastChannel. One screen can show the Plan while the other shows Demographics with live inventory. A green link icon in the sidebar indicates active sync. These strings are the tooltip text for the sync status indicator.</div>
         <div class="section-items">
         <div class="review-item" data-key="sync.linked" data-section="10" id="item-sync.linked">
             <div class="item-header">
@@ -7030,12 +7046,12 @@
 
     <div class="section" id="section-12">
         <h2 class="section-title">Help Modal</h2>
-        <div class="section-guidance">Click the Help button (? icon) in the sidebar Actions section. The help modal has multiple sections: Session Privacy, Screws &amp; Hooks, Interbody Cages, Osteotomies, Confirm Plan, Portrait &amp; Tablet Mode, Save/Load/Export, Linked Screens, and Keyboard Shortcuts. Bodies may contain HTML markup — please preserve any HTML tags (&lt;strong&gt;, &lt;br&gt;, &lt;ul&gt;, &lt;li&gt;, etc.) and only translate the text content. The help modal uses a two-column layout in landscape and closes with Escape.</div>
+        <div class="section-guidance">Click the Help button (? icon) in the sidebar Actions section. The help modal has multiple sections: Session Privacy, Screws &amp; Hooks, Interbody Cages, Osteotomies, Confirm Plan, Portrait &amp; Tablet Mode, Save/Load/Export, Linked Screens, and Keyboard Shortcuts. Bodies may contain HTML markup. Please preserve any HTML tags (&lt;strong&gt;, &lt;br&gt;, &lt;ul&gt;, &lt;li&gt;, etc.) and only translate the text content. The help modal uses a two-column layout in landscape and closes with Escape.</div>
         <div class="section-items">
         <div class="review-item" data-key="help.cages.body" data-section="12" id="item-help.cages.body">
             <div class="item-header">
                 <code class="key-label">help.cages.body</code>
-                <span class="hint html-hint">Contains HTML — preserve tags</span>
+                <span class="hint html-hint">Contains HTML: preserve tags</span>
             </div>
             <div class="item-grid">
                 <div class="col-english">
@@ -7101,16 +7117,16 @@
         <div class="review-item" data-key="help.copy_plan.body" data-section="12" id="item-help.copy_plan.body">
             <div class="item-header">
                 <code class="key-label">help.copy_plan.body</code>
-                <span class="hint html-hint">Contains HTML — preserve tags</span>
+                <span class="hint html-hint">Contains HTML: preserve tags</span>
             </div>
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">In &lt;strong&gt;portrait mode&lt;/strong&gt;, planned placements appear as faint ghosts on the Construct tab. Tap any ghost to review and confirm it — the modal opens pre-filled with planned sizes and annotations. &lt;strong&gt;Confirm Plan&lt;/strong&gt; accepts all remaining unconfirmed placements at once. In landscape mode, both columns are visible side by side.</div>
+                    <div class="english-text">In &lt;strong&gt;portrait mode&lt;/strong&gt;, planned placements appear as faint ghosts on the Construct tab. Tap any ghost to review and confirm it - the modal opens pre-filled with planned sizes and annotations. &lt;strong&gt;Confirm Plan&lt;/strong&gt; accepts all remaining unconfirmed placements at once. In landscape mode, both columns are visible side by side.</div>
                 </div>
                 <div class="col-translation">
                     <label>Español</label>
-                    <textarea class="translation-field" data-key="help.copy_plan.body" data-original="En &lt;strong&gt;modo vertical&lt;/strong&gt;, las colocaciones planificadas aparecen como fantasmas tenues en la pestaña Constructo. Toque cualquier fantasma para revisarlo y confirmarlo — el diálogo se abre prerrellenado con tamaños y anotaciones planificados. &lt;strong&gt;Confirmar plan&lt;/strong&gt; acepta todas las colocaciones no confirmadas restantes de una vez. En modo horizontal, ambas columnas son visibles lado a lado.">En &lt;strong&gt;modo vertical&lt;/strong&gt;, las colocaciones planificadas aparecen como fantasmas tenues en la pestaña Constructo. Toque cualquier fantasma para revisarlo y confirmarlo — el diálogo se abre prerrellenado con tamaños y anotaciones planificados. &lt;strong&gt;Confirmar plan&lt;/strong&gt; acepta todas las colocaciones no confirmadas restantes de una vez. En modo horizontal, ambas columnas son visibles lado a lado.</textarea>
+                    <textarea class="translation-field" data-key="help.copy_plan.body" data-original="En &lt;strong&gt;modo vertical&lt;/strong&gt;, las colocaciones planificadas aparecen como fantasmas tenues en la pestaña Constructo. Toque cualquier fantasma para revisarlo y confirmarlo - el diálogo se abre prerrellenado con tamaños y anotaciones planificados. &lt;strong&gt;Confirmar plan&lt;/strong&gt; acepta todas las colocaciones no confirmadas restantes de una vez. En modo horizontal, ambas columnas son visibles lado a lado.">En &lt;strong&gt;modo vertical&lt;/strong&gt;, las colocaciones planificadas aparecen como fantasmas tenues en la pestaña Constructo. Toque cualquier fantasma para revisarlo y confirmarlo - el diálogo se abre prerrellenado con tamaños y anotaciones planificados. &lt;strong&gt;Confirmar plan&lt;/strong&gt; acepta todas las colocaciones no confirmadas restantes de una vez. En modo horizontal, ambas columnas son visibles lado a lado.</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -7167,16 +7183,16 @@
         <div class="review-item" data-key="help.linked_screens.body" data-section="12" id="item-help.linked_screens.body">
             <div class="item-header">
                 <code class="key-label">help.linked_screens.body</code>
-                <span class="hint html-hint">Contains HTML — preserve tags</span>
+                <span class="hint html-hint">Contains HTML: preserve tags</span>
             </div>
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Open the app in &lt;strong&gt;two windows of the same browser&lt;/strong&gt; (e.g. two Chrome windows, not Chrome + Edge) on a computer with two or more screens. Changes sync automatically between windows — one screen can show the Plan while the other shows Demographics with live inventory. A green link icon indicates an active connection. Both windows must be running the same app version.</div>
+                    <div class="english-text">Open the app in &lt;strong&gt;two windows of the same browser&lt;/strong&gt; (e.g. two Chrome windows, not Chrome + Edge) on a computer with two or more screens. Changes sync automatically between windows - one screen can show the Plan while the other shows Demographics with live inventory. A green link icon indicates an active connection. Both windows must be running the same app version.</div>
                 </div>
                 <div class="col-translation">
                     <label>Español</label>
-                    <textarea class="translation-field" data-key="help.linked_screens.body" data-original="Abra la aplicación en &lt;strong&gt;dos ventanas del mismo navegador&lt;/strong&gt; (p.u00A0ej. dos ventanas de Chrome, no Chrome + Edge) en un ordenador con dos o más pantallas. Los cambios se sincronizan automáticamente — una pantalla puede mostrar el Plan y la otra la Demografía con inventario en vivo. Un icono verde de enlace indica una conexión activa. Ambas ventanas deben ejecutar la misma versión de la aplicación.">Abra la aplicación en &lt;strong&gt;dos ventanas del mismo navegador&lt;/strong&gt; (p.u00A0ej. dos ventanas de Chrome, no Chrome + Edge) en un ordenador con dos o más pantallas. Los cambios se sincronizan automáticamente — una pantalla puede mostrar el Plan y la otra la Demografía con inventario en vivo. Un icono verde de enlace indica una conexión activa. Ambas ventanas deben ejecutar la misma versión de la aplicación.</textarea>
+                    <textarea class="translation-field" data-key="help.linked_screens.body" data-original="Abra la aplicación en &lt;strong&gt;dos ventanas del mismo navegador&lt;/strong&gt; (p.u00A0ej. dos ventanas de Chrome, no Chrome + Edge) en un ordenador con dos o más pantallas. Los cambios se sincronizan automáticamente - una pantalla puede mostrar el Plan y la otra la Demografía con inventario en vivo. Un icono verde de enlace indica una conexión activa. Ambas ventanas deben ejecutar la misma versión de la aplicación.">Abra la aplicación en &lt;strong&gt;dos ventanas del mismo navegador&lt;/strong&gt; (p.u00A0ej. dos ventanas de Chrome, no Chrome + Edge) en un ordenador con dos o más pantallas. Los cambios se sincronizan automáticamente - una pantalla puede mostrar el Plan y la otra la Demografía con inventario en vivo. Un icono verde de enlace indica una conexión activa. Ambas ventanas deben ejecutar la misma versión de la aplicación.</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -7233,12 +7249,12 @@
         <div class="review-item" data-key="help.osteotomies.body" data-section="12" id="item-help.osteotomies.body">
             <div class="item-header">
                 <code class="key-label">help.osteotomies.body</code>
-                <span class="hint html-hint">Contains HTML — preserve tags</span>
+                <span class="hint html-hint">Contains HTML: preserve tags</span>
             </div>
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Schwab 1-2 (Facet, Ponte) are placed at the &lt;strong&gt;disc level&lt;/strong&gt; — click the space between vertebrae. Schwab 3+ (PSO, VCR, etc.) are placed on the &lt;strong&gt;vertebral body&lt;/strong&gt; — click the midline. VCR, ML-VCR, and Corpectomy include a reconstruction cage description field.</div>
+                    <div class="english-text">Schwab 1-2 (Facet, Ponte) are placed at the &lt;strong&gt;disc level&lt;/strong&gt; - click the space between vertebrae. Schwab 3+ (PSO, VCR, etc.) are placed on the &lt;strong&gt;vertebral body&lt;/strong&gt; - click the midline. VCR, ML-VCR, and Corpectomy include a reconstruction cage description field.</div>
                 </div>
                 <div class="col-translation">
                     <label>Español</label>
@@ -7299,16 +7315,16 @@
         <div class="review-item" data-key="help.portrait_mode.body" data-section="12" id="item-help.portrait_mode.body">
             <div class="item-header">
                 <code class="key-label">help.portrait_mode.body</code>
-                <span class="hint html-hint">Contains HTML — preserve tags</span>
+                <span class="hint html-hint">Contains HTML: preserve tags</span>
             </div>
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">The app detects screen orientation automatically. &lt;strong&gt;Landscape&lt;/strong&gt; shows Plan and Construct side by side. &lt;strong&gt;Portrait&lt;/strong&gt; shows one column at a time — swipe or tap tabs to switch between Demographics, Plan, and Construct. Designed for tablets; phones (screens under 600px) open in view-only mode.</div>
+                    <div class="english-text">The app detects screen orientation automatically. &lt;strong&gt;Landscape&lt;/strong&gt; shows Plan and Construct side by side. &lt;strong&gt;Portrait&lt;/strong&gt; shows one column at a time - swipe or tap tabs to switch between Demographics, Plan, and Construct. Designed for tablets; phones (screens under 600px) open in view-only mode.</div>
                 </div>
                 <div class="col-translation">
                     <label>Español</label>
-                    <textarea class="translation-field" data-key="help.portrait_mode.body" data-original="La aplicación detecta la orientación de la pantalla automáticamente. &lt;strong&gt;Horizontal&lt;/strong&gt; muestra Plan y Constructo lado a lado. &lt;strong&gt;Vertical&lt;/strong&gt; muestra una columna a la vez — deslice o toque las pestañas para cambiar entre Demografía, Plan y Constructo. Diseñado para tabletas; los teléfonos (pantallas menores de 600px) se abren en modo solo lectura.">La aplicación detecta la orientación de la pantalla automáticamente. &lt;strong&gt;Horizontal&lt;/strong&gt; muestra Plan y Constructo lado a lado. &lt;strong&gt;Vertical&lt;/strong&gt; muestra una columna a la vez — deslice o toque las pestañas para cambiar entre Demografía, Plan y Constructo. Diseñado para tabletas; los teléfonos (pantallas menores de 600px) se abren en modo solo lectura.</textarea>
+                    <textarea class="translation-field" data-key="help.portrait_mode.body" data-original="La aplicación detecta la orientación de la pantalla automáticamente. &lt;strong&gt;Horizontal&lt;/strong&gt; muestra Plan y Constructo lado a lado. &lt;strong&gt;Vertical&lt;/strong&gt; muestra una columna a la vez - deslice o toque las pestañas para cambiar entre Demografía, Plan y Constructo. Diseñado para tabletas; los teléfonos (pantallas menores de 600px) se abren en modo solo lectura.">La aplicación detecta la orientación de la pantalla automáticamente. &lt;strong&gt;Horizontal&lt;/strong&gt; muestra Plan y Constructo lado a lado. &lt;strong&gt;Vertical&lt;/strong&gt; muestra una columna a la vez - deslice o toque las pestañas para cambiar entre Demografía, Plan y Constructo. Diseñado para tabletas; los teléfonos (pantallas menores de 600px) se abren en modo solo lectura.</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -7431,7 +7447,7 @@
         <div class="review-item" data-key="help.screws_hooks.body" data-section="12" id="item-help.screws_hooks.body">
             <div class="item-header">
                 <code class="key-label">help.screws_hooks.body</code>
-                <span class="hint html-hint">Contains HTML — preserve tags</span>
+                <span class="hint html-hint">Contains HTML: preserve tags</span>
             </div>
             <div class="item-grid">
                 <div class="col-english">
@@ -7497,7 +7513,7 @@
         <div class="review-item" data-key="help.session_privacy.body" data-section="12" id="item-help.session_privacy.body">
             <div class="item-header">
                 <code class="key-label">help.session_privacy.body</code>
-                <span class="hint html-hint">Contains HTML — preserve tags</span>
+                <span class="hint html-hint">Contains HTML: preserve tags</span>
             </div>
             <div class="item-grid">
                 <div class="col-english">
@@ -7563,7 +7579,7 @@
         <div class="review-item" data-key="help.shortcuts.body" data-section="12" id="item-help.shortcuts.body">
             <div class="item-header">
                 <code class="key-label">help.shortcuts.body</code>
-                <span class="hint html-hint">Contains HTML — preserve tags</span>
+                <span class="hint html-hint">Contains HTML: preserve tags</span>
             </div>
             <div class="item-grid">
                 <div class="col-english">
@@ -7902,7 +7918,7 @@
 
     <div class="section" id="section-14">
         <h2 class="section-title">Alerts &amp; Confirmations</h2>
-        <div class="section-guidance">These appear as toast notifications or custom modals during specific actions: loading invalid files, starting a new patient, copying plan to construct, and cage permissibility warnings. Info toasts auto-dismiss; error toasts persist. Some contain {placeholder} replacements — keep the {braces} intact and only translate the surrounding text.</div>
+        <div class="section-guidance">These appear as toast notifications or custom modals during specific actions: loading invalid files, starting a new patient, copying plan to construct, and cage permissibility warnings. Info toasts auto-dismiss; error toasts persist. Some contain {placeholder} replacements: keep the {braces} intact and only translate the surrounding text.</div>
         <div class="section-items">
         <div class="review-item" data-key="alert.all_confirmed" data-section="14" id="item-alert.all_confirmed">
             <div class="item-header">
@@ -7940,7 +7956,7 @@
         <div class="review-item" data-key="alert.cage_not_permitted" data-section="14" id="item-alert.cage_not_permitted">
             <div class="item-header">
                 <code class="key-label">alert.cage_not_permitted</code>
-                <span class="hint placeholder-hint">Contains {placeholders} — keep braces intact</span>
+                <span class="hint placeholder-hint">Contains {placeholders}: keep braces intact</span>
             </div>
             <div class="item-grid">
                 <div class="col-english">
@@ -8072,7 +8088,7 @@
         <div class="review-item" data-key="alert.no_cage_types" data-section="14" id="item-alert.no_cage_types">
             <div class="item-header">
                 <code class="key-label">alert.no_cage_types</code>
-                <span class="hint placeholder-hint">Contains {placeholders} — keep braces intact</span>
+                <span class="hint placeholder-hint">Contains {placeholders}: keep braces intact</span>
             </div>
             <div class="item-grid">
                 <div class="col-english">
@@ -8239,7 +8255,7 @@
 
     <div class="section" id="section-15">
         <h2 class="section-title">Credits &amp; Disclaimer</h2>
-        <div class="section-guidance">The app name, developer credit, and license link appear in the Help modal footer. The translation disclaimer appears in the main app footer and on exported documents. The license text contains an HTML link — preserve the &lt;a&gt; tag and only translate surrounding text.</div>
+        <div class="section-guidance">The app name, developer credit, and license link appear in the Help modal footer. The translation disclaimer appears in the main app footer and on exported documents. The license text contains an HTML link. Preserve the &lt;a&gt; tag and only translate surrounding text.</div>
         <div class="section-items">
         <div class="review-item" data-key="credits.app_name" data-section="15" id="item-credits.app_name">
             <div class="item-header">
@@ -8310,7 +8326,7 @@
         <div class="review-item" data-key="credits.license" data-section="15" id="item-credits.license">
             <div class="item-header">
                 <code class="key-label">credits.license</code>
-                <span class="hint html-hint">Contains HTML — preserve tags</span>
+                <span class="hint html-hint">Contains HTML: preserve tags</span>
             </div>
             <div class="item-grid">
                 <div class="col-english">
@@ -8455,7 +8471,7 @@
                     If you notice any technical problems while testing the app in Español, please report them here.
                     This could include: layout issues (text overflow, truncation, overlapping elements), broken buttons or interactions,
                     display problems on specific screen sizes or orientations, export/PDF issues, or anything that does not work as expected.
-                    You do not need to report English-only issues here — focus on problems you see when the app is set to Español.
+                    You do not need to report English-only issues here. Focus on problems you see when the app is set to Español.
                 </div>
                 <div id="bug-list"></div>
                 <button class="add-bug-btn" onclick="addBugReport()">+ Add Bug Report</button>
@@ -8465,9 +8481,9 @@
                             <span class="bug-number"></span>
                             <select class="bug-severity">
                                 <option value="">Severity...</option>
-                                <option value="minor">Minor — cosmetic / wording</option>
-                                <option value="moderate">Moderate — confusing or awkward</option>
-                                <option value="major">Major — blocks workflow or loses data</option>
+                                <option value="minor">Minor: cosmetic / wording</option>
+                                <option value="moderate">Moderate: confusing or awkward</option>
+                                <option value="major">Major: blocks workflow or loses data</option>
                             </select>
                             <button class="bug-remove-btn" onclick="removeBugReport(this)" title="Remove this bug report">&times;</button>
                         </div>
@@ -8654,6 +8670,47 @@
             try { localStorage.setItem(MILESTONE_KEY, '1'); } catch(e) {}
         };
 
+        // --- Next unreviewed & auto-scroll ---
+
+        function findNextUnreviewed(afterEl) {
+            const items = Array.from(document.querySelectorAll('.review-item'));
+            const startIdx = afterEl ? items.indexOf(afterEl) + 1 : 0;
+            // Search from current position to end, then wrap around
+            for (let i = 0; i < items.length; i++) {
+                const item = items[(startIdx + i) % items.length];
+                if (item.style.display === 'none') continue;
+                if (!item.querySelector('input[type="radio"]:checked')) return item;
+            }
+            return null;
+        }
+
+        function scrollToItem(item) {
+            if (!item) return;
+            item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            item.style.boxShadow = '0 0 0 3px rgba(45,106,79,0.3)';
+            setTimeout(() => { item.style.boxShadow = ''; }, 1500);
+        }
+
+        window.goToNextUnreviewed = function() {
+            const next = findNextUnreviewed(null);
+            if (next) scrollToItem(next);
+        };
+
+        function updateNextButton() {
+            const btn = document.getElementById('next-unreviewed');
+            const next = findNextUnreviewed(null);
+            btn.disabled = !next;
+            btn.textContent = next ? 'Next unreviewed ↓' : 'All reviewed ✓';
+        }
+
+        function autoScrollToNext(currentItem) {
+            setTimeout(() => {
+                const next = findNextUnreviewed(currentItem);
+                if (next) scrollToItem(next);
+                updateNextButton();
+            }, 300);
+        }
+
         // --- Filter ---
 
         window.setFilter = function(filter) {
@@ -8739,7 +8796,7 @@
                         const bugMsg = data.bugs ? ', ' + data.bugs.length + ' bug reports' : '';
                         alert('Review loaded: ' + Object.keys(data.items).length + ' items' + bugMsg + '.');
                     } else {
-                        alert('Invalid review file — no items found.');
+                        alert('Invalid review file: no items found.');
                     }
                 } catch(err) {
                     alert('Error reading file: ' + err.message);
@@ -8823,6 +8880,10 @@
                 if (item) updateItemAppearance(item);
                 updateProgress();
                 autoSave();
+                // Auto-scroll to next unreviewed after marking via radio button
+                if (e.target.matches('input[type="radio"]') && item) {
+                    autoScrollToNext(item);
+                }
             }
             // Bug report fields
             if (e.target.matches('.bug-severity')) {
@@ -8896,6 +8957,7 @@
         // Init
         autoLoad();
         updateProgress();
+        updateNextButton();
         // Defer textarea sizing until layout is complete
         requestAnimationFrame(sizeTextareas);
     })();
