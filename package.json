@@ -1,0 +1,34 @@
+{
+  "name": "spine-planner-vite",
+  "version": "1.0.0",
+  "description": "A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instrumentation diagrams with a visual, exportable chart that documents the pre-operative plan and post-operative construct. Runs offline on hospital computers as a single HTML file — no installation required.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0-only",
+  "type": "module",
+  "dependencies": {
+    "@fontsource-variable/source-serif-4": "^5.2.9",
+    "@fontsource/inter": "^5.2.8",
+    "html-to-image": "^1.11.13",
+    "jspdf": "^4.2.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
+    "@vitejs/plugin-react": "^6.0.1",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^4.2.2",
+    "vite": "^8.0.1",
+    "vite-plugin-singlefile": "^2.3.2"
+  }
+}

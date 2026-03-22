@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate per-language HTML review forms from the TRANSLATIONS object in index.html.
+Generate per-language HTML review forms from translations.json.
 
 Each form has two parts:
   1. Translation Review — verify/correct every translated string
@@ -22,7 +22,7 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_DIR = SCRIPT_DIR.parent
-INDEX_HTML = PROJECT_DIR / "index.html"
+TRANSLATIONS_FILE = PROJECT_DIR / "src" / "i18n" / "translations.json"
 OUTPUT_DIR = PROJECT_DIR / "review-forms"
 
 # Language metadata: code -> (English name, native name)
@@ -218,145 +218,10 @@ SECTIONS = [
 ]
 
 
-def parse_translations(html: str) -> dict:
-    """Extract the TRANSLATIONS object from index.html using direct JS parsing.
-
-    Parses the nested { lang: { key: value, ... }, ... } structure character by
-    character, handling single-quoted strings that may contain double quotes (from
-    embedded HTML attributes).
-    """
-    marker = "const TRANSLATIONS = {"
-    start = html.find(marker)
-    if start == -1:
-        raise ValueError("TRANSLATIONS object not found in HTML")
-
-    pos = start + len(marker) - 1  # points at the opening {
-
-    def skip_ws_and_comments():
-        nonlocal pos
-        while pos < len(html):
-            # Skip whitespace
-            if html[pos] in " \t\n\r":
-                pos += 1
-                continue
-            # Skip single-line comments
-            if html[pos : pos + 2] == "//":
-                end = html.find("\n", pos)
-                pos = end + 1 if end != -1 else len(html)
-                continue
-            # Skip multi-line comments
-            if html[pos : pos + 2] == "/*":
-                end = html.find("*/", pos)
-                pos = end + 2 if end != -1 else len(html)
-                continue
-            break
-
-    def read_string() -> str:
-        """Read a single- or double-quoted JS string, returning unescaped content."""
-        nonlocal pos
-        quote = html[pos]
-        pos += 1  # skip opening quote
-        chars = []
-        while pos < len(html):
-            ch = html[pos]
-            if ch == "\\" and pos + 1 < len(html):
-                nxt = html[pos + 1]
-                if nxt == "n":
-                    chars.append("\n")
-                elif nxt == "t":
-                    chars.append("\t")
-                elif nxt == "\\":
-                    chars.append("\\")
-                elif nxt == quote:
-                    chars.append(quote)
-                elif nxt == '"':
-                    chars.append('"')
-                elif nxt == "'":
-                    chars.append("'")
-                else:
-                    chars.append(nxt)
-                pos += 2
-                continue
-            if ch == quote:
-                pos += 1  # skip closing quote
-                return "".join(chars)
-            chars.append(ch)
-            pos += 1
-        raise ValueError(f"Unterminated string starting near position {pos}")
-
-    def read_value():
-        """Read a JS value (string, number, boolean, null, object, array)."""
-        nonlocal pos
-        skip_ws_and_comments()
-        ch = html[pos]
-        if ch in ("'", '"'):
-            return read_string()
-        if ch == "{":
-            return read_object()
-        if ch == "[":
-            return read_array()
-        # Numbers, booleans, null
-        m = re.match(r"(true|false|null|-?\d+\.?\d*)", html[pos:])
-        if m:
-            pos += len(m.group(0))
-            val = m.group(0)
-            if val == "true":
-                return True
-            if val == "false":
-                return False
-            if val == "null":
-                return None
-            return float(val) if "." in val else int(val)
-        raise ValueError(f"Unexpected character '{ch}' at position {pos}")
-
-    def read_object() -> dict:
-        nonlocal pos
-        pos += 1  # skip {
-        obj = {}
-        skip_ws_and_comments()
-        while pos < len(html) and html[pos] != "}":
-            skip_ws_and_comments()
-            if html[pos] == "}":
-                break
-            # Read key — quoted or bare identifier
-            if html[pos] in ("'", '"'):
-                key = read_string()
-            else:
-                m = re.match(r"[a-zA-Z_]\w*", html[pos:])
-                if not m:
-                    raise ValueError(f"Expected key at position {pos}")
-                key = m.group(0)
-                pos += len(key)
-            skip_ws_and_comments()
-            if html[pos] != ":":
-                raise ValueError(f"Expected ':' after key '{key}' at position {pos}")
-            pos += 1  # skip :
-            val = read_value()
-            obj[key] = val
-            skip_ws_and_comments()
-            if pos < len(html) and html[pos] == ",":
-                pos += 1
-            skip_ws_and_comments()
-        if pos < len(html):
-            pos += 1  # skip }
-        return obj
-
-    def read_array() -> list:
-        nonlocal pos
-        pos += 1  # skip [
-        arr = []
-        skip_ws_and_comments()
-        while pos < len(html) and html[pos] != "]":
-            arr.append(read_value())
-            skip_ws_and_comments()
-            if pos < len(html) and html[pos] == ",":
-                pos += 1
-            skip_ws_and_comments()
-        if pos < len(html):
-            pos += 1  # skip ]
-        return arr
-
-    return read_object()
+def load_translations(path: Path) -> dict:
+    """Load the translations from a JSON file."""
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
 
 
 def classify_key(key: str) -> int:
@@ -1197,14 +1062,12 @@ def generate_html(lang: str, translations: dict) -> str:
 
 
 def main():
-    if not INDEX_HTML.exists():
-        print(f"Error: {INDEX_HTML} not found")
+    if not TRANSLATIONS_FILE.exists():
+        print(f"Error: {TRANSLATIONS_FILE} not found")
         sys.exit(1)
 
-    html = INDEX_HTML.read_text(encoding="utf-8")
-    print(f"Read {len(html):,} characters from {INDEX_HTML.name}")
-
-    translations = parse_translations(html)
+    translations = load_translations(TRANSLATIONS_FILE)
+    print(f"Loaded translations from {TRANSLATIONS_FILE.relative_to(PROJECT_DIR)}")
     langs = [code for code in translations.keys() if code != "en"]
     en_keys = list(translations.get("en", {}).keys())
     print(f"Found {len(en_keys)} English keys, {len(langs)} target languages: {', '.join(sorted(langs))}")

@@ -33,54 +33,14 @@
         return null;
     }
 
-    async function extractObject(html, marker) {
-        const startIdx = html.indexOf(marker);
-        if (startIdx === -1) throw new Error(marker + ' not found in index.html');
-
-        const isArray = marker.trimEnd().endsWith('[');
-        const openChar = isArray ? '[' : '{';
-        const closeChar = isArray ? ']' : '}';
-
-        let braceCount = 0;
-        let objStart = html.indexOf(openChar, startIdx);
-        let i = objStart;
-        let inString = false;
-        let stringChar = '';
-        let escaped = false;
-
-        for (; i < html.length; i++) {
-            const ch = html[i];
-            if (escaped) { escaped = false; continue; }
-            if (ch === '\\') { escaped = true; continue; }
-            if (inString) {
-                if (ch === stringChar) inString = false;
-                continue;
-            }
-            if (ch === "'" || ch === '"' || ch === '`') {
-                inString = true;
-                stringChar = ch;
-                continue;
-            }
-            if (ch === openChar) braceCount++;
-            if (ch === closeChar) {
-                braceCount--;
-                if (braceCount === 0) break;
-            }
-        }
-
-        const objText = html.substring(objStart, i + 1);
-        return new Function('return ' + objText)();
-    }
-
     async function run() {
         const banner = document.getElementById('banner');
         const resultsDiv = document.getElementById('results');
 
         try {
-            const resp = await fetch('../index.html');
-            if (!resp.ok) throw new Error('Failed to fetch index.html: ' + resp.status);
-            const html = await resp.text();
-            const translations = await extractObject(html, 'const TRANSLATIONS = {');
+            const transResp = await fetch('../src/i18n/translations.json');
+            if (!transResp.ok) throw new Error('Failed to fetch translations.json: ' + transResp.status);
+            const translations = await transResp.json();
 
             const allLangs = Object.keys(translations);
             const enKeys = Object.keys(translations.en || {});

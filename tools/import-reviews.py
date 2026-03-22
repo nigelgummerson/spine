@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Import completed translation review JSON files and apply corrections to index.html.
+Import completed translation review JSON files and apply corrections to translations.json.
 
 Usage:
     python tools/import-reviews.py [review-file.json ...]         # Report only
-    python tools/import-reviews.py --apply [review-file.json ...]  # Apply corrections to index.html
+    python tools/import-reviews.py --apply [review-file.json ...]  # Apply corrections to translations.json
 
     If no files specified, processes all *-review-*.json files in review-forms/
 
 Outputs:
     - Console summary of corrections per language
     - review-forms/{lang}-corrections.txt — detailed correction report
-    - With --apply: updates TRANSLATIONS in index.html with corrected strings
+    - With --apply: updates translations.json with corrected strings
 """
 
 import json
@@ -21,7 +21,7 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_DIR = SCRIPT_DIR.parent
-INDEX_HTML = PROJECT_DIR / "index.html"
+TRANSLATIONS_FILE = PROJECT_DIR / "src" / "i18n" / "translations.json"
 REVIEW_DIR = PROJECT_DIR / "review-forms"
 
 
@@ -132,20 +132,15 @@ def write_correction_report(result: dict, output_dir: Path):
     return outfile
 
 
-def escape_js_single_quote(s: str) -> str:
-    """Escape a string for use inside single-quoted JS string literal."""
-    return s.replace("\\", "\\\\").replace("'", "\\'")
+def apply_corrections(corrections: list[dict], lang: str, translations: dict) -> int:
+    """Apply corrections to the translations dict.
 
-
-def apply_corrections(corrections: list[dict], lang: str, html: str) -> tuple[str, int]:
-    """Apply corrections to the TRANSLATIONS object in index.html.
-
-    For each correction, finds the exact line `'key': 'old_value'` within
-    the target language block and replaces the value.
-
-    Returns (updated_html, count_applied).
+    Returns count of corrections applied.
     """
     applied = 0
+
+    if lang not in translations:
+        return 0
 
     for item in corrections:
         key = item["key"]
@@ -155,68 +150,10 @@ def apply_corrections(corrections: list[dict], lang: str, html: str) -> tuple[st
         if original == corrected:
             continue
 
-        # Build the pattern to find this specific key-value pair.
-        # Match: 'key': 'original_value'  (with possible whitespace variations)
-        escaped_key = re.escape(escape_js_single_quote(key))
-        escaped_original = re.escape(escape_js_single_quote(original))
+        translations[lang][key] = corrected
+        applied += 1
 
-        pattern = (
-            rf"('{escaped_key}'\s*:\s*')"
-            rf"{escaped_original}"
-            rf"(')"
-        )
-
-        # We need to only match within the correct language block.
-        # Find the language block boundaries first.
-        lang_marker = re.search(rf"^\s+{lang}\s*:\s*\{{", html, re.MULTILINE)
-        if not lang_marker:
-            continue
-
-        lang_start = lang_marker.start()
-
-        # Find the end of this language block by brace matching
-        depth = 0
-        in_string = False
-        string_char = ""
-        escaped = False
-        lang_end = lang_start
-        found_open = False
-
-        for i in range(lang_start, len(html)):
-            ch = html[i]
-            if escaped:
-                escaped = False
-                continue
-            if ch == "\\":
-                escaped = True
-                continue
-            if in_string:
-                if ch == string_char:
-                    in_string = False
-                continue
-            if ch in ("'", '"'):
-                in_string = True
-                string_char = ch
-                continue
-            if ch == "{":
-                depth += 1
-                found_open = True
-            elif ch == "}":
-                depth -= 1
-                if found_open and depth == 0:
-                    lang_end = i + 1
-                    break
-
-        lang_block = html[lang_start:lang_end]
-
-        match = re.search(pattern, lang_block)
-        if match:
-            escaped_corrected = escape_js_single_quote(corrected)
-            new_block = lang_block[:match.start()] + match.group(1) + escaped_corrected + match.group(2) + lang_block[match.end():]
-            html = html[:lang_start] + new_block + html[lang_end:]
-            applied += 1
-
-    return html, applied
+    return applied
 
 
 def main():
@@ -237,8 +174,9 @@ def main():
             sys.exit(1)
 
     if apply_mode:
-        print(f"APPLY MODE — corrections will be written to {INDEX_HTML.name}\n")
-        html = INDEX_HTML.read_text(encoding="utf-8")
+        print(f"APPLY MODE — corrections will be written to {TRANSLATIONS_FILE.relative_to(PROJECT_DIR)}\n")
+        with open(TRANSLATIONS_FILE, encoding="utf-8") as f:
+            translations = json.load(f)
         total_applied = 0
     else:
         print(f"Processing {len(files)} review file(s)...\n")
@@ -284,21 +222,23 @@ def main():
             print(f"    Report:    {report_file.name}")
 
             if apply_mode:
-                html, applied = apply_corrections(result["corrected"], lang, html)
-                print(f"    Applied:   {applied}/{n_corrected} corrections to {INDEX_HTML.name}")
+                applied = apply_corrections(result["corrected"], lang, translations)
+                print(f"    Applied:   {applied}/{n_corrected} corrections to translations.json")
                 total_applied += applied
 
         print()
 
     if apply_mode and total_applied > 0:
-        INDEX_HTML.write_text(html, encoding="utf-8")
-        print(f"Wrote {total_applied} correction(s) to {INDEX_HTML.name}")
+        with open(TRANSLATIONS_FILE, "w", encoding="utf-8") as f:
+            json.dump(translations, f, ensure_ascii=False, indent=2)
+            f.write("\n")
+        print(f"Wrote {total_applied} correction(s) to {TRANSLATIONS_FILE.relative_to(PROJECT_DIR)}")
         print(f"Run 'python tools/generate-review-forms.py' to regenerate review forms with updated translations.")
     elif apply_mode:
         print("No corrections to apply.")
     elif len(files) > 1:
         print("Done. Correction reports written to review-forms/")
-        print("Re-run with --apply to write corrections to index.html.")
+        print("Re-run with --apply to write corrections to translations.json.")
 
 
 if __name__ == "__main__":

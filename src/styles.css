@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/* BASE STYLES */
+body { font-family: 'Inter', sans-serif; font-feature-settings: "tnum"; overflow: hidden; background-color: #f1f5f9; }
+.serif { font-family: 'Source Serif 4', serif; }
+.font-heading { font-family: 'Source Serif 4', serif; }
+.no-select { user-select: none; -webkit-user-select: none; }
+
+/* EXPORT CONTAINER */
+#export-container {
+    width: 1485px;
+    height: 1050px;
+    background: white;
+    margin: 0 auto;
+    display: flex;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    flex-shrink: 0;
+    transform-origin: top center;
+    position: relative;
+}
+
+/* EDITABLE FIELDS */
+.editable-field {
+    border-bottom: 1px dashed #cbd5e1;
+    min-width: 100px;
+    display: inline-block;
+    color: #334155;
+    padding: 2px 0;
+    outline: none;
+    cursor: text;
+    line-height: 1.4;
+}
+.editable-field:focus {
+    border-bottom: 1px solid #0f172a;
+    background-color: #f8fafc;
+    outline: 2px solid #3b82f6;
+    outline-offset: 1px;
+    border-radius: 2px;
+}
+.editable-field:empty:before {
+    content: attr(placeholder);
+    color: #6b7280;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
+/* Privacy Toggle Animation */
+.toggle-checkbox:checked {
+    right: 0;
+    border-color: #ef4444;
+}
+.toggle-checkbox:checked + .toggle-label {
+    background-color: #ef4444;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    background-color: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(2px);
+}
+
+/* Hide scrollbar inside export container */
+#export-container ::-webkit-scrollbar { display: none; }
+#export-container * { -ms-overflow-style: none; scrollbar-width: none; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-\[fadeIn_0\.2s_ease-out\], [class*="animate-"] { animation: none !important; }
+    .portrait-tab-content { transition: none !important; }
+    .transition-all, .transition-colors, .transition-transform { transition: none !important; }
+}
+
+/* PORTRAIT MODE */
+.portrait-toolbar ::-webkit-scrollbar { height: 4px; }
+.portrait-toolbar ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
+.portrait-tab-content { transition: transform 0.3s ease-out; }
+
+@media print {
+    .portrait-toolbar, .portrait-tabs { display: none !important; }
+}

@@ -15,46 +15,6 @@
     </div>
 
     <script>
-    async function extractObject(html, marker) {
-        const startIdx = html.indexOf(marker);
-        if (startIdx === -1) throw new Error(marker + ' not found in index.html');
-
-        let braceCount = 0;
-        const opener = marker.includes('[') ? null : '{';
-        const isArray = marker.trimEnd().endsWith('[');
-        const openChar = isArray ? '[' : '{';
-        const closeChar = isArray ? ']' : '}';
-
-        let objStart = html.indexOf(openChar, startIdx);
-        let i = objStart;
-        let inString = false;
-        let stringChar = '';
-        let escaped = false;
-
-        for (; i < html.length; i++) {
-            const ch = html[i];
-            if (escaped) { escaped = false; continue; }
-            if (ch === '\\') { escaped = true; continue; }
-            if (inString) {
-                if (ch === stringChar) inString = false;
-                continue;
-            }
-            if (ch === "'" || ch === '"' || ch === '`') {
-                inString = true;
-                stringChar = ch;
-                continue;
-            }
-            if (ch === openChar) braceCount++;
-            if (ch === closeChar) {
-                braceCount--;
-                if (braceCount === 0) break;
-            }
-        }
-
-        const objText = html.substring(objStart, i + 1);
-        return new Function('return ' + objText)();
-    }
-
     async function loadAllowlist() {
         try {
             const resp = await fetch('translation-glossary.json');
@@ -71,12 +31,15 @@
         const resultsDiv = document.getElementById('results');
 
         try {
-            const resp = await fetch('../index.html');
-            if (!resp.ok) throw new Error('Failed to fetch index.html: ' + resp.status);
-            const html = await resp.text();
+            const [transResp, langsResp] = await Promise.all([
+                fetch('../src/i18n/translations.json'),
+                fetch('../src/i18n/languages.json'),
+            ]);
+            if (!transResp.ok) throw new Error('Failed to fetch translations.json: ' + transResp.status);
+            if (!langsResp.ok) throw new Error('Failed to fetch languages.json: ' + langsResp.status);
 
-            const translations = await extractObject(html, 'const TRANSLATIONS = {');
-            const supportedLangs = await extractObject(html, 'const SUPPORTED_LANGUAGES = [');
+            const translations = await transResp.json();
+            const supportedLangs = await langsResp.json();
             const allowlist = await loadAllowlist();
 
             const langCodes = supportedLangs.map(l => l.code);

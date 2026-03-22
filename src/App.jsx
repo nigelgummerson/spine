@@ -1,0 +1,3128 @@
+import React, { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } from 'react';
+import * as htmlToImage from 'html-to-image';
+import { jsPDF } from 'jspdf';
+import { t, detectLanguage, getCurrentLang, setCurrentLang, SUPPORTED_LANGUAGES, LOCALE_MAP, LANG_ALIASES } from './i18n/i18n';
+
+// Unique ID generator — counter starts from timestamp to avoid collisions with saved data
+let _nextId = Date.now();
+const genId = () => ++_nextId;
+
+// ==========================================
+// ORIENTATION DETECTION
+// ==========================================
+const usePortrait = () => {
+    const [isPortrait, setIsPortrait] = useState(() => window.matchMedia('(orientation: portrait)').matches);
+    useEffect(() => {
+        const mql = window.matchMedia('(orientation: portrait)');
+        const handler = (e) => setIsPortrait(e.matches);
+        mql.addEventListener('change', handler);
+        return () => mql.removeEventListener('change', handler);
+    }, []);
+    return isPortrait;
+};
+
+// ==========================================
+// INTERNATIONALISATION (i18n)
+// ==========================================
+
+
+// ==========================================
+// SECTION 0: VERSION & CHANGE LOG
+// ==========================================
+
+const CURRENT_VERSION = "v2.0.3-beta";
+
+const CHANGE_LOG = [
+    { version: "v2.0.3-beta", date: "2026-03-22", changes: [
+        "Translation disclaimer now links to language-specific review form on GitHub Pages — reviewers always see the latest translations.",
+        "Review forms: persistent backup banner after first edit, 50% milestone prompt to download progress backup.",
+    ]},
+    { version: "v2.0.2-beta", date: "2026-03-22", changes: [
+        "Audit and correction of clinical translations across 14 languages — fixed Greek distraction/derotation terms and Polish surgical terminology.",
+        "Localized 'Ghost placements' to more idiomatic clinical terms (Phantomplatzierungen, Pozycje widmo, etc.).",
+        "Updated translation glossary and regenerated clinical review forms.",
+    ]},
+    { version: "v2.0.1-beta", date: "2026-03-21", changes: [
+        "Translated 8 hardcoded English UI strings across all 14 languages — rod inventory labels, cervical cage hint, osteotomy fallback, corpectomy label, sync tooltips, whole-spine button.",
+        "Fixed dual-window sync race condition — stale state no longer overwrites deletions. Incoming sync cancels pending outbound debounce.",
+        "One-implant-per-zone enforced at state level — rapid clicks can no longer create duplicates.",
+        "App version check on sync — mismatched versions block data exchange with a warning toast.",
+    ]},
+    { version: "v2.0.0-beta", date: "2026-03-21", changes: [
+        "JSON format v4 — spinal-instrumentation schema for clinical records, research, and data exchange. Structured screw sizes, typed elements, separated forces/rods, document metadata (UUID, timestamps), barcode-ready.",
+        "Apple HIG design overhaul — light sidebar with corporate brand accents (Medtronic, DePuy, Stryker, VB Spine, Globus). Osteotomy colour amber (red reserved for destructive actions). Uniform vertebral body fill.",
+        "Dual-window sync — BroadcastChannel for theatre dual displays. Export picker (Plan or Final Record). Export timestamp footer.",
+        "Osteotomies at correct anatomical level — Schwab 1-2 at disc level, Schwab 3+ on vertebral body. Optional correction angles.",
+        "Accessibility — WCAG contrast, toast notifications, modal focus trapping, prefers-reduced-motion, ARIA roles, 10px font floor, enlarged touch targets.",
+        "Sidebar and toolbar reordered by workflow frequency. Click inactive chart to switch editing side. Help modal two-column landscape. Linked Screens help entry.",
+        "Pedicle proportions at full anatomical scale with height-based vertical positioning.",
+    ]},
+    { version: "v1.1.0-beta", date: "2026-03-20", changes: [
+        "Portrait/tablet mode — responsive layout detects screen orientation. Toolbar, tab-based columns, swipe gestures. View-only on phones (<600px).",
+        "Internationalisation — 14 European languages with auto-detection. Clinical terminology verified against national spine society glossaries.",
+        "Renamed to Spinal Instrumentation Plan & Record.",
+        "3 new colour schemes (Forest Green, Teal & Coral, Steel & Ice). Theme picker redesigned as colour swatches.",
+    ]},
+    { version: "v0.9.7-beta", date: "2026-03-14", changes: [
+        "Rod fields added to Plan side with length estimate placeholders.",
+        "Rods section added to inventory.",
+    ]},
+    { version: "v0.9.6-beta", date: "2026-03-04", changes: [
+        "Note tool — level-anchored text annotations with optional arrow, draggable positioning, preset label chips.",
+        "Sidebar reorganised: Implants and Annotations categories.",
+    ]},
+    { version: "v0.9.5-beta", date: "2026-03-03", changes: [
+        "Fixed duplicate ID generation and hover jitter on implant icons.",
+    ]},
+    { version: "v0.9.3-alpha", date: "2026-03-01", changes: [
+        "Data-driven vertebral body proportions (T1-S1) from X-ray calibration data.",
+        "Pixel-perfect PDF/JPG export via html-to-image (replacing html2canvas).",
+        "Hooks (5 types), bands/wires/cables, screw annotations, osteotomy reconstruction cages, bone graft section.",
+        "Keyboard shortcuts in all modals (Enter/Escape/Delete).",
+        "7 colour themes. JSON format v3 with plan/construct separation.",
+    ]},
+    { version: "v0.8.0-alpha", date: "2026-02-28", changes: [
+        "Sidebar-only UI — all controls moved from header to sidebar.",
+        "16 implant manufacturers with auto-theme switching.",
+        "Cage permissibility by surgical approach and anatomical level.",
+        "Draggable crosslinks, auto-scaling views, Inter font throughout.",
+    ]},
+    { version: "v0.7.0-alpha", date: "2025-12-05", changes: [
+        "Interbody cage support with disc zones and corpectomy tool.",
+        "Strict cage permissibility logic. T10-Pelvis view mode.",
+    ]},
+    { version: "v0.5.6-alpha", date: "2025-12-04", changes: [
+        "Initial release with isotropic scaling.",
+    ]}
+];
+
+const BONE_GRAFT_OPTIONS = [
+    'Local Bone', 'Autograft', 'Allograft',
+    'Synthetics', 'DBM', 'BMP' // DBM, BMP — international abbreviations, not translated
+];
+
+const BONE_GRAFT_LABEL_KEYS = {
+    'Local Bone': 'clinical.bone_graft.local_bone',
+    'Autograft': 'clinical.bone_graft.autograft',
+    'Allograft': 'clinical.bone_graft.allograft',
+    'Synthetics': 'clinical.bone_graft.synthetics',
+};
+
+const IMPLANT_COMPANIES = [
+    'Medtronic', 'DePuy Synthes', 'Globus Medical', 'Stryker', 'VB Spine',
+    'Zimmer Biomet', 'Orthofix', 'ATEC Spine', 'SI-BONE', 'Aesculap (B. Braun)',
+    'ulrich medical', 'SpineGuard', 'Spinal Elements', 'Life Spine', 'Aurora Spine', 'Precision Spine'
+];
+
+const SCREW_SYSTEMS = {
+    'Medtronic': ['ModuLeX', 'Solera', 'Solera Voyager', 'Infinity OCT', 'VERTEX SELECT', 'TSRH'],
+    'DePuy Synthes': ['TriALTIS', 'EXPEDIUM VERSE', 'EXPEDIUM', 'VIPER PRIME', 'VIPER 2 MIS', 'ALTALYNE', 'MATRIX', 'SYMPHONY OCT'],
+    'Globus Medical': ['CREO', 'CREO MIS', 'REVERE', 'REVOLVE', 'Reline', 'Reline 3D', 'Armada', 'Precept'],
+    'Stryker': ['Serrato', 'MESA 2', 'MESA Rail', 'Xia 3', 'DENALI', 'ES2', 'Everest', 'CASPIAN OCT'],
+    'VB Spine': ['Serrato', 'MESA 2', 'MESA Rail', 'Xia 3', 'DENALI', 'DENALI MI', 'ES2', 'Everest', 'OASYS', 'CASPIAN OCT', 'YUKON OCT'],
+    'Zimmer Biomet': ['Vital', 'Vitality', 'Polaris', 'Sequoia', 'PathFinder NXT', 'Cypher MIS', 'Virage OCT'],
+    'Orthofix': ['Firebird', 'Firebird NXG', 'Phoenix MIS', 'Mariner', 'NorthStar OCT'],
+    'ATEC Spine': ['InVictus', 'InVictus OCT', 'Arsenal', 'Zodiac'],
+    'SI-BONE': ['iFuse', 'iFuse-TORQ', 'iFuse Bedrock'],
+    'Aesculap (B. Braun)': ['S4', 'Ennovate'],
+    'ulrich medical': ['neon3', 'tango RS', 'uCentum', 'Momentum', 'flamenco'],
+    'Spinal Elements': ['Overwatch', 'Mercury', 'Lotus', 'Karma'],
+    'Life Spine': ['CENTERLINE', 'Solstice OCT'],
+    'Aurora Spine': ['ZIP', 'DEXA-C'],
+    'Precision Spine': ['SureLOK', 'Reform'],
+};
+
+// Light sidebar = Apple-style light chrome with colour accent
+// Dark sidebar = dark mode variant for preference
+// textPrimary/textSecondary/textMuted control sidebar text colours
+// btnBg/btnBorder control inactive button backgrounds
+const _light = { textPrimary: '#1d1d1f', textSecondary: 'rgba(0,0,0,0.55)', textMuted: 'rgba(0,0,0,0.35)', btnBg: 'rgba(0,0,0,0.06)', btnBorder: 'rgba(0,0,0,0.1)', hoverBg: 'rgba(0,0,0,0.08)', titleText: '#1d1d1f' };
+const _dark  = { textPrimary: '#FFFFFF', textSecondary: 'rgba(255,255,255,0.7)', textMuted: 'rgba(255,255,255,0.5)', btnBg: 'rgba(255,255,255,0.12)', btnBorder: 'rgba(255,255,255,0.25)', hoverBg: 'rgba(255,255,255,0.15)', titleText: '#FFFFFF' };
+const COLOUR_SCHEMES = [
+    // --- Corporate themes (light sidebar, real brand colours) ---
+    { id: 'default', label: 'Default',        sidebarBg: '#f5f5f7', sidebarBorder: '#d1d1d6', sidebarTitleBg: '#e8e8ed', activeBg: '#005EB8', activeBorder: '#003087', activeText: '#FFFFFF', accent: '#005EB8', swatch: '#005EB8', ..._light },
+    { id: 'navy',    label: 'Medtronic',       sidebarBg: '#f5f5f7', sidebarBorder: '#d1d1d6', sidebarTitleBg: '#140F4B', activeBg: '#1010EB', activeBorder: '#140F4B', activeText: '#FFFFFF', accent: '#1010EB', swatch: '#140F4B', ..._light, titleText: '#FFFFFF' },
+    { id: 'red',     label: 'DePuy Synthes',   sidebarBg: '#f5f5f7', sidebarBorder: '#d1d1d6', sidebarTitleBg: '#A01000', activeBg: '#D71600', activeBorder: '#A01000', activeText: '#FFFFFF', accent: '#D71600', swatch: '#D71600', ..._light, titleText: '#FFFFFF' },
+    { id: 'gold',    label: 'Stryker',         sidebarBg: '#f5f5f7', sidebarBorder: '#d1d1d6', sidebarTitleBg: '#1a1a1a', activeBg: '#FFB600', activeBorder: '#CC9200', activeText: '#000000', accent: '#FFB600', swatch: '#FFB600', ..._light, titleText: '#FFFFFF' },
+    { id: 'purple',  label: 'VB Spine',        sidebarBg: '#f5f5f7', sidebarBorder: '#d1d1d6', sidebarTitleBg: '#4A2570', activeBg: '#663399', activeBorder: '#4A2570', activeText: '#FFFFFF', accent: '#663399', swatch: '#663399', ..._light, titleText: '#FFFFFF' },
+    { id: 'midnight',label: 'Globus Medical',  sidebarBg: '#f5f5f7', sidebarBorder: '#d1d1d6', sidebarTitleBg: '#001D4A', activeBg: '#CF2E2E', activeBorder: '#001D4A', activeText: '#FFFFFF', accent: '#CF2E2E', swatch: '#002F73', ..._light, titleText: '#FFFFFF' },
+    // --- Non-corporate themes (dark sidebar) ---
+    { id: 'dark',    label: 'Dark',            sidebarBg: '#1c1c1e', sidebarBorder: '#38383a', sidebarTitleBg: '#141414', activeBg: '#0a84ff', activeBorder: '#0070e0', activeText: '#FFFFFF', accent: '#0a84ff', swatch: '#1c1c1e', ..._dark },
+    { id: 'forest',  label: 'Forest',          sidebarBg: '#1c1c1e', sidebarBorder: '#38383a', sidebarTitleBg: '#141414', activeBg: '#059669', activeBorder: '#047857', activeText: '#FFFFFF', accent: '#059669', swatch: '#059669', ..._dark },
+    { id: 'teal',    label: 'Coral',            sidebarBg: '#1c1c1e', sidebarBorder: '#38383a', sidebarTitleBg: '#141414', activeBg: '#f97316', activeBorder: '#ea580c', activeText: '#1c1c1e', accent: '#f97316', swatch: '#f97316', ..._dark },
+    { id: 'steel',   label: 'Ice',              sidebarBg: '#1c1c1e', sidebarBorder: '#38383a', sidebarTitleBg: '#141414', activeBg: '#38bdf8', activeBorder: '#0ea5e9', activeText: '#1c1c1e', accent: '#38bdf8', swatch: '#38bdf8', ..._dark },
+];
+
+// Set to false to disable automatic theme switching when a company is selected
+const AUTO_THEME_FROM_COMPANY = true;
+
+const COMPANY_THEME_MAP = {
+    'Medtronic': 'navy',
+    'DePuy Synthes': 'red',
+    'Stryker': 'gold',
+    'VB Spine': 'purple',
+    'Globus Medical': 'midnight',
+};
+
+const DIAMETER_OPTIONS = [];
+for (let i = 3.5; i <= 10.5; i += 0.5) DIAMETER_OPTIONS.push(i.toFixed(1));
+
+const LENGTH_OPTIONS = [];
+for (let i = 10; i <= 35; i++) LENGTH_OPTIONS.push(i);
+for (let i = 40; i <= 100; i += 5) LENGTH_OPTIONS.push(i);
+
+const CAGE_PERMISSIBILITY = {
+  acdf: ['C2','C3','C4','C5','C6','C7'],
+  plif: ['T11','T12','L1','L2','L3','L4','L5'],
+  tlif: ['T11','T12','L1','L2','L3','L4','L5'],
+  xlif: ['T5','T6','T7','T8','T9','T10','T11','T12','L1','L2','L3','L4'],
+  olif: ['T12','L1','L2','L3','L4'],
+  alif: ['L4','L5'],
+};
+
+const HOOK_TYPES = ['pedicle_hook','tp_hook','tp_hook_up','sl_hook','il_hook'];
+const NO_SIZE_TYPES = [...HOOK_TYPES, 'band', 'wire', 'cable'];
+
+const NOTE_PRESET_KEYS = [
+    'clinical.note.last_visible_rib', 'clinical.note.end_vertebra', 'clinical.note.apex',
+    'clinical.note.transitional_level', 'clinical.note.stable_vertebra', 'clinical.note.neutral_vertebra'
+];
+
+const CAGE_TYPES = [ // International abbreviations — not translated
+  { id: 'acdf', label: 'ACDF', descKey: 'clinical.cage.acdf.desc', approach: 'anterior', defaultSide: 'left', sideOptions: ['left','right'], defaults: { height:'6', width:'16', length:'14', lordosis:'0' } },
+  { id: 'plif', label: 'PLIF', descKey: 'clinical.cage.plif.desc', approach: 'posterior', defaultSide: 'bilateral', sideOptions: null, defaults: { height:'10', width:'10', length:'25', lordosis:'0' } },
+  { id: 'tlif', label: 'TLIF', descKey: 'clinical.cage.tlif.desc', approach: 'posterior', defaultSide: 'left', sideOptions: ['left','right'], defaults: { height:'10', width:'10', length:'30', lordosis:'0' } },
+  { id: 'xlif', label: 'XLIF/LLIF', descKey: 'clinical.cage.xlif.desc', approach: 'lateral', defaultSide: 'left', sideOptions: ['left','right'], defaults: { height:'10', width:'18', length:'50', lordosis:'0' } },
+  { id: 'olif', label: 'OLIF', descKey: 'clinical.cage.olif.desc', approach: 'lateral', defaultSide: 'left', sideOptions: ['left','right'], defaults: { height:'10', width:'18', length:'45', lordosis:'0' } },
+  { id: 'alif', label: 'ALIF', descKey: 'clinical.cage.alif.desc', approach: 'anterior', defaultSide: 'midline', sideOptions: null, defaults: { height:'12', width:'35', length:'25', lordosis:'10' } },
+];
+
+const APPROACH_GROUPS = [
+  { labelKey: 'clinical.approach.posterior', descKey: 'clinical.approach.posterior.desc', types: ['plif','tlif'] },
+  { labelKey: 'clinical.approach.anterior', descKey: 'clinical.approach.anterior.desc', types: ['acdf','alif'] },
+  { labelKey: 'clinical.approach.lateral', descKey: 'clinical.approach.lateral.desc', types: ['xlif','olif'] },
+];
+
+const getDiscLabel = (levelId, levels) => {
+  const idx = levels.findIndex(l => l.id === levelId);
+  const nextLevel = idx >= 0 && idx < levels.length - 1 ? levels[idx + 1] : null;
+  if (!nextLevel) return levelId;
+  const nextNum = nextLevel.id.replace(/^[A-Z]+/, '');
+  return `${levelId}/${nextNum}`;
+};
+
+// ==========================================
+// SECTION 1: ICONS & ASSETS
+// ==========================================
+const IconTrash = () => (<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>);
+const IconDownload = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>);
+const IconImage = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>);
+const IconCopy = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>);
+const IconUpload = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>);
+const IconSave = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>);
+const IconCC = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10.8 9.5a2.5 2.5 0 0 0-1.3-.8"/><path d="M9.5 9.5c-.8.5-1.5 1.5-1.5 2.5s.7 2 1.5 2.5"/><path d="M14.2 9.5a2.5 2.5 0 0 0-1.3-.8"/><path d="M12.9 9.5c-.8.5-1.5 1.5-1.5 2.5s.7 2 1.5 2.5"/></svg>);
+const IconX = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>);
+const IconPDF = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>);
+const IconHelp = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>);
+const IconLink = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>);
+const IconHistory = () => (<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>);
+const IconCardinal = () => (<svg viewBox="0 0 24 24" className="w-5 h-5 opacity-40 hover:opacity-100 transition-opacity text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/><path d="M8 7l4-4 4 4"/><path d="M8 17l4 4 4-4"/><path d="M17 8l4 4-4 4"/><path d="M7 8l-4 4 4 4"/></svg>);
+
+// ==========================================
+// SECTION 2: UI COMPONENTS & MODALS
+// ==========================================
+
+const formatDate = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return isoString;
+    return date.toLocaleDateString(LOCALE_MAP[getCurrentLang()] || 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+};
+
+const ChangeLogModal = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onClick={onClose} onKeyDown={e => e.key === 'Escape' && onClose()} ref={el => el && el.focus()}>
+            <div className="bg-white rounded-lg shadow-2xl w-full overflow-hidden flex flex-col max-h-[80vh]" style={{ maxWidth: window.matchMedia('(orientation: landscape)').matches ? '48rem' : '32rem', outline: 'none' }} onClick={e => e.stopPropagation()}>
+                <div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm flex items-center gap-2"><IconHistory/> {t('modal.changelog.title')}</h3><button onClick={onClose} className="hover:text-slate-300"><IconX /></button></div>
+                <div className="p-0 overflow-y-auto flex-1">
+                    {CHANGE_LOG.map((log, i) => (
+                        <div key={i} className={`p-4 border-b border-slate-100 ${i===0 ? 'bg-amber-50/50' : ''}`}>
+                            <div className="flex justify-between items-baseline mb-2"><span className="font-bold text-slate-800 text-sm">{log.version}</span><span className="text-[10px] text-slate-400 font-mono">{log.date}</span></div>
+                            <ul className="list-disc list-inside text-xs text-slate-600 space-y-1">{log.changes.map((c, j) => <li key={j}>{c}</li>)}</ul>
+                        </div>
+                    ))}
+                </div>
+                <div className="bg-slate-50 px-4 py-3 text-right border-t border-slate-200"><button onClick={onClose} className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold">{t('button.close')}</button></div>
+            </div>
+        </div>
+    );
+};
+
+const IconCage = () => (
+    <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none">
+        <rect x="4" y="10" width="24" height="12" rx="3" fill="#0ea5e9" opacity="0.25" stroke="#0284c7" strokeWidth="1.5"/>
+        <rect x="7" y="13" width="7" height="6" rx="1" fill="#0284c7" opacity="0.9"/>
+        <rect x="18" y="13" width="7" height="6" rx="1" fill="#0284c7" opacity="0.9"/>
+        <line x1="16" y1="12" x2="16" y2="20" stroke="#0284c7" strokeWidth="1" strokeDasharray="2 1"/>
+    </svg>
+);
+
+const HelpModal = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onClick={onClose} onKeyDown={e => e.key === 'Escape' && onClose()} ref={el => el && el.focus()}>
+            <div className="bg-white rounded-lg shadow-2xl w-full overflow-hidden flex flex-col max-h-[85vh]" style={{ maxWidth: window.matchMedia('(orientation: landscape)').matches ? '48rem' : '32rem', outline: 'none' }} onClick={e => e.stopPropagation()}>
+                <div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center">
+                    <h3 className="font-bold text-sm">{t('help.title')}</h3>
+                    <button onClick={onClose} className="hover:text-slate-300"><IconX /></button>
+                </div>
+                <div className="p-6 space-y-4 overflow-y-auto flex-1" style={{ columns: window.matchMedia('(orientation: landscape)').matches ? 2 : 1, columnGap: '24px' }}>
+                    <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
+                        <div className="min-w-[40px] pt-1"><div className="w-8 h-4 rounded-full border border-red-500 bg-white relative"><div className="absolute right-0 top-0 w-3.5 h-3.5 bg-red-500 rounded-full"></div></div></div>
+                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.session_privacy.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.session_privacy.body')}} /></div>
+                    </div>
+                    <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
+                        <div className="min-w-[40px] pt-1"><InstrumentIcon type="polyaxial" className="w-6 h-6" /></div>
+                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.screws_hooks.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.screws_hooks.body')}} /></div>
+                    </div>
+                    <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
+                        <div className="min-w-[40px] pt-1"><IconCage /></div>
+                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.cages.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.cages.body')}} /></div>
+                    </div>
+                    <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
+                        <div className="min-w-[40px] pt-1"><InstrumentIcon type="osteotomy" className="w-6 h-6" /></div>
+                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.osteotomies.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.osteotomies.body')}} /></div>
+                    </div>
+                    <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
+                        <div className="min-w-[40px] pt-1"><div className="bg-slate-700 text-white px-2 py-1 rounded text-[10px] font-bold inline-block"><IconCopy /></div></div>
+                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.copy_plan.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.copy_plan.body')}} /></div>
+                    </div>
+                    <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
+                        <div className="min-w-[40px] pt-1 text-center text-lg">📱</div>
+                        <div>
+                            <h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.portrait_mode.title')}</h4>
+                            <p className="text-slate-600 text-xs leading-relaxed" dangerouslySetInnerHTML={{ __html: t('help.portrait_mode.body') }} />
+                        </div>
+                    </div>
+                    <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
+                        <div className="min-w-[40px] pt-1"><IconSave /></div>
+                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.save_load.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.save_load.body')}} /></div>
+                    </div>
+                    <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
+                        <div className="min-w-[40px] pt-1"><IconLink /></div>
+                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.linked_screens.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.linked_screens.body')}} /></div>
+                    </div>
+                    <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
+                        <div className="min-w-[40px] pt-1"><span className="text-lg">&#x2328;</span></div>
+                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.shortcuts.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.shortcuts.body')}} /></div>
+                    </div>
+                    <div className="border-t border-slate-200 pt-4 mt-2" style={{ breakInside: 'avoid', columnSpan: 'all' }}>
+                        <p className="text-xs text-slate-700 leading-relaxed">
+                            <span className="font-bold text-slate-900">{t('credits.app_name')}</span> {CURRENT_VERSION}<br/>
+                            {t('credits.developer')} <span className="font-bold">{t('credits.developer_name')}</span><br/>
+                            {/* Statement of origin — not translated */}Designed in Leeds · Yorkshire · England
+                        </p>
+                        <div className="flex items-start gap-1 text-[10px] text-slate-400 leading-tight mt-2">
+                            <div className="mt-0.5 shrink-0"><IconCC /></div>
+                            <span dangerouslySetInnerHTML={{__html: t('credits.license')}} />
+                        </div>
+                        <p className="text-[10px] text-slate-400 mt-2"><a href="https://nigelgummerson.github.io/spine-planner/quick-reference.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600">{t('credits.quick_reference')}</a></p>
+                    </div>
+                </div>
+                <div className="bg-slate-50 px-4 py-3 text-right border-t border-slate-200">
+                    <button onClick={onClose} className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold">{t('button.close')}</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Shared keyboard handler factory for modals (used via onKeyDown on overlay div)
+// Enter/Escape work from anywhere (including text fields); Delete/Backspace only trigger
+// implant deletion when NOT in a text field (so typing in annotation fields works normally)
+const modalKeyHandler = ({ onSubmit, onClose, onDelete, isEditing }) => (e) => {
+    const tag = e.target.tagName;
+    const inTextField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+    if (e.key === 'Enter') { e.preventDefault(); onSubmit(); }
+    else if (e.key === 'Escape') { e.preventDefault(); onClose(); }
+    else if (!inTextField && (e.key === 'Delete' || e.key === 'Backspace') && isEditing && onDelete) { e.preventDefault(); onDelete(); }
+    else if (e.key === 'Tab') {
+        e.preventDefault();
+        const modal = e.currentTarget;
+        const focusable = Array.from(modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+        if (focusable.length === 0) return;
+        const idx = focusable.indexOf(document.activeElement);
+        const next = e.shiftKey
+            ? (idx <= 0 ? focusable.length - 1 : idx - 1)
+            : (idx >= focusable.length - 1 ? 0 : idx + 1);
+        focusable[next].focus();
+    }
+};
+
+const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation }) => {
+    if (!isOpen) return null;
+    const [mode, setMode] = useState(defaultMode || 'standard');
+    const [diameter, setDiameter] = useState(defaultDiameter);
+    const [length, setLength] = useState(defaultLength);
+    const [customText, setCustomText] = useState(defaultCustomText || '');
+    const [selectedType, setSelectedType] = useState(initialTool || 'polyaxial');
+    const [annotation, setAnnotation] = useState(initialAnnotation || '');
+    const [fixationText, setFixationText] = useState('');
+    const isHookOnly = HOOK_TYPES.includes(selectedType);
+    const isFixation = ['band','wire','cable'].includes(selectedType);
+    const isHook = isHookOnly || isFixation;
+
+    useEffect(() => {
+        if (isOpen) {
+            if (initialTool) setSelectedType(initialTool);
+            if (initialData && typeof initialData === 'string') {
+                 if (initialData === "Custom") { setMode('custom'); setCustomText(defaultCustomText || ''); }
+                 else if (initialData.includes('x')) { const parts = initialData.split('x'); if (parts.length === 2) { setMode('standard'); setDiameter(parts[0]); setLength(parts[1]); } else { setMode('custom'); setCustomText(initialData); } }
+                 else { setMode(defaultMode || 'standard'); }
+            } else if (initialData === null && initialData !== undefined) { setMode('none'); }
+            else { setMode(defaultMode || 'standard'); setDiameter(defaultDiameter); setLength(defaultLength); setCustomText(defaultCustomText || ''); }
+            setAnnotation(initialAnnotation || '');
+            setFixationText((initialData && typeof initialData === 'string' && ['band','wire','cable'].includes(initialTool)) ? initialData : '');
+        }
+    }, [isOpen, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation]);
+
+    const handleSubmit = () => {
+        let finalSize = null;
+        if (isHookOnly) { finalSize = null; }
+        else if (isFixation) { finalSize = fixationText || null; }
+        else if (mode === 'custom') finalSize = customText || "Custom";
+        else if (mode === 'standard') finalSize = `${diameter}x${length}`;
+        onConfirm(
+            finalSize,
+            (isHookOnly || isFixation) ? null : { diameter, length, mode, customText },
+            selectedType,
+            annotation
+        );
+        onClose();
+    };
+    const isScrew = ['monoaxial','polyaxial','uniplanar'].includes(selectedType);
+    const isEditing = initialData !== undefined;
+    const hookLabels = { pedicle_hook: t('clinical.hook.pedicle_hook'), tp_hook: t('clinical.hook.tp_hook'), tp_hook_up: t('clinical.hook.tp_hook_up'), sl_hook: t('clinical.hook.sl_hook'), il_hook: t('clinical.hook.il_hook') };
+    const modalRef = useRef(null);
+    useEffect(() => { if (modalRef.current) modalRef.current.focus(); }, []);
+
+    return (
+        <div ref={modalRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
+            <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
+                <div className="bg-slate-900 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{isEditing ? t('modal.screw.title_edit') : t('modal.screw.title_new')}</h3><button onClick={onClose} className="hover:text-red-400"><IconX /></button></div>
+                <div className="p-6">
+                    <div className="bg-slate-100 p-1 rounded mb-2">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1 mb-0.5">{t('modal.screw.section_screws')}</div>
+                        <div className="grid grid-cols-3 gap-1">{['monoaxial', 'polyaxial', 'uniplanar'].map(typ => (<button key={typ} onClick={() => setSelectedType(typ)} className={`py-2.5 px-1 text-[10px] font-bold uppercase rounded transition-all flex flex-col items-center gap-1 ${selectedType === typ ? 'bg-white shadow text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}><InstrumentIcon type={typ} className="w-6 h-6" color={selectedType === typ ? '#0f172a' : '#94a3b8'} />{t('clinical.screw.' + typ + '.short')}</button>))}</div>
+                    </div>
+                    <div className="bg-slate-100 p-1 rounded mb-1">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1 mb-0.5">{t('modal.screw.section_hooks')}</div>
+                        <div className="grid grid-cols-5 gap-0.5">{HOOK_TYPES.map(typ => (<button key={typ} onClick={() => setSelectedType(typ)} className={`py-1.5 px-0.5 text-[10px] font-bold uppercase rounded transition-all flex flex-col items-center gap-0.5 ${selectedType === typ ? 'bg-white shadow text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}><InstrumentIcon type={typ} className="w-4 h-4" color={selectedType === typ ? '#0f172a' : '#94a3b8'} />{hookLabels[typ]}</button>))}</div>
+                    </div>
+                    <div className="bg-slate-50 p-0.5 rounded mb-5">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1 mb-0.5">{t('modal.screw.section_bands')}</div>
+                        <div className="grid grid-cols-3 gap-0.5">{['band', 'wire', 'cable'].map(typ => (<button key={typ} onClick={() => setSelectedType(typ)} className={`py-1 px-0.5 text-[10px] font-bold uppercase rounded transition-all ${selectedType === typ ? 'bg-white shadow text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}>{t('clinical.fixation.' + typ)}</button>))}</div>
+                    </div>
+                    {isHookOnly ? (
+                        <div className="text-center py-4 text-slate-400 text-xs italic">{t('modal.screw.hook_no_sizing')}</div>
+                    ) : isFixation ? (
+                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.screw.description')}</label><input type="text" value={fixationText} onChange={(e) => setFixationText(e.target.value)} placeholder={t('modal.screw.description_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-amber-500 outline-none" autoFocus /></div>
+                    ) : (<>
+                        <div className="flex gap-2 mb-4">{['standard','custom','none'].map(m => { const labels = { standard: t('modal.screw.mode_standard'), custom: t('modal.screw.mode_custom'), none: t('modal.screw.mode_none') }; const active = mode === m; return <button key={m} onClick={() => setMode(m)} className={`flex-1 py-1 text-xs font-bold rounded border transition-all ${active ? 'bg-amber-500 text-slate-900 border-amber-600' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>{labels[m]}</button>; })}</div>
+                        {mode === 'standard' && (<div className="space-y-4"><div className="grid grid-cols-4 gap-2"><select value={diameter} onChange={(e) => setDiameter(e.target.value)} className="col-span-4 w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{DIAMETER_OPTIONS.map(d => <option key={d} value={d}>{d} mm</option>)}</select></div><select value={length} onChange={(e) => setLength(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{LENGTH_OPTIONS.map(l => <option key={l} value={l}>{l} mm</option>)}</select></div>)}
+                        {mode === 'custom' && <input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} placeholder={t('modal.screw.custom_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg focus:border-amber-500 outline-none" autoFocus />}
+                        {mode === 'none' && <div className="text-center py-6 text-slate-400 text-sm italic">{t('modal.screw.icon_only')}</div>}
+                    </>)}
+                    {(isScrew || isHookOnly) && <div className="mt-3"><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.screw.annotation')}</label><input type="text" value={annotation} onChange={(e) => setAnnotation(e.target.value)} placeholder={t('modal.screw.annotation_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-amber-500 outline-none" /></div>}
+                </div>
+                <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center" title={t('shortcut.delete')}><IconTrash/> {t('button.remove')}</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title={t('shortcut.escape')}>{t('button.cancel')}</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg" title={t('shortcut.enter')}>{t('button.confirm')}</button></div></div>
+            </div>
+        </div>
+    );
+};
+
+// --- CAGE MODAL (with approach grouping, permissibility, side selector) ---
+const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, levelId, levels }) => {
+    if (!isOpen) return null;
+
+    // Determine smart default type for this level
+    const getDefaultType = (lvl) => {
+        if (!lvl) return 'tlif';
+        if (lvl.startsWith('C')) return 'acdf';
+        if (lvl === 'T11' || lvl === 'T12') return 'xlif';
+        if (lvl === 'L1' || lvl === 'L2' || lvl === 'L3') return 'xlif';
+        if (lvl === 'L4') return 'tlif';
+        if (lvl === 'L5') return 'alif';
+        return 'tlif';
+    };
+
+    const permittedTypes = CAGE_TYPES.filter(ct => (CAGE_PERMISSIBILITY[ct.id] || []).includes(levelId));
+
+    const initType = initialData ? initialData.tool : getDefaultType(levelId);
+    // If initType isn't permitted, fall back to first permitted
+    const safeInitType = permittedTypes.find(ct => ct.id === initType) ? initType : (permittedTypes[0]?.id || 'tlif');
+    const initDef = CAGE_TYPES.find(ct => ct.id === safeInitType);
+
+    const [type, setType] = useState(safeInitType);
+    const [height, setHeight] = useState(initialData?.data?.height || initDef?.defaults?.height || '10');
+    const [width, setWidth] = useState(initialData?.data?.width || initDef?.defaults?.width || '10');
+    const [length, setLength] = useState(initialData?.data?.length || initDef?.defaults?.length || '25');
+    const [lordosis, setLordosis] = useState(initialData?.data?.lordosis || initDef?.defaults?.lordosis || '0');
+    const [side, setSide] = useState(initialData?.data?.side || initDef?.defaultSide || 'left');
+
+    useEffect(() => {
+        if (isOpen) {
+            if (initialData) {
+                setType(initialData.tool);
+                setHeight(initialData.data.height || '10');
+                setWidth(initialData.data.width || '10');
+                setLength(initialData.data.length || '25');
+                setLordosis(initialData.data.lordosis || '0');
+                setSide(initialData.data.side || CAGE_TYPES.find(ct => ct.id === initialData.tool)?.defaultSide || 'left');
+            } else {
+                const def = CAGE_TYPES.find(ct => ct.id === safeInitType);
+                setType(safeInitType);
+                if (def) {
+                    setHeight(def.defaults.height);
+                    setWidth(def.defaults.width);
+                    setLength(def.defaults.length);
+                    setLordosis(def.defaults.lordosis);
+                    setSide(def.defaultSide);
+                }
+            }
+        }
+    }, [isOpen, initialData]);
+
+    const handleTypeChange = (newType) => {
+        setType(newType);
+        const def = CAGE_TYPES.find(ct => ct.id === newType);
+        if (def) {
+            setHeight(def.defaults.height);
+            setWidth(def.defaults.width);
+            setLength(def.defaults.length);
+            setLordosis(def.defaults.lordosis);
+            setSide(def.defaultSide);
+        }
+    };
+
+    const selectedDef = CAGE_TYPES.find(ct => ct.id === type);
+    const discLabel = levels ? getDiscLabel(levelId, levels) : levelId;
+
+    const handleSubmit = () => {
+        onConfirm({ type, height, width, length, lordosis, side });
+        onClose();
+    };
+    const cageRef = useRef(null);
+    useEffect(() => { if (cageRef.current) cageRef.current.focus(); }, []);
+
+    return (
+        <div ref={cageRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing: !!initialData })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
+            <div className="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden">
+                <div className="bg-sky-800 text-white px-4 py-3 flex justify-between items-center">
+                    <h3 className="font-bold text-sm">{initialData ? t('modal.cage.title_edit') : t('modal.cage.title_new')} — {discLabel}</h3>
+                    <button onClick={onClose} className="hover:text-sky-200"><IconX /></button>
+                </div>
+                <div className="p-5 space-y-4">
+                    {/* Approach groups */}
+                    {APPROACH_GROUPS.map(group => {
+                        const permittedInGroup = group.types
+                            .map(id => CAGE_TYPES.find(ct => ct.id === id))
+                            .filter(ct => ct && (CAGE_PERMISSIBILITY[ct.id] || []).includes(levelId));
+                        if (permittedInGroup.length === 0) return null;
+                        return (
+                            <div key={group.labelKey}>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{t(group.labelKey)} <span className="font-normal normal-case">— {t(group.descKey)}</span></div>
+                                <div className="flex gap-1.5">
+                                    {permittedInGroup.map(ct => (
+                                        <button key={ct.id} onClick={() => handleTypeChange(ct.id)}
+                                            className={`flex-1 py-2 px-2 rounded border text-xs font-bold transition-all ${
+                                                type === ct.id ? 'bg-sky-700 text-white border-sky-800 shadow' :
+                                                'bg-slate-50 text-slate-700 border-slate-200 hover:bg-sky-50 hover:border-sky-300'
+                                            }`}>
+                                            <div>{ct.label}</div>
+                                            <div className={`text-[10px] font-normal mt-0.5 ${type === ct.id ? 'text-sky-200' : 'text-slate-400'}`}>{t(ct.descKey).split(' ').slice(0,2).join(' ')}</div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+
+                    {/* Side selector (for types with sideOptions) */}
+                    {selectedDef?.sideOptions && (
+                        <div>
+                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.side')}</label>
+                            <div className="flex gap-1">
+                                {selectedDef.sideOptions.map(s => (
+                                    <button key={s} onClick={() => setSide(s)}
+                                        className={`flex-1 py-1.5 rounded border text-xs font-bold transition-all ${
+                                            side === s ? 'bg-sky-700 text-white border-sky-800' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-sky-50'
+                                        }`}>{t('modal.cage.side_' + s)}</button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Dimensions */}
+                    <div className="grid grid-cols-2 gap-3">
+                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.height')}</label><input type="number" value={height} onChange={e => setHeight(e.target.value)} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
+                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.lordosis')}</label><input type="number" value={lordosis} onChange={e => setLordosis(e.target.value)} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
+                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.length')}</label><input type="number" value={length} onChange={e => setLength(e.target.value)} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
+                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.width')}</label><input type="number" value={width} onChange={e => setWidth(e.target.value)} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
+                    </div>
+                </div>
+                <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{initialData ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center"><IconTrash/> {t('button.remove')}</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.cancel')}</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-sky-800 text-white hover:bg-sky-700 text-sm font-bold shadow-lg">{t('button.confirm')}</button></div></div>
+            </div>
+        </div>
+    );
+};
+
+const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, defaultType, defaultAngle, discLevelOnly }) => {
+    if (!isOpen) return null;
+
+    const OSTEOTOMY_TYPES = [
+        { id: 'Facet', labelKey: 'clinical.osteotomy.facet.label', shortLabel: 'Facet', schwabKey: 'clinical.osteotomy.facet.schwab', descKey: 'clinical.osteotomy.facet.desc', defaultAngle: '5', group: 'posterior', discLevel: true },
+        { id: 'Ponte', labelKey: 'clinical.osteotomy.ponte.label', shortLabel: 'Ponte', schwabKey: 'clinical.osteotomy.ponte.schwab', descKey: 'clinical.osteotomy.ponte.desc', defaultAngle: '10', group: 'posterior', discLevel: true },
+        { id: 'PSO', labelKey: 'clinical.osteotomy.pso.label', shortLabel: 'PSO', schwabKey: 'clinical.osteotomy.pso.schwab', descKey: 'clinical.osteotomy.pso.desc', defaultAngle: '25', group: 'posterior' },
+        { id: 'ExtPSO', labelKey: 'clinical.osteotomy.extpso.label', shortLabel: 'Ext PSO', schwabKey: 'clinical.osteotomy.extpso.schwab', descKey: 'clinical.osteotomy.extpso.desc', defaultAngle: '35', group: 'posterior' },
+        { id: 'VCR', labelKey: 'clinical.osteotomy.vcr.label', shortLabel: 'VCR', schwabKey: 'clinical.osteotomy.vcr.schwab', descKey: 'clinical.osteotomy.vcr.desc', defaultAngle: '40', group: 'posterior' },
+        { id: 'ML-VCR', labelKey: 'clinical.osteotomy.mlvcr.label', shortLabel: 'ML VCR', schwabKey: 'clinical.osteotomy.mlvcr.schwab', descKey: 'clinical.osteotomy.mlvcr.desc', defaultAngle: '0', group: 'posterior' },
+        { id: 'Corpectomy', labelKey: 'clinical.osteotomy.corpectomy.label', shortLabel: 'Corpectomy', schwabKey: 'clinical.osteotomy.corpectomy.schwab', descKey: 'clinical.osteotomy.corpectomy.desc', defaultAngle: '0', group: 'anterior' }
+    ];
+
+    const filteredTypes = discLevelOnly === true
+        ? OSTEOTOMY_TYPES.filter(ot => ot.discLevel)
+        : discLevelOnly === false
+            ? OSTEOTOMY_TYPES.filter(ot => !ot.discLevel)
+            : OSTEOTOMY_TYPES;
+
+    // Resolve initial type: use defaultType only if it's in the filtered list
+    const resolvedDefault = filteredTypes.find(ot => ot.id === defaultType) ? defaultType : filteredTypes[0]?.id || 'PSO';
+
+    const [type, setType] = useState(resolvedDefault);
+    const [angle, setAngle] = useState('');
+    const [reconstructionCage, setReconstructionCage] = useState('');
+
+    const needsReconCage = ['VCR','ML-VCR','Corpectomy'].includes(type);
+
+    useEffect(() => {
+        if (isOpen) {
+            if (initialData && typeof initialData === 'object') {
+                setType(initialData.type);
+                setAngle(initialData.angle !== undefined && initialData.angle !== null ? String(initialData.angle) : '');
+                setReconstructionCage(initialData.reconstructionCage || '');
+            } else {
+                setType(resolvedDefault);
+                setAngle('');
+                setReconstructionCage('');
+            }
+        }
+    }, [isOpen, initialData, defaultType, defaultAngle]);
+
+    const selectedDef = filteredTypes.find(ot => ot.id === type) || filteredTypes[0];
+    const handleTypeChange = (e) => {
+        const newTypeID = e.target.value;
+        setType(newTypeID);
+        setAngle('');
+        if (!['VCR','ML-VCR','Corpectomy'].includes(newTypeID)) setReconstructionCage('');
+    };
+    const handleSubmit = () => {
+        onConfirm({
+            type, angle: angle !== '' ? angle : null,
+            shortLabel: selectedDef.shortLabel,
+            reconstructionCage: needsReconCage ? reconstructionCage : ''
+        });
+        onClose();
+    };
+    const isEditing = !!initialData;
+    const osteoRef = useRef(null);
+    useEffect(() => { if (osteoRef.current) osteoRef.current.focus(); }, []);
+    return (
+        <div ref={osteoRef} tabIndex={-1} style={{outline:'none'}}
+            onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })}
+            className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
+            <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
+                <div className="bg-amber-800 text-white px-4 py-3 flex justify-between items-center">
+                    <h3 className="font-bold text-sm">{isEditing ? t('modal.osteotomy.title_edit') : t('modal.osteotomy.title_new')}</h3>
+                    <button onClick={onClose} className="hover:text-red-200"><IconX /></button>
+                </div>
+                <div className="p-6 space-y-4">
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('modal.osteotomy.type')}</label>
+                        <select value={type} onChange={handleTypeChange}
+                            className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-amber-500 outline-none">
+                            {filteredTypes.some(ot => ot.group === 'posterior') && <optgroup label={t('modal.osteotomy.optgroup_posterior')}>
+                                {filteredTypes.filter(ot => ot.group === 'posterior').map(ot =>
+                                    <option key={ot.id} value={ot.id}>{t(ot.labelKey)}</option>
+                                )}
+                            </optgroup>}
+                            {filteredTypes.some(ot => ot.group === 'anterior') && <optgroup label={t('modal.osteotomy.optgroup_anterior')}>
+                                {filteredTypes.filter(ot => ot.group === 'anterior').map(ot =>
+                                    <option key={ot.id} value={ot.id}>{t(ot.labelKey)}</option>
+                                )}
+                            </optgroup>}
+                        </select>
+                    </div>
+                    <div className="bg-amber-50 border border-amber-100 rounded p-3 text-xs">
+                        <div className="font-bold text-amber-800 uppercase tracking-wider mb-1">{t(selectedDef.schwabKey)}</div>
+                        <div className="text-amber-700 mb-2">{t(selectedDef.descKey)}</div>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('modal.osteotomy.angle')}</label>
+                        <div className="flex items-center gap-2">
+                            <input type="number" value={angle} onChange={(e) => setAngle(e.target.value)} placeholder={selectedDef.defaultAngle}
+                                className="w-24 p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none text-center" />
+                            <span className="italic text-slate-400 text-sm">{t('modal.osteotomy.degrees')}</span>
+                        </div>
+                    </div>
+                    {needsReconCage && (
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('modal.osteotomy.recon_cage')}</label>
+                            <input type="text" value={reconstructionCage}
+                                onChange={(e) => setReconstructionCage(e.target.value)}
+                                placeholder={t('modal.osteotomy.recon_cage_placeholder')}
+                                className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-amber-500 outline-none" />
+                        </div>
+                    )}
+                </div>
+                <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">
+                    {isEditing ? (
+                        <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center">
+                            <IconTrash/> {t('button.remove')}
+                        </button>
+                    ) : <div></div>}
+                    <div className="flex gap-2">
+                        <button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.cancel')}</button>
+                        <button onClick={handleSubmit} className="px-6 py-2 rounded bg-amber-800 text-white hover:bg-amber-700 text-sm font-bold shadow-lg">{t('button.confirm')}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const FORCE_TYPES = [
+    { id: 'translate_left', labelKey: 'clinical.force.translate_left', icon: 'translate_left' },
+    { id: 'translate_right', labelKey: 'clinical.force.translate_right', icon: 'translate_right' },
+    { id: 'compression', labelKey: 'clinical.force.compression', icon: 'compression' },
+    { id: 'distraction', labelKey: 'clinical.force.distraction', icon: 'distraction' },
+    { id: 'derotate_cw', labelKey: 'clinical.force.derotate_cw', icon: 'derotate_cw' },
+    { id: 'derotate_ccw', labelKey: 'clinical.force.derotate_ccw', icon: 'derotate_ccw' },
+];
+
+const ScrewSystemCombo = ({ value, onChange, company, placeholder }) => {
+    const [open, setOpen] = useState(false);
+    const [editing, setEditing] = useState(false);
+    const [filter, setFilter] = useState('');
+    const ref = useRef(null);
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => { if (ref.current && !ref.current.contains(e.target)) { setOpen(false); setEditing(false); } };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+    useEffect(() => { if (editing && inputRef.current) inputRef.current.focus(); }, [editing]);
+
+    const companySystems = company && SCREW_SYSTEMS[company] ? SCREW_SYSTEMS[company] : [];
+    const otherSystems = Object.entries(SCREW_SYSTEMS).filter(([k]) => k !== company).flatMap(([k, v]) => v.map(s => ({ name: s, company: k })));
+    const seen = new Set(companySystems);
+    const uniqueOther = otherSystems.filter(s => { if (seen.has(s.name)) return false; seen.add(s.name); return true; });
+
+    const q = filter.toLowerCase();
+    const matchedCompany = companySystems.filter(s => s.toLowerCase().includes(q));
+    const matchedOther = uniqueOther.filter(s => s.name.toLowerCase().includes(q) || s.company.toLowerCase().includes(q));
+
+    return (
+        <div ref={ref} className="relative">
+            {editing ? (
+                <input ref={inputRef} type="text" className="editable-field w-full text-xs" value={value} placeholder={placeholder} onChange={e => { onChange(e.target.value); setFilter(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} />
+            ) : (
+                <div className="editable-field w-full text-xs cursor-pointer" style={{ whiteSpace: 'normal', wordBreak: 'break-word' }} onClick={() => { setEditing(true); setOpen(true); }}>{value || <span style={{ color: '#6b7280' }}>{placeholder}</span>}</div>
+            )}
+            {open && (matchedCompany.length > 0 || matchedOther.length > 0) && (
+                <div className="absolute z-50 left-0 right-0 top-full mt-0.5 bg-white border border-slate-300 rounded shadow-lg max-h-48 overflow-y-auto text-xs">
+                    {matchedCompany.length > 0 && <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase bg-slate-50">{company}</div>}
+                    {matchedCompany.map(s => <div key={s} className="px-2 py-1.5 cursor-pointer hover:bg-amber-50 font-semibold text-slate-800" onClick={() => { onChange(s); setFilter(''); setOpen(false); }}>{s}</div>)}
+                    {matchedOther.length > 0 && <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase bg-slate-50 border-t border-slate-200">{t('patient.other_companies')}</div>}
+                    {matchedOther.map(s => <div key={`${s.company}-${s.name}`} className="px-2 py-1.5 cursor-pointer hover:bg-slate-50 text-slate-600 flex justify-between" onClick={() => { onChange(s.name); setFilter(''); setOpen(false); }}><span>{s.name}</span><span className="text-slate-400 text-[10px]">{s.company}</span></div>)}
+                </div>
+            )}
+        </div>
+    );
+};
+
+const ForceModal = ({ isOpen, onClose, onConfirm }) => {
+    if (!isOpen) return null;
+    const forceRef = useRef(null);
+    useEffect(() => { if (forceRef.current) forceRef.current.focus(); }, []);
+    return (
+        <div ref={forceRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: () => {}, onClose, onDelete: null, isEditing: false })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
+            <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden">
+                <div className="bg-blue-700 text-white px-4 py-3 flex justify-between items-center">
+                    <h3 className="font-bold text-sm">{t('modal.force.title')}</h3>
+                    <button onClick={onClose} className="hover:text-blue-200"><IconX /></button>
+                </div>
+                <div className="p-4 grid grid-cols-2 gap-2">
+                    {FORCE_TYPES.map(f => (
+                        <button key={f.id} onClick={() => { onConfirm(f.id); onClose(); }}
+                            className="flex flex-col items-center gap-1 p-3 rounded border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 transition-all">
+                            <InstrumentIcon type={f.icon} className="w-8 h-8" color="#2563eb" />
+                            <span className="text-[10px] font-bold text-slate-700">{t(f.labelKey)}</span>
+                        </button>
+                    ))}
+                </div>
+                <div className="bg-slate-50 px-4 py-2 text-right border-t border-slate-100">
+                    <button onClick={onClose} className="px-4 py-1.5 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.cancel')}</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const NoteModal = ({ isOpen, onClose, onConfirm, onDelete, initialText, initialShowArrow, isEditing }) => {
+    if (!isOpen) return null;
+    const [text, setText] = useState(initialText || '');
+    const [showArrow, setShowArrow] = useState(initialShowArrow || false);
+    const noteRef = useRef(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            setText(initialText || '');
+            setShowArrow(initialShowArrow || false);
+        }
+    }, [isOpen, initialText, initialShowArrow]);
+
+    useEffect(() => { if (noteRef.current) noteRef.current.focus(); }, []);
+
+    const handleSubmit = () => {
+        if (!text.trim()) return;
+        onConfirm(text.trim(), showArrow);
+        onClose();
+    };
+
+    return (
+        <div ref={noteRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
+            <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
+                <div className="bg-violet-800 text-white px-4 py-3 flex justify-between items-center">
+                    <h3 className="font-bold text-sm">{isEditing ? t('modal.note.title_edit') : t('modal.note.title_new')}</h3>
+                    <button onClick={onClose} className="hover:text-violet-200"><IconX /></button>
+                </div>
+                <div className="p-5 space-y-3">
+                    <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.note.text')}</label>
+                        <input type="text" value={text} onChange={e => setText(e.target.value)} placeholder={t('modal.note.text_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-violet-500 outline-none" autoFocus />
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                        {NOTE_PRESET_KEYS.map(key => { const label = t(key); return (
+                            <button key={key} onClick={() => setText(label)} className={`px-2 py-1 rounded text-[10px] font-medium border transition-all ${text === label ? 'bg-violet-100 border-violet-300 text-violet-800' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-violet-50 hover:border-violet-200'}`}>{label}</button>
+                        ); })}
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" checked={showArrow} onChange={e => setShowArrow(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
+                        <span className="text-xs text-slate-600">{t('modal.note.show_arrow')}</span>
+                    </label>
+                </div>
+                <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">
+                    {isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center"><IconTrash/> {t('button.remove')}</button> : <div></div>}
+                    <div className="flex gap-2">
+                        <button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.cancel')}</button>
+                        <button onClick={handleSubmit} className="px-6 py-2 rounded bg-violet-800 text-white hover:bg-violet-700 text-sm font-bold shadow-lg">{t('button.confirm')}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const CreditsFooter = ({ lang }) => (
+    <div className="mt-auto pt-3 pb-4 border-t border-slate-200 shrink-0">
+        <p className="text-xs text-slate-500 leading-tight text-center">
+            {t('credits.app_name')}
+        </p>
+        {/* Statement of origin — not translated */}
+        <p className="text-[10px] text-slate-400 leading-tight text-center mt-0.5">
+            Designed in Leeds · Yorkshire · England
+        </p>
+        {lang !== 'en' && (
+            <p className="text-[10px] text-amber-600 leading-tight text-center mt-1 italic">
+                {t('disclaimer.text')} — <a href={`https://nigelgummerson.github.io/spine-planner/review-forms/${lang}/${lang}-review.html`} target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-800">{t('disclaimer.review')}</a>
+            </p>
+        )}
+    </div>
+);
+
+// --- INVENTORY CATEGORIES ---
+const INVENTORY_CATEGORIES = [
+    { key: 'screws', labelKey: 'inventory.screws', toolIds: ['monoaxial','polyaxial','uniplanar'] },
+    { key: 'hooks', labelKey: 'inventory.hooks', toolIds: HOOK_TYPES },
+    { key: 'cages', labelKey: 'inventory.cages', toolIds: ['acdf','plif','tlif','xlif','olif','alif'] },
+    { key: 'fixation', labelKey: 'inventory.fixation', toolIds: ['band','wire','cable'] },
+    { key: 'osteotomies', labelKey: 'inventory.osteotomies', toolIds: ['osteotomy'] },
+    { key: 'other', labelKey: 'inventory.other', toolIds: ['connector','unstable'] },
+];
+
+const ImplantInventory = ({ placements, tools, title, visibleLevelIds, levels, rods }) => {
+    const grouped = useMemo(() => {
+        const counts = {};
+        placements.forEach(p => {
+            if (!visibleLevelIds.includes(p.levelId)) return;
+            const tool = tools.find(item => item.id === p.tool);
+            if (!tool || tool.type === 'force') return;
+            const toolLabel = tool.labelKey ? t(tool.labelKey) : tool.label;
+            let key = toolLabel;
+            if (p.data) {
+                if (typeof p.data === 'string' && tool.needsSize) { key = `${toolLabel} (${p.data})`; }
+                else if (p.tool === 'osteotomy' && typeof p.data === 'object') { key = p.data.angle != null && p.data.angle !== '' ? `${p.data.shortLabel} (${p.data.angle}°)` : p.data.shortLabel; }
+                else if (typeof p.data === 'object' && p.data.height) {
+                    const discLbl = levels ? getDiscLabel(p.levelId, levels) : p.levelId;
+                    const sideStr = p.data.side && p.data.side !== 'bilateral' && p.data.side !== 'midline' ? ` (${p.data.side.charAt(0).toUpperCase()})` : '';
+                    key = `${toolLabel} ${discLbl} ${p.data.height}H ${p.data.lordosis}°${sideStr}`;
+                }
+                else if (p.data !== 'Custom' && typeof p.data !== 'object') { key = `${toolLabel} ${p.data}`; }
+            }
+            const catKey = INVENTORY_CATEGORIES.find(c => c.toolIds.includes(p.tool))?.key || 'other';
+            if (!counts[catKey]) counts[catKey] = {};
+            counts[catKey][key] = (counts[catKey][key] || 0) + 1;
+        });
+        return counts;
+    }, [placements, tools, visibleLevelIds, levels]);
+
+    const hasImplants = Object.values(grouped).some(cat => Object.keys(cat).length > 0);
+    const hasRods = rods && (rods.left || rods.right);
+    if (!hasImplants && !hasRods) return null;
+
+    const totalItems = Object.values(grouped).reduce((sum, cat) => sum + Object.keys(cat).length, 0);
+    const useColumns = totalItems > 6;
+
+    return (
+        <div className="mt-2 border-t border-slate-200 pt-1 shrink-0">
+            <h3 className="text-[10px] font-bold text-slate-900 uppercase tracking-widest mb-2 border-b border-slate-100 pb-1">{title}</h3>
+            <div style={useColumns ? { columns: 2, columnGap: '8px' } : undefined}>
+                {INVENTORY_CATEGORIES.map(cat => {
+                    const items = grouped[cat.key];
+                    if (!items || Object.keys(items).length === 0) return null;
+                    return (
+                        <div key={cat.key} className="mb-2" style={{ breakInside: 'avoid' }}>
+                            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-0.5 mb-0.5">{t(cat.labelKey)}</div>
+                            {Object.entries(items).sort().map(([name, count]) => (
+                                <div key={name} className="flex justify-between text-[10px] py-0.5 border-b border-slate-100">
+                                    <span className="text-slate-700 font-medium">{name}</span>
+                                    <span className="font-bold text-slate-900 ml-2">{count}</span>
+                                </div>
+                            ))}
+                        </div>
+                    );
+                })}
+                {hasRods && (
+                    <div className="mb-2" style={{ breakInside: 'avoid' }}>
+                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-0.5 mb-0.5">{t('inventory.rods')}</div>
+                        {rods.left && <div className="text-[10px] py-0.5 border-b border-slate-100"><span className="text-slate-700 font-medium">{t('inventory.rod_left')} {rods.left}</span></div>}
+                        {rods.right && <div className="text-[10px] py-0.5 border-b border-slate-100"><span className="text-slate-700 font-medium">{t('inventory.rod_right')} {rods.right}</span></div>}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// ==========================================
+// SECTION 3: RENDERERS
+// ==========================================
+
+const REGIONS = {
+    Oc: { height: 25, color: '#f1f5f9' },
+    C: { height: 24, color: '#f1f5f9' },
+    T: { height: 36, color: '#f1f5f9' },
+    L: { height: 46, color: '#f1f5f9' },
+    S: { height: 52, color: '#f1f5f9' },
+    Pelvis: { height: 35, color: '#f1f5f9' }
+};
+
+// Anatomical dimensions (mm): bodyW/bodyH from X-ray measurements interpolated
+// between anchors T2(36x20), T12(48x30), L4(60x36).
+// Pedicle data from Lien et al. 2007 (Eur Spine J, PMC2200778) — averaged L/R.
+// Lumbar pedH cross-checked against Zindrick 1987 (Spine 12:160-166).
+const VERTEBRA_ANATOMY = {
+    T1:  { bodyW: 34.8, bodyH: 19.0, pedW: 7.7, pedH:  8.7 },
+    T2:  { bodyW: 36.0, bodyH: 20.0, pedW: 5.5, pedH: 10.3 },
+    T3:  { bodyW: 37.2, bodyH: 21.0, pedW: 4.0, pedH: 10.4 },
+    T4:  { bodyW: 38.4, bodyH: 22.0, pedW: 3.5, pedH: 10.3 },
+    T5:  { bodyW: 39.6, bodyH: 23.0, pedW: 3.8, pedH: 10.6 },
+    T6:  { bodyW: 40.8, bodyH: 24.0, pedW: 4.0, pedH: 10.2 },
+    T7:  { bodyW: 42.0, bodyH: 25.0, pedW: 4.4, pedH: 10.4 },
+    T8:  { bodyW: 43.2, bodyH: 26.0, pedW: 4.8, pedH: 10.9 },
+    T9:  { bodyW: 44.4, bodyH: 27.0, pedW: 5.3, pedH: 12.4 },
+    T10: { bodyW: 45.6, bodyH: 28.0, pedW: 5.7, pedH: 13.7 },
+    T11: { bodyW: 46.8, bodyH: 29.0, pedW: 7.2, pedH: 15.1 },
+    T12: { bodyW: 48.0, bodyH: 30.0, pedW: 7.6, pedH: 15.1 },
+    L1:  { bodyW: 51.0, bodyH: 31.5, pedW: 6.5, pedH: 13.7 },
+    L2:  { bodyW: 54.0, bodyH: 33.0, pedW: 7.2, pedH: 14.1 },
+    L3:  { bodyW: 57.0, bodyH: 34.5, pedW: 9.2, pedH: 13.9 },
+    L4:  { bodyW: 60.0, bodyH: 36.0, pedW: 11.9, pedH: 12.8 },
+    L5:  { bodyW: 63.0, bodyH: 35.0, pedW: 17.6, pedH: 12.5 },
+    S1:  { bodyW: 66.0, bodyH: 34.0, pedW: 20.0, pedH: 14.0 },
+};
+
+// Per-level SVG height: use same mm-to-SVG scale as width (130/66 ≈ 1.97) for correct aspect ratio
+// Add padding (6 SVG units) so body path doesn't touch viewBox edges
+const VERT_SVG_SCALE = 130 / 66.0; // same scale for width and height
+const VERT_PAD = 3; // top/bottom padding in SVG units
+const getLevelHeight = (level) => {
+    const a = VERTEBRA_ANATOMY[level.id];
+    if (a) return Math.round(a.bodyH * VERT_SVG_SCALE) + VERT_PAD * 2;
+    return REGIONS[level.type].height;
+};
+
+// Convert mm anatomy data to SVG coordinates within the 160-unit viewBox
+const getVertSvgGeometry = (levelId) => {
+    const a = VERTEBRA_ANATOMY[levelId];
+    if (!a) return null;
+    const maxBodySvg = 130;
+    const maxBodyMm = 66.0;
+    const scale = maxBodySvg / maxBodyMm;
+    const bw = a.bodyW * scale;
+    const cx = 80;
+    const left = cx - bw / 2;
+    const right = cx + bw / 2;
+    // Pedicle positions: inset from body edge
+    const pedInset = (a.pedW * scale) * 0.5;
+    const pedLeftCx = left + pedInset + 5;
+    const pedRightCx = right - pedInset - 5;
+    // Pedicle radii: scaled down for schematic (not anatomically literal)
+    // pedRx = transverse (width), pedRy = sagittal (height)
+    const pedScale = 1.0;
+    const pedRx = Math.max(1.5, (a.pedW * scale / 2) * pedScale);
+    const pedRy = Math.max(2, (a.pedH * scale / 2) * pedScale);
+    const isLumbar = levelId.startsWith('L') || levelId === 'S1';
+    return { left, right, cx, bw, pedLeftCx, pedRightCx, pedRx, pedRy, isLumbar };
+};
+
+const ALL_LEVELS = [
+    { id: 'Oc', type: 'Oc' },
+    ...['C1','C2','C3','C4','C5','C6','C7'].map(id => ({ id, type: 'C' })),
+    ...['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'].map(id => ({ id, type: 'T' })),
+    ...['L1','L2','L3','L4','L5'].map(id => ({ id, type: 'L' })),
+    { id: 'S1', type: 'S' },
+    { id: 'Pelvis', type: 'Pelvis' },
+];
+
+// Disc height varies by region: lumbar ~30% body height, thoracic ~18%, cervical ~5mm
+const DISC_MIN_PX = 8; // minimum rendered disc zone height in pixels
+const getDiscHeight = (level) => {
+    if (level.type === 'Pelvis' || level.type === 'S' || level.id === 'Oc' || level.id === 'C1') return 0;
+    const h = getLevelHeight(level);
+    if (level.type === 'L') return Math.round(h * 0.30);
+    if (level.type === 'T') return Math.round(h * 0.18);
+    return Math.round(5 * VERT_SVG_SCALE); // cervical ~5mm
+};
+
+const buildHeightMap = (lvls, hScale) => {
+    let y = 0;
+    const map = [];
+    lvls.forEach(level => {
+        const vertH = getLevelHeight(level) * hScale;
+        const rawDiscH = getDiscHeight(level) * hScale;
+        // Match actual DOM: disc zones have min DISC_MIN_PX, plus 1px border per level
+        const discH = rawDiscH > 0 ? Math.max(DISC_MIN_PX, rawDiscH) : 0;
+        const border = 1;
+        map.push({ levelId: level.id, startY: y, vertEnd: y + vertH, endY: y + vertH + discH });
+        y += vertH + discH + border;
+    });
+    return { map, totalHeight: y };
+};
+
+const WHOLE_SPINE_MAP = buildHeightMap(ALL_LEVELS, 1);
+
+const levelToYNorm = (levelId) => {
+    const entry = WHOLE_SPINE_MAP.map.find(e => e.levelId === levelId);
+    if (!entry) return 500;
+    const midY = (entry.startY + entry.vertEnd) / 2;
+    return (midY / WHOLE_SPINE_MAP.totalHeight) * 1000;
+};
+
+const yNormToRenderedY = (yNorm, viewLevels, hScale) => {
+    const anatomicalY = (yNorm / 1000) * WHOLE_SPINE_MAP.totalHeight;
+    const allEntry = WHOLE_SPINE_MAP.map.find(e => anatomicalY >= e.startY && anatomicalY < e.endY);
+    if (!allEntry) {
+        // Check if it's at the very bottom
+        const last = WHOLE_SPINE_MAP.map[WHOLE_SPINE_MAP.map.length - 1];
+        if (anatomicalY >= last.startY && anatomicalY <= last.endY) {
+            const viewMap = buildHeightMap(viewLevels, hScale);
+            const viewEntry = viewMap.map.find(e => e.levelId === last.levelId);
+            if (!viewEntry) return null;
+            const fraction = (last.endY - last.startY) > 0 ? (anatomicalY - last.startY) / (last.endY - last.startY) : 0;
+            return viewEntry.startY + fraction * (viewEntry.endY - viewEntry.startY);
+        }
+        return null;
+    }
+    const viewMap = buildHeightMap(viewLevels, hScale);
+    const viewEntry = viewMap.map.find(e => e.levelId === allEntry.levelId);
+    if (!viewEntry) return null;
+    const segLen = allEntry.endY - allEntry.startY;
+    const fraction = segLen > 0 ? (anatomicalY - allEntry.startY) / segLen : 0;
+    const viewSegLen = viewEntry.endY - viewEntry.startY;
+    return viewEntry.startY + fraction * viewSegLen;
+};
+
+const renderedYToYNorm = (renderedY, viewLevels, hScale) => {
+    const viewMap = buildHeightMap(viewLevels, hScale);
+    let entry = viewMap.map.find(e => renderedY >= e.startY && renderedY < e.endY);
+    if (!entry) {
+        if (renderedY <= 0) entry = viewMap.map[0];
+        else entry = viewMap.map[viewMap.map.length - 1];
+    }
+    const wholeEntry = WHOLE_SPINE_MAP.map.find(e => e.levelId === entry.levelId);
+    if (!wholeEntry) return 500;
+    const segLen = entry.endY - entry.startY;
+    const fraction = segLen > 0 ? Math.max(0, Math.min(1, (renderedY - entry.startY) / segLen)) : 0;
+    const wholeSegLen = wholeEntry.endY - wholeEntry.startY;
+    const anatomicalY = wholeEntry.startY + fraction * wholeSegLen;
+    return Math.max(0, Math.min(1000, (anatomicalY / WHOLE_SPINE_MAP.totalHeight) * 1000));
+};
+
+const CHART_CONTENT_HEIGHT = 920;
+const calculateAutoScale = (levels) => {
+    let totalUnscaled = 0;
+    let discCount = 0;
+    levels.forEach(level => {
+        totalUnscaled += getLevelHeight(level) + getDiscHeight(level);
+        if (getDiscHeight(level) > 0) discCount++;
+    });
+    if (totalUnscaled <= 0) return 0.5;
+    // Account for fixed per-level costs: 1px border per level, min disc zone height
+    const borderCost = levels.length; // 1px border-b per level
+    const available = CHART_CONTENT_HEIGHT - borderCost;
+    // Iterative: disc zones have min DISC_MIN_PX, so solve for scale
+    // where scaled disc heights below DISC_MIN_PX get clamped
+    let scale = available / totalUnscaled;
+    for (let i = 0; i < 3; i++) {
+        let minHeightExtra = 0;
+        levels.forEach(level => {
+            const dh = getDiscHeight(level);
+            if (dh > 0 && dh * scale < DISC_MIN_PX) {
+                minHeightExtra += DISC_MIN_PX - dh * scale;
+            }
+        });
+        scale = (available - minHeightExtra) / totalUnscaled;
+    }
+    return Math.min(1.5, Math.max(0.5, scale));
+};
+
+const InstrumentIcon = ({ type, className = "w-5 h-5", color = "black" }) => {
+    const strokeWidth = 2.5; const HookBase = ({ direction, label }) => (<svg viewBox="0 0 40 24" className="w-full h-full">{direction === 'up' ? <path d="M12 18V6m0 0l-4 4m4-4l4 4m-8 12h8" stroke={color} fill="none" strokeWidth={strokeWidth} /> : <path d="M12 6v12m0 0l-4-4m4 4l4-4m-8-12h8" stroke={color} fill="none" strokeWidth={strokeWidth} />}<text x="22" y="17" fontSize="14" fontWeight="bold" fontFamily="serif" fill={color}>{label}</text></svg>);
+    switch (type) {
+        // ... Implants ...
+        case 'monoaxial': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /></svg>;
+        case 'polyaxial': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /><path d="M7 7l10 10M17 7l-10 10" /></svg>;
+        case 'uniplanar': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /><path d="M12 3v18" /></svg>;
+        case 'pedicle_hook': return <div className={className}><HookBase direction="up" label="P" /></div>;
+        case 'tp_hook': return <div className={className}><HookBase direction="down" label="TP" /></div>;
+        case 'tp_hook_up': return <div className={className}><HookBase direction="up" label="TP" /></div>;
+        case 'sl_hook': return <div className={className}><HookBase direction="down" label="SL" /></div>;
+        case 'il_hook': return <div className={className}><HookBase direction="up" label="IL" /></div>;
+        case 'band': return <svg viewBox="0 0 36 24" className={className} overflow="visible"><text x="18" y="16" textAnchor="middle" fontSize="11" fontWeight="bold" fill={color} fontFamily="Inter, sans-serif">BAND</text></svg>;
+        case 'wire': return <svg viewBox="0 0 36 24" className={className} overflow="visible"><text x="18" y="16" textAnchor="middle" fontSize="11" fontWeight="bold" fill={color} fontFamily="Inter, sans-serif">WIRE</text></svg>;
+        case 'cable': return <svg viewBox="0 0 36 24" className={className} overflow="visible"><text x="18" y="16" textAnchor="middle" fontSize="10" fontWeight="bold" fill={color} fontFamily="Inter, sans-serif">CABLE</text></svg>;
+        case 'connector': return <svg viewBox="0 0 40 10" className={className} stroke={color} fill="none" strokeWidth="2"><line x1="2" y1="5" x2="38" y2="5" strokeWidth="3" /><circle cx="2" cy="5" r="2" fill={color} /><circle cx="38" cy="5" r="2" fill={color} /></svg>;
+        case 'unstable': return <svg viewBox="0 0 24 24" className={`${className} bg-white rounded border border-red-100 shadow-sm`} fill="none" stroke="#dc2626" strokeWidth="2.5"><path d="M2 12 L6 8 L10 16 L14 8 L18 16 L22 12" strokeLinecap="round" strokeLinejoin="round" /><path d="M2 12 L6 8 L10 16 L14 8 L18 16 L22 12" stroke="#7f1d1d" strokeWidth="0.8" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+        case 'osteotomy': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><path d="M2 12h20M12 2l10 10-10 10L2 12z" fill="#d97706" opacity="0.8" stroke="#78350f" strokeWidth="1" /></svg>;
+        
+        // --- Cages ---
+        case 'cage': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><rect x="4" y="8" width="16" height="8" rx="2" /></svg>;
+        case 'acdf': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><path d="M6 8h12v8H6z" /></svg>; 
+        case 'plif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><rect x="3" y="8" width="7" height="8" /><rect x="14" y="8" width="7" height="8" /></svg>;
+        case 'tlif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><path d="M4 12c0-4 8-8 8-8s8 4 8 8-8 8-8 8-8-4-8-8z" /></svg>;
+        case 'xlif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><rect x="2" y="10" width="20" height="4" rx="1" /></svg>;
+        case 'olif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><ellipse cx="12" cy="12" rx="10" ry="6" /></svg>;
+        case 'alif': return <svg viewBox="0 0 24 24" className={className} fill="#0284c7" stroke="none"><ellipse cx="12" cy="12" rx="10" ry="6" /></svg>;
+        
+        // --- Forces ---
+        case 'translate_left': return <svg viewBox="0 0 24 24" className={className} fill="#2563eb" stroke="none"><path d="M20 12H4M4 12l8-8M4 12l8 8" stroke="#2563eb" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>; 
+        case 'translate_right': return <svg viewBox="0 0 24 24" className={className} fill="#2563eb" stroke="none"><path d="M4 12h16M20 12l-8-8M20 12l-8 8" stroke="#2563eb" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>; 
+        case 'derotate_cw': return <svg viewBox="0 0 24 24" className={className} stroke="#2563eb" fill="none" strokeWidth="2.5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>;
+        case 'derotate_ccw': return <svg viewBox="0 0 24 24" className={className} stroke="#2563eb" fill="none" strokeWidth="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>;
+        case 'compression': return <svg viewBox="0 0 24 24" className={className} stroke="#2563eb" fill="none" strokeWidth="3"><path d="M12 2v8m-4-4 4 4 4-4" /><path d="M12 22v-8m4 4-4-4-4 4" /></svg>; 
+        case 'distraction': return <svg viewBox="0 0 24 24" className={className} stroke="#2563eb" fill="none" strokeWidth="3"><path d="M12 10V2m4 4-4-4-4 4" /><path d="M12 14v8m-4-4 4 4 4-4" /></svg>;
+
+        // --- Mode ---
+        case 'implant': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="3" /></svg>;
+
+        // --- Annotations ---
+        case 'note': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>;
+        default: return null;
+    }
+};
+
+const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale = 1 }) => {
+    const common = { fill: REGIONS[type].color, stroke: "#475569", strokeWidth: "1.5" };
+    const geom = getVertSvgGeometry(label);
+
+    if (isCorpectomy) {
+        const cl = geom ? geom.left : 40;
+        const cr = geom ? geom.right : 120;
+        return (
+            <svg viewBox={`0 0 160 ${height}`} className="w-full h-full block" overflow="visible">
+                <line x1="80" y1="0" x2="80" y2={height} stroke="#cbd5e1" strokeDasharray="3 3" />
+                <path d={`M${cl},${VERT_PAD} L${cr},${VERT_PAD} L${cr},${height-VERT_PAD} L${cl},${height-VERT_PAD} Z`} fill="none" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
+                <text x="80" y={height/2} dominantBaseline="middle" textAnchor="middle" fontSize="10" fill="#94a3b8" className="font-sans italic">{t('chart.corpectomy')}</text>
+            </svg>
+        );
+    }
+
+    return (
+        <svg viewBox={`0 0 160 ${height}`} className="w-full h-full block" overflow="visible">
+            <line x1="80" y1="-2" x2="80" y2={height + 2} stroke="#cbd5e1" strokeDasharray="3 3" />
+            <g>
+                {type === 'Oc' && <path d="M30,2 Q80,45 130,2 L130,10 Q80,50 30,10 Z" transform={`scale(1, ${height/30})`} {...common} fill="#f1f5f9" />}
+
+                {type === 'C' && (
+                    <g transform={`scale(1, ${height/24})`}>
+                        <path d="M45,4 Q80,-2 115,4 L120,18 Q80,24 40,18 Z" {...common} />
+                    </g>
+                )}
+
+                {(type === 'T' || type === 'L') && geom && (() => {
+                    const l = geom.left, r = geom.right;
+                    const isT = type === 'T';
+                    const c = isT ? 3 : 4; // corner radius
+                    const w = isT ? 2 : 3; // waist indent
+                    const t = VERT_PAD; // top of body
+                    const b = height - VERT_PAD; // bottom of body
+                    const m = (t + b) / 2; // midpoint for waist
+                    const endCurve = isT ? 2 : 2; // endplate concavity
+                    // Rounded corners, biconcave endplates & waisted sidewalls
+                    const bodyPath = `M${l},${t+c} Q${l},${t} ${l+c},${t} Q80,${t+endCurve} ${r-c},${t} Q${r},${t} ${r},${t+c} Q${r-w},${m} ${r},${b-c} Q${r},${b} ${r-c},${b} Q80,${b-endCurve} ${l+c},${b} Q${l},${b} ${l},${b-c} Q${l+w},${m} ${l},${t+c} Z`;
+                    // Pedicle vertical position: centre offset from top of body
+                    // Uses pedicle sagittal height (pedRy) to scale position, matching medial-lateral convention
+                    const pedCy = t + geom.pedRy + 5;
+                    const pedStroke = isT ? "#94a3b8" : "#64748b";
+                    const pedWidth = isT ? "1" : "1.5";
+                    return (
+                        <g>
+                            <path d={bodyPath} {...common} />
+                            <ellipse cx={geom.pedLeftCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth}/>
+                            <ellipse cx={geom.pedRightCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth}/>
+                        </g>
+                    );
+                })()}
+
+                {type === 'S' && geom && (() => {
+                    const t = VERT_PAD;
+                    const b = height - VERT_PAD;
+                    const narrowFrac = 0.6; // sacrum narrows to 60% at bottom
+                    return <path d={`M${geom.left},${t} Q80,${t-4} ${geom.right},${t} L${80 + (geom.right-80)*narrowFrac},${b} Q80,${b+4} ${80 - (80-geom.left)*narrowFrac},${b} Z`} {...common} />;
+                })()}
+                {type === 'Pelvis' && <rect x="25" y={VERT_PAD} width="110" height={height - VERT_PAD * 2} rx="3" {...common} opacity="0.6" />}
+            </g>
+            <text x="80" y={height/2} dominantBaseline="middle" textAnchor="middle" fontSize={Math.min(14, Math.max(10, 10 / Math.max(0.6, heightScale)))} fontWeight="bold" fill="#334155" className="font-sans pointer-events-none select-none">{label}</text>
+        </svg>
+    );
+};
+
+const CageVisualization = ({ cageType, heightScale, levelId }) => {
+    const h = 12 * heightScale;
+    const color = "#0ea5e9";
+    const geom = getVertSvgGeometry(levelId);
+    const l = geom ? geom.left : 30;
+    const r = geom ? geom.right : 130;
+    const bw = r - l;
+    const ann = 3; // annulus margin each side
+    // PLIF: ~10mm each cage ≈ 20 SVG units, bilateral
+    const plifW = Math.min(20, bw * 0.18);
+    const plifGap = bw * 0.08;
+    // ACDF: ~14mm ≈ 28 SVG units
+    const acdfW = Math.min(28, bw * 0.55);
+    // TLIF: banana curve ~60% of body width
+    const tlifHalf = bw * 0.3;
+
+    switch (cageType) {
+        case 'plif': return <g><rect x={80 - plifGap/2 - plifW} y="2" width={plifW} height={h} rx="1" fill={color} opacity="0.8" /><rect x={80 + plifGap/2} y="2" width={plifW} height={h} rx="1" fill={color} opacity="0.8" /></g>;
+        case 'tlif': return <path d={`M${80 - tlifHalf},2 Q80,${h+5} ${80 + tlifHalf},2`} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" />;
+        case 'acdf': return <rect x={80 - acdfW/2} y="2" width={acdfW} height={h} rx="2" fill={color} opacity="0.9" />;
+        case 'xlif': { const oh = 4; return <rect x={l - oh} y="2" width={bw + oh*2} height={h} rx="2" fill={color} opacity="0.6" />; }
+        case 'olif': return <rect x={l + ann} y="2" width={bw - ann*2} height={h} rx="2" fill={color} opacity="0.7" />;
+        case 'alif': return <rect x={l + ann} y="2" width={bw - ann*2} height={h} rx="2" fill={color} opacity="0.7" />;
+        default: return <rect x={80 - acdfW/2} y="2" width={acdfW} height={h} fill={color} />;
+    }
+};
+
+const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tools, onPlacementClick, onGhostClick, readOnly, showForces, heightScale, onDiscClick, cages, levels, viewMode, forcePlacements, ghostCages, onGhostCageClick }) => {
+    const getItems = (z) => {
+        const src = (forcePlacements && z.startsWith('force')) ? forcePlacements : placements;
+        return src.filter(p => p.levelId === level.id && p.zone === z);
+    };
+    const rowHeight = getLevelHeight(level) * heightScale;
+    const scaledWidth = 160 * heightScale;
+
+    // Scaled instrument sizes
+    const iconScale = Math.max(0.65, Math.min(1.3, heightScale));
+    const screwPx = Math.round(24 * iconScale);
+    const hookW = Math.round(30 * iconScale);
+    const hookH = Math.round(20 * iconScale);
+    const osteoPx = Math.round(32 * iconScale);
+    const midPx = Math.round(36 * iconScale);
+    // Label font scaling: gentle reduction in compressed views (use hs^0.3 not linear)
+    const labelScale = Math.max(0.9, Math.min(1.2, Math.pow(heightScale, 0.3)));
+    const labelPx = Math.max(13, Math.min(16, Math.round(14 * labelScale)));
+    const cageLabelPx = Math.max(12, Math.min(15, Math.round(13 * labelScale)));
+    const cageMaxW = Math.round(120 / Math.max(1, iconScale));
+    const osteoLabelPx = Math.max(13, Math.min(16, Math.round(15 * labelScale)));
+
+    // Check if Corpectomy
+    const isCorpectomy = placements.some(p => p.levelId === level.id && p.data?.type === 'Corpectomy');
+
+    // Reconstruction cage text from osteotomy
+    const reconCageText = placements.filter(p => p.levelId === level.id && p.tool === 'osteotomy' && p.data?.reconstructionCage).map(p => p.data.reconstructionCage)[0] || '';
+
+    // Check for Cage below this level
+    const cageBelow = cages.find(c => c.levelId === level.id);
+    const ghostCageBelow = !cageBelow && ghostCages ? ghostCages.find(c => c.levelId === level.id) : null;
+    // Check for disc-level osteotomy (Schwab 1-2)
+    const discOsteo = placements.find(p => p.levelId === level.id && p.zone === 'disc');
+    const ghostDiscOsteo = !discOsteo && ghostPlacements ? ghostPlacements.find(p => p.levelId === level.id && p.zone === 'disc') : null;
+
+    const GhostTarget = ({ type }) => {
+        if (type === 'force') return <div className="flex items-center justify-center h-full w-full"><IconCardinal /></div>;
+        return (<div style={{ width: screwPx, height: screwPx }} className="rounded-full border-2 border-slate-400 border-dashed flex items-center justify-center opacity-60 hover:opacity-100 hover:border-amber-400 hover:bg-amber-50 transition-all"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full"></div></div>);
+    };
+
+    const ZoneContent = ({ zone, align }) => {
+        const items = getItems(zone);
+        const ghostItem = (!items.length && ghostPlacements && !zone.startsWith('force'))
+            ? ghostPlacements.find(p => p.levelId === level.id && p.zone === zone)
+            : null;
+        const hasItems = items.length > 0;
+        const justifyClass = align === 'right' ? 'justify-start pl-1' : (align === 'center' ? 'justify-center' : 'justify-end pr-1');
+        const isForceZone = zone.startsWith('force');
+        const verticalClass = isForceZone ? 'items-center' : 'items-start pt-[2px]';
+        return (
+            <div className={`flex ${verticalClass} gap-1 h-full ${justifyClass} relative`}>{!hasItems && !ghostItem && !readOnly && (zone === 'left' || zone === 'right' || isForceZone) && <GhostTarget type={isForceZone ? 'force' : 'screw'} />}
+                {items.map(p => {
+                    const tool = tools.find(item => item.id === p.tool);
+                    const isHookItem = HOOK_TYPES.includes(p.tool);
+                    const isOsteo = p.tool === 'osteotomy';
+                    let displayLabel = p.data;
+                    let angle = null;
+                    if (isOsteo && typeof p.data === 'object') {
+                        displayLabel = p.data.shortLabel || p.data.type;
+                        angle = p.data.angle;
+                    }
+                    const iW = isHookItem ? hookW : isOsteo ? osteoPx : screwPx;
+                    const iH = isHookItem ? hookH : isOsteo ? osteoPx : screwPx;
+                    const ann = p.annotation || '';
+                    const showData = p.data && !isHookItem;
+                    const showAnn = !!ann;
+                    const isInline = heightScale < 0.85 && showData && showAnn;
+                    const labelBlock = (showData || showAnn) ? (
+                        <div
+                            className={`flex ${isInline ? (align === 'left' ? 'flex-row-reverse' : 'flex-row') : 'flex-col'} leading-none`}
+                            style={{
+                                alignItems: isInline ? 'center' : (align === 'right' ? 'flex-start' : 'flex-end'),
+                                gap: isInline ? '3px' : '0px'
+                            }}
+                        >
+                            {showData && (
+                                <span
+                                    className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight"
+                                    style={{ fontSize: labelPx + 'px' }}
+                                >
+                                    {isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : displayLabel) : displayLabel}
+                                </span>
+                            )}
+                            {showAnn && (
+                                <span
+                                    className="text-slate-400 italic whitespace-nowrap px-1 leading-tight"
+                                    style={{ fontSize: Math.max(8, labelPx - 2) + 'px' }}
+                                >
+                                    {ann}
+                                </span>
+                            )}
+                        </div>
+                    ) : null;
+                    return (
+                        <div
+                            key={p.id}
+                            className={`relative group flex items-center gap-1 ${!readOnly ? 'cursor-pointer' : ''}`}
+                            onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}
+                        >
+                            {align === 'left' && labelBlock}
+                            <div
+                                style={{ width: iW, height: iH, willChange: 'transform' }}
+                                className={`${!readOnly ? 'group-hover:scale-110 transition-transform' : ''}`}
+                            >
+                                <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />
+                                {!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}
+                            </div>
+                            {align === 'right' && labelBlock}
+                        </div>
+                    );
+                })}
+                {ghostItem && (() => {
+                    const tool = tools.find(item => item.id === ghostItem.tool);
+                    const isHookItem = HOOK_TYPES.includes(ghostItem.tool);
+                    const isOsteo = ghostItem.tool === 'osteotomy';
+                    let displayLabel = ghostItem.data;
+                    let angle = null;
+                    if (isOsteo && typeof ghostItem.data === 'object') {
+                        displayLabel = ghostItem.data.shortLabel || ghostItem.data.type;
+                        angle = ghostItem.data.angle;
+                    }
+                    const iW = isHookItem ? hookW : isOsteo ? osteoPx : screwPx;
+                    const iH = isHookItem ? hookH : isOsteo ? osteoPx : screwPx;
+                    const ann = ghostItem.annotation || '';
+                    const showData = ghostItem.data && !isHookItem;
+                    const showAnn = !!ann;
+                    const isInline = heightScale < 0.85 && showData && showAnn;
+                    const ghostLabelBlock = (showData || showAnn) ? (
+                        <div
+                            className={`flex ${isInline ? (align === 'left' ? 'flex-row-reverse' : 'flex-row') : 'flex-col'} leading-none`}
+                            style={{
+                                alignItems: isInline ? 'center' : (align === 'right' ? 'flex-start' : 'flex-end'),
+                                gap: isInline ? '3px' : '0px'
+                            }}
+                        >
+                            {showData && (
+                                <span
+                                    className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight"
+                                    style={{ fontSize: labelPx + 'px' }}
+                                >
+                                    {isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : displayLabel) : displayLabel}
+                                </span>
+                            )}
+                            {showAnn && (
+                                <span
+                                    className="text-slate-400 italic whitespace-nowrap px-1 leading-tight"
+                                    style={{ fontSize: Math.max(8, labelPx - 2) + 'px' }}
+                                >
+                                    {ann}
+                                </span>
+                            )}
+                        </div>
+                    ) : null;
+                    return (
+                        <div
+                            key={'ghost-' + ghostItem.id}
+                            className="relative group flex items-center gap-1 cursor-pointer"
+                            style={{ opacity: 0.4 }}
+                            onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostItem); }}
+                        >
+                            {align === 'left' && ghostLabelBlock}
+                            <div
+                                style={{ width: iW, height: iH, willChange: 'transform' }}
+                                className="group-hover:scale-110 transition-transform"
+                            >
+                                <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />
+                                <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />
+                            </div>
+                            {align === 'right' && ghostLabelBlock}
+                        </div>
+                    );
+                })()}
+            </div>
+        );
+    };
+
+    return (
+        <div data-zone-click="true" className="flex flex-col w-full relative border-b border-slate-100">
+            <div className="flex w-full relative z-20" style={{ height: `${rowHeight}px` }}>
+                {showForces && <div className={`w-10 border-r border-slate-100/50 bg-blue-50/20 ${!readOnly && !forcePlacements ? 'hover:bg-blue-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && !forcePlacements && onZoneClick(level.id, 'force_left')}><ZoneContent zone="force_left" align="center"/></div>}
+                <div className={`flex-1 overflow-visible min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><div className="flex items-center h-full">{reconCageText && <span className="font-bold text-sky-700 bg-sky-50 border border-sky-200 px-1 rounded shadow-sm whitespace-nowrap ml-1 shrink-0" style={{ fontSize: Math.max(8, cageLabelPx) + 'px' }}>{reconCageText}</span>}<div className="flex-1 h-full"><ZoneContent zone="left" align="left"/></div></div></div>
+
+                <div style={{ width: `${scaledWidth}px` }} className={`relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}>
+                    <SpineVertebra label={level.id} type={level.type} height={getLevelHeight(level)} isCorpectomy={isCorpectomy} heightScale={heightScale} />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        {getItems('mid').filter(p => p.tool !== 'connector').map(p => {
+                            const tool = tools.find(item => item.id === p.tool);
+                            let displayLabel = '';
+                            let angle = '';
+                            if (p.tool === 'osteotomy' && typeof p.data === 'object') {
+                                displayLabel = p.data.shortLabel || p.data.type;
+                                angle = p.data.angle;
+                            }
+                            return (
+                                <div
+                                    key={p.id}
+                                    className="pointer-events-auto relative group flex flex-col items-center"
+                                    onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}
+                                >
+                                    <div style={{ width: midPx, height: midPx }}>
+                                        <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-md text-slate-900" />
+                                    </div>
+                                    {p.tool === 'osteotomy' && p.data && (
+                                        <div
+                                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-amber-300 text-amber-800 px-1 rounded shadow-sm whitespace-nowrap z-20"
+                                            style={{ fontSize: osteoLabelPx + 'px' }}
+                                        >
+                                            {displayLabel}{angle != null && angle !== '' ? ` ${angle}\u00B0` : ''}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                        {ghostPlacements && !getItems('mid').length && (() => {
+                            const gp = ghostPlacements.find(p => p.levelId === level.id && p.zone === 'mid');
+                            if (!gp) return null;
+                            const tool = tools.find(item => item.id === gp.tool);
+                            let displayLabel = '';
+                            let angle = '';
+                            if (gp.tool === 'osteotomy' && typeof gp.data === 'object') {
+                                displayLabel = gp.data.shortLabel || gp.data.type;
+                                angle = gp.data.angle;
+                            }
+                            return (
+                                <div
+                                    key={'ghost-' + gp.id}
+                                    className="pointer-events-auto relative group flex flex-col items-center cursor-pointer"
+                                    style={{ opacity: 0.4 }}
+                                    onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(gp); }}
+                                >
+                                    <div style={{ width: midPx, height: midPx }}>
+                                        <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-md text-slate-900" />
+                                    </div>
+                                    {gp.tool === 'osteotomy' && gp.data && (
+                                        <div
+                                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-amber-300 text-amber-800 px-1 rounded shadow-sm whitespace-nowrap z-20"
+                                            style={{ fontSize: osteoLabelPx + 'px' }}
+                                        >
+                                            {displayLabel}{angle != null && angle !== '' ? ` ${angle}\u00B0` : ''}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })()}
+                    </div>
+                </div>
+
+                <div className={`flex-1 overflow-visible min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'right')}><ZoneContent zone="right" align="right"/></div>
+                {showForces && <div className={`w-10 border-l border-slate-100/50 bg-blue-50/20 ${!readOnly && !forcePlacements ? 'hover:bg-blue-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && !forcePlacements && onZoneClick(level.id, 'force_right')}><ZoneContent zone="force_right" align="center"/></div>}
+            </div>
+
+            {/* INTERBODY DISC ZONE (Except after Pelvis or C1) */}
+            {level.type !== 'Pelvis' && level.type !== 'S' && level.id !== 'Oc' && level.id !== 'C1' && (
+                <div className="w-full flex justify-center relative z-10">
+                    <div style={{ width: `${scaledWidth}px`, height: `${Math.max(DISC_MIN_PX, getDiscHeight(level) * heightScale)}px` }} className={`flex items-center justify-center cursor-pointer transition-all ${!readOnly ? 'hover:bg-sky-100/50' : ''}`} onClick={() => !readOnly && onDiscClick(level.id)}>
+                        {cageBelow ? (
+                            viewMode === 'whole' && level.type === 'C' ? (
+                                <div className="relative w-full h-full flex items-center justify-center">
+                                    <span className="text-amber-600 italic whitespace-nowrap" style={{ fontSize: Math.max(9, cageLabelPx - 1) + 'px' }}>{t('chart.cervical_cage_hint')}</span>
+                                </div>
+                            ) : (
+                            <div className="relative group w-full h-full flex justify-center">
+                                <svg viewBox="0 0 160 20" preserveAspectRatio="none" className="w-full h-full overflow-visible"><CageVisualization cageType={cageBelow.tool} heightScale={1} levelId={level.id} /></svg>
+                                <span className="absolute font-bold text-sky-700 bg-white/80 px-0.5 rounded whitespace-nowrap z-20" style={{ left: 'calc(75% + 2em)', top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{cageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {cageBelow.data.height}H {cageBelow.data.lordosis}°{cageBelow.data.side && cageBelow.data.side !== 'bilateral' && cageBelow.data.side !== 'midline' ? ` (${cageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
+                            </div>)
+                        ) : ghostCageBelow ? (
+                            viewMode === 'whole' && level.type === 'C' ? (
+                                <div className="relative w-full h-full flex items-center justify-center" style={{ opacity: 0.4 }}>
+                                    <span className="text-amber-600 italic whitespace-nowrap" style={{ fontSize: Math.max(9, cageLabelPx - 1) + 'px' }}>{t('chart.cervical_cage_hint')}</span>
+                                </div>
+                            ) : (
+                            <div className="relative group w-full h-full flex justify-center cursor-pointer" style={{ opacity: 0.4 }} onClick={(e) => { e.stopPropagation(); onGhostCageClick && onGhostCageClick(ghostCageBelow); }}>
+                                <svg viewBox="0 0 160 20" preserveAspectRatio="none" className="w-full h-full overflow-visible"><CageVisualization cageType={ghostCageBelow.tool} heightScale={1} levelId={level.id} /></svg>
+                                <span className="absolute font-bold text-sky-700 bg-white/80 px-0.5 rounded whitespace-nowrap z-20" style={{ left: 'calc(75% + 2em)', top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{ghostCageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {ghostCageBelow.data.height}H {ghostCageBelow.data.lordosis}°{ghostCageBelow.data.side && ghostCageBelow.data.side !== 'bilateral' && ghostCageBelow.data.side !== 'midline' ? ` (${ghostCageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
+                            </div>)
+                        ) : discOsteo ? (
+                            <div className="relative group w-full h-full flex items-center justify-center cursor-pointer" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(discOsteo); }}>
+                                <span className="font-bold text-amber-800 bg-amber-50/80 border border-amber-300 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{discOsteo.data?.shortLabel || t('clinical.osteotomy.fallback')} {getDiscLabel(level.id, levels)}{discOsteo.data?.angle != null && discOsteo.data?.angle !== '' ? ` ${discOsteo.data.angle}\u00B0` : ''}</span>
+                            </div>
+                        ) : ghostDiscOsteo ? (
+                            <div className="relative group w-full h-full flex items-center justify-center cursor-pointer" style={{ opacity: 0.4 }} onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostDiscOsteo); }}>
+                                <span className="font-bold text-amber-800 bg-amber-50/80 border border-amber-300 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{ghostDiscOsteo.data?.shortLabel || t('clinical.osteotomy.fallback')} {getDiscLabel(level.id, levels)}{ghostDiscOsteo.data?.angle != null && ghostDiscOsteo.data?.angle !== '' ? ` ${ghostDiscOsteo.data.angle}\u00B0` : ''}</span>
+                            </div>
+                        ) : (
+                            !readOnly && <div className="h-2 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const ChartPaper = ({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements, ghostConnectors, onGhostConnectorClick, ghostCages, onGhostCageClick }) => {
+    const contentRef = useRef(null);
+    const [draggingId, setDraggingId] = useState(null);
+    const dragStartRef = useRef(null);
+    const [draggingNoteId, setDraggingNoteId] = useState(null);
+    const noteDragStartRef = useRef(null);
+    const scaledWidth = 160 * heightScale;
+    const iconScale = Math.max(0.65, Math.min(1.3, heightScale));
+    const connW = Math.round(80 * iconScale);
+    const connH = Math.round(24 * iconScale);
+
+    const activeGhostConnectors = ghostConnectors ? ghostConnectors.filter(gc => !connectors.some(c => c.levelId === gc.levelId)) : [];
+
+    // Convert connector {levelId, fraction} to rendered Y pixel position
+    const connectorToRenderedY = (conn) => {
+        const viewMap = buildHeightMap(levels, heightScale);
+        const entry = viewMap.map.find(e => e.levelId === conn.levelId);
+        if (!entry) return null;
+        return entry.startY + conn.fraction * (entry.vertEnd - entry.startY);
+    };
+
+    // Convert rendered Y to {levelId, fraction}, snapping to nearest level
+    const renderedYToConnector = (localY) => {
+        const viewMap = buildHeightMap(levels, heightScale);
+        // Use <= endY to include the exact boundary pixel; also handles gap pixels between levels
+        let entry = viewMap.map.find(e => localY >= e.startY && localY <= e.endY);
+        if (!entry) {
+            // Find nearest level by distance to midpoint (handles border gaps)
+            let best = viewMap.map[0], bestDist = Infinity;
+            viewMap.map.forEach(e => {
+                const mid = (e.startY + e.endY) / 2;
+                const dist = Math.abs(localY - mid);
+                if (dist < bestDist) { bestDist = dist; best = e; }
+            });
+            entry = best;
+        }
+        const segLen = entry.vertEnd - entry.startY;
+        const fraction = segLen > 0 ? Math.max(0, Math.min(1, (localY - entry.startY) / segLen)) : 0.5;
+        return { levelId: entry.levelId, fraction };
+    };
+
+    useEffect(() => {
+        if (!draggingId || readOnly) return;
+        const handleMouseMove = (e) => {
+            if (!contentRef.current) return;
+            const rect = contentRef.current.getBoundingClientRect();
+            const localY = e.clientY - rect.top;
+            const { levelId, fraction } = renderedYToConnector(localY);
+            onConnectorUpdate(draggingId, { levelId, fraction });
+        };
+        const handleMouseUp = () => setDraggingId(null);
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        return () => { document.removeEventListener('mousemove', handleMouseMove); document.removeEventListener('mouseup', handleMouseUp); };
+    }, [draggingId, levels, heightScale, readOnly, onConnectorUpdate]);
+
+    // Note position: convert note to pixel coords within contentRef
+    const getNotePixelPos = (note) => {
+        const viewMap = buildHeightMap(levels, heightScale);
+        const entry = viewMap.map.find(e => e.levelId === note.levelId);
+        if (!entry) return null;
+        const anchorY = (entry.startY + entry.vertEnd) / 2;
+        const x = note.offsetX || 80;
+        const y = anchorY + (note.offsetY || 0);
+        return { x, y, anchorY };
+    };
+
+    // Note drag handler
+    useEffect(() => {
+        if (!draggingNoteId || readOnly) return;
+        const handleMouseMove = (e) => {
+            if (!contentRef.current || !noteDragStartRef.current) return;
+            const dx = e.clientX - noteDragStartRef.current.clientX;
+            const dy = e.clientY - noteDragStartRef.current.clientY;
+            const startOX = noteDragStartRef.current.offsetX;
+            const startOY = noteDragStartRef.current.offsetY;
+            onNoteUpdate(draggingNoteId, { offsetX: startOX + dx, offsetY: startOY + dy });
+        };
+        const handleMouseUp = () => setDraggingNoteId(null);
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        return () => { document.removeEventListener('mousemove', handleMouseMove); document.removeEventListener('mouseup', handleMouseUp); };
+    }, [draggingNoteId, readOnly, onNoteUpdate]);
+
+
+    return (
+    <div className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative"><div className={`${forcePlacements ? 'px-2 py-1' : 'p-2'} bg-slate-50 border-b border-slate-200 text-center`}><div className="font-bold text-sm text-slate-800 uppercase tracking-wider">{title}</div>{forcePlacements && <div className="text-[10px] font-normal text-blue-400 italic -mt-0.5">{t('chart.force_plan_only')}</div>}</div><div className="flex-1 relative flex flex-col pt-8 px-2 justify-center">
+        <div className="flex w-full absolute top-1 left-0 right-0 px-2 text-xs font-bold uppercase tracking-tighter text-center pointer-events-none z-10">
+            {showForces && <div className="w-10 text-blue-400">{t('chart.header.force')}</div>}
+            <div className="flex-1 text-right pr-4 text-slate-500">{t('chart.header.left')}</div>
+            <div style={{ width: `${scaledWidth}px` }}></div>
+            <div className="flex-1 text-left pl-4 text-slate-500">{t('chart.header.right')}</div>
+            {showForces && <div className="w-10 text-blue-400">{t('chart.header.force')}</div>}
+        </div>
+        {rodHeader && <div className="flex w-full absolute top-4 left-0 right-0 px-2 z-10">
+            {showForces && <div className="w-10"></div>}
+            <div className="flex-1 flex justify-end pr-1">{React.Children.toArray(rodHeader.props.children)[0]}</div>
+            <div style={{ width: `${scaledWidth * 0.5}px` }}></div>
+            <div className="flex-1 flex justify-start pl-0">{React.Children.toArray(rodHeader.props.children)[1]}</div>
+            {showForces && <div className="w-10"></div>}
+        </div>}
+        <div ref={contentRef} className="flex flex-col w-full relative">
+            {levels.map(lvl => <LevelRow key={lvl.id} level={lvl} placements={placements} ghostPlacements={ghostPlacements} onZoneClick={onZoneClick} onPlacementClick={onPlacementClick} onGhostClick={onGhostClick} tools={tools} readOnly={readOnly} showForces={showForces} heightScale={heightScale} cages={cages} onDiscClick={onDiscClick} levels={levels} viewMode={viewMode} forcePlacements={forcePlacements} ghostCages={ghostCages} onGhostCageClick={onGhostCageClick} />)}
+            {/* Connector overlay */}
+            {connectors && connectors.length > 0 && (
+                <div className="absolute inset-0 pointer-events-none z-30">
+                    {connectors.map(conn => {
+                        const y = connectorToRenderedY(conn);
+                        if (y === null) return null;
+                        return (
+                            <div key={conn.id}
+                                className={`absolute pointer-events-auto group ${!readOnly ? 'cursor-grab' : ''} ${draggingId === conn.id ? 'cursor-grabbing z-40' : ''}`}
+                                style={{ top: `${y - connH / 2}px`, left: '50%', transform: 'translateX(-50%)', width: `${scaledWidth}px`, height: `${connH}px` }}
+                                onMouseDown={(e) => { if (!readOnly) { e.preventDefault(); dragStartRef.current = { y: e.clientY }; setDraggingId(conn.id); } }}>
+                                <InstrumentIcon type="connector" className="w-full h-full drop-shadow-md text-slate-900" />
+                                {!readOnly && <button
+                                    className="hidden group-hover:flex absolute -top-2.5 -right-2.5 bg-red-500 text-white rounded-full w-5 h-5 items-center justify-center text-[10px] font-bold shadow hover:bg-red-600 z-50"
+                                    onClick={(e) => { e.stopPropagation(); onConnectorRemove(conn.id); }}
+                                    onMouseDown={(e) => e.stopPropagation()}>x</button>}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+            {/* Ghost connector overlay */}
+            {activeGhostConnectors.length > 0 && (
+                <div className="absolute inset-0 pointer-events-none z-29">
+                    {activeGhostConnectors.map(gc => {
+                        const y = connectorToRenderedY(gc);
+                        if (y === null) return null;
+                        return (
+                            <div key={gc.id || gc.levelId}
+                                className="absolute pointer-events-auto cursor-pointer"
+                                style={{ top: `${y - connH / 2}px`, left: '50%', transform: 'translateX(-50%)', width: `${scaledWidth}px`, height: `${connH}px`, opacity: 0.4 }}
+                                onClick={() => onGhostConnectorClick && onGhostConnectorClick(gc)}>
+                                <InstrumentIcon type="connector" className="w-full h-full drop-shadow-md text-slate-900" />
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+            {/* Notes overlay */}
+            {(() => {
+                const activeGhostNotes = ghostNotes ? ghostNotes.filter(gn => !notes.some(n => n.levelId === gn.levelId)) : [];
+                const hasNotes = notes && notes.length > 0;
+                const hasGhosts = activeGhostNotes.length > 0;
+                if (!hasNotes && !hasGhosts) return null;
+                return (
+                <React.Fragment>
+                    {/* Arrow SVG layer */}
+                    <svg className="absolute inset-0 pointer-events-none z-31 w-full h-full" style={{ overflow: 'visible' }}>
+                        <defs>
+                            <marker id={`arrowhead-${title.replace(/\s+/g,'')}`} markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                <polygon points="0 0, 8 3, 0 6" fill="#7c3aed" />
+                            </marker>
+                        </defs>
+                        {hasNotes && notes.filter(n => n.showArrow).map(n => {
+                            const pos = getNotePixelPos(n);
+                            if (!pos) return null;
+                            const contentW = contentRef.current?.clientWidth || 600;
+                            const noteX = contentW / 2 + pos.x;
+                            const noteY = pos.y;
+                            const anchorX = contentW / 2;
+                            const anchorY = pos.anchorY;
+                            const dx = anchorX - noteX;
+                            const dy = anchorY - noteY;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            if (dist < 10) return null;
+                            const startX = noteX + (dx / dist) * 8;
+                            const startY = noteY + (dy / dist) * 8;
+                            const endX = anchorX - (dx / dist) * 4;
+                            const endY = anchorY - (dy / dist) * 4;
+                            return <line key={n.id} x1={startX} y1={startY} x2={endX} y2={endY} stroke="#7c3aed" strokeWidth="1" markerEnd={`url(#arrowhead-${title.replace(/\s+/g,'')})`} />;
+                        })}
+                        {hasGhosts && <g style={{ opacity: 0.4 }}>
+                            {activeGhostNotes.filter(gn => gn.showArrow).map(gn => {
+                                const pos = getNotePixelPos(gn);
+                                if (!pos) return null;
+                                const contentW = contentRef.current?.clientWidth || 600;
+                                const noteX = contentW / 2 + pos.x;
+                                const noteY = pos.y;
+                                const anchorX = contentW / 2;
+                                const anchorY = pos.anchorY;
+                                const dx = anchorX - noteX;
+                                const dy = anchorY - noteY;
+                                const dist = Math.sqrt(dx * dx + dy * dy);
+                                if (dist < 10) return null;
+                                const startX = noteX + (dx / dist) * 8;
+                                const startY = noteY + (dy / dist) * 8;
+                                const endX = anchorX - (dx / dist) * 4;
+                                const endY = anchorY - (dy / dist) * 4;
+                                return <line key={`ghost-${gn.id}`} x1={startX} y1={startY} x2={endX} y2={endY} stroke="#7c3aed" strokeWidth="1" markerEnd={`url(#arrowhead-${title.replace(/\s+/g,'')})`} />;
+                            })}
+                        </g>}
+                    </svg>
+                    {/* Note label layer */}
+                    <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 32 }}>
+                        {hasNotes && notes.map(n => {
+                            const pos = getNotePixelPos(n);
+                            if (!pos) return null;
+                            return (
+                                <div key={n.id} data-note-click="true"
+                                    className={`absolute pointer-events-auto group select-none ${!readOnly ? 'cursor-grab' : ''} ${draggingNoteId === n.id ? 'cursor-grabbing' : ''}`}
+                                    style={{ left: `calc(50% + ${pos.x}px)`, top: `${pos.y}px`, transform: 'translate(-50%, -50%)' }}
+                                    onMouseDown={(e) => {
+                                        if (readOnly) return;
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        noteDragStartRef.current = { clientX: e.clientX, clientY: e.clientY, offsetX: n.offsetX || 80, offsetY: n.offsetY || 0 };
+                                        setDraggingNoteId(n.id);
+                                    }}
+                                    onClick={(e) => { e.stopPropagation(); if (!readOnly && !draggingNoteId) onNoteClick(n); }}
+                                >
+                                    <span className="text-[10px] font-bold text-violet-700 bg-white/90 border border-violet-200 px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">{n.text}</span>
+                                    {!readOnly && <button
+                                        className="hidden group-hover:flex absolute -top-2.5 -right-2.5 bg-red-500 text-white rounded-full w-5 h-5 items-center justify-center text-[10px] font-bold shadow hover:bg-red-600 z-50"
+                                        onClick={(e) => { e.stopPropagation(); onNoteRemove(n.id); }}
+                                        onMouseDown={(e) => e.stopPropagation()}>x</button>}
+                                </div>
+                            );
+                        })}
+                        {hasGhosts && activeGhostNotes.map(gn => {
+                            const pos = getNotePixelPos(gn);
+                            if (!pos) return null;
+                            return (
+                                <div key={`ghost-${gn.id}`}
+                                    className="absolute pointer-events-auto select-none"
+                                    style={{ left: `calc(50% + ${pos.x}px)`, top: `${pos.y}px`, transform: 'translate(-50%, -50%)', opacity: 0.4, cursor: 'pointer' }}
+                                    onClick={(e) => { e.stopPropagation(); if (onGhostNoteClick) onGhostNoteClick(gn); }}
+                                >
+                                    <span className="text-[10px] font-bold text-violet-700 bg-white/90 border border-violet-200 px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">{gn.text}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </React.Fragment>
+                );
+            })()}
+        </div></div></div>
+    );
+};
+
+// ==========================================
+// SECTION 4: MAIN APP CONTROLLER
+// ==========================================
+const App = () => {
+    const [selectedTool, setSelectedTool] = useState('implant');
+    const [lastUsedScrewType, setLastUsedScrewType] = useState('polyaxial');
+    const [activeChart, setActiveChart] = useState(() => {
+        const savedTab = localStorage.getItem('spine_planner_tab');
+        return savedTab === '2' ? 'completed' : 'planned';
+    }); 
+    const [plannedPlacements, setPlannedPlacements] = useState([]);
+    const [completedPlacements, setCompletedPlacements] = useState([]);
+    const [plannedCages, setPlannedCages] = useState([]);
+    const [completedCages, setCompletedCages] = useState([]);
+    const [plannedConnectors, setPlannedConnectors] = useState([]);
+    const [completedConnectors, setCompletedConnectors] = useState([]);
+    const [plannedNotes, setPlannedNotes] = useState([]);
+    const [completedNotes, setCompletedNotes] = useState([]);
+    const [documentId, setDocumentId] = useState(() => crypto.randomUUID());
+    const [documentCreated, setDocumentCreated] = useState(() => new Date().toISOString());
+    const [colourScheme, setColourScheme] = useState(() => {
+        const stored = localStorage.getItem('spine_planner_theme');
+        return (stored && COLOUR_SCHEMES.some(s => s.id === stored)) ? stored : 'default';
+    });
+    const [themeOpen, setThemeOpen] = useState(false);
+    const [showFinalInventory, setShowFinalInventory] = useState(false);
+    const [currentLang, setCurrentLangState] = useState(detectLanguage());
+
+    const changeLang = (code) => {
+        setCurrentLang(code);
+        setCurrentLangState(code);
+        document.documentElement.lang = code;
+        localStorage.setItem('spine_planner_lang', code);
+    };
+
+    const changeTheme = (id) => {
+        setColourScheme(id);
+        localStorage.setItem('spine_planner_theme', id);
+    };
+    const [patientData, setPatientData] = useState({ name: '', id: '', surgeon: '', location: '', date: new Date().toISOString().split('T')[0], company: '', screwSystem: '', leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '', boneGraft: { types: [], notes: '' } });
+    const [viewMode, setViewMode] = useState('thoracolumbar'); 
+    const [scale, setScale] = useState(1);
+    const [incognitoMode, setIncognitoMode] = useState(false);
+    const [isEditingDate, setIsEditingDate] = useState(false);
+    const [hasLoaded, setHasLoaded] = useState(false);
+    const [syncConnected, setSyncConnected] = useState(false);
+    const receivingSync = useRef(false);
+    const syncChannelRef = useRef(null);
+    const syncTimerRef = useRef(null);
+    const lastPongRef = useRef(0);
+    const syncVersionRef = useRef(0);
+    const syncVersionMismatchRef = useRef(false);
+    const serializeRef = useRef(null);
+    const deserializeRef = useRef(null);
+
+    // MODALS
+    const [screwModalOpen, setScrewModalOpen] = useState(false);
+    const [osteoModalOpen, setOsteoModalOpen] = useState(false);
+    const [cageModalOpen, setCageModalOpen] = useState(false);
+    const [forceModalOpen, setForceModalOpen] = useState(false);
+    const [helpModalOpen, setHelpModalOpen] = useState(false);
+    const [changeLogOpen, setChangeLogOpen] = useState(false);
+    const [noteModalOpen, setNoteModalOpen] = useState(false);
+    const [pendingNoteTool, setPendingNoteTool] = useState(null); // { tool: 'note', levelId, offsetX, offsetY }
+    const [editingNote, setEditingNote] = useState(null); // full note object when editing
+    
+    const [confirmNewPatient, setConfirmNewPatient] = useState(false);
+    const [exportPicker, setExportPicker] = useState(null); // 'jpg' or 'pdf'
+
+    // TOAST NOTIFICATIONS
+    const [toasts, setToasts] = useState([]);
+    const toastIdRef = useRef(0);
+    const showToast = useCallback((message, type = 'info') => {
+        const id = ++toastIdRef.current;
+        setToasts(prev => [...prev, { id, message, type }]);
+        if (type !== 'error') setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
+    }, []);
+    const dismissToast = useCallback((id) => setToasts(prev => prev.filter(t => t.id !== id)), []);
+
+    // EDITING STATE
+    const [pendingPlacement, setPendingPlacement] = useState(null);
+    const [editingPlacementId, setEditingPlacementId] = useState(null);
+    const [editingData, setEditingData] = useState(null);
+    const [editingTool, setEditingTool] = useState(null);
+    const [editingCageLevel, setEditingCageLevel] = useState(null);
+    const [discPickerLevel, setDiscPickerLevel] = useState(null);
+    const [editingAnnotation, setEditingAnnotation] = useState('');
+
+    const [defaultDiameter, setDefaultDiameter] = useState('6.5');
+    const [defaultLength, setDefaultLength] = useState('45');
+    const [defaultScrewMode, setDefaultScrewMode] = useState('standard');
+    const [defaultCustomText, setDefaultCustomText] = useState('');
+    const [defaultOsteoType, setDefaultOsteoType] = useState('PSO');
+    const [defaultOsteoAngle, setDefaultOsteoAngle] = useState('25');
+    const [osteoDiscLevel, setOsteoDiscLevel] = useState(undefined); // true=disc only, false=vertebral only, undefined=all
+    const [pendingForceZone, setPendingForceZone] = useState(null);
+    
+    const exportRef = useRef(null);
+    const containerWrapperRef = useRef(null);
+    const fileInputRef = useRef(null);
+
+    // PORTRAIT MODE
+    const isPortrait = usePortrait();
+    const isSmallScreen = useMemo(() => Math.min(window.screen.width, window.screen.height) < 600, []);
+    const isViewOnly = isPortrait && isSmallScreen;
+    const [portraitExporting, setPortraitExporting] = useState(false);
+    const [portraitTab, setPortraitTab] = useState(() => {
+        const saved = localStorage.getItem('spine_planner_tab');
+        const n = saved ? parseInt(saved, 10) : 0;
+        return (n >= 0 && n <= 2) ? n : 0;
+    });
+    const switchPortraitTab = useCallback((tab) => {
+        setPortraitTab(tab);
+        localStorage.setItem('spine_planner_tab', String(tab));
+        if (tab === 1) setActiveChart('planned');
+        else if (tab === 2) setActiveChart('completed');
+    }, []);
+    const PORTRAIT_TABS = ['portrait.tab.demographics', 'portrait.tab.plan', 'portrait.tab.construct'];
+    const portraitContentRef = useRef(null);
+    const touchStartRef = useRef(null);
+    const [portraitScale, setPortraitScale] = useState(1);
+    // Fixed column sizes matching the export container proportions
+    const PORTRAIT_COL_W = [370, 637, 637]; // demographics, plan, construct (construct widened for ghost forces)
+    const PORTRAIT_COL_H = 1050;
+
+    // Swipe gesture detection for portrait tab switching
+    const handleTouchStart = useCallback((e) => {
+        if (!isPortrait) return;
+        const touch = e.touches[0];
+        touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
+    }, [isPortrait]);
+
+    const handleTouchEnd = useCallback((e) => {
+        if (!isPortrait || !touchStartRef.current) return;
+        const touch = e.changedTouches[0];
+        const dx = touch.clientX - touchStartRef.current.x;
+        const dy = touch.clientY - touchStartRef.current.y;
+        const elapsed = Date.now() - touchStartRef.current.time;
+        touchStartRef.current = null;
+        // Only trigger on predominantly horizontal swipes with min 50px threshold
+        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5 && elapsed < 500) {
+            if (dx < 0 && portraitTab < 2) switchPortraitTab(portraitTab + 1);
+            else if (dx > 0 && portraitTab > 0) switchPortraitTab(portraitTab - 1);
+        }
+    }, [isPortrait, portraitTab]);
+
+    const levels = useMemo(() => {
+        const lvls = [];
+        // VIEW LOGIC
+        if (viewMode === 'whole' || viewMode === 'cervical') { lvls.push({ id: 'Oc', type: 'Oc' }); ['C1','C2','C3','C4','C5','C6','C7'].forEach(l => lvls.push({ id:l, type:'C' })); }
+        
+        if (viewMode === 'cervical') { ['T1','T2','T3','T4'].forEach(l => lvls.push({ id:l, type:'T' })); }
+        else if (viewMode === 't10_pelvis') { ['T10','T11','T12'].forEach(l => lvls.push({ id:l, type:'T' })); }
+        else { ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'].forEach(l => lvls.push({ id:l, type:'T' })); }
+
+        if (viewMode !== 'cervical') { ['L1','L2','L3','L4','L5'].forEach(l => lvls.push({ id:l, type:'L' })); lvls.push({ id:'S1', type:'S' }); lvls.push({ id:'Pelvis', type:'Pelvis' }); }
+        return lvls;
+    }, [viewMode]);
+
+    const scheme = COLOUR_SCHEMES.find(s => s.id === colourScheme) || COLOUR_SCHEMES[0];
+
+    // SERIALISE / DESERIALISE — v4 spinal-instrumentation format
+    // Mapping tables: internal tool IDs ↔ v4 schema types
+    const TOOL_TO_V4_HOOK = { pedicle_hook: 'pedicle', tp_hook: 'transverse-process-down', tp_hook_up: 'transverse-process-up', sl_hook: 'supralaminar', il_hook: 'infralaminar', supra_laminar_hook: 'supralaminar', infra_laminar_hook: 'infralaminar' };
+    const V4_HOOK_TO_TOOL = Object.fromEntries(Object.entries(TOOL_TO_V4_HOOK).map(([k,v]) => [v, k]));
+    const TOOL_TO_V4_FIXATION = { band: 'sublaminar-band', wire: 'sublaminar-wire', cable: 'cable' };
+    const V4_FIXATION_TO_TOOL = Object.fromEntries(Object.entries(TOOL_TO_V4_FIXATION).map(([k,v]) => [v, k]));
+    const OSTEO_TO_V4 = { Facet: { t: 'facetectomy', g: 1 }, Ponte: { t: 'ponte', g: 2 }, PSO: { t: 'PSO', g: 3 }, ExtPSO: { t: 'extended-PSO', g: 4 }, VCR: { t: 'VCR', g: 5 }, 'ML-VCR': { t: 'multilevel-VCR', g: 6 }, Corpectomy: { t: 'corpectomy', g: null } };
+    const V4_OSTEO_TO_TOOL = Object.fromEntries(Object.entries(OSTEO_TO_V4).map(([k,v]) => [v.t, k]));
+    const FORCE_TO_V4 = { translate_left: { type: 'translation', direction: 'left' }, translate_right: { type: 'translation', direction: 'right' }, compression: { type: 'compression' }, distraction: { type: 'distraction' }, derotate_cw: { type: 'derotation', direction: 'clockwise' }, derotate_ccw: { type: 'derotation', direction: 'anticlockwise' } };
+    const V4_FORCE_TO_TOOL = { 'translation-left': 'translate_left', 'translation-right': 'translate_right', compression: 'compression', distraction: 'distraction', 'derotation-clockwise': 'derotate_cw', 'derotation-anticlockwise': 'derotate_ccw' };
+    const ZONE_TO_SIDE = { left: 'left', right: 'right', mid: 'midline', disc: 'midline', force_left: 'left', force_right: 'right' };
+    const BONEGRAFT_TO_V4 = { 'Local Bone': 'local-bone', 'Autograft': 'iliac-crest-autograft', 'Allograft': 'allograft', 'Synthetics': 'synthetic', 'DBM': 'DBM', 'BMP': 'BMP' };
+    const V4_BONEGRAFT_TO_TOOL = Object.fromEntries(Object.entries(BONEGRAFT_TO_V4).map(([k,v]) => [v, k]));
+
+    // Convert internal placements/cages/connectors/notes/forces → v4 elements/forces/notes
+    const internalToV4Chart = (placements, cages, connectors, notes, rodText, planRodText) => {
+        const elements = [];
+        const forces = [];
+        // Placements → elements or forces
+        (placements || []).forEach(p => {
+            const fv4 = FORCE_TO_V4[p.tool];
+            if (fv4) {
+                forces.push({ id: p.id, type: fv4.type, direction: fv4.direction || undefined, level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left' });
+                return;
+            }
+            if (p.tool === 'unstable') return; // UI-only marker
+            const screwTypes = ['monoaxial', 'polyaxial', 'uniplanar'];
+            const hookTypes = Object.keys(TOOL_TO_V4_HOOK);
+            const fixTypes = Object.keys(TOOL_TO_V4_FIXATION);
+            if (screwTypes.includes(p.tool)) {
+                const el = { id: p.id, type: 'screw', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left' };
+                const screw = { headType: p.tool };
+                if (typeof p.data === 'string' && p.data.includes('x')) {
+                    const parts = p.data.split('x').map(Number);
+                    if (!isNaN(parts[0])) screw.diameter = parts[0];
+                    if (!isNaN(parts[1])) screw.length = parts[1];
+                }
+                el.screw = screw;
+                if (p.annotation) el.annotation = p.annotation;
+                elements.push(el);
+            } else if (hookTypes.includes(p.tool)) {
+                const el = { id: p.id, type: 'hook', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', hook: { hookType: TOOL_TO_V4_HOOK[p.tool] } };
+                if (p.annotation) el.annotation = p.annotation;
+                elements.push(el);
+            } else if (fixTypes.includes(p.tool)) {
+                const el = { id: p.id, type: 'fixation', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', fixation: { fixationType: TOOL_TO_V4_FIXATION[p.tool] } };
+                if (p.data) el.fixation.description = p.data;
+                if (p.annotation) el.annotation = p.annotation;
+                elements.push(el);
+            } else if (p.tool === 'osteotomy' && typeof p.data === 'object') {
+                const ov4 = OSTEO_TO_V4[p.data.type] || { t: p.data.type, g: null };
+                const el = { id: p.id, type: 'osteotomy', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'midline' };
+                el.osteotomy = { osteotomyType: ov4.t };
+                if (ov4.g) el.osteotomy.schwabGrade = ov4.g;
+                if (p.data.angle != null && p.data.angle !== '') el.osteotomy.correctionAngle = Number(p.data.angle);
+                if (p.data.reconstructionCage) el.osteotomy.reconstructionCage = p.data.reconstructionCage;
+                elements.push(el);
+            }
+        });
+        // Cages → elements
+        (cages || []).forEach(c => {
+            const el = { id: c.id, type: 'cage', level: c.levelId, side: c.data?.side || 'bilateral' };
+            el.cage = { approach: c.tool.toUpperCase() };
+            if (c.data) {
+                if (c.data.height) el.cage.height = Number(c.data.height);
+                if (c.data.width) el.cage.width = Number(c.data.width);
+                if (c.data.length) el.cage.length = Number(c.data.length);
+                if (c.data.lordosis) el.cage.lordosis = Number(c.data.lordosis);
+            }
+            elements.push(el);
+        });
+        // Connectors → elements
+        (connectors || []).forEach(cn => {
+            elements.push({ id: cn.id, type: 'connector', level: cn.levelId, side: 'midline', connector: { connectorType: 'crosslink', fraction: cn.fraction } });
+        });
+        // Rods from free text
+        const rods = [];
+        if (rodText?.left) rods.push({ id: 'rod-left', side: 'left', freeText: rodText.left });
+        if (rodText?.right) rods.push({ id: 'rod-right', side: 'right', freeText: rodText.right });
+        // Notes (strip pixel offsets)
+        const v4Notes = (notes || []).map(n => ({ id: n.id, level: n.levelId, text: n.text, showArrow: n.showArrow || false }));
+        const notePositions = {};
+        (notes || []).forEach(n => { if (n.offsetX !== undefined) notePositions[n.id] = { offsetX: n.offsetX, offsetY: n.offsetY }; });
+        return { elements, forces, rods, notes: v4Notes, notePositions };
+    };
+
+    // Convert v4 elements/forces/notes → internal state arrays
+    const v4ChartToInternal = (chartData, notePositions) => {
+        const placements = [], cages = [], connectors = [], notes = [];
+        (chartData.elements || []).forEach(el => {
+            if (el.type === 'screw') {
+                const sizeStr = (el.screw?.diameter && el.screw?.length) ? `${el.screw.diameter}x${el.screw.length}` : null;
+                const zone = el.side === 'right' ? 'right' : 'left';
+                placements.push({ id: el.id, levelId: el.level, zone, tool: el.screw?.headType || 'polyaxial', data: sizeStr, annotation: el.annotation || '' });
+            } else if (el.type === 'hook') {
+                const tool = V4_HOOK_TO_TOOL[el.hook?.hookType] || 'pedicle_hook';
+                const zone = el.side === 'right' ? 'right' : 'left';
+                placements.push({ id: el.id, levelId: el.level, zone, tool, data: null, annotation: el.annotation || '' });
+            } else if (el.type === 'fixation') {
+                const tool = V4_FIXATION_TO_TOOL[el.fixation?.fixationType] || 'band';
+                const zone = el.side === 'right' ? 'right' : 'left';
+                placements.push({ id: el.id, levelId: el.level, zone, tool, data: el.fixation?.description || null, annotation: el.annotation || '' });
+            } else if (el.type === 'osteotomy') {
+                const v3Type = V4_OSTEO_TO_TOOL[el.osteotomy?.osteotomyType] || el.osteotomy?.osteotomyType || 'PSO';
+                const isDisc = ['facetectomy', 'ponte'].includes(el.osteotomy?.osteotomyType);
+                placements.push({ id: el.id, levelId: el.level, zone: isDisc ? 'disc' : 'mid', tool: 'osteotomy', data: { type: v3Type, shortLabel: el.osteotomy?.osteotomyType === 'facetectomy' ? 'Facet' : (v3Type.length <= 6 ? v3Type : v3Type.substring(0,3).toUpperCase()), angle: el.osteotomy?.correctionAngle ?? null, reconstructionCage: el.osteotomy?.reconstructionCage || '' }, annotation: '' });
+            } else if (el.type === 'cage') {
+                cages.push({ id: el.id, levelId: el.level, tool: (el.cage?.approach || 'TLIF').toLowerCase(), data: { height: String(el.cage?.height || ''), lordosis: String(el.cage?.lordosis || ''), side: el.side || 'bilateral', width: el.cage?.width ? String(el.cage.width) : undefined, length: el.cage?.length ? String(el.cage.length) : undefined } });
+            } else if (el.type === 'connector') {
+                connectors.push({ id: el.id, levelId: el.level, fraction: el.connector?.fraction || 0.5, tool: 'connector' });
+            }
+        });
+        // Forces → placements
+        (chartData.forces || []).forEach(f => {
+            const key = f.direction ? `${f.type}-${f.direction}` : f.type;
+            const tool = V4_FORCE_TO_TOOL[key] || 'compression';
+            const zone = f.side === 'right' ? 'force_right' : 'force_left';
+            placements.push({ id: f.id, levelId: f.level, zone, tool, data: null, annotation: '' });
+        });
+        // Notes — restore pixel offsets
+        (chartData.notes || []).forEach(n => {
+            const pos = notePositions?.[n.id] || { offsetX: -100, offsetY: 0 };
+            notes.push({ id: n.id, tool: 'note', levelId: n.level, text: n.text, offsetX: pos.offsetX, offsetY: pos.offsetY, showArrow: n.showArrow || false });
+        });
+        // Rod free text
+        const rodLeft = (chartData.rods || []).find(r => r.side === 'left');
+        const rodRight = (chartData.rods || []).find(r => r.side === 'right');
+        return { placements, cages, connectors, notes, rodLeft: rodLeft?.freeText || '', rodRight: rodRight?.freeText || '' };
+    };
+
+    const serializeState = () => {
+        const planChart = internalToV4Chart(plannedPlacements, plannedCages, plannedConnectors, plannedNotes, { left: patientData.planLeftRod, right: patientData.planRightRod });
+        const constChart = internalToV4Chart(completedPlacements, completedCages, completedConnectors, completedNotes, { left: patientData.leftRod, right: patientData.rightRod });
+        return {
+            schema: { format: 'spinal-instrumentation', version: 4, schemaUrl: 'https://spine-planner.org/schema/v4/spinal-instrumentation.json', generator: { name: 'Spinal Instrumentation Plan & Record', version: CURRENT_VERSION, url: 'https://nigelgummerson.github.io/spine-planner' } },
+            document: { id: documentId, created: documentCreated, modified: new Date().toISOString(), language: currentLang },
+            patient: { name: patientData.name, identifier: patientData.id },
+            case: { date: patientData.date, surgeon: patientData.surgeon, location: patientData.location || '' },
+            implantSystem: { manufacturer: patientData.company, system: patientData.screwSystem },
+            plan: { elements: planChart.elements, rods: planChart.rods, forces: planChart.forces, boneGraft: { types: (patientData.boneGraft?.types || []).map(t => BONEGRAFT_TO_V4[t] || t), notes: patientData.boneGraft?.notes || '' }, notes: planChart.notes },
+            construct: { elements: constChart.elements, rods: constChart.rods, forces: constChart.forces, boneGraft: { types: [], notes: '' }, notes: constChart.notes },
+            ui: { colourScheme, viewMode, notePositions: { ...planChart.notePositions, ...constChart.notePositions } }
+        };
+    };
+
+    // Migrate v3 → internal state (legacy support)
+    const migrateConnectors = (conns) => {
+        if (!conns) return conns;
+        return conns.map(c => {
+            if (c.levelId) return c;
+            if (c.yNorm === undefined) return c;
+            const anatomicalY = (c.yNorm / 1000) * WHOLE_SPINE_MAP.totalHeight;
+            const entry = WHOLE_SPINE_MAP.map.find(e => anatomicalY >= e.startY && anatomicalY < e.endY) || WHOLE_SPINE_MAP.map[WHOLE_SPINE_MAP.map.length - 1];
+            const segLen = entry.vertEnd - entry.startY;
+            const fraction = segLen > 0 ? Math.max(0, Math.min(1, (anatomicalY - entry.startY) / segLen)) : 0.5;
+            return { id: c.id, levelId: entry.levelId, fraction, tool: 'connector' };
+        });
+    };
+
+    const deserializeState = (json) => {
+        // v4 format
+        if (json.schema?.version === 4) {
+            if (json.document?.id) setDocumentId(json.document.id);
+            if (json.document?.created) setDocumentCreated(json.document.created);
+            // Patient data — reconstruct internal format
+            const pd = {
+                name: json.patient?.name || '', id: json.patient?.identifier || '',
+                surgeon: json.case?.surgeon || '', location: json.case?.location || '',
+                date: json.case?.date || new Date().toISOString().split('T')[0],
+                company: json.implantSystem?.manufacturer || '', screwSystem: json.implantSystem?.system || '',
+                leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '',
+                boneGraft: { types: (json.plan?.boneGraft?.types || []).map(t => V4_BONEGRAFT_TO_TOOL[t] || t), notes: json.plan?.boneGraft?.notes || '' }
+            };
+            const notePos = json.ui?.notePositions || {};
+            if (json.plan) {
+                const p = v4ChartToInternal(json.plan, notePos);
+                setPlannedPlacements(p.placements); setPlannedCages(p.cages); setPlannedConnectors(p.connectors); setPlannedNotes(p.notes);
+                pd.planLeftRod = p.rodLeft; pd.planRightRod = p.rodRight;
+            }
+            if (json.construct) {
+                const c = v4ChartToInternal(json.construct, notePos);
+                setCompletedPlacements(c.placements); setCompletedCages(c.cages); setCompletedConnectors(c.connectors); setCompletedNotes(c.notes);
+                pd.leftRod = c.rodLeft; pd.rightRod = c.rodRight;
+            }
+            setPatientData(pd);
+            if (json.ui?.viewMode) setViewMode(json.ui.viewMode);
+            if (json.ui?.colourScheme) changeTheme(json.ui.colourScheme);
+            return;
+        }
+        // v3 / v2 legacy format
+        if (json.patient) setPatientData(json.patient);
+        if (json.plan) {
+            if (json.plan.implants) setPlannedPlacements(json.plan.implants);
+            if (json.plan.cages) setPlannedCages(json.plan.cages);
+            if (json.plan.connectors) setPlannedConnectors(migrateConnectors(json.plan.connectors));
+            if (json.plan.notes) setPlannedNotes(json.plan.notes);
+        }
+        if (json.construct) {
+            if (json.construct.implants) setCompletedPlacements(json.construct.implants);
+            if (json.construct.cages) setCompletedCages(json.construct.cages);
+            if (json.construct.connectors) setCompletedConnectors(migrateConnectors(json.construct.connectors));
+            if (json.construct.notes) setCompletedNotes(json.construct.notes);
+        }
+        if (json.preferences?.viewMode) setViewMode(json.preferences.viewMode);
+        if (json.preferences?.colourScheme) changeTheme(json.preferences.colourScheme);
+    };
+    serializeRef.current = serializeState;
+    deserializeRef.current = deserializeState;
+
+    // AUTO-LOAD
+    // SYNC LANGUAGE ON MOUNT
+    useEffect(() => {
+        setCurrentLang(currentLang);
+        document.documentElement.lang = currentLang;
+    }, []);
+
+    useEffect(() => {
+        const saved = localStorage.getItem('spine_planner_v2');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (parsed.schema?.version === 4 || parsed.formatVersion >= 2) deserializeState(parsed);
+            } catch (e) { console.error("Data load error"); }
+        }
+        setHasLoaded(true);
+    }, []);
+
+    // AUTO-SAVE + BROADCAST SYNC
+    useEffect(() => {
+        if (hasLoaded && !incognitoMode) {
+            localStorage.setItem('spine_planner_v2', JSON.stringify(serializeState()));
+        }
+        if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+        // Broadcast to other windows (skip if this update came from sync)
+        if (receivingSync.current) {
+            receivingSync.current = false;
+            return;
+        }
+        if (hasLoaded && syncChannelRef.current) {
+            syncVersionRef.current++;
+            clearTimeout(syncTimerRef.current);
+            syncTimerRef.current = setTimeout(() => {
+                if (syncChannelRef.current) {
+                    syncChannelRef.current.postMessage({ type: 'state', appVersion: CURRENT_VERSION, payload: serializeState(), version: syncVersionRef.current });
+                }
+            }, 200);
+        }
+    }, [plannedPlacements, completedPlacements, plannedCages, completedCages, plannedConnectors, completedConnectors, plannedNotes, completedNotes, patientData, viewMode, colourScheme, hasLoaded, incognitoMode]);
+
+    // BROADCAST CHANNEL SYNC
+    useEffect(() => {
+        if (typeof BroadcastChannel === 'undefined') return;
+        const ch = new BroadcastChannel('spine-planner-sync');
+        syncChannelRef.current = ch;
+
+        ch.onmessage = (e) => {
+            const msg = e.data;
+            // Version mismatch — ignore sync from older/newer app versions
+            if (msg.appVersion !== CURRENT_VERSION) {
+                if (!syncVersionMismatchRef.current) {
+                    syncVersionMismatchRef.current = true;
+                    showToast(`Another window is running ${msg.appVersion} — please reload all windows to sync.`, 'error');
+                }
+                return;
+            }
+            if (msg.type === 'ping') {
+                ch.postMessage({ type: 'pong', appVersion: CURRENT_VERSION, payload: serializeRef.current() });
+            } else if (msg.type === 'pong') {
+                lastPongRef.current = Date.now();
+                setSyncConnected(true);
+                if (msg.payload) {
+                    clearTimeout(syncTimerRef.current);
+                    receivingSync.current = true;
+                    deserializeRef.current(msg.payload);
+                }
+            } else if (msg.type === 'state') {
+                if (msg.payload) {
+                    // Cancel any pending outbound sync — the incoming state supersedes it
+                    clearTimeout(syncTimerRef.current);
+                    receivingSync.current = true;
+                    deserializeRef.current(msg.payload);
+                }
+            }
+        };
+
+        // Initial ping to discover existing peers
+        ch.postMessage({ type: 'ping', appVersion: CURRENT_VERSION });
+
+        // Heartbeat: ping every 5s, disconnect if no pong in 10s
+        const heartbeat = setInterval(() => {
+            ch.postMessage({ type: 'ping', appVersion: CURRENT_VERSION });
+            if (lastPongRef.current > 0 && Date.now() - lastPongRef.current > 10000) {
+                setSyncConnected(false);
+                lastPongRef.current = 0;
+            }
+        }, 5000);
+
+        const handleUnload = () => ch.postMessage({ type: 'bye' });
+        window.addEventListener('beforeunload', handleUnload);
+
+        return () => {
+            clearInterval(heartbeat);
+            window.removeEventListener('beforeunload', handleUnload);
+            ch.postMessage({ type: 'bye' });
+            ch.close();
+            syncChannelRef.current = null;
+        };
+    }, [hasLoaded]);
+
+    // RESIZE OBSERVER — portrait mode: scale active column to fit
+    useEffect(() => {
+        if (!isPortrait || !portraitContentRef.current) return;
+        const recalc = () => {
+            if (!portraitContentRef.current) return;
+            const availW = portraitContentRef.current.clientWidth;
+            const availH = portraitContentRef.current.clientHeight;
+            const colW = PORTRAIT_COL_W[portraitTab];
+            const colH = PORTRAIT_COL_H;
+            const pad = 16; // small margin
+            setPortraitScale(Math.min((availW - pad) / colW, (availH - pad) / colH));
+        };
+        recalc();
+        const observer = new ResizeObserver(recalc);
+        observer.observe(portraitContentRef.current);
+        return () => observer.disconnect();
+    }, [isPortrait, portraitTab]);
+
+    // RESIZE OBSERVER — landscape mode: scale export container
+    useEffect(() => {
+        if (isPortrait || !containerWrapperRef.current) return;
+        const observer = new ResizeObserver(() => {
+            if (containerWrapperRef.current && exportRef.current) {
+                const wrapperH = containerWrapperRef.current.clientHeight;
+                const wrapperW = containerWrapperRef.current.clientWidth;
+                setScale(Math.min((wrapperW - 40) / 1485, (wrapperH - 40) / 1050));
+            }
+        });
+        observer.observe(containerWrapperRef.current);
+        return () => observer.disconnect();
+    }, [isPortrait]);
+
+    // ALL TOOL DEFINITIONS (for rendering and lookup)
+    const allTools = [
+        { id: 'monoaxial', labelKey: 'tool.monoaxial', icon: 'monoaxial', needsSize: true, type: 'implant' },
+        { id: 'polyaxial', labelKey: 'tool.polyaxial', icon: 'polyaxial', needsSize: true, type: 'implant' },
+        { id: 'uniplanar', labelKey: 'tool.uniplanar', icon: 'uniplanar', needsSize: true, type: 'implant' },
+        { id: 'pedicle_hook', labelKey: 'tool.pedicle_hook', icon: 'pedicle_hook', type: 'implant' },
+        { id: 'tp_hook', labelKey: 'tool.tp_hook', icon: 'tp_hook', type: 'implant' },
+        { id: 'tp_hook_up', labelKey: 'tool.tp_hook_up', icon: 'tp_hook_up', type: 'implant' },
+        { id: 'sl_hook', labelKey: 'tool.sl_hook', icon: 'sl_hook', type: 'implant' },
+        { id: 'il_hook', labelKey: 'tool.il_hook', icon: 'il_hook', type: 'implant' },
+        { id: 'band', labelKey: 'tool.band', icon: 'band', type: 'implant' },
+        { id: 'wire', labelKey: 'tool.wire', icon: 'wire', type: 'implant' },
+        { id: 'cable', labelKey: 'tool.cable', icon: 'cable', type: 'implant' },
+        { id: 'implant', labelKey: 'tool.implant', icon: 'implant', type: 'mode' },
+        { id: 'connector', labelKey: 'tool.connector', icon: 'connector', type: 'mid' },
+        { id: 'unstable', labelKey: 'tool.unstable', icon: 'unstable', type: 'mid' },
+        { id: 'osteotomy', labelKey: 'tool.osteotomy', icon: 'osteotomy', isOsteotomy: true, type: 'mid' },
+        { id: 'Corpectomy', labelKey: 'tool.corpectomy', icon: 'cage', isOsteotomy: true, type: 'mid' },
+        { id: 'translate_left', labelKey: 'tool.translate_left', icon: 'translate_left', type: 'force' },
+        { id: 'translate_right', labelKey: 'tool.translate_right', icon: 'translate_right', type: 'force' },
+        { id: 'compression', labelKey: 'tool.compression', icon: 'compression', type: 'force' },
+        { id: 'distraction', labelKey: 'tool.distraction', icon: 'distraction', type: 'force' },
+        { id: 'derotate_cw', labelKey: 'tool.derotate_cw', icon: 'derotate_cw', type: 'force' },
+        { id: 'derotate_ccw', labelKey: 'tool.derotate_ccw', icon: 'derotate_ccw', type: 'force' },
+        { id: 'note', labelKey: 'tool.note', icon: 'note', type: 'annotation' },
+    ];
+
+    // SIDEBAR PALETTE
+    const tools = [
+        { categoryKey: 'sidebar.category.tools', items: allTools.filter(item => ['implant','connector','unstable','osteotomy','Corpectomy','note'].includes(item.id)) },
+    ];
+
+    // LOGIC HANDLERS — zone determines behaviour
+    const handleZoneClick = (levelId, zone) => {
+        const isForceZone = zone.startsWith('force');
+
+        // Force zones → always open ForceModal, regardless of selected tool
+        if (isForceZone) {
+            setPendingForceZone({ levelId, zone });
+            setForceModalOpen(true);
+            return;
+        }
+
+        // ANNOTATION MODE: when note/pin selected, non-force clicks place notes
+        if (selectedTool === 'note') {
+            const hs = calculateAutoScale(levels);
+            const levelObj = levels.find(l => l.id === levelId);
+            const vertH = levelObj ? getLevelHeight(levelObj) * hs : 30;
+            setPendingNoteTool({ tool: selectedTool, levelId, offsetX: -100, offsetY: Math.round(vertH / 2) });
+            setEditingNote(null);
+            setNoteModalOpen(true);
+            return;
+        }
+
+        // Left/right zones — one implant per zone
+        if (zone === 'left' || zone === 'right') {
+            const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
+            const existing = currentPlacements.find(p => p.levelId === levelId && p.zone === zone);
+            if (existing) {
+                // Zone occupied → edit existing implant
+                handlePlacementClick(existing);
+                return;
+            }
+            setPendingPlacement({ levelId, zone, tool: lastUsedScrewType });
+            setEditingPlacementId(null);
+            setEditingData(undefined);
+            setEditingTool(lastUsedScrewType);
+            setEditingAnnotation('');
+            setScrewModalOpen(true);
+            return;
+        }
+
+        // Mid zone — check for existing osteotomy first
+        const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
+        const existingOsteo = currentPlacements.find(p => p.levelId === levelId && p.zone === 'mid' && p.tool === 'osteotomy');
+        if (existingOsteo) {
+            handlePlacementClick(existingOsteo);
+            return;
+        }
+        // Connector/unstable tools still work when selected
+        const tool = allTools.find(item => item.id === selectedTool);
+        if (tool && selectedTool === 'connector') {
+            addConnector(levelId);
+        } else if (tool && !tool.isOsteotomy && tool.type !== 'mode' && selectedTool !== 'implant') {
+            addPlacement(levelId, zone, selectedTool, null);
+        } else {
+            // Default: open osteotomy modal (Schwab 3+)
+            setPendingPlacement({ levelId, zone, tool: 'osteotomy' });
+            setEditingPlacementId(null);
+            setEditingData(undefined);
+            setOsteoDiscLevel(false);
+            setOsteoModalOpen(true);
+        }
+    };
+
+    const handleForceConfirm = (forceType) => {
+        if (pendingForceZone) {
+            addPlacement(pendingForceZone.levelId, pendingForceZone.zone, forceType, null);
+            setPendingForceZone(null);
+        }
+    };
+
+    const handleDiscClick = (levelId) => {
+        if (levelId === 'Oc' || levelId === 'C1' || levelId === 'S1' || levelId === 'Pelvis') return showToast(t('alert.no_disc_space'), 'error');
+
+        // If disc-level osteotomy exists, edit it
+        const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
+        const existingOsteo = currentPlacements.find(p => p.levelId === levelId && p.zone === 'disc');
+        if (existingOsteo) { handlePlacementClick(existingOsteo); return; }
+
+        // If cage exists, edit it
+        const currentCages = activeChart === 'planned' ? plannedCages : completedCages;
+        const existingCage = currentCages.find(c => c.levelId === levelId);
+        if (existingCage) { setEditingCageLevel(levelId); setEditingData(existingCage); setCageModalOpen(true); return; }
+
+        // Nothing exists — show picker (cage vs osteotomy)
+        setDiscPickerLevel(levelId);
+    };
+    const handleDiscPickCage = () => {
+        const levelId = discPickerLevel;
+        setDiscPickerLevel(null);
+        const anyPermitted = Object.values(CAGE_PERMISSIBILITY).some(arr => arr.includes(levelId));
+        if (!anyPermitted) return showToast(t('alert.no_cage_types', { level: getDiscLabel(levelId, levels) }), 'error');
+        setEditingCageLevel(levelId);
+        setEditingData(undefined);
+        setCageModalOpen(true);
+    };
+    const handleDiscPickOsteo = () => {
+        const levelId = discPickerLevel;
+        setDiscPickerLevel(null);
+        setPendingPlacement({ levelId, zone: 'disc', tool: 'osteotomy' });
+        setEditingPlacementId(null);
+        setEditingData(undefined);
+        setOsteoDiscLevel(true);
+        setOsteoModalOpen(true);
+    };
+
+    const handleCageConfirm = (data) => {
+        const lvl = editingCageLevel;
+        const permitted = CAGE_PERMISSIBILITY[data.type] || [];
+        if (!permitted.includes(lvl)) {
+            const cageType = CAGE_TYPES.find(ct => ct.id === data.type);
+            return showToast(t('alert.cage_not_permitted', { cageType: cageType?.label || data.type.toUpperCase(), level: getDiscLabel(lvl, levels) }), 'error');
+        }
+
+        const newCage = { levelId: editingCageLevel, tool: data.type, data: { height: data.height, width: data.width, length: data.length, lordosis: data.lordosis, side: data.side } };
+        const setter = activeChart === 'planned' ? setPlannedCages : setCompletedCages;
+        setter(prev => {
+            const filtered = prev.filter(c => c.levelId !== editingCageLevel);
+            return [...filtered, newCage];
+        });
+    };
+
+    const handleDeleteCage = () => {
+        const setter = activeChart === 'planned' ? setPlannedCages : setCompletedCages;
+        setter(prev => prev.filter(c => c.levelId !== editingCageLevel));
+        setCageModalOpen(false);
+    };
+
+    const handlePlacementClick = (p) => {
+        const tool = allTools.find(item => item.id === p.tool);
+        const isHookType = NO_SIZE_TYPES.includes(p.tool);
+        if (tool.needsSize || isHookType) { setEditingPlacementId(p.id); setEditingData(p.data); setEditingTool(p.tool); setEditingAnnotation(p.annotation || ''); setScrewModalOpen(true); }
+        else if (tool.isOsteotomy) { setEditingPlacementId(p.id); setEditingData(p.data); setOsteoDiscLevel(p.zone === 'disc' ? true : false); setOsteoModalOpen(true); }
+        else { removePlacement(p.id); }
+    };
+
+    const handleGhostClick = (ghost) => {
+        // Ensure we're editing construct side
+        setActiveChart('completed');
+
+        const tool = allTools.find(item => item.id === ghost.tool);
+        const isHookType = NO_SIZE_TYPES.includes(ghost.tool);
+
+        if (tool.needsSize || isHookType) {
+            // Screws, hooks, fixation — open ScrewModal pre-filled
+            setPendingPlacement({ levelId: ghost.levelId, zone: ghost.zone, tool: ghost.tool });
+            setEditingPlacementId(null);
+            setEditingData(ghost.data);
+            setEditingTool(ghost.tool);
+            setEditingAnnotation(ghost.annotation || '');
+            setScrewModalOpen(true);
+        } else if (tool.isOsteotomy) {
+            // Osteotomies — open OsteotomyModal pre-filled
+            setPendingPlacement({ levelId: ghost.levelId, zone: ghost.zone, tool: ghost.tool });
+            setEditingPlacementId(null);
+            setEditingData(ghost.data);
+            setOsteoDiscLevel(ghost.zone === 'disc' ? true : false);
+            setOsteoModalOpen(true);
+        }
+    };
+
+    const handleScrewConfirm = (sizeData, components, finalType, annotation) => {
+        if (components) { setDefaultDiameter(components.diameter); setDefaultLength(components.length); setDefaultScrewMode(components.mode); setDefaultCustomText(components.customText || ''); }
+        setLastUsedScrewType(finalType);
+        if (editingPlacementId) { updatePlacement(editingPlacementId, finalType, sizeData, annotation); setEditingPlacementId(null); }
+        else if (pendingPlacement) { addPlacement(pendingPlacement.levelId, pendingPlacement.zone, finalType, sizeData, annotation); setPendingPlacement(null); }
+    };
+
+    const handleOsteoConfirm = (data) => {
+        setDefaultOsteoType(data.type);
+        if (editingPlacementId) { updatePlacement(editingPlacementId, 'osteotomy', data); setEditingPlacementId(null); } 
+        else if (pendingPlacement) { addPlacement(pendingPlacement.levelId, pendingPlacement.zone, 'osteotomy', data); setPendingPlacement(null); }
+    };
+
+    const addPlacement = (levelId, zone, tool, data, annotation) => {
+        const newP = { id: genId(), levelId, zone, tool, data, annotation: annotation || '' };
+        const setter = activeChart === 'planned' ? setPlannedPlacements : setCompletedPlacements;
+        // One implant per left/right zone — use functional update to check latest state
+        if (zone === 'left' || zone === 'right') {
+            setter(prev => prev.some(p => p.levelId === levelId && p.zone === zone) ? prev : [...prev, newP]);
+        } else {
+            setter(prev => [...prev, newP]);
+        }
+    };
+    const updatePlacement = (id, tool, data, annotation) => {
+        const updater = (prev) => prev.map(p =>
+            p.id === id ? { ...p, tool, data, annotation: annotation !== undefined ? annotation : (p.annotation || '') } : p
+        );
+        if (activeChart === 'planned') setPlannedPlacements(updater);
+        else setCompletedPlacements(updater);
+    };
+    const removePlacement = (id) => {
+        const filter = prev => prev.filter(p => p.id !== id);
+        if (activeChart === 'planned') setPlannedPlacements(filter);
+        else setCompletedPlacements(filter);
+        setScrewModalOpen(false);
+        setOsteoModalOpen(false);
+    };
+
+    // CONNECTOR HANDLERS
+    const addConnector = (levelId) => {
+        const newConn = { id: genId(), levelId, fraction: 0.5, tool: 'connector' };
+        const setter = activeChart === 'planned' ? setPlannedConnectors : setCompletedConnectors;
+        setter(prev => [...prev, newConn]);
+    };
+    const updateConnector = (connId, { levelId, fraction }) => {
+        const updater = prev => prev.map(c => c.id === connId ? { ...c, levelId, fraction } : c);
+        if (activeChart === 'planned') setPlannedConnectors(updater); else setCompletedConnectors(updater);
+    };
+    const removeConnector = (connId) => {
+        const filter = prev => prev.filter(c => c.id !== connId);
+        if (activeChart === 'planned') setPlannedConnectors(filter); else setCompletedConnectors(filter);
+    };
+
+    // NOTE HANDLERS
+    const handleNoteConfirm = (text, showArrow) => {
+        if (editingNote) {
+            const currentNotes = activeChart === 'planned' ? plannedNotes : completedNotes;
+            const exists = currentNotes.some(n => n.id === editingNote.id);
+            if (exists) {
+                const updater = prev => prev.map(n => n.id === editingNote.id ? { ...n, text, showArrow } : n);
+                if (activeChart === 'planned') setPlannedNotes(updater); else setCompletedNotes(updater);
+            } else {
+                const newNote = { id: genId(), tool: 'note', levelId: editingNote.levelId, text, offsetX: editingNote.offsetX, offsetY: editingNote.offsetY, showArrow };
+                setCompletedNotes(prev => [...prev, newNote]);
+            }
+            setEditingNote(null);
+        } else if (pendingNoteTool) {
+            const newNote = { id: genId(), tool: pendingNoteTool.tool, levelId: pendingNoteTool.levelId, text, offsetX: pendingNoteTool.offsetX, offsetY: pendingNoteTool.offsetY, showArrow };
+            const setter = activeChart === 'planned' ? setPlannedNotes : setCompletedNotes;
+            setter(prev => [...prev, newNote]);
+            setPendingNoteTool(null);
+        }
+    };
+    const handleNoteDelete = () => {
+        if (editingNote) {
+            const filter = prev => prev.filter(n => n.id !== editingNote.id);
+            if (activeChart === 'planned') setPlannedNotes(filter); else setCompletedNotes(filter);
+            setEditingNote(null);
+            setNoteModalOpen(false);
+        }
+    };
+    const handleNoteClick = (note) => {
+        setEditingNote(note);
+        setPendingNoteTool(null);
+        setNoteModalOpen(true);
+    };
+    const handleGhostNoteClick = (ghostNote) => {
+        setActiveChart('completed');
+        setEditingNote({ ...ghostNote });
+        setPendingNoteTool(null);
+        setNoteModalOpen(true);
+    };
+
+    const handleGhostConnectorClick = (ghostConn) => {
+        setCompletedConnectors(prev => [...prev, { id: genId(), levelId: ghostConn.levelId, fraction: ghostConn.fraction, tool: 'connector' }]);
+    };
+
+    const handleGhostCageClick = (ghostCage) => {
+        setActiveChart('completed');
+        setEditingCageLevel(ghostCage.levelId);
+        setEditingData(ghostCage);
+        setCageModalOpen(true);
+    };
+    const updateNotePosition = (noteId, { offsetX, offsetY }) => {
+        const updater = prev => prev.map(n => n.id === noteId ? { ...n, offsetX, offsetY } : n);
+        if (activeChart === 'planned') setPlannedNotes(updater); else setCompletedNotes(updater);
+    };
+    const removeNote = (noteId) => {
+        const filter = prev => prev.filter(n => n.id !== noteId);
+        if (activeChart === 'planned') setPlannedNotes(filter); else setCompletedNotes(filter);
+    };
+
+    // EXPORT
+    const prepareExportCanvas = async () => {
+        await document.fonts.ready;
+        // In portrait mode, mount the off-screen export container temporarily
+        if (isPortrait) {
+            setPortraitExporting(true);
+            // Wait for React to render the export container
+            await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+        }
+        const element = exportRef.current;
+        // Sync DOM properties to attributes so cloneNode preserves them
+        element.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            if (cb.checked) cb.setAttribute('checked', 'checked');
+            else cb.removeAttribute('checked');
+        });
+        element.querySelectorAll('select').forEach(sel => {
+            Array.from(sel.options).forEach((opt, i) => {
+                if (i === sel.selectedIndex) opt.setAttribute('selected', 'selected');
+                else opt.removeAttribute('selected');
+            });
+        });
+        const canvas = await htmlToImage.toCanvas(element, {
+            pixelRatio: 2,
+            backgroundColor: '#ffffff',
+            width: 1485,
+            height: 1050,
+            filter: (node) => !node.dataset?.exportHide
+        });
+        return canvas;
+    };
+    const promptExportJPG = () => setExportPicker('jpg');
+    const promptExportPDF = () => setExportPicker('pdf');
+    const runExportWithChoice = async (format, useFinal) => {
+        setExportPicker(null);
+        setActiveChart(useFinal ? 'completed' : 'planned');
+        setShowFinalInventory(useFinal);
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+        if (format === 'jpg') await runExportJPG();
+        else await runExportPDF();
+    };
+    const runExportJPG = async () => {
+        const canvas = await prepareExportCanvas();
+        const link = document.createElement('a');
+        link.download = `SpinePlan_${patientData.name || 'Patient'}.jpg`;
+        link.href = canvas.toDataURL('image/jpeg', 0.9);
+        link.click();
+        if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+        setPortraitExporting(false);
+    };
+    const runExportPDF = async () => {
+        const canvas = await prepareExportCanvas();
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1485, 1050] });
+        pdf.addImage(imgData, 'JPEG', 0, 0, 1485, 1050);
+        pdf.save(`SpinePlan_${patientData.name || 'Patient'}.pdf`);
+        if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+        setPortraitExporting(false);
+    };
+    const saveProjectJSON = () => {
+        const data = serializeState();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `SpineProject_${patientData.name || 'Unnamed'}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+    };
+    const loadProjectJSON = (e) => {
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const json = JSON.parse(ev.target.result);
+                if (json.schema?.version === 4 || json.formatVersion >= 2) {
+                    deserializeState(json);
+                    // Broadcast loaded state immediately so synced windows update
+                    if (syncChannelRef.current) {
+                        clearTimeout(syncTimerRef.current);
+                        syncChannelRef.current.postMessage({ type: 'state', payload: json });
+                    }
+                } else {
+                    showToast(t('alert.unsupported_format'), 'error');
+                    return;
+                }
+                showToast(t('alert.loaded'));
+            } catch(err) { showToast(t('alert.invalid_file'), 'error'); }
+        };
+        reader.readAsText(file); e.target.value = null;
+    };
+
+    const copyPlanToCompleted = () => {
+        if (plannedPlacements.length === 0 && plannedConnectors.length === 0 && plannedNotes.length === 0 && plannedCages.length === 0) return showToast(t('alert.no_plan'));
+
+        // Filter out plan placements that already have a construct placement at the same levelId + zone
+        // Also exclude force placements (force_left, force_right) — forces are plan-only
+        const newPlacements = plannedPlacements.filter(p =>
+            !p.zone.startsWith('force') &&
+            !completedPlacements.some(cp => cp.levelId === p.levelId && cp.zone === p.zone)
+        );
+        const newConnectors = plannedConnectors.filter(pc =>
+            !completedConnectors.some(cc => cc.levelId === pc.levelId)
+        );
+        const newNotes = plannedNotes.filter(pn =>
+            !completedNotes.some(cn => cn.levelId === pn.levelId)
+        );
+        const newCages = plannedCages.filter(pc =>
+            !completedCages.some(cc => cc.levelId === pc.levelId)
+        );
+
+        if (newPlacements.length === 0 && newConnectors.length === 0 && newNotes.length === 0 && newCages.length === 0) {
+            return showToast(t('alert.all_confirmed'));
+        }
+
+        setCompletedPlacements(prev => [...prev, ...newPlacements.map(p => ({...p, id: genId()}))]);
+        setCompletedCages(prev => [...prev, ...newCages.map(c => ({...c}))]);
+        setCompletedConnectors(prev => [...prev, ...newConnectors.map(c => ({...c, id: genId()}))]);
+        setCompletedNotes(prev => [...prev, ...newNotes.map(n => ({...n, id: genId()}))]);
+        setActiveChart('completed');
+    };
+
+    // --- Shared sub-elements (used in both portrait and landscape) ---
+    const demographicsContent = (
+        <React.Fragment>
+            <h2 className="font-bold text-2xl text-slate-900 mb-4 border-b-4 border-slate-900 pb-2">{t('export.title')}</h2>
+            <div className="flex-1 flex flex-col overflow-y-auto min-h-0">
+                <div className="space-y-1 shrink-0">
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.name')}</label><div className="editable-field w-full text-xs font-semibold" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, name: e.target.innerText})} placeholder={t('patient.click_to_enter')}>{patientData.name}</div></div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.id')}</label><div className="editable-field w-full text-xs font-mono" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, id: e.target.innerText})} placeholder={t('patient.click_to_enter')}>{patientData.id}</div></div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.surgeon')}</label><div className="editable-field w-full text-xs" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, surgeon: e.target.innerText})} placeholder={t('patient.click_to_enter')}>{patientData.surgeon}</div></div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.date')}</label><div className="editable-field w-full text-xs cursor-pointer" onClick={() => setIsEditingDate(true)}>{isEditingDate ? <input type="date" className="w-full text-xs border-b border-slate-800 bg-transparent outline-none py-0" value={patientData.date} autoFocus onBlur={()=>setIsEditingDate(false)} onChange={e=>setPatientData({...patientData, date:e.target.value})} /> : formatDate(patientData.date)}</div></div>
+                </div>
+                <div className="border-t border-slate-200 my-3"></div>
+                <div className="space-y-1 shrink-0">
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.supplier')}</label><select className="editable-field w-full text-xs bg-white cursor-pointer" value={patientData.company} onChange={e => { const v = e.target.value; setPatientData({...patientData, company: v}); if (AUTO_THEME_FROM_COMPANY && COMPANY_THEME_MAP[v]) { changeTheme(COMPANY_THEME_MAP[v]); } }}><option value="">{t('patient.select_supplier')}</option>{IMPLANT_COMPANIES.map(c => <option key={c} value={c}>{c}</option>)}<option value="__other">{t('patient.other')}</option></select>{patientData.company === '__other' && <div className="editable-field w-full text-xs mt-0.5" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, company: e.target.innerText})} placeholder={t('patient.enter_company')}></div>}</div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.screw_system')}</label><ScrewSystemCombo value={patientData.screwSystem} onChange={v => setPatientData({...patientData, screwSystem: v})} company={patientData.company} placeholder={t('patient.screw_system_placeholder')} /></div>
+                </div>
+                <div className="border-t border-slate-200 my-2"></div>
+                <div className="shrink-0">
+                    <h3 className="text-[10px] font-bold text-slate-500 uppercase mb-1">{t('patient.bone_graft')}</h3>
+                    <div className="grid grid-cols-3 gap-x-1 gap-y-0.5">
+                        {BONE_GRAFT_OPTIONS.map(opt => (
+                            <label key={opt} className="flex items-center gap-1 text-[10px] text-slate-700 cursor-pointer hover:text-slate-900 leading-tight">
+                                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500 shrink-0" checked={(patientData.boneGraft?.types || []).includes(opt)} onChange={e => { const types = patientData.boneGraft?.types || []; setPatientData({...patientData, boneGraft: { ...patientData.boneGraft, types: e.target.checked ? [...types, opt] : types.filter(v => v !== opt) }}); }} />
+                                <span className="truncate">{BONE_GRAFT_LABEL_KEYS[opt] ? t(BONE_GRAFT_LABEL_KEYS[opt]) : opt}</span>
+                            </label>
+                        ))}
+                    </div>
+                    <div className="editable-field w-full text-[10px] mt-1" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, boneGraft: { ...(patientData.boneGraft || {}), notes: e.target.innerText }})} placeholder={t('patient.bone_graft_notes_placeholder')}>{patientData.boneGraft?.notes || ''}</div>
+                </div>
+                <ImplantInventory placements={[...(showFinalInventory ? completedPlacements : plannedPlacements), ...(showFinalInventory ? completedCages : plannedCages).map(c => ({...c, tool: c.tool})), ...(showFinalInventory ? completedConnectors : plannedConnectors).map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid'}))]} tools={[...allTools, {id: 'tlif', labelKey: 'inventory.cage.tlif'}, {id: 'plif', labelKey: 'inventory.cage.plif'}, {id: 'acdf', labelKey: 'inventory.cage.acdf'}, {id: 'xlif', labelKey: 'inventory.cage.xlif'}, {id: 'olif', labelKey: 'inventory.cage.olif'}, {id: 'alif', labelKey: 'inventory.cage.alif'}]} title={showFinalInventory ? t('inventory.title_construct') : t('inventory.title_plan')} visibleLevelIds={levels.map(l => l.id)} levels={levels} rods={showFinalInventory ? { left: patientData.leftRod, right: patientData.rightRod } : { left: patientData.planLeftRod, right: patientData.planRightRod }} />
+                <button onClick={() => setShowFinalInventory(!showFinalInventory)} className="mt-1 w-full text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase tracking-wider py-1 border border-slate-200 rounded hover:bg-slate-50 transition-colors">{showFinalInventory ? t('inventory.view_plan') : t('inventory.view_final')}</button>
+            </div>
+            <CreditsFooter lang={currentLang} />
+        </React.Fragment>
+    );
+
+    const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planLeftRod: e.target.innerText})} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planRightRod: e.target.innerText})} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} />;
+
+    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostNotes={isPortrait ? plannedNotes : undefined} onGhostNoteClick={handleGhostNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} />;
+
+    const newPatientAction = () => setConfirmNewPatient(true);
+    const executeNewPatient = () => {
+        setConfirmNewPatient(false);
+        setPlannedPlacements([]); setCompletedPlacements([]);
+        setPlannedCages([]); setCompletedCages([]);
+        setPlannedConnectors([]); setCompletedConnectors([]);
+        setPlannedNotes([]); setCompletedNotes([]);
+        const emptyPatient = { name: '', id: '', surgeon: '', location: '', date: new Date().toISOString().split('T')[0], company: '', screwSystem: '', leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '', boneGraft: { types: [], notes: '' } };
+        setPatientData(emptyPatient);
+        setActiveChart('planned');
+        setDocumentId(crypto.randomUUID());
+        setDocumentCreated(new Date().toISOString());
+        if (syncChannelRef.current) {
+            clearTimeout(syncTimerRef.current);
+            const emptyV4 = serializeState();
+            syncChannelRef.current.postMessage({ type: 'state', payload: {
+                formatVersion: 3, patient: emptyPatient, preferences: { viewMode, colourScheme },
+                plan: { implants: [], cages: [], connectors: [], notes: [] },
+                construct: { implants: [], cages: [], connectors: [], notes: [] },
+            }});
+        }
+    };
+
+    const modals = (
+        <React.Fragment>
+            <ScrewModal isOpen={screwModalOpen} onClose={() => setScrewModalOpen(false)} onConfirm={handleScrewConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} initialTool={editingTool} defaultDiameter={defaultDiameter} defaultLength={defaultLength} defaultMode={defaultScrewMode} defaultCustomText={defaultCustomText} initialAnnotation={editingAnnotation} />
+            <OsteotomyModal isOpen={osteoModalOpen} onClose={() => { setOsteoModalOpen(false); setOsteoDiscLevel(undefined); }} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} discLevelOnly={osteoDiscLevel} />
+            <CageModal isOpen={cageModalOpen} onClose={() => setCageModalOpen(false)} onConfirm={handleCageConfirm} onDelete={handleDeleteCage} initialData={editingData} levelId={editingCageLevel} levels={levels} />
+            <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
+            <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
+            <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
+            {exportPicker && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" onClick={() => setExportPicker(null)}>
+                <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
+                    <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold uppercase tracking-wider text-center">{exportPicker.toUpperCase()}</div>
+                    <div className="p-3 flex flex-col gap-2">
+                        <button onClick={() => runExportWithChoice(exportPicker, false)} className="w-full px-4 py-3 rounded text-sm font-bold border transition-colors hover:brightness-95" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{t('export.plan')}</button>
+                        <button onClick={() => runExportWithChoice(exportPicker, true)} className="w-full px-4 py-3 rounded text-sm font-bold text-white bg-slate-800 hover:bg-slate-700">{t('export.construct')}</button>
+                    </div>
+                </div>
+            </div>}
+            {confirmNewPatient && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" onClick={() => setConfirmNewPatient(false)}>
+                <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
+                    <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold">{t('sidebar.new_patient')}</div>
+                    <div className="p-5 text-sm text-slate-600">{t('alert.new_patient')}</div>
+                    <div className="bg-slate-50 px-4 py-3 flex justify-end gap-2 border-t border-slate-100">
+                        <button onClick={() => setConfirmNewPatient(false)} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.cancel')}</button>
+                        <button onClick={executeNewPatient} className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 text-sm font-bold">{t('button.confirm')}</button>
+                    </div>
+                </div>
+            </div>}
+            {discPickerLevel && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" onClick={() => setDiscPickerLevel(null)}>
+                <div className="bg-white rounded-lg shadow-2xl w-full max-w-[200px] overflow-hidden" onClick={e => e.stopPropagation()}>
+                    <div className="bg-slate-700 text-white px-3 py-2 text-center text-xs font-bold uppercase tracking-wider">{getDiscLabel(discPickerLevel, levels)}</div>
+                    <div className="p-2 flex flex-col gap-1">
+                        <button onClick={handleDiscPickCage} className="w-full px-3 py-2 rounded text-sm font-bold text-sky-800 bg-sky-50 border border-sky-200 hover:bg-sky-100 transition-colors">{t('help.cages.title')}</button>
+                        <button onClick={handleDiscPickOsteo} className="w-full px-3 py-2 rounded text-sm font-bold text-amber-800 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors">{t('help.osteotomies.title')}</button>
+                    </div>
+                </div>
+            </div>}
+            <NoteModal isOpen={noteModalOpen} onClose={() => { setNoteModalOpen(false); setEditingNote(null); setPendingNoteTool(null); }} onConfirm={handleNoteConfirm} onDelete={handleNoteDelete} initialText={editingNote?.text || ''} initialShowArrow={editingNote?.showArrow || false} isEditing={!!editingNote} />
+        </React.Fragment>
+    );
+
+    const themeDropdown = (
+        <div className="relative">
+            <button onClick={() => setThemeOpen(!themeOpen)} className="flex items-center gap-0.5 p-1 rounded hover:bg-white/10">
+                {[scheme.sidebarBg, '#FFFFFF', scheme.activeBg, scheme.activeText].map((c, i) => (
+                    <div key={i} className="w-2.5 h-2.5 rounded-full border" style={{ backgroundColor: c, borderColor: scheme.sidebarBorder }}></div>
+                ))}
+            </button>
+            {themeOpen && (
+                <div className="absolute right-0 top-full mt-1 rounded-lg shadow-xl border p-1.5 z-50" style={{ backgroundColor: scheme.sidebarTitleBg, borderColor: scheme.sidebarBorder }}>
+                    {COLOUR_SCHEMES.map(s => (
+                        <button key={s.id} onClick={() => { changeTheme(s.id); setThemeOpen(false); }}
+                            className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-all ${colourScheme === s.id ? 'ring-1 ring-white/50' : 'hover:bg-white/10'}`}>
+                            <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: s.sidebarBg }}></div>
+                            <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: '#FFFFFF' }}></div>
+                            <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: s.activeBg }}></div>
+                            <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: s.activeText }}></div>
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+
+    // ============================================================
+    // PORTRAIT LAYOUT
+    // ============================================================
+    if (isPortrait) {
+        return (
+            <div className="h-full flex flex-col overflow-hidden">
+                {modals}
+                <input type="file" ref={fileInputRef} onChange={loadProjectJSON} className="hidden" accept=".json" />
+
+                {/* Portrait Toolbar */}
+                <div className="portrait-toolbar flex flex-col z-20 no-print shadow-xl shrink-0" style={{ backgroundColor: scheme.sidebarBg, color: scheme.textPrimary }}>
+                    {/* Row 1: Title, Theme, Language, Action icons */}
+                    <div className="flex items-center gap-2 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                        <span className="font-bold text-sm tracking-tight shrink-0">{t('sidebar.title')}</span>
+                        <div className="flex-1"></div>
+                        {themeDropdown}
+                        <select value={currentLang} onChange={e => changeLang(e.target.value)}
+                            className="bg-transparent text-[10px] border-none outline-none cursor-pointer w-14" style={{ color: scheme.textSecondary }}>
+                            {SUPPORTED_LANGUAGES.map(l => (
+                                <option key={l.code} value={l.code} style={{color: '#1e293b'}}>{l.code.toUpperCase()}</option>
+                            ))}
+                        </select>
+                        <div className="flex items-center gap-0">
+                            <button onClick={() => fileInputRef.current.click()} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.load')}><IconUpload /></button>
+                            <button onClick={saveProjectJSON} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.save')}><IconSave /></button>
+                            <button onClick={promptExportJPG} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.jpg')}><IconImage /></button>
+                            <button onClick={promptExportPDF} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.pdf')}><IconPDF /></button>
+                            <button onClick={() => setHelpModalOpen(true)} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.help')}><IconHelp /></button>
+                            <div className="p-2.5 rounded" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? t('sync.linked') : t('sync.no_peer')}><IconLink />{syncConnected && <span className="inline-block ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
+                        </div>
+                    </div>
+
+                    {/* Row 2: Editing tools (tablet+) or view-only banner (phone) */}
+                    {isViewOnly ? (
+                        <div className="flex items-center gap-2 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                            <div className="flex-1 text-[10px] italic" style={{ color: scheme.textMuted }}>{t('portrait.view_only')}</div>
+                            <div className="flex gap-0.5 shrink-0">
+                                {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
+                                    const shortLabels = { cervical: 'C', thoracolumbar: 'T', t10_pelvis: 'L', whole: t('sidebar.view.whole_short') };
+                                    const active = viewMode === vm;
+                                    return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{shortLabels[vm]}</button>;
+                                })}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-1 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                            <div className="flex gap-0.5 overflow-x-auto flex-1 min-w-0">
+                                {tools[0].items.map(item => {
+                                    const active = selectedTool === item.id;
+                                    return <button key={item.id} onClick={() => setSelectedTool(item.id)} title={t(item.labelKey)} className={`shrink-0 px-2.5 py-2 rounded border flex items-center gap-1 text-[10px] font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>
+                                        <InstrumentIcon type={item.icon} className="w-3 h-3" color={active ? scheme.activeText : scheme.textSecondary} />
+                                    </button>;
+                                })}
+                            </div>
+                            <div className="w-px h-5 bg-white/20 mx-1"></div>
+                            <div className="flex gap-0.5 shrink-0">
+                                {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
+                                    const shortLabels = { cervical: 'C', thoracolumbar: 'T', t10_pelvis: 'L', whole: t('sidebar.view.whole_short') };
+                                    const active = viewMode === vm;
+                                    return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{shortLabels[vm]}</button>;
+                                })}
+                            </div>
+                            <div className="w-px h-5 bg-white/20 mx-1"></div>
+                            <button onClick={() => { copyPlanToCompleted(); switchPortraitTab(2); }} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold hover:bg-white/10 hover:brightness-125 shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)' }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
+                            <div className={`shrink-0 w-5 h-5 rounded-full cursor-pointer ${incognitoMode ? 'bg-red-500' : 'bg-white/20'}`} onClick={() => setIncognitoMode(!incognitoMode)} title={t('sidebar.session_privacy')}></div>
+                            <button onClick={newPatientAction} className="p-2.5 rounded shrink-0" style={{ color: '#dc2626' }} title={t('sidebar.new_patient')}><IconTrash /></button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Portrait Tab Bar */}
+                <div className="portrait-tabs flex shrink-0 z-10" style={{ backgroundColor: scheme.sidebarTitleBg, color: scheme.titleText }}>
+                    {PORTRAIT_TABS.map((tabKey, i) => {
+                        const active = portraitTab === i;
+                        return (
+                            <button key={tabKey} onClick={() => switchPortraitTab(i)}
+                                className={`flex-1 py-2 text-xs font-bold transition-all border-b-2 ${active ? '' : 'opacity-60 hover:opacity-80 border-transparent'}`}
+                                style={active ? { color: scheme.activeText, backgroundColor: scheme.activeBg, borderColor: scheme.activeText } : undefined}>
+                                {t(tabKey)}
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Portrait Content — swipeable tabs */}
+                <div ref={portraitContentRef} className="flex-1 overflow-hidden relative bg-slate-300"
+                    onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div style={{ width: PORTRAIT_COL_W[portraitTab], height: PORTRAIT_COL_H, transform: `scale(${portraitScale})`, transformOrigin: 'center center' }}>
+                            {portraitTab === 0 && (
+                                <div className="w-full h-full overflow-y-auto bg-white p-8 flex flex-col">
+                                    {demographicsContent}
+                                </div>
+                            )}
+                            {portraitTab === 1 && (
+                                <div className="w-full h-full flex flex-col bg-white">
+                                    {planChart}
+                                </div>
+                            )}
+                            {portraitTab === 2 && (
+                                <div className="w-full h-full flex flex-col bg-white">
+                                    {constructChart}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Hidden off-screen export container for PDF/JPG — only mounted during export to avoid duplicate React elements */}
+                {portraitExporting && (
+                    <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', pointerEvents: 'none' }}>
+                        <div id="export-container" ref={exportRef}>
+                            <div className="w-[370px] bg-white border-r border-slate-300 flex flex-col p-8">
+                                <CreditsFooter lang={currentLang} />
+                            </div>
+                            <div className="flex-[4] flex flex-col h-full">
+                                <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={() => {}} connectors={plannedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.planLeftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.planRightRod}</span></div></React.Fragment>} />
+                            </div>
+                            <div className="flex-[3] flex flex-col h-full">
+                                <ChartPaper title={t('export.construct')} placements={completedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={() => {}} connectors={completedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={completedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.leftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.rightRod}</span></div></React.Fragment>} />
+                            </div>
+                            <div className="absolute bottom-1 right-2 text-[8px] text-slate-300 font-mono">{new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    // ============================================================
+    // LANDSCAPE LAYOUT (unchanged)
+    // ============================================================
+    return (
+        <div className="h-full flex flex-col overflow-hidden">
+            {modals}
+
+            <div className="flex-1 overflow-hidden bg-slate-200 flex relative">
+                <aside className="w-[340px] flex flex-col z-20 overflow-y-auto no-print shadow-xl" style={{ backgroundColor: scheme.sidebarBg, borderRight: `1px solid ${scheme.sidebarBorder}`, color: scheme.textPrimary }}>
+                    {/* 1. Tool Palette — most used, top position */}
+                    <div className="p-3 space-y-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                        {tools.map((g,i) => (
+                            <div key={i}>
+                                <h3 className="text-[10px] uppercase font-bold mb-1.5 tracking-widest" style={{ color: scheme.textMuted }}>{t(g.categoryKey)}</h3>
+                                <div className="grid grid-cols-2 gap-1">
+                                    {g.items.map(item => {
+                                        const active = selectedTool === item.id;
+                                        return <button key={item.id} onClick={() => setSelectedTool(item.id)} className={`p-1 h-10 rounded border flex flex-col items-center justify-center gap-0.5 transition-all text-xs ${active ? 'font-bold' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>
+                                            <InstrumentIcon type={item.icon} className="w-3.5 h-3.5" color={active ? scheme.activeText : scheme.textSecondary} />
+                                            <span className="text-center text-[10px] leading-tight">{t(item.labelKey)}</span>
+                                        </button>;
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* 2. Plan/Construct Toggle + Confirm Plan — workflow controls */}
+                    <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                        <h3 className="text-[10px] uppercase font-bold mb-1.5 tracking-widest" style={{ color: scheme.textMuted }}>{t('sidebar.editing')}</h3>
+                        <div className="flex rounded p-1 border" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>
+                            <button onClick={() => setActiveChart('planned')} className={`flex-1 px-3 py-1.5 rounded transition-all text-xs ${activeChart==='planned'?'font-bold':'hover:brightness-125'}`} style={activeChart==='planned' ? { backgroundColor: scheme.activeBg, color: scheme.activeText } : undefined}>{t('sidebar.plan')}</button>
+                            <button onClick={() => setActiveChart('completed')} className={`flex-1 px-3 py-1.5 rounded transition-all text-xs ${activeChart==='completed'?'font-bold':'hover:brightness-125'}`} style={activeChart==='completed' ? { backgroundColor: scheme.activeBg, color: scheme.activeText } : undefined}>{t('sidebar.construct')}</button>
+                        </div>
+                        <button onClick={copyPlanToCompleted} className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded text-xs font-bold border transition-colors hover:brightness-125 mt-2" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder, color: scheme.textSecondary }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
+                    </div>
+
+                    {/* 3. Region View */}
+                    <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                        <h3 className="text-[10px] uppercase font-bold mb-1.5 tracking-widest" style={{ color: scheme.textMuted }}>{t('sidebar.region_view')}</h3>
+                        <div className="grid grid-cols-2 gap-1">
+                            {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
+                                const labels = { cervical: t('sidebar.view.cervical'), thoracolumbar: t('sidebar.view.thoracolumbar'), t10_pelvis: t('sidebar.view.t10_pelvis'), whole: t('sidebar.view.whole') };
+                                const active = viewMode === vm;
+                                return <button key={vm} onClick={() => setViewMode(vm)} className={`py-1.5 px-1 text-[10px] rounded border font-bold transition-all ${active ? 'border-transparent' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{labels[vm]}</button>;
+                            })}
+                        </div>
+                    </div>
+
+                    {/* 4. File Operations */}
+                    <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                        <input type="file" ref={fileInputRef} onChange={loadProjectJSON} className="hidden" accept=".json" />
+                        <div className="grid grid-cols-2 gap-1">
+                            <button onClick={() => fileInputRef.current.click()} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconUpload /> {t('sidebar.load')}</button>
+                            <button onClick={saveProjectJSON} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconSave /> {t('sidebar.save')}</button>
+                            <button onClick={promptExportJPG} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconImage /> {t('sidebar.jpg')}</button>
+                            <button onClick={promptExportPDF} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconPDF /> {t('sidebar.pdf')}</button>
+                        </div>
+                    </div>
+
+                    {/* 5. Session Privacy */}
+                    <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                        <div className={`flex items-center gap-2 px-2 py-2 rounded border cursor-pointer transition-colors ${incognitoMode ? 'bg-red-900/30 border-red-500/50' : 'bg-transparent border-transparent hover:bg-white/5'}`} onClick={() => setIncognitoMode(!incognitoMode)}>
+                            <div className="relative inline-block w-10 h-5 align-middle select-none shrink-0"><input type="checkbox" className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300" style={{ top: 0, left: 0 }} checked={incognitoMode} onChange={(e) => setIncognitoMode(e.target.checked)}/><label className={`toggle-label block overflow-hidden h-5 rounded-full cursor-pointer border ${incognitoMode ? 'bg-red-600 border-red-600' : 'bg-slate-600 border-slate-600'}`}></label></div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: incognitoMode ? '#dc2626' : scheme.textMuted }}>{t('sidebar.session_privacy')}</span>
+                        </div>
+                    </div>
+
+                    {/* 6. Theme & Language — preferences, rarely changed */}
+                    <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                        <div className="flex items-center gap-3">
+                            <div className="relative">
+                                <button onClick={() => setThemeOpen(!themeOpen)} className="flex items-center gap-1.5 hover:brightness-125 py-1 rounded transition-colors">
+                                    <span className="font-bold text-[10px] uppercase tracking-widest" style={{ color: scheme.textMuted }}>{t('sidebar.theme')}</span>
+                                    <div className="flex gap-0.5">
+                                        <div className="w-3 h-3 rounded-full border" style={{ backgroundColor: scheme.sidebarBg, borderColor: scheme.sidebarBorder }}></div>
+                                        <div className="w-3 h-3 rounded-full border" style={{ backgroundColor: '#FFFFFF', borderColor: scheme.sidebarBorder }}></div>
+                                        <div className="w-3 h-3 rounded-full border" style={{ backgroundColor: scheme.activeBg, borderColor: scheme.sidebarBorder }}></div>
+                                        <div className="w-3 h-3 rounded-full border" style={{ backgroundColor: scheme.activeText, borderColor: scheme.sidebarBorder }}></div>
+                                    </div>
+                                </button>
+                                {themeOpen && (
+                                    <div className="absolute left-0 bottom-full mb-1 rounded-lg shadow-xl border p-1.5 z-50" style={{ backgroundColor: scheme.sidebarTitleBg, borderColor: scheme.sidebarBorder }}>
+                                        {COLOUR_SCHEMES.map(s => (
+                                            <button key={s.id} onClick={() => { changeTheme(s.id); setThemeOpen(false); }}
+                                                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-all ${colourScheme === s.id ? 'ring-1 ring-white/50' : 'hover:bg-white/10'}`}>
+                                                <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: s.sidebarBg }}></div>
+                                                <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: '#FFFFFF' }}></div>
+                                                <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: s.activeBg }}></div>
+                                                <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: s.activeText }}></div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                                <span className="font-bold text-[10px] uppercase tracking-widest shrink-0" style={{ color: scheme.textMuted }}>{t('sidebar.language')}</span>
+                                <select value={currentLang} onChange={e => changeLang(e.target.value)}
+                                    className="flex-1 min-w-0 bg-transparent text-[10px] border-none outline-none cursor-pointer" style={{ color: scheme.textSecondary }}>
+                                    {SUPPORTED_LANGUAGES.map(l => (
+                                        <option key={l.code} value={l.code} style={{color: '#1e293b'}}>{l.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Spacer to push bottom items down */}
+                    <div className="flex-1"></div>
+
+                    {/* 7. Help — prominent, bottom right */}
+                    <div className="p-3" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
+                        <button onClick={() => setHelpModalOpen(true)} className="w-full flex items-center justify-center gap-2 hover:brightness-125 px-3 py-2 rounded text-xs font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconHelp /> {t('sidebar.help')}</button>
+                    </div>
+
+                    {/* 8. Utility row — version, new patient, sync */}
+                    <div className="px-3 pb-1 flex items-center gap-1">
+                        <div className="flex items-center justify-center px-1.5 py-1.5 rounded text-[10px]" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? t('sync.linked') : t('sync.no_peer')}><IconLink />{syncConnected && <span className="ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
+                        <button onClick={() => setChangeLogOpen(true)} className="flex items-center justify-center px-2 py-1.5 rounded text-[10px] font-mono" style={{ color: scheme.textMuted }}>{CURRENT_VERSION}</button>
+                        <div className="flex-1"></div>
+                        <button onClick={newPatientAction} className="flex items-center justify-center gap-1 px-2 py-1.5 rounded text-[10px] font-bold" style={{ color: '#dc2626' }}>
+                            <IconTrash /> {t('sidebar.new_patient')}
+                        </button>
+                    </div>
+
+                    <CreditsFooter lang={currentLang} />
+                </aside>
+
+                <div ref={containerWrapperRef} id="print-wrapper" className="flex-1 flex items-center justify-center p-8 bg-slate-300 overflow-hidden relative">
+                    <div style={{ transform: `scale(${scale})` }}>
+                        <div id="export-container" ref={exportRef}>
+                            <div className="w-[370px] bg-white border-r border-slate-300 flex flex-col p-8">{demographicsContent}</div>
+                            <div className="flex-[4] flex flex-col h-full relative" style={activeChart === 'planned' ? { borderTop: `3px solid ${scheme.activeBg}` } : undefined} onClick={() => activeChart !== 'planned' && setActiveChart('planned')}>
+                                {planChart}
+                                {activeChart !== 'planned' && !isPortrait && <div className="absolute inset-0 bg-slate-400/20 cursor-pointer z-20" data-export-hide="true" />}
+                            </div>
+                            <div className="flex-[3] flex flex-col h-full relative" style={activeChart === 'completed' ? { borderTop: `3px solid ${scheme.activeBg}` } : undefined} onClick={() => activeChart !== 'completed' && setActiveChart('completed')}>
+                                {constructChart}
+                                {activeChart !== 'completed' && !isPortrait && <div className="absolute inset-0 bg-slate-400/20 cursor-pointer z-20" data-export-hide="true" />}
+                            </div>
+                            <div className="absolute bottom-1 right-2 text-[8px] text-slate-300 font-mono">{new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/* Toast notifications */}
+            {toasts.length > 0 && <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2 pointer-events-none">
+                {toasts.map(toast => (
+                    <div key={toast.id} className={`pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium animate-[fadeIn_0.2s_ease-out] ${toast.type === 'error' ? 'bg-red-800 text-white' : 'bg-slate-800 text-white'}`}>
+                        <span>{toast.message}</span>
+                        <button onClick={() => dismissToast(toast.id)} className="ml-1 hover:brightness-125 text-xs font-bold">✕</button>
+                    </div>
+                ))}
+            </div>}
+        </div>
+    );
+};
+
+export default App;
