@@ -22,7 +22,7 @@ spine-planner/
 │   ├── inter-subset.css    # Inter font (WOFF2, Latin/Greek subsets)
 │   ├── source-serif-4-subset.css  # Source Serif 4 (WOFF2, Latin/Greek)
 │   ├── i18n/
-│   │   ├── translations.json    # All translations (14 languages × 253 keys)
+│   │   ├── translations.json    # All translations (16 languages × 263 keys)
 │   │   ├── languages.json       # SUPPORTED_LANGUAGES array
 │   │   └── i18n.js              # t(), detectLanguage(), lang state
 │   ├── data/
