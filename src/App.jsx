@@ -28,6 +28,7 @@ import { CreditsFooter } from './components/CreditsFooter';
 import { ImplantInventory } from './components/ImplantInventory';
 import { ChartPaper } from './components/chart/ChartPaper';
 import { InstrumentIcon } from './components/chart/InstrumentIcon';
+import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, getDisclaimerTimestamp } from './components/modals/DisclaimerModal';
 
 const App = () => {
     const [selectedTool, setSelectedTool] = useState('implant');
@@ -94,6 +95,15 @@ const App = () => {
     
     const [confirmNewPatient, setConfirmNewPatient] = useState(false);
     const [exportPicker, setExportPicker] = useState(null); // 'jpg' or 'pdf'
+    const [disclaimerAccepted, setDisclaimerAccepted] = useState(() => isDisclaimerAccepted());
+
+    // Re-check disclaimer at half-day boundary (AM/PM)
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (!isDisclaimerAccepted()) setDisclaimerAccepted(false);
+        }, 60000); // check every minute
+        return () => clearInterval(interval);
+    }, []);
 
     // TOAST NOTIFICATIONS
     const [toasts, setToasts] = useState([]);
@@ -1095,6 +1105,7 @@ const App = () => {
                     {/* Row 1: Title, Theme, Language, Action icons */}
                     <div className="flex items-center gap-2 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
                         <span className="font-bold text-sm tracking-tight shrink-0">{t('sidebar.title')}</span>
+                        <button onClick={() => setChangeLogOpen(true)} className="text-[9px] font-mono opacity-50 shrink-0">{CURRENT_VERSION}</button>
                         <div className="flex-1"></div>
                         {themeDropdown}
                         <select value={currentLang} onChange={e => changeLang(e.target.value)}
@@ -1202,7 +1213,7 @@ const App = () => {
                             <div className="flex-[3] flex flex-col h-full">
                                 <ChartPaper title={t('export.construct')} placements={completedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={() => {}} connectors={completedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={completedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.leftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.rightRod}</span></div></React.Fragment>} />
                             </div>
-                            <div className="absolute bottom-1 right-2 text-[8px] text-slate-300 font-mono">{t('export.disclaimer')} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
+                            <div className="absolute bottom-1 right-2 text-[8px] text-slate-300 font-mono">{getDisclaimerTimestamp() ? `${t('disclaimer.accepted_label')} ${getDisclaimerTimestamp()}` : ''} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
                         </div>
                     </div>
                 )}
@@ -1350,7 +1361,7 @@ const App = () => {
                                 {constructChart}
                                 {activeChart !== 'completed' && !isPortrait && <div className="absolute inset-0 bg-slate-400/20 cursor-pointer z-20" data-export-hide="true" />}
                             </div>
-                            <div className="absolute bottom-1 right-2 text-[8px] text-slate-300 font-mono">{t('export.disclaimer')} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
+                            <div className="absolute bottom-1 right-2 text-[8px] text-slate-300 font-mono">{getDisclaimerTimestamp() ? `${t('disclaimer.accepted_label')} ${getDisclaimerTimestamp()}` : ''} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
                         </div>
                     </div>
                 </div>
@@ -1364,6 +1375,7 @@ const App = () => {
                     </div>
                 ))}
             </div>}
+            {!disclaimerAccepted && <DisclaimerModal onAccept={() => { acceptDisclaimer(); setDisclaimerAccepted(true); }} />}
         </div>
     );
 };
