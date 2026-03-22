@@ -144,6 +144,31 @@
         .bug-grid textarea { resize: vertical; min-height: 60px; }
         .nav-link-bugs { color: #b45309 !important; font-weight: 500; }
 
+        /* Backup banner — persistent, below header */
+        .backup-banner { display: none; background: #f0f4f8; border-bottom: 1px solid #d1d5db;
+                          padding: 6px 24px; font-size: 12px; color: #555; text-align: center;
+                          position: sticky; top: var(--header-h, 80px); z-index: 99; }
+        .backup-banner.visible { display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .backup-banner .backup-btn { background: #2d6a4f; color: white; border: none; padding: 3px 10px;
+                                      border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500; }
+        .backup-banner .backup-btn:hover { background: #40916c; }
+
+        /* Milestone toast — 50% prompt */
+        .milestone-toast { display: none; position: fixed; bottom: 24px; right: 24px; z-index: 200;
+                            background: #1a1a2e; color: white; padding: 16px 20px; border-radius: 10px;
+                            box-shadow: 0 8px 24px rgba(0,0,0,0.25); max-width: 340px; font-size: 13px;
+                            line-height: 1.5; animation: toast-in 0.3s ease; }
+        .milestone-toast.visible { display: block; }
+        .milestone-toast .toast-title { font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+        .milestone-toast .toast-actions { display: flex; gap: 8px; margin-top: 10px; }
+        .milestone-toast .toast-btn { padding: 5px 14px; border-radius: 5px; border: none; cursor: pointer;
+                                       font-size: 12px; font-weight: 500; }
+        .milestone-toast .toast-btn-primary { background: #2d6a4f; color: white; }
+        .milestone-toast .toast-btn-primary:hover { background: #40916c; }
+        .milestone-toast .toast-btn-dismiss { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); }
+        .milestone-toast .toast-btn-dismiss:hover { background: rgba(255,255,255,0.25); }
+        @keyframes toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
         /* Responsive */
         @media (max-width: 900px) {
             .nav { display: none; }
@@ -169,6 +194,20 @@
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
             <div class="progress-text" id="progress-text">0 of 244 items reviewed (0%)</div>
+        </div>
+    </div>
+
+    <div class="backup-banner" id="backup-banner">
+        <span>Your progress is saved in this browser. To continue on another device, download a backup.</span>
+        <button class="backup-btn" onclick="exportReview()">Download backup</button>
+    </div>
+
+    <div class="milestone-toast" id="milestone-toast">
+        <div class="toast-title">Halfway there!</div>
+        <div>You have reviewed 50% of the translations. Now is a good time to save a backup in case you switch devices or clear your browser data.</div>
+        <div class="toast-actions">
+            <button class="toast-btn toast-btn-primary" onclick="exportReview(); dismissMilestone()">Download backup</button>
+            <button class="toast-btn toast-btn-dismiss" onclick="dismissMilestone()">Not now</button>
         </div>
     </div>
 
@@ -8342,11 +8381,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Translation unverified — feedback welcome: skeletalsurgery@icloud.com</div>
+                    <div class="english-text">Translation unverified</div>
                 </div>
                 <div class="col-translation">
                     <label>Español</label>
-                    <textarea class="translation-field" data-key="disclaimer.text" data-original="Traducción no verificada — comentarios bienvenidos: skeletalsurgery@icloud.com">Traducción no verificada — comentarios bienvenidos: skeletalsurgery@icloud.com</textarea>
+                    <textarea class="translation-field" data-key="disclaimer.text" data-original="Traducción no verificada">Traducción no verificada</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -8531,6 +8570,8 @@
                 if (data.items) loadState(data.items);
                 else loadState(data);  // backwards compat with old format
                 if (data.bugs) loadBugReports(data.bugs);
+                // Restore milestone dismissed state
+                if (localStorage.getItem(MILESTONE_KEY)) milestoneShown = true;
             } catch(e) {}
         }
 
@@ -8561,6 +8602,12 @@
             document.getElementById('progress-fill').style.width = pct + '%';
             document.getElementById('progress-text').textContent = reviewed + ' of ' + TOTAL + ' items reviewed (' + pct + '%)';
 
+            // Show backup banner once any review activity exists
+            if (reviewed > 0) showBackupBanner();
+
+            // Check 50% milestone
+            checkMilestone(reviewed);
+
             // Update nav counts per section
             const sections = {};
             document.querySelectorAll('.review-item').forEach(item => {
@@ -8577,6 +8624,35 @@
                 }
             });
         }
+
+        // --- Backup banner & milestone ---
+
+        let bannerShown = false;
+        let milestoneShown = false;
+        const MILESTONE_KEY = STORAGE_KEY + '_milestone50';
+
+        function showBackupBanner() {
+            if (bannerShown) return;
+            bannerShown = true;
+            document.getElementById('backup-banner').classList.add('visible');
+            // Adjust nav sticky position to account for banner height
+            requestAnimationFrame(syncHeaderHeight);
+        }
+
+        function checkMilestone(reviewed) {
+            if (milestoneShown) return;
+            const pct = Math.round((reviewed / TOTAL) * 100);
+            if (pct >= 50) {
+                try { if (localStorage.getItem(MILESTONE_KEY)) return; } catch(e) {}
+                milestoneShown = true;
+                document.getElementById('milestone-toast').classList.add('visible');
+            }
+        }
+
+        window.dismissMilestone = function() {
+            document.getElementById('milestone-toast').classList.remove('visible');
+            try { localStorage.setItem(MILESTONE_KEY, '1'); } catch(e) {}
+        };
 
         // --- Filter ---
 
@@ -8618,6 +8694,8 @@
         window.resetReview = function() {
             if (!confirm('This will clear all your review progress, corrections, comments, bug reports, and personal details.\n\nThis cannot be undone. Continue?')) return;
             localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(MILESTONE_KEY);
+            milestoneShown = false;
             document.querySelectorAll('.translation-field').forEach(ta => {
                 ta.value = ta.dataset.original;
                 ta.classList.remove('modified');
@@ -8808,7 +8886,9 @@
         // Measure header and set CSS variable so nav sticks below it
         function syncHeaderHeight() {
             const h = document.querySelector('.header').offsetHeight;
-            document.documentElement.style.setProperty('--header-h', h + 'px');
+            const banner = document.getElementById('backup-banner');
+            const bh = banner.classList.contains('visible') ? banner.offsetHeight : 0;
+            document.documentElement.style.setProperty('--header-h', (h + bh) + 'px');
         }
         syncHeaderHeight();
         window.addEventListener('resize', syncHeaderHeight);
