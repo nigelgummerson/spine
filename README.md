@@ -3,7 +3,7 @@
 A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instrumentation diagrams with a visual, exportable chart that documents the pre-operative plan and post-operative construct. Runs offline on hospital computers as a single HTML file — no installation required.
 
 **Version:** v2.0.2-beta | **License:** GNU GPLv3
-**Live:** [nigelgummerson.github.io/spine-planner](https://nigelgummerson.github.io/spine-planner)
+**Live:** [plan.skeletalsurgery.com/spine](https://plan.skeletalsurgery.com/spine/)
 
 ## Features
 
@@ -40,9 +40,9 @@ React 18, Tailwind CSS, html-to-image, jsPDF — all via CDN. No build process, 
 
 ## Usage
 
-Open `index.html` in a browser, or visit the [live site](https://nigelgummerson.github.io/spine-planner).
+Open `index.html` in a browser, or visit the [live site](https://plan.skeletalsurgery.com/spine/).
 
-See the [Quick Reference Guide](https://nigelgummerson.github.io/spine-planner/quick-reference.html) for a translated quick-start guide (14 languages).
+See the [Quick Reference Guide](https://plan.skeletalsurgery.com/spine/quick-reference.html) for a translated quick-start guide (14 languages).
 
 ## Author
 

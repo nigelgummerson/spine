@@ -55,8 +55,8 @@ spine-planner/
 ```
 
 ## GitHub & Deployment
-- **Repository:** github.com/nigelgummerson/spine-planner
-- **Live Site:** nigelgummerson.github.io/spine-planner (GitHub Pages)
+- **Repository:** github.com/nigelgummerson/spine
+- **Live Site:** plan.skeletalsurgery.com/spine (GitHub Pages, custom domain)
 - **Deployment:** GitHub Actions — `npm ci && npm run build`, deploys `dist/` on push to main
 
 ## Tech Stack
