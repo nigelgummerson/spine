@@ -1217,6 +1217,7 @@ const App = () => {
                         </div>
                     </div>
                 )}
+            {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerTick(n => n + 1); }} />}
             </div>
         );
     }
