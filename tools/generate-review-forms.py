@@ -53,6 +53,7 @@ SKIP_KEYS = {
     "clinical.screw.uniplanar.short",  # Universal abbreviation — "Uni"
     "patient.plan_rod_left_placeholder",   # Example measurements — "e.g. 5.5mm CoCr 120mm"
     "patient.plan_rod_right_placeholder",  # Example measurements — "e.g. 5.5mm TiAlV 120mm"
+    "disclaimer.review",                   # UI link text — "Help improve this translation"
 }
 
 # UI workflow sections — keys grouped by where they appear in the app.
