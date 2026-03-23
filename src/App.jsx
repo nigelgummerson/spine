@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
 import { t, detectLanguage, getCurrentLang, setCurrentLang, SUPPORTED_LANGUAGES, LOCALE_MAP } from './i18n/i18n';
@@ -11,7 +11,7 @@ import { _light, _dark, COLOUR_SCHEMES, AUTO_THEME_FROM_COMPANY, COMPANY_THEME_M
 import { CAGE_PERMISSIBILITY, HOOK_TYPES, NO_SIZE_TYPES, NOTE_PRESET_KEYS, CAGE_TYPES,
          APPROACH_GROUPS, getDiscLabel, FORCE_TYPES, INVENTORY_CATEGORIES } from './data/clinical';
 import { REGIONS, VERTEBRA_ANATOMY, VERT_SVG_SCALE, VERT_PAD, getLevelHeight, getVertSvgGeometry,
-         ALL_LEVELS, DISC_MIN_PX, getDiscHeight, buildHeightMap, WHOLE_SPINE_MAP,
+         ALL_LEVELS, DISC_MIN_PX, getDiscHeight, buildHeightMap,
          levelToYNorm, yNormToRenderedY, renderedYToYNorm, CHART_CONTENT_HEIGHT,
          calculateAutoScale } from './data/anatomy';
 import { IconTrash, IconDownload, IconImage, IconCopy, IconUpload, IconSave,
@@ -29,6 +29,8 @@ import { ImplantInventory } from './components/ImplantInventory';
 import { ChartPaper } from './components/chart/ChartPaper';
 import { InstrumentIcon } from './components/chart/InstrumentIcon';
 import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, getDisclaimerTimestamp } from './components/modals/DisclaimerModal';
+import { useDocumentState } from './hooks/useDocumentState';
+import { serializeState as serializeDocState, deserializeDocument } from './state/documentReducer';
 
 const App = () => {
     const [selectedTool, setSelectedTool] = useState('implant');
@@ -37,16 +39,6 @@ const App = () => {
         const savedTab = localStorage.getItem('spine_planner_tab');
         return savedTab === '2' ? 'completed' : 'planned';
     }); 
-    const [plannedPlacements, setPlannedPlacements] = useState([]);
-    const [completedPlacements, setCompletedPlacements] = useState([]);
-    const [plannedCages, setPlannedCages] = useState([]);
-    const [completedCages, setCompletedCages] = useState([]);
-    const [plannedConnectors, setPlannedConnectors] = useState([]);
-    const [completedConnectors, setCompletedConnectors] = useState([]);
-    const [plannedNotes, setPlannedNotes] = useState([]);
-    const [completedNotes, setCompletedNotes] = useState([]);
-    const [documentId, setDocumentId] = useState(() => crypto.randomUUID());
-    const [documentCreated, setDocumentCreated] = useState(() => new Date().toISOString());
     const [colourScheme, setColourScheme] = useState(() => {
         const stored = localStorage.getItem('spine_planner_theme');
         return (stored && COLOUR_SCHEMES.some(s => s.id === stored)) ? stored : 'default';
@@ -66,22 +58,31 @@ const App = () => {
         setColourScheme(id);
         localStorage.setItem('spine_planner_theme', id);
     };
-    const [patientData, setPatientData] = useState({ name: '', id: '', surgeon: '', location: '', date: new Date().toISOString().split('T')[0], company: '', screwSystem: '', leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '', boneGraft: { types: [], notes: '' } });
-    const [viewMode, setViewMode] = useState('thoracolumbar'); 
+    const [viewMode, setViewMode] = useState('thoracolumbar');
     const [scale, setScale] = useState(1);
     const [incognitoMode, setIncognitoMode] = useState(false);
     const [isEditingDate, setIsEditingDate] = useState(false);
-    const [hasLoaded, setHasLoaded] = useState(false);
-    const [syncConnected, setSyncConnected] = useState(false);
-    const receivingSync = useRef(false);
-    const syncChannelRef = useRef(null);
-    const syncTimerRef = useRef(null);
-    const lastPongRef = useRef(0);
-    const syncVersionRef = useRef(0);
-    const syncVersionMismatchRef = useRef(false);
-    const serializeRef = useRef(null);
-    const deserializeRef = useRef(null);
-    const changeLangRef = useRef(null);
+
+    // TOAST NOTIFICATIONS (defined before useDocumentState so showToast can be passed as parameter)
+    const [toasts, setToasts] = useState([]);
+    const toastIdRef = useRef(0);
+    const showToast = useCallback((message, type = 'info') => {
+        const id = ++toastIdRef.current;
+        setToasts(prev => [...prev, { id, message, type }]);
+        if (type !== 'error') setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
+    }, []);
+    const dismissToast = useCallback((id) => setToasts(prev => prev.filter(t => t.id !== id)), []);
+
+    // DOCUMENT STATE (clinical data, sync, auto-save)
+    const { state, dispatch, serialize, syncChannelRef, syncConnected, hasLoaded } = useDocumentState({
+        viewMode, colourScheme, changeTheme, changeLang, incognitoMode, currentLang, setViewMode, showToast,
+    });
+    const {
+        patientData, plannedPlacements, completedPlacements,
+        plannedCages, completedCages, plannedConnectors, completedConnectors,
+        plannedNotes, completedNotes, reconLabelPositions,
+    } = state;
+    const setPatientField = (field, value) => dispatch({ type: 'SET_PATIENT_FIELD', field, value });
 
     // MODALS
     const [screwModalOpen, setScrewModalOpen] = useState(false);
@@ -93,10 +94,9 @@ const App = () => {
     const [noteModalOpen, setNoteModalOpen] = useState(false);
     const [pendingNoteTool, setPendingNoteTool] = useState(null); // { tool: 'note', levelId, offsetX, offsetY }
     const [editingNote, setEditingNote] = useState(null); // full note object when editing
-    
+
     const [confirmNewPatient, setConfirmNewPatient] = useState(false);
     const [confirmClearConstruct, setConfirmClearConstruct] = useState(false);
-    const [reconLabelPositions, setReconLabelPositions] = useState({});
     const [exportPicker, setExportPicker] = useState(null); // 'jpg' or 'pdf'
     // Disclaimer: derive from sessionStorage on every render, use counter to force re-render on accept
     const [disclaimerTick, setDisclaimerTick] = useState(0);
@@ -107,16 +107,6 @@ const App = () => {
         const interval = setInterval(() => setDisclaimerTick(n => n + 1), 60000);
         return () => clearInterval(interval);
     }, []);
-
-    // TOAST NOTIFICATIONS
-    const [toasts, setToasts] = useState([]);
-    const toastIdRef = useRef(0);
-    const showToast = useCallback((message, type = 'info') => {
-        const id = ++toastIdRef.current;
-        setToasts(prev => [...prev, { id, message, type }]);
-        if (type !== 'error') setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
-    }, []);
-    const dismissToast = useCallback((id) => setToasts(prev => prev.filter(t => t.id !== id)), []);
 
     // EDITING STATE
     const [pendingPlacement, setPendingPlacement] = useState(null);
@@ -200,331 +190,12 @@ const App = () => {
 
     const scheme = COLOUR_SCHEMES.find(s => s.id === colourScheme) || COLOUR_SCHEMES[0];
 
-    // SERIALISE / DESERIALISE - v4 spinal-instrumentation format
-    // Mapping tables: internal tool IDs ↔ v4 schema types
-    const TOOL_TO_V4_HOOK = { pedicle_hook: 'pedicle', tp_hook: 'transverse-process-down', tp_hook_up: 'transverse-process-up', sl_hook: 'supralaminar', il_hook: 'infralaminar', supra_laminar_hook: 'supralaminar', infra_laminar_hook: 'infralaminar' };
-    const V4_HOOK_TO_TOOL = Object.fromEntries(Object.entries(TOOL_TO_V4_HOOK).map(([k,v]) => [v, k]));
-    const TOOL_TO_V4_FIXATION = { band: 'sublaminar-band', wire: 'sublaminar-wire', cable: 'cable' };
-    const V4_FIXATION_TO_TOOL = Object.fromEntries(Object.entries(TOOL_TO_V4_FIXATION).map(([k,v]) => [v, k]));
-    const OSTEO_TO_V4 = { Facet: { t: 'facetectomy', g: 1 }, Ponte: { t: 'ponte', g: 2 }, PSO: { t: 'PSO', g: 3 }, ExtPSO: { t: 'extended-PSO', g: 4 }, VCR: { t: 'VCR', g: 5 }, 'ML-VCR': { t: 'multilevel-VCR', g: 6 }, Corpectomy: { t: 'corpectomy', g: null } };
-    const V4_OSTEO_TO_TOOL = Object.fromEntries(Object.entries(OSTEO_TO_V4).map(([k,v]) => [v.t, k]));
-    const FORCE_TO_V4 = { translate_left: { type: 'translation', direction: 'left' }, translate_right: { type: 'translation', direction: 'right' }, compression: { type: 'compression' }, distraction: { type: 'distraction' }, derotate_cw: { type: 'derotation', direction: 'clockwise' }, derotate_ccw: { type: 'derotation', direction: 'anticlockwise' } };
-    const V4_FORCE_TO_TOOL = { 'translation-left': 'translate_left', 'translation-right': 'translate_right', compression: 'compression', distraction: 'distraction', 'derotation-clockwise': 'derotate_cw', 'derotation-anticlockwise': 'derotate_ccw' };
-    const ZONE_TO_SIDE = { left: 'left', right: 'right', mid: 'midline', disc: 'midline', force_left: 'left', force_right: 'right' };
-    const BONEGRAFT_TO_V4 = { 'Local Bone': 'local-bone', 'Autograft': 'iliac-crest-autograft', 'Allograft': 'allograft', 'Synthetics': 'synthetic', 'DBM': 'DBM', 'BMP': 'BMP' };
-    const V4_BONEGRAFT_TO_TOOL = Object.fromEntries(Object.entries(BONEGRAFT_TO_V4).map(([k,v]) => [v, k]));
 
-    // Convert internal placements/cages/connectors/notes/forces → v4 elements/forces/notes
-    const internalToV4Chart = (placements, cages, connectors, notes, rodText, planRodText) => {
-        const elements = [];
-        const forces = [];
-        // Placements → elements or forces
-        (placements || []).forEach(p => {
-            const fv4 = FORCE_TO_V4[p.tool];
-            if (fv4) {
-                forces.push({ id: p.id, type: fv4.type, direction: fv4.direction || undefined, level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left' });
-                return;
-            }
-            if (p.tool === 'unstable') return; // UI-only marker
-            const screwTypes = ['monoaxial', 'polyaxial', 'uniplanar'];
-            const hookTypes = Object.keys(TOOL_TO_V4_HOOK);
-            const fixTypes = Object.keys(TOOL_TO_V4_FIXATION);
-            if (screwTypes.includes(p.tool)) {
-                const el = { id: p.id, type: 'screw', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left' };
-                const screw = { headType: p.tool };
-                if (typeof p.data === 'string' && p.data.includes('x')) {
-                    const parts = p.data.split('x').map(Number);
-                    if (!isNaN(parts[0])) screw.diameter = parts[0];
-                    if (!isNaN(parts[1])) screw.length = parts[1];
-                }
-                el.screw = screw;
-                if (p.annotation) el.annotation = p.annotation;
-                elements.push(el);
-            } else if (hookTypes.includes(p.tool)) {
-                const el = { id: p.id, type: 'hook', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', hook: { hookType: TOOL_TO_V4_HOOK[p.tool] } };
-                if (p.annotation) el.annotation = p.annotation;
-                elements.push(el);
-            } else if (fixTypes.includes(p.tool)) {
-                const el = { id: p.id, type: 'fixation', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', fixation: { fixationType: TOOL_TO_V4_FIXATION[p.tool] } };
-                if (p.data) el.fixation.description = p.data;
-                if (p.annotation) el.annotation = p.annotation;
-                elements.push(el);
-            } else if (p.tool === 'osteotomy' && typeof p.data === 'object') {
-                const ov4 = OSTEO_TO_V4[p.data.type] || { t: p.data.type, g: null };
-                const el = { id: p.id, type: 'osteotomy', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'midline' };
-                el.osteotomy = { osteotomyType: ov4.t };
-                if (ov4.g) el.osteotomy.schwabGrade = ov4.g;
-                if (p.data.angle != null && p.data.angle !== '') el.osteotomy.correctionAngle = Number(p.data.angle);
-                if (p.data.reconstructionCage) el.osteotomy.reconstructionCage = p.data.reconstructionCage;
-                elements.push(el);
-            }
-        });
-        // Cages → elements
-        (cages || []).forEach(c => {
-            const el = { id: c.id, type: 'cage', level: c.levelId, side: c.data?.side || 'bilateral' };
-            el.cage = { approach: c.tool.toUpperCase() };
-            if (c.data) {
-                if (c.data.height) el.cage.height = Number(c.data.height);
-                if (c.data.width) el.cage.width = Number(c.data.width);
-                if (c.data.length) el.cage.length = Number(c.data.length);
-                if (c.data.lordosis) el.cage.lordosis = Number(c.data.lordosis);
-            }
-            elements.push(el);
-        });
-        // Connectors → elements
-        (connectors || []).forEach(cn => {
-            elements.push({ id: cn.id, type: 'connector', level: cn.levelId, side: 'midline', connector: { connectorType: 'crosslink', fraction: cn.fraction } });
-        });
-        // Rods from free text
-        const rods = [];
-        if (rodText?.left) rods.push({ id: 'rod-left', side: 'left', freeText: rodText.left });
-        if (rodText?.right) rods.push({ id: 'rod-right', side: 'right', freeText: rodText.right });
-        // Notes (strip pixel offsets)
-        const v4Notes = (notes || []).map(n => ({ id: n.id, level: n.levelId, text: n.text, showArrow: n.showArrow || false }));
-        const notePositions = {};
-        (notes || []).forEach(n => { if (n.offsetX !== undefined) notePositions[n.id] = { offsetX: n.offsetX, offsetY: n.offsetY }; });
-        return { elements, forces, rods, notes: v4Notes, notePositions };
-    };
-
-    // Convert v4 elements/forces/notes → internal state arrays
-    const v4ChartToInternal = (chartData, notePositions) => {
-        const placements = [], cages = [], connectors = [], notes = [];
-        (chartData.elements || []).forEach(el => {
-            if (el.type === 'screw') {
-                const sizeStr = (el.screw?.diameter && el.screw?.length) ? `${el.screw.diameter}x${el.screw.length}` : null;
-                const zone = el.side === 'right' ? 'right' : 'left';
-                placements.push({ id: el.id, levelId: el.level, zone, tool: el.screw?.headType || 'polyaxial', data: sizeStr, annotation: el.annotation || '' });
-            } else if (el.type === 'hook') {
-                const tool = V4_HOOK_TO_TOOL[el.hook?.hookType] || 'pedicle_hook';
-                const zone = el.side === 'right' ? 'right' : 'left';
-                placements.push({ id: el.id, levelId: el.level, zone, tool, data: null, annotation: el.annotation || '' });
-            } else if (el.type === 'fixation') {
-                const tool = V4_FIXATION_TO_TOOL[el.fixation?.fixationType] || 'band';
-                const zone = el.side === 'right' ? 'right' : 'left';
-                placements.push({ id: el.id, levelId: el.level, zone, tool, data: el.fixation?.description || null, annotation: el.annotation || '' });
-            } else if (el.type === 'osteotomy') {
-                const v3Type = V4_OSTEO_TO_TOOL[el.osteotomy?.osteotomyType] || el.osteotomy?.osteotomyType || 'PSO';
-                const isDisc = ['facetectomy', 'ponte'].includes(el.osteotomy?.osteotomyType);
-                placements.push({ id: el.id, levelId: el.level, zone: isDisc ? 'disc' : 'mid', tool: 'osteotomy', data: { type: v3Type, shortLabel: el.osteotomy?.osteotomyType === 'facetectomy' ? 'Facet' : (v3Type.length <= 6 ? v3Type : v3Type.substring(0,3).toUpperCase()), angle: el.osteotomy?.correctionAngle ?? null, reconstructionCage: el.osteotomy?.reconstructionCage || '' }, annotation: '' });
-            } else if (el.type === 'cage') {
-                cages.push({ id: el.id, levelId: el.level, tool: (el.cage?.approach || 'TLIF').toLowerCase(), data: { height: String(el.cage?.height || ''), lordosis: String(el.cage?.lordosis || ''), side: el.side || 'bilateral', width: el.cage?.width ? String(el.cage.width) : undefined, length: el.cage?.length ? String(el.cage.length) : undefined } });
-            } else if (el.type === 'connector') {
-                connectors.push({ id: el.id, levelId: el.level, fraction: el.connector?.fraction || 0.5, tool: 'connector' });
-            }
-        });
-        // Forces → placements
-        (chartData.forces || []).forEach(f => {
-            const key = f.direction ? `${f.type}-${f.direction}` : f.type;
-            const tool = V4_FORCE_TO_TOOL[key] || 'compression';
-            const zone = f.side === 'right' ? 'force_right' : 'force_left';
-            placements.push({ id: f.id, levelId: f.level, zone, tool, data: null, annotation: '' });
-        });
-        // Notes - restore pixel offsets
-        (chartData.notes || []).forEach(n => {
-            const pos = notePositions?.[n.id] || { offsetX: -140, offsetY: 0 };
-            notes.push({ id: n.id, tool: 'note', levelId: n.level, text: n.text, offsetX: pos.offsetX, offsetY: pos.offsetY, showArrow: n.showArrow || false });
-        });
-        // Rod free text
-        const rodLeft = (chartData.rods || []).find(r => r.side === 'left');
-        const rodRight = (chartData.rods || []).find(r => r.side === 'right');
-        return { placements, cages, connectors, notes, rodLeft: rodLeft?.freeText || '', rodRight: rodRight?.freeText || '' };
-    };
-
-    const serializeState = () => {
-        const planChart = internalToV4Chart(plannedPlacements, plannedCages, plannedConnectors, plannedNotes, { left: patientData.planLeftRod, right: patientData.planRightRod });
-        const constChart = internalToV4Chart(completedPlacements, completedCages, completedConnectors, completedNotes, { left: patientData.leftRod, right: patientData.rightRod });
-        return {
-            schema: { format: 'spinal-instrumentation', version: 4, schemaUrl: 'https://spine-planner.org/schema/v4/spinal-instrumentation.json', generator: { name: 'Spinal Instrumentation Plan & Record', version: CURRENT_VERSION, url: 'https://plan.skeletalsurgery.com/spine' } },
-            document: { id: documentId, created: documentCreated, modified: new Date().toISOString(), language: currentLang },
-            patient: { name: patientData.name, identifier: patientData.id },
-            case: { date: patientData.date, surgeon: patientData.surgeon, location: patientData.location || '' },
-            implantSystem: { manufacturer: patientData.company, system: patientData.screwSystem },
-            plan: { elements: planChart.elements, rods: planChart.rods, forces: planChart.forces, boneGraft: { types: (patientData.boneGraft?.types || []).map(t => BONEGRAFT_TO_V4[t] || t), notes: patientData.boneGraft?.notes || '' }, notes: planChart.notes },
-            construct: { elements: constChart.elements, rods: constChart.rods, forces: constChart.forces, boneGraft: { types: [], notes: '' }, notes: constChart.notes },
-            ui: { colourScheme, viewMode, notePositions: { ...planChart.notePositions, ...constChart.notePositions, ...reconLabelPositions } }
-        };
-    };
-
-    // Migrate v3 → internal state (legacy support)
-    const migrateConnectors = (conns) => {
-        if (!conns) return conns;
-        return conns.map(c => {
-            if (c.levelId) return c;
-            if (c.yNorm === undefined) return c;
-            const anatomicalY = (c.yNorm / 1000) * WHOLE_SPINE_MAP.totalHeight;
-            const entry = WHOLE_SPINE_MAP.map.find(e => anatomicalY >= e.startY && anatomicalY < e.endY) || WHOLE_SPINE_MAP.map[WHOLE_SPINE_MAP.map.length - 1];
-            const segLen = entry.vertEnd - entry.startY;
-            const fraction = segLen > 0 ? Math.max(0, Math.min(1, (anatomicalY - entry.startY) / segLen)) : 0.5;
-            return { id: c.id, levelId: entry.levelId, fraction, tool: 'connector' };
-        });
-    };
-
-    const deserializeState = (json) => {
-        // v4 format
-        if (json.schema?.version === 4) {
-            if (json.document?.id) setDocumentId(json.document.id);
-            if (json.document?.created) setDocumentCreated(json.document.created);
-            // Patient data - reconstruct internal format
-            const pd = {
-                name: json.patient?.name || '', id: json.patient?.identifier || '',
-                surgeon: json.case?.surgeon || '', location: json.case?.location || '',
-                date: json.case?.date || new Date().toISOString().split('T')[0],
-                company: json.implantSystem?.manufacturer || '', screwSystem: json.implantSystem?.system || '',
-                leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '',
-                boneGraft: { types: (json.plan?.boneGraft?.types || []).map(t => V4_BONEGRAFT_TO_TOOL[t] || t), notes: json.plan?.boneGraft?.notes || '' },
-            };
-            const notePos = json.ui?.notePositions || {};
-            if (json.plan) {
-                const p = v4ChartToInternal(json.plan, notePos);
-                setPlannedPlacements(p.placements); setPlannedCages(p.cages); setPlannedConnectors(p.connectors); setPlannedNotes(p.notes);
-                pd.planLeftRod = p.rodLeft; pd.planRightRod = p.rodRight;
-            }
-            if (json.construct) {
-                const c = v4ChartToInternal(json.construct, notePos);
-                setCompletedPlacements(c.placements); setCompletedCages(c.cages); setCompletedConnectors(c.connectors); setCompletedNotes(c.notes);
-                pd.leftRod = c.rodLeft; pd.rightRod = c.rodRight;
-            }
-            setPatientData(pd);
-            // Restore recon label positions from notePositions
-            const reconPos = {};
-            Object.entries(notePos).forEach(([k, v]) => { if (k.startsWith('recon-')) reconPos[k] = v; });
-            if (Object.keys(reconPos).length > 0) setReconLabelPositions(reconPos);
-            if (json.ui?.viewMode) setViewMode(json.ui.viewMode);
-            if (json.ui?.colourScheme) changeTheme(json.ui.colourScheme);
-            return;
-        }
-        // v3 / v2 legacy format
-        if (json.patient) setPatientData(json.patient);
-        if (json.plan) {
-            if (json.plan.implants) setPlannedPlacements(json.plan.implants);
-            if (json.plan.cages) setPlannedCages(json.plan.cages);
-            if (json.plan.connectors) setPlannedConnectors(migrateConnectors(json.plan.connectors));
-            if (json.plan.notes) setPlannedNotes(json.plan.notes);
-        }
-        if (json.construct) {
-            if (json.construct.implants) setCompletedPlacements(json.construct.implants);
-            if (json.construct.cages) setCompletedCages(json.construct.cages);
-            if (json.construct.connectors) setCompletedConnectors(migrateConnectors(json.construct.connectors));
-            if (json.construct.notes) setCompletedNotes(json.construct.notes);
-        }
-        if (json.preferences?.viewMode) setViewMode(json.preferences.viewMode);
-        if (json.preferences?.colourScheme) changeTheme(json.preferences.colourScheme);
-    };
-    serializeRef.current = serializeState;
-    deserializeRef.current = deserializeState;
-    changeLangRef.current = changeLang;
-
-    // AUTO-LOAD
     // SYNC LANGUAGE ON MOUNT
     useEffect(() => {
         setCurrentLang(currentLang);
         document.documentElement.lang = currentLang;
     }, []);
-
-    useEffect(() => {
-        const saved = localStorage.getItem('spine_planner_v2');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                if (parsed.schema?.version === 4 || parsed.formatVersion >= 2) deserializeState(parsed);
-            } catch (e) { console.error("Data load error"); }
-        }
-        setHasLoaded(true);
-    }, []);
-
-    // AUTO-SAVE + BROADCAST SYNC
-    useEffect(() => {
-        if (hasLoaded && !incognitoMode) {
-            localStorage.setItem('spine_planner_v2', JSON.stringify(serializeState()));
-        }
-        if (incognitoMode) localStorage.removeItem('spine_planner_v2');
-        // Broadcast to other windows (skip if this update came from sync)
-        if (receivingSync.current) {
-            receivingSync.current = false;
-            return;
-        }
-        if (hasLoaded && syncChannelRef.current) {
-            syncVersionRef.current++;
-            clearTimeout(syncTimerRef.current);
-            syncTimerRef.current = setTimeout(() => {
-                if (syncChannelRef.current) {
-                    syncChannelRef.current.postMessage({ type: 'state', appVersion: CURRENT_VERSION, payload: serializeState(), version: syncVersionRef.current });
-                }
-            }, 200);
-        }
-    }, [plannedPlacements, completedPlacements, plannedCages, completedCages, plannedConnectors, completedConnectors, plannedNotes, completedNotes, patientData, viewMode, colourScheme, hasLoaded, incognitoMode, reconLabelPositions]);
-
-    // BROADCAST CHANNEL SYNC
-    useEffect(() => {
-        if (typeof BroadcastChannel === 'undefined') return;
-        const ch = new BroadcastChannel('spine-planner-sync');
-        syncChannelRef.current = ch;
-
-        ch.onmessage = (e) => {
-            const msg = e.data;
-            // Version mismatch - ignore sync from older/newer app versions
-            if (!msg.appVersion) {
-                console.warn('Sync: ignoring message without appVersion', msg);
-                return;
-            }
-            if (msg.appVersion !== CURRENT_VERSION) {
-                if (!syncVersionMismatchRef.current) {
-                    syncVersionMismatchRef.current = true;
-                    console.warn('Sync version mismatch:', { received: msg.appVersion, expected: CURRENT_VERSION, msgType: msg.type });
-                    showToast(`Another window is running ${msg.appVersion} — please reload all windows to sync.`, 'error');
-                }
-                return;
-            }
-            if (msg.type === 'ping') {
-                ch.postMessage({ type: 'pong', appVersion: CURRENT_VERSION, payload: serializeRef.current() });
-            } else if (msg.type === 'pong') {
-                lastPongRef.current = Date.now();
-                setSyncConnected(true);
-                if (msg.payload) {
-                    clearTimeout(syncTimerRef.current);
-                    receivingSync.current = true;
-                    deserializeRef.current(msg.payload);
-                }
-            } else if (msg.type === 'state') {
-                if (msg.payload) {
-                    // Cancel any pending outbound sync - the incoming state supersedes it
-                    clearTimeout(syncTimerRef.current);
-                    receivingSync.current = true;
-                    deserializeRef.current(msg.payload);
-                }
-            } else if (msg.type === 'lang_accepted') {
-                // Other window accepted disclaimer in a new language — apply language + acceptance
-                if (msg.lang) {
-                    acceptDisclaimer(msg.lang);
-                    changeLangRef.current(msg.lang);
-                    setDisclaimerTick(n => n + 1);
-                }
-            }
-        };
-
-        // Initial ping to discover existing peers
-        ch.postMessage({ type: 'ping', appVersion: CURRENT_VERSION });
-
-        // Heartbeat: ping every 5s, disconnect if no pong in 10s
-        const heartbeat = setInterval(() => {
-            ch.postMessage({ type: 'ping', appVersion: CURRENT_VERSION });
-            if (lastPongRef.current > 0 && Date.now() - lastPongRef.current > 10000) {
-                setSyncConnected(false);
-                lastPongRef.current = 0;
-            }
-        }, 5000);
-
-        const handleUnload = () => ch.postMessage({ type: 'bye' });
-        window.addEventListener('beforeunload', handleUnload);
-
-        return () => {
-            clearInterval(heartbeat);
-            window.removeEventListener('beforeunload', handleUnload);
-            ch.postMessage({ type: 'bye' });
-            ch.close();
-            syncChannelRef.current = null;
-        };
-    }, [hasLoaded]);
 
     // RESIZE OBSERVER - portrait mode: scale active column to fit
     useEffect(() => {
@@ -703,17 +374,15 @@ const App = () => {
             return showToast(t('alert.cage_not_permitted', { cageType: cageType?.label || data.type.toUpperCase(), level: getDiscLabel(lvl, levels) }), 'error');
         }
 
-        const newCage = { levelId: editingCageLevel, tool: data.type, data: { height: data.height, width: data.width, length: data.length, lordosis: data.lordosis, side: data.side } };
-        const setter = activeChart === 'planned' ? setPlannedCages : setCompletedCages;
-        setter(prev => {
-            const filtered = prev.filter(c => c.levelId !== editingCageLevel);
-            return [...filtered, newCage];
+        dispatch({
+            type: 'SET_CAGE',
+            chart: activeChart === 'planned' ? 'plan' : 'construct',
+            cage: { levelId: editingCageLevel, tool: data.type, data: { height: data.height, width: data.width, length: data.length, lordosis: data.lordosis, side: data.side } },
         });
     };
 
     const handleDeleteCage = () => {
-        const setter = activeChart === 'planned' ? setPlannedCages : setCompletedCages;
-        setter(prev => prev.filter(c => c.levelId !== editingCageLevel));
+        dispatch({ type: 'REMOVE_CAGE', chart: activeChart === 'planned' ? 'plan' : 'construct', levelId: editingCageLevel });
         setCageModalOpen(false);
     };
 
@@ -764,69 +433,72 @@ const App = () => {
     };
 
     const addPlacement = (levelId, zone, tool, data, annotation) => {
-        const newP = { id: genId(), levelId, zone, tool, data, annotation: annotation || '' };
-        const setter = activeChart === 'planned' ? setPlannedPlacements : setCompletedPlacements;
-        // One implant per left/right zone - use functional update to check latest state
-        if (zone === 'left' || zone === 'right') {
-            setter(prev => prev.some(p => p.levelId === levelId && p.zone === zone) ? prev : [...prev, newP]);
-        } else {
-            setter(prev => [...prev, newP]);
-        }
+        dispatch({
+            type: 'ADD_PLACEMENT',
+            chart: activeChart === 'planned' ? 'plan' : 'construct',
+            placement: { id: genId(), levelId, zone, tool, data, annotation: annotation || '' },
+        });
     };
     const updatePlacement = (id, tool, data, annotation) => {
-        const updater = (prev) => prev.map(p =>
-            p.id === id ? { ...p, tool, data, annotation: annotation !== undefined ? annotation : (p.annotation || '') } : p
-        );
-        if (activeChart === 'planned') setPlannedPlacements(updater);
-        else setCompletedPlacements(updater);
+        dispatch({
+            type: 'UPDATE_PLACEMENT',
+            chart: activeChart === 'planned' ? 'plan' : 'construct',
+            id, tool, data, annotation,
+        });
     };
     const removePlacement = (id) => {
-        const filter = prev => prev.filter(p => p.id !== id);
-        if (activeChart === 'planned') setPlannedPlacements(filter);
-        else setCompletedPlacements(filter);
+        dispatch({
+            type: 'REMOVE_PLACEMENT',
+            chart: activeChart === 'planned' ? 'plan' : 'construct',
+            id,
+        });
         setScrewModalOpen(false);
         setOsteoModalOpen(false);
     };
 
     // CONNECTOR HANDLERS
     const addConnector = (levelId) => {
-        const newConn = { id: genId(), levelId, fraction: 0.5, tool: 'connector' };
-        const setter = activeChart === 'planned' ? setPlannedConnectors : setCompletedConnectors;
-        setter(prev => [...prev, newConn]);
+        dispatch({
+            type: 'ADD_CONNECTOR',
+            chart: activeChart === 'planned' ? 'plan' : 'construct',
+            connector: { id: genId(), levelId, fraction: 0.5, tool: 'connector' },
+        });
     };
     const updateConnector = (connId, { levelId, fraction }) => {
-        const updater = prev => prev.map(c => c.id === connId ? { ...c, levelId, fraction } : c);
-        if (activeChart === 'planned') setPlannedConnectors(updater); else setCompletedConnectors(updater);
+        dispatch({
+            type: 'UPDATE_CONNECTOR',
+            chart: activeChart === 'planned' ? 'plan' : 'construct',
+            id: connId, levelId, fraction,
+        });
     };
     const removeConnector = (connId) => {
-        const filter = prev => prev.filter(c => c.id !== connId);
-        if (activeChart === 'planned') setPlannedConnectors(filter); else setCompletedConnectors(filter);
+        dispatch({
+            type: 'REMOVE_CONNECTOR',
+            chart: activeChart === 'planned' ? 'plan' : 'construct',
+            id: connId,
+        });
     };
 
     // NOTE HANDLERS
     const handleNoteConfirm = (text, showArrow) => {
+        const chart = activeChart === 'planned' ? 'plan' : 'construct';
         if (editingNote) {
             const currentNotes = activeChart === 'planned' ? plannedNotes : completedNotes;
             const exists = currentNotes.some(n => n.id === editingNote.id);
             if (exists) {
-                const updater = prev => prev.map(n => n.id === editingNote.id ? { ...n, text, showArrow } : n);
-                if (activeChart === 'planned') setPlannedNotes(updater); else setCompletedNotes(updater);
+                dispatch({ type: 'UPDATE_NOTE', chart, id: editingNote.id, text, showArrow });
             } else {
-                const newNote = { id: genId(), tool: 'note', levelId: editingNote.levelId, text, offsetX: editingNote.offsetX, offsetY: editingNote.offsetY, showArrow };
-                setCompletedNotes(prev => [...prev, newNote]);
+                dispatch({ type: 'ADD_NOTE', chart: 'construct', note: { id: genId(), tool: 'note', levelId: editingNote.levelId, text, offsetX: editingNote.offsetX, offsetY: editingNote.offsetY, showArrow } });
             }
             setEditingNote(null);
         } else if (pendingNoteTool) {
-            const newNote = { id: genId(), tool: pendingNoteTool.tool, levelId: pendingNoteTool.levelId, text, offsetX: pendingNoteTool.offsetX, offsetY: pendingNoteTool.offsetY, showArrow };
-            const setter = activeChart === 'planned' ? setPlannedNotes : setCompletedNotes;
-            setter(prev => [...prev, newNote]);
+            dispatch({ type: 'ADD_NOTE', chart, note: { id: genId(), tool: pendingNoteTool.tool, levelId: pendingNoteTool.levelId, text, offsetX: pendingNoteTool.offsetX, offsetY: pendingNoteTool.offsetY, showArrow } });
             setPendingNoteTool(null);
         }
     };
     const handleNoteDelete = () => {
         if (editingNote) {
-            const filter = prev => prev.filter(n => n.id !== editingNote.id);
-            if (activeChart === 'planned') setPlannedNotes(filter); else setCompletedNotes(filter);
+            dispatch({ type: 'REMOVE_NOTE', chart: activeChart === 'planned' ? 'plan' : 'construct', id: editingNote.id });
             setEditingNote(null);
             setNoteModalOpen(false);
         }
@@ -844,7 +516,7 @@ const App = () => {
     };
 
     const handleGhostConnectorClick = (ghostConn) => {
-        setCompletedConnectors(prev => [...prev, { id: genId(), levelId: ghostConn.levelId, fraction: ghostConn.fraction, tool: 'connector' }]);
+        dispatch({ type: 'ADD_CONNECTOR', chart: 'construct', connector: { id: genId(), levelId: ghostConn.levelId, fraction: ghostConn.fraction, tool: 'connector' } });
     };
 
     const handleGhostCageClick = (ghostCage) => {
@@ -854,15 +526,13 @@ const App = () => {
         setCageModalOpen(true);
     };
     const updateNotePosition = (noteId, { offsetX, offsetY }) => {
-        const updater = prev => prev.map(n => n.id === noteId ? { ...n, offsetX, offsetY } : n);
-        if (activeChart === 'planned') setPlannedNotes(updater); else setCompletedNotes(updater);
+        dispatch({ type: 'UPDATE_NOTE_POSITION', chart: activeChart === 'planned' ? 'plan' : 'construct', id: noteId, offsetX, offsetY });
     };
     const removeNote = (noteId) => {
-        const filter = prev => prev.filter(n => n.id !== noteId);
-        if (activeChart === 'planned') setPlannedNotes(filter); else setCompletedNotes(filter);
+        dispatch({ type: 'REMOVE_NOTE', chart: activeChart === 'planned' ? 'plan' : 'construct', id: noteId });
     };
     const updateReconLabelPosition = (reconId, { offsetX, offsetY }) => {
-        setReconLabelPositions(prev => ({ ...prev, [reconId]: { offsetX, offsetY } }));
+        dispatch({ type: 'SET_RECON_LABEL_POSITION', id: reconId, offsetX, offsetY });
     };
 
     // EXPORT
@@ -950,8 +620,8 @@ const App = () => {
         setPortraitExporting(false);
     };
     const saveProjectJSON = () => {
-        const data = serializeState();
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const data = serialize();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = `SpineProject_${patientData.name || 'Unnamed'}.json`;
@@ -961,62 +631,37 @@ const App = () => {
         if (incognitoMode) localStorage.removeItem('spine_planner_v2');
     };
     const loadProjectJSON = (e) => {
-        const file = e.target.files[0]; if(!file) return;
+        const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = (ev) => {
             try {
                 const json = JSON.parse(ev.target.result);
                 if (json.schema?.version === 4 || json.formatVersion >= 2) {
-                    deserializeState(json);
-                    // Broadcast loaded state immediately so synced windows update
-                    if (syncChannelRef.current) {
-                        clearTimeout(syncTimerRef.current);
-                        syncChannelRef.current.postMessage({ type: 'state', payload: json });
-                    }
+                    const result = deserializeDocument(json);
+                    dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
+                    if (result.viewMode) setViewMode(result.viewMode);
+                    if (result.colourScheme) changeTheme(result.colourScheme);
                 } else {
                     showToast(t('alert.unsupported_format'), 'error');
                     return;
                 }
                 showToast(t('alert.loaded'));
-            } catch(err) { showToast(t('alert.invalid_file'), 'error'); }
+            } catch (err) { showToast(t('alert.invalid_file'), 'error'); }
         };
         reader.readAsText(file); e.target.value = null;
     };
 
     const copyPlanToCompleted = () => {
         if (plannedPlacements.length === 0 && plannedConnectors.length === 0 && plannedNotes.length === 0 && plannedCages.length === 0) return showToast(t('alert.no_plan'));
-
-        // Filter out plan placements that already have a construct placement at the same levelId + zone
-        // Also exclude force placements (force_left, force_right) - forces are plan-only
-        const newPlacements = plannedPlacements.filter(p =>
-            !p.zone.startsWith('force') &&
-            !completedPlacements.some(cp => cp.levelId === p.levelId && cp.zone === p.zone)
-        );
-        const newConnectors = plannedConnectors.filter(pc =>
-            !completedConnectors.some(cc => cc.levelId === pc.levelId)
-        );
-        const newNotes = plannedNotes.filter(pn =>
-            !completedNotes.some(cn => cn.levelId === pn.levelId)
-        );
-        const newCages = plannedCages.filter(pc =>
-            !completedCages.some(cc => cc.levelId === pc.levelId)
-        );
-
+        // Check if anything would actually change before dispatching
+        const newPlacements = plannedPlacements.filter(p => !p.zone.startsWith('force') && !completedPlacements.some(cp => cp.levelId === p.levelId && cp.zone === p.zone));
+        const newCages = plannedCages.filter(pc => !completedCages.some(cc => cc.levelId === pc.levelId));
+        const newConnectors = plannedConnectors.filter(pc => !completedConnectors.some(cc => cc.levelId === pc.levelId));
+        const newNotes = plannedNotes.filter(pn => !completedNotes.some(cn => cn.levelId === pn.levelId));
         if (newPlacements.length === 0 && newConnectors.length === 0 && newNotes.length === 0 && newCages.length === 0) {
             return showToast(t('alert.all_confirmed'));
         }
-
-        // Copy essential data only — implant type, size, position.
-        // Strip: annotations, notes, fixation descriptions, osteotomy angles.
-        const FIXATION_IDS = ['band', 'wire', 'cable'];
-        setCompletedPlacements(prev => [...prev, ...newPlacements.map(p => {
-            let data = p.data;
-            if (FIXATION_IDS.includes(p.tool)) data = null;
-            if (p.tool === 'osteotomy' && typeof p.data === 'object') data = { ...p.data, angle: null, reconstructionCage: '' };
-            return { ...p, id: genId(), annotation: '', data };
-        })]);
-        setCompletedCages(prev => [...prev, ...newCages.map(c => ({...c}))]);
-        setCompletedConnectors(prev => [...prev, ...newConnectors.map(c => ({...c, id: genId()}))]);
+        dispatch({ type: 'COPY_PLAN_TO_CONSTRUCT', genId });
         setActiveChart('completed');
     };
 
@@ -1025,10 +670,7 @@ const App = () => {
         setConfirmClearConstruct(true);
     };
     const confirmClearConstructAction = () => {
-        setCompletedPlacements([]);
-        setCompletedCages([]);
-        setCompletedConnectors([]);
-        setCompletedNotes([]);
+        dispatch({ type: 'CLEAR_CONSTRUCT' });
         setConfirmClearConstruct(false);
         setActiveChart('planned');
         showToast(t('alert.construct_cleared'));
@@ -1040,15 +682,15 @@ const App = () => {
             <h2 className="font-bold text-2xl text-slate-900 mb-4 border-b-4 border-slate-900 pb-2">{t('export.title')}</h2>
             <div className="flex-1 flex flex-col overflow-y-auto min-h-0">
                 <div className="space-y-1 shrink-0">
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.name')}</label><div className="editable-field w-full text-xs font-semibold" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, name: e.target.innerText})} placeholder={t('patient.click_to_enter')}>{patientData.name}</div></div>
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.id')}</label><div className="editable-field w-full text-xs font-mono" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, id: e.target.innerText})} placeholder={t('patient.click_to_enter')}>{patientData.id}</div></div>
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.surgeon')}</label><div className="editable-field w-full text-xs" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, surgeon: e.target.innerText})} placeholder={t('patient.click_to_enter')}>{patientData.surgeon}</div></div>
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.date')}</label><div className="editable-field w-full text-xs cursor-pointer" onClick={() => setIsEditingDate(true)}>{isEditingDate ? <input type="date" className="w-full text-xs border-b border-slate-800 bg-transparent outline-none py-0" value={patientData.date} autoFocus onBlur={()=>setIsEditingDate(false)} onChange={e=>setPatientData({...patientData, date:e.target.value})} /> : formatDate(patientData.date)}</div></div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.name')}</label><div className="editable-field w-full text-xs font-semibold" contentEditable suppressContentEditableWarning onBlur={e => setPatientField('name', e.target.innerText)} placeholder={t('patient.click_to_enter')}>{patientData.name}</div></div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.id')}</label><div className="editable-field w-full text-xs font-mono" contentEditable suppressContentEditableWarning onBlur={e => setPatientField('id', e.target.innerText)} placeholder={t('patient.click_to_enter')}>{patientData.id}</div></div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.surgeon')}</label><div className="editable-field w-full text-xs" contentEditable suppressContentEditableWarning onBlur={e => setPatientField('surgeon', e.target.innerText)} placeholder={t('patient.click_to_enter')}>{patientData.surgeon}</div></div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.date')}</label><div className="editable-field w-full text-xs cursor-pointer" onClick={() => setIsEditingDate(true)}>{isEditingDate ? <input type="date" className="w-full text-xs border-b border-slate-800 bg-transparent outline-none py-0" value={patientData.date} autoFocus onBlur={()=>setIsEditingDate(false)} onChange={e=>setPatientField('date', e.target.value)} /> : formatDate(patientData.date)}</div></div>
                 </div>
                 <div className="border-t border-slate-200 my-3"></div>
                 <div className="space-y-1 shrink-0">
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.supplier')}</label><select className="editable-field w-full text-xs bg-white cursor-pointer" value={patientData.company} onChange={e => { const v = e.target.value; setPatientData({...patientData, company: v}); if (AUTO_THEME_FROM_COMPANY && COMPANY_THEME_MAP[v]) { changeTheme(COMPANY_THEME_MAP[v]); } }}><option value="">{t('patient.select_supplier')}</option>{IMPLANT_COMPANIES.map(c => <option key={c} value={c}>{c}</option>)}<option value="__other">{t('patient.other')}</option></select>{patientData.company === '__other' && <div className="editable-field w-full text-xs mt-0.5" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, company: e.target.innerText})} placeholder={t('patient.enter_company')}></div>}</div>
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.screw_system')}</label><ScrewSystemCombo value={patientData.screwSystem} onChange={v => setPatientData({...patientData, screwSystem: v})} company={patientData.company} placeholder={t('patient.screw_system_placeholder')} /></div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.supplier')}</label><select className="editable-field w-full text-xs bg-white cursor-pointer" value={patientData.company} onChange={e => { const v = e.target.value; setPatientField('company', v); if (AUTO_THEME_FROM_COMPANY && COMPANY_THEME_MAP[v]) { changeTheme(COMPANY_THEME_MAP[v]); } }}><option value="">{t('patient.select_supplier')}</option>{IMPLANT_COMPANIES.map(c => <option key={c} value={c}>{c}</option>)}<option value="__other">{t('patient.other')}</option></select>{patientData.company === '__other' && <div className="editable-field w-full text-xs mt-0.5" contentEditable suppressContentEditableWarning onBlur={e => setPatientField('company', e.target.innerText)} placeholder={t('patient.enter_company')}></div>}</div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.screw_system')}</label><ScrewSystemCombo value={patientData.screwSystem} onChange={v => setPatientField('screwSystem', v)} company={patientData.company} placeholder={t('patient.screw_system_placeholder')} /></div>
                 </div>
                 <div className="border-t border-slate-200 my-2"></div>
                 <div className="shrink-0">
@@ -1056,12 +698,12 @@ const App = () => {
                     <div className="grid grid-cols-3 gap-x-1 gap-y-0.5">
                         {BONE_GRAFT_OPTIONS.map(opt => (
                             <label key={opt} className="flex items-center gap-1 text-[10px] text-slate-700 cursor-pointer hover:text-slate-900 leading-tight">
-                                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500 shrink-0" checked={(patientData.boneGraft?.types || []).includes(opt)} onChange={e => { const types = patientData.boneGraft?.types || []; setPatientData({...patientData, boneGraft: { ...patientData.boneGraft, types: e.target.checked ? [...types, opt] : types.filter(v => v !== opt) }}); }} />
+                                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500 shrink-0" checked={(patientData.boneGraft?.types || []).includes(opt)} onChange={e => { const types = patientData.boneGraft?.types || []; dispatch({ type: 'SET_BONE_GRAFT', types: e.target.checked ? [...types, opt] : types.filter(v => v !== opt), notes: patientData.boneGraft?.notes || '' }); }} />
                                 <span className="truncate">{BONE_GRAFT_LABEL_KEYS[opt] ? t(BONE_GRAFT_LABEL_KEYS[opt]) : opt}</span>
                             </label>
                         ))}
                     </div>
-                    <div className="editable-field w-full text-[10px] mt-1" contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, boneGraft: { ...(patientData.boneGraft || {}), notes: e.target.innerText }})} placeholder={t('patient.bone_graft_notes_placeholder')}>{patientData.boneGraft?.notes || ''}</div>
+                    <div className="editable-field w-full text-[10px] mt-1" contentEditable suppressContentEditableWarning onBlur={e => dispatch({ type: 'SET_BONE_GRAFT', types: patientData.boneGraft?.types || [], notes: e.target.innerText })} placeholder={t('patient.bone_graft_notes_placeholder')}>{patientData.boneGraft?.notes || ''}</div>
                 </div>
                 <ImplantInventory placements={[...(showFinalInventory ? completedPlacements : plannedPlacements), ...(showFinalInventory ? completedCages : plannedCages).map(c => ({...c, tool: c.tool})), ...(showFinalInventory ? completedConnectors : plannedConnectors).map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid'}))]} tools={[...allTools, {id: 'tlif', labelKey: 'inventory.cage.tlif'}, {id: 'plif', labelKey: 'inventory.cage.plif'}, {id: 'acdf', labelKey: 'inventory.cage.acdf'}, {id: 'xlif', labelKey: 'inventory.cage.xlif'}, {id: 'olif', labelKey: 'inventory.cage.olif'}, {id: 'alif', labelKey: 'inventory.cage.alif'}]} title={showFinalInventory ? t('inventory.title_construct') : t('inventory.title_plan')} visibleLevelIds={levels.map(l => l.id)} levels={levels} rods={showFinalInventory ? { left: patientData.leftRod, right: patientData.rightRod } : { left: patientData.planLeftRod, right: patientData.planRightRod }} />
                 <button onClick={() => setShowFinalInventory(!showFinalInventory)} className="mt-1 w-full text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase tracking-wider py-1 border border-slate-200 rounded hover:bg-slate-50 transition-colors">{showFinalInventory ? t('inventory.view_plan') : t('inventory.view_final')}</button>
@@ -1070,30 +712,19 @@ const App = () => {
         </React.Fragment>
     );
 
-    const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planLeftRod: e.target.innerText})} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planRightRod: e.target.innerText})} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} />;
+    const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('planLeftRod', e.target.innerText)} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('planRightRod', e.target.innerText)} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} />;
 
-    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostNotes={isPortrait ? plannedNotes : undefined} onGhostNoteClick={handleGhostNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} />;
+    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostNotes={isPortrait ? plannedNotes : undefined} onGhostNoteClick={handleGhostNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('leftRod', e.target.innerText)} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('rightRod', e.target.innerText)} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} />;
 
     const newPatientAction = () => setConfirmNewPatient(true);
     const executeNewPatient = () => {
         setConfirmNewPatient(false);
-        setPlannedPlacements([]); setCompletedPlacements([]);
-        setPlannedCages([]); setCompletedCages([]);
-        setPlannedConnectors([]); setCompletedConnectors([]);
-        setPlannedNotes([]); setCompletedNotes([]);
-        const emptyPatient = { name: '', id: '', surgeon: '', location: '', date: new Date().toISOString().split('T')[0], company: '', screwSystem: '', leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '', boneGraft: { types: [], notes: '' } };
-        setPatientData(emptyPatient);
+        dispatch({ type: 'NEW_PATIENT' });
         setActiveChart('planned');
-        setDocumentId(crypto.randomUUID());
-        setDocumentCreated(new Date().toISOString());
+        // Broadcast empty state to synced windows
         if (syncChannelRef.current) {
-            clearTimeout(syncTimerRef.current);
-            const emptyV4 = serializeState();
-            syncChannelRef.current.postMessage({ type: 'state', payload: {
-                formatVersion: 3, patient: emptyPatient, preferences: { viewMode, colourScheme },
-                plan: { implants: [], cages: [], connectors: [], notes: [] },
-                construct: { implants: [], cages: [], connectors: [], notes: [] },
-            }});
+            const emptyState = serializeDocState(state, viewMode, colourScheme, CURRENT_VERSION, currentLang);
+            syncChannelRef.current.postMessage({ type: 'state', appVersion: CURRENT_VERSION, payload: emptyState });
         }
     };
 
