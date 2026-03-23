@@ -1,10 +1,12 @@
-// src/state/schema.js
+// src/state/schema.ts
 import { z } from 'zod';
 
 // --- ValidationError ---
 
 export class ValidationError extends Error {
-    constructor(issues) {
+    issues: z.ZodIssue[];
+
+    constructor(issues: z.ZodIssue[]) {
         const first = issues[0];
         const path = first?.path?.join('.') || 'unknown';
         const msg = first?.message || 'validation failed';
@@ -156,9 +158,13 @@ export const v4Schema = z.object({
     }).passthrough().optional(),
 }).passthrough();
 
+// --- Inferred type ---
+
+export type V4Document = z.infer<typeof v4Schema>;
+
 // --- Validate ---
 
-export function validateV4(json) {
+export function validateV4(json: unknown): V4Document {
     const result = v4Schema.safeParse(json);
     if (!result.success) {
         throw new ValidationError(result.error.issues);
