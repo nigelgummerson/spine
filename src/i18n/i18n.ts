@@ -13,6 +13,7 @@ export const LOCALE_MAP: Record<string, string> = {
     pt: 'pt-PT', it: 'it-IT', nl: 'nl-NL', pl: 'pl-PL',
     tr: 'tr-TR', nb: 'nb-NO', da: 'da-DK', sv: 'sv-SE',
     el: 'el-GR', fi: 'fi-FI', he: 'he-IL', hi: 'hi-IN', ru: 'ru-RU', uk: 'uk-UA',
+    'zh-Hans': 'zh-CN',
 };
 
 export const LANG_ALIASES: Record<string, string> = {

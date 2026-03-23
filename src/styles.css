@@ -2,6 +2,7 @@
 
 /* BASE STYLES */
 body { font-family: 'Inter', 'Tahoma', 'Nirmala UI', 'Noto Sans Devanagari', sans-serif; font-feature-settings: "tnum"; overflow: hidden; background-color: #f1f5f9; }
+[lang="zh-Hans"] body { font-family: 'Inter', 'Noto Sans SC', 'Tahoma', 'Nirmala UI', sans-serif; font-feature-settings: "tnum"; }
 .serif { font-family: 'Source Serif 4', serif; }
 .font-heading { font-family: 'Source Serif 4', serif; }
 .no-select { user-select: none; -webkit-user-select: none; }

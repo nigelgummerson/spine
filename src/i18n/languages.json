@@ -17,5 +17,6 @@
   { "code": "fi", "name": "Suomi" },
   { "code": "sv", "name": "Svenska" },
   { "code": "tr", "name": "Türkçe" },
-  { "code": "uk", "name": "Українська" }
+  { "code": "uk", "name": "Українська" },
+  { "code": "zh-Hans", "name": "简体中文" }
 ]
