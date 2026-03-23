@@ -19,11 +19,11 @@ export const InstrumentIcon = ({ type, className = "w-5 h-5", color = "black" }:
         case 'monoaxial': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /></svg>;
         case 'polyaxial': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /><path d="M7 7l10 10M17 7l-10 10" /></svg>;
         case 'uniplanar': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /><path d="M12 3v18" /></svg>;
-        case 'pedicle_hook': return <div className={className}><HookBase direction="up" label="P" /></div>;
-        case 'tp_hook': return <div className={className}><HookBase direction="down" label="TP" /></div>;
-        case 'tp_hook_up': return <div className={className}><HookBase direction="up" label="TP" /></div>;
-        case 'sl_hook': return <div className={className}><HookBase direction="down" label="SL" /></div>;
-        case 'il_hook': return <div className={className}><HookBase direction="up" label="IL" /></div>;
+        case 'pedicle_hook': return <HookBase direction="up" label="P" />;
+        case 'tp_hook': return <HookBase direction="down" label="TP" />;
+        case 'tp_hook_up': return <HookBase direction="up" label="TP" />;
+        case 'sl_hook': return <HookBase direction="down" label="SL" />;
+        case 'il_hook': return <HookBase direction="up" label="IL" />;
         case 'band': return <svg viewBox="0 0 36 24" className={className} overflow="visible"><text x="18" y="19" textAnchor="middle" fontSize="22" fontWeight="bold" fill={color} fontFamily="Inter, sans-serif">BAND</text></svg>;
         case 'wire': return <svg viewBox="0 0 36 24" className={className} overflow="visible"><text x="18" y="19" textAnchor="middle" fontSize="22" fontWeight="bold" fill={color} fontFamily="Inter, sans-serif">WIRE</text></svg>;
         case 'cable': return <svg viewBox="0 0 36 24" className={className} overflow="visible"><text x="18" y="19" textAnchor="middle" fontSize="20" fontWeight="bold" fill={color} fontFamily="Inter, sans-serif">CABLE</text></svg>;
