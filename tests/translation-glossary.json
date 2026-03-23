@@ -11,7 +11,11 @@
       "NVWC",
       "NOV",
       "AO Spine Ukraine",
-      "RASS"
+      "RASS",
+      "Israeli Spine Society",
+      "Chinese Spine Society (CSS)",
+      "JSSR",
+      "Korean Spine Society (KSS)"
     ],
     "last_updated": "2026-03-20",
     "notes": "All translations marked verified: false pending review by native-speaking spine surgeons. Sources indicate the national/international society whose published terminology was referenced."
@@ -116,6 +120,26 @@
           "expected": "Релиз фасеточного сустава",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "שחרור מפרק פאסטי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "关节突关节松解",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "椎間関節解離",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "후관절 유리술",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -196,6 +220,26 @@
         "ru": {
           "expected": "Schwab степень 1",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "Schwab דרגה 1",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "Schwab 1级",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "Schwab Grade 1",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "Schwab 등급 1",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -278,6 +322,26 @@
           "expected": "Резекция нижней фасетки; удаление суставной капсулы.",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "כריתת פאסט תחתון; הסרת קפסולת המפרק.",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "下关节突切除；关节囊切除。",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "下関節突起切除；関節包除去。",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "하관절돌기 절제; 관절낭 제거.",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -358,6 +422,26 @@
         "ru": {
           "expected": "Ponte / Smith Petersen",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -440,6 +524,26 @@
           "expected": "Schwab степень 2",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "Schwab דרגה 2",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "Schwab 2级",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "Schwab Grade 2",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "Schwab 등급 2",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -520,6 +624,26 @@
         "ru": {
           "expected": "Полная фасетэктомия; жёлтая связка + пластинка.",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "כריתת פאסט מלאה; ליגמנטום פלאבום + למינה.",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "完全关节突切除；黄韧带+椎板。",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "完全椎間関節切除；黄色靭帯＋椎弓。",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "완전 후관절 절제술; 황색인대 + 추궁.",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -602,6 +726,26 @@
           "expected": "Стандартная PSO",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "PSO סטנדרטי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "标准PSO",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "標準PSO",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "표준 PSO",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -682,6 +826,26 @@
         "ru": {
           "expected": "Schwab степень 3",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "Schwab דרגה 3",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "Schwab 3级",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "Schwab Grade 3",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "Schwab 등급 3",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -764,6 +928,26 @@
           "expected": "Педикулярная субтракция; частичный клин тела.",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "חיסור פדיקולרי; טריז גוף חלקי.",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "椎弓根截骨；部分椎体楔形截骨。",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "椎弓根短縮骨切り；椎体部分楔状骨切り。",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "척추경 감산 절골술; 추체 부분 쐐기 절제.",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -844,6 +1028,26 @@
         "ru": {
           "expected": "Расширенная PSO",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "PSO מורחב",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "扩大PSO",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "拡大PSO",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "확장 PSO",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -926,6 +1130,26 @@
           "expected": "Schwab степень 4",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "Schwab דרגה 4",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "Schwab 4级",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "Schwab Grade 4",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "Schwab 등급 4",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -1006,6 +1230,26 @@
         "ru": {
           "expected": "PSO + резекция смежного диска.",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "PSO + כריתת דיסק סמוך.",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "PSO + 邻近椎间盘切除。",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "PSO＋隣接椎間板切除。",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "PSO + 인접 추간판 절제.",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -1088,6 +1332,26 @@
           "expected": "VCR",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "VCR",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "VCR",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "VCR",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "VCR",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -1168,6 +1432,26 @@
         "ru": {
           "expected": "Schwab степень 5",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "Schwab דרגה 5",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "Schwab 5级",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "Schwab Grade 5",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "Schwab 등급 5",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -1250,6 +1534,26 @@
           "expected": "Полная резекция позвоночного столба.",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "כריתה מלאה של עמוד השדרה.",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "全脊椎切除术。",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "全脊椎切除術。",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "완전 척추주 절제술.",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -1330,6 +1634,26 @@
         "ru": {
           "expected": "Многоуровневая VCR",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "VCR רב-רמתי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "多节段VCR",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "多椎体VCR",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "다분절 VCR",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -1412,6 +1736,26 @@
           "expected": "Schwab степень 6",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "Schwab דרגה 6",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "Schwab 6级",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "Schwab Grade 6",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "Schwab 등급 6",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -1492,6 +1836,26 @@
         "ru": {
           "expected": "Резекция нескольких позвонков и дисков.",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "כריתת חוליות ודיסקים מרובים.",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "多个椎体及椎间盘切除。",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "複数椎体および椎間板の切除。",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "다수 추체 및 추간판 절제.",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -1574,6 +1938,26 @@
           "expected": "Корпэктомия (передняя)",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "כריתת גוף חוליה (קדמי)",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "椎体次全切除术 (前路)",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "椎体亜全摘術 (前方)",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "추체 절제술 (전방)",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -1654,6 +2038,26 @@
         "ru": {
           "expected": "Передний",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "קדמי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "前路",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "前方",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "전방",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -1736,6 +2140,26 @@
           "expected": "Удаление тела позвонка.",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "הסרת גוף החוליה.",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "椎体切除。",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "椎体切除。",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "추체 제거.",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -1816,6 +2240,26 @@
         "ru": {
           "expected": "Передняя шейная дискэктомия и спондилодез",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "כריתת דיסק צווארית קדמית והיתוך",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "颈椎前路椎间盘切除融合术",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "前方頚椎椎間板切除固定術",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "경추 전방 추간판 절제술 및 유합술",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -1898,6 +2342,26 @@
           "expected": "Задний поясничный межтеловой спондилодез",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "היתוך בין-גופי מותני אחורי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "后路腰椎椎间融合术",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "後方腰椎椎体間固定術",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "후방 요추 추체간 유합술",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -1978,6 +2442,26 @@
         "ru": {
           "expected": "Трансфораминальный поясничный межтеловой спондилодез",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "היתוך בין-גופי מותני טרנספורמינלי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "经椎间孔腰椎椎间融合术",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "経椎間孔腰椎椎体間固定術",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "경추간공 요추 추체간 유합술",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -2060,6 +2544,26 @@
           "expected": "Латеральный поясничный межтеловой спондилодез",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "היתוך בין-גופי מותני צידי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "侧方腰椎椎间融合术",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "側方腰椎椎体間固定術",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "측방 요추 추체간 유합술",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -2140,6 +2644,26 @@
         "ru": {
           "expected": "Косой поясничный межтеловой спондилодез",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "היתוך בין-גופי מותני אלכסוני",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "斜外侧腰椎椎间融合术",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "斜外側腰椎椎体間固定術",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "사방 요추 추체간 유합술",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -2222,6 +2746,26 @@
           "expected": "Передний поясничный межтеловой спондилодез",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "היתוך בין-גופי מותני קדמי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "前路腰椎椎间融合术",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "前方腰椎椎体間固定術",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "전방 요추 추체간 유합술",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -2302,6 +2846,26 @@
         "ru": {
           "expected": "Задний",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "אחורי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "后路",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "後方",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "후방",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -2384,6 +2948,26 @@
           "expected": "Передний",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "קדמי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "前路",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "前方",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "전방",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -2464,6 +3048,26 @@
         "ru": {
           "expected": "Латеральный",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "צידי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "侧方",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "側方",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "측방",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -2546,6 +3150,26 @@
           "expected": "Местная кость",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "עצם מקומית",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "局部骨",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "局所骨",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "국소골",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -2626,6 +3250,26 @@
         "ru": {
           "expected": "Аутотрансплантат",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "שתל עצמי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "自体骨",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "自家骨",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "자가골",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -2708,6 +3352,26 @@
           "expected": "Аллотрансплантат",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "שתל אלוגני",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "异体骨",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "同種骨",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "동종골",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -2788,6 +3452,26 @@
         "ru": {
           "expected": "Синтетики",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "חומרים סינתטיים",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "人工骨",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "人工骨",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "합성골",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -2870,6 +3554,26 @@
           "expected": "Ножка дуги",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "פדיקל",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "椎弓根",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "椎弓根",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "척추경",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -2950,6 +3654,26 @@
         "ru": {
           "expected": "ПО (Вниз)",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "זיז רוחבי (למטה)",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "横突 (下)",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "横突起 (下)",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "횡돌기 (하향)",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -3032,6 +3756,26 @@
           "expected": "ПО (Вверх)",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "זיז רוחבי (למעלה)",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "横突 (上)",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "横突起 (上)",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "횡돌기 (상향)",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -3112,6 +3856,26 @@
         "ru": {
           "expected": "Супра-лам",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "סופרה-למינרי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "椎板上",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "椎弓上",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "추궁상",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -3194,6 +3958,26 @@
           "expected": "Инфра-лам",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "אינפרה-למינרי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "椎板下",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "椎弓下",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "추궁하",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -3274,6 +4058,26 @@
         "ru": {
           "expected": "Трансляция влево",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "הסטה שמאלה",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "向左平移",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "左方移動",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "좌측 이동",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -3356,6 +4160,26 @@
           "expected": "Трансляция вправо",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "הסטה ימינה",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "向右平移",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "右方移動",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "우측 이동",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -3436,6 +4260,26 @@
         "ru": {
           "expected": "Компрессия",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "דחיסה",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "加压",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "圧迫",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "압박",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -3518,6 +4362,26 @@
           "expected": "Дистракция",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "הסחה",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "撑开",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "伸延",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "신연",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -3598,6 +4462,26 @@
         "ru": {
           "expected": "Деротация по ЧС",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "הסרת סיבוב עם השעון",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "顺时针去旋转",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "回旋矯正 時計回り",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "시계방향 교정회전",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -3680,6 +4564,26 @@
           "expected": "Деротация против ЧС",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "הסרת סיבוב נגד השעון",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "逆时针去旋转",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "回旋矯正 反時計回り",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "반시계방향 교정회전",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -3760,6 +4664,26 @@
         "ru": {
           "expected": "Поставщик имплантов",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "ספק שתלים",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "内植物供应商",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "インプラントメーカー",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "삽입물 공급업체",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -3842,6 +4766,26 @@
           "expected": "Система винтов",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "מערכת ברגים",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "螺钉系统",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "スクリューシステム",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "나사 시스템",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -3922,6 +4866,26 @@
         "ru": {
           "expected": "Реконструктивный кейдж",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "כלוב שחזור",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "重建融合器",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "再建ケージ",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "재건 케이지",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -4004,6 +4968,26 @@
           "expected": "Конфиденциальность сеанса",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "פרטיות הפעלה",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "会话隐私",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "セッションプライバシー",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "세션 개인정보 보호",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -4084,6 +5068,26 @@
         "ru": {
           "expected": "Копировать план в конструкцию",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "העתק תוכנית למבנה",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "复制计划到术中记录",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "計画を術中記録にコピー",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "계획을 구조물에 복사",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -4166,6 +5170,26 @@
           "expected": "Моноаксиальный",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "מונואקסיאלי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "单轴",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "単軸",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "단축",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -4246,6 +5270,26 @@
         "ru": {
           "expected": "Полиаксиальный",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "פוליאקסיאלי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "万向",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "多軸",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "다축",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }
@@ -4328,6 +5372,26 @@
           "expected": "Унипланарный",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "יוניפלנרי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "单平面",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "一方向",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "단평면",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -4409,6 +5473,26 @@
           "expected": "Костный трансплантат",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "שתל עצם",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "植骨",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "骨移植",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "골이식",
+          "source": "Korean Spine Society (KSS)",
+          "verified": false
         }
       }
     },
@@ -4489,6 +5573,26 @@
         "ru": {
           "expected": "Итоговая хирургическая конструкция",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "מבנה ניתוחי סופי",
+          "source": "Israeli Spine Society",
+          "verified": false
+        },
+        "zh-Hans": {
+          "expected": "最终手术记录",
+          "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "最終手術記録",
+          "source": "JSSR",
+          "verified": false
+        },
+        "ko": {
+          "expected": "최종 수술 구조물",
+          "source": "Korean Spine Society (KSS)",
           "verified": false
         }
       }

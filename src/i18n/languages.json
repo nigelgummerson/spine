@@ -5,7 +5,10 @@
   { "code": "de", "name": "Deutsch" },
   { "code": "el", "name": "Ελληνικά" },
   { "code": "es", "name": "Español" },
+  { "code": "he", "name": "עברית" },
   { "code": "hi", "name": "हिन्दी" },
+  { "code": "ja", "name": "日本語" },
+  { "code": "ko", "name": "한국어" },
   { "code": "fr", "name": "Français" },
   { "code": "it", "name": "Italiano" },
   { "code": "nl", "name": "Nederlands" },
@@ -16,5 +19,6 @@
   { "code": "fi", "name": "Suomi" },
   { "code": "sv", "name": "Svenska" },
   { "code": "tr", "name": "Türkçe" },
-  { "code": "uk", "name": "Українська" }
+  { "code": "uk", "name": "Українська" },
+  { "code": "zh-Hans", "name": "简体中文" }
 ]

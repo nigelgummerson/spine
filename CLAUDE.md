@@ -1,10 +1,10 @@
 # Spinal Instrumentation Plan & Record
 
 ## What This Project Is
-A web application for pre-operative spinal surgery planning. Deployed as a code-split web build to GitHub Pages for connected hospital computers, with a standalone single-file download for offline use. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 18 languages (16 European + Hindi and Arabic with RTL support).
+A web application for pre-operative spinal surgery planning. Deployed as a code-split web build to GitHub Pages for connected hospital computers, with a standalone single-file download for offline use. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 22 languages (16 European + Hindi + Arabic with RTL + Hebrew with RTL + Chinese Simplified + Japanese + Korean).
 
 ## Current Status
-- **Version:** v2.4.2-beta
+- **Version:** v2.5.0-beta
 - **Last Updated:** 2026-03-23
 - **License:** GNU GPLv3
 - **Language:** TypeScript (strict)
@@ -27,7 +27,7 @@ spine-planner/
 │   ├── inter-subset.css    # Inter font (WOFF2, Latin/Greek subsets)
 │   ├── source-serif-4-subset.css  # Source Serif 4 (WOFF2, Latin/Greek)
 │   ├── i18n/
-│   │   ├── translations.json    # All translations (18 languages × 274 keys)
+│   │   ├── translations.json    # All translations (22 languages × 274 keys)
 │   │   ├── languages.json       # SUPPORTED_LANGUAGES array
 │   │   ├── i18n.ts              # t(), detectLanguage(), lang state
 │   │   └── __tests__/i18n.test.ts
@@ -91,13 +91,14 @@ spine-planner/
 - **Language:** TypeScript (strict mode) — all source files .tsx/.ts
 - **Framework:** React 19 (npm, pre-compiled JSX — no in-browser transpilation)
 - **Styling:** Tailwind CSS v4 (PostCSS)
-- **Fonts:** Inter + Source Serif 4 via fontsource (WOFF2, Latin/Greek subsets, embedded as base64)
+- **Fonts:** Inter + Source Serif 4 via fontsource (WOFF2, Latin/Greek subsets, embedded as base64). CJK: Noto Sans SC/JP/KR via fontsource (web build only, language-conditional font stacks via `[lang]` CSS selectors)
 - **Validation:** Zod — validates v4 JSON schema on file load
 - **Testing:** Vitest — 232 tests across 5 test files
 - **Export:** html-to-image (SVG foreignObject) + jsPDF (JPEG quality 0.85)
 - **All dependencies bundled** — no CDN calls, fully offline
 
 ## Version History (Recent)
+- **v2.5.0-beta** (2026-03-23): CJK + Hebrew i18n expansion — 4 new languages (Hebrew, Chinese Simplified, Japanese, Korean), bringing total to 22. Hebrew is 2nd RTL language (uses existing Arabic infrastructure). CJK fonts (Noto Sans SC/JP/KR) loaded via @fontsource in web build only; standalone uses system fonts. Language-conditional font stacks via `[lang]` CSS selectors prevent cross-CJK glyph substitution. `measureText()` canvas utility replaces character-count heuristic for SVG text widths (fixes note labels, osteotomy labels for CJK double-width characters). SVG export font URLs absolutified for blob context rendering. `detectLanguage()` updated to handle script subtags (zh-Hans). Clinical glossary sources: Israeli Spine Society, Chinese Spine Society, JSSR, Korean Spine Society. 252 tests across 5 files.
 - **v2.4.2-beta** (2026-03-23): Component-level tests via React Testing Library + jsdom. 27 tests covering modal rendering, keyboard handling (Escape/Enter), focus trapping (Tab/Shift+Tab cycling), portal behaviour, overlay click dismissal, and ARIA attributes. 232 total tests across 5 files. Dev dependencies: @testing-library/react, @testing-library/jest-dom, jsdom. Vitest config updated with per-file jsdom environment matching.
 - **v2.4.1-beta** (2026-03-23): CI quality gates — `npm test` (205 tests) now runs before every deploy and release build. Legacy v2/v3 JSON validated on load via Zod (`validateLegacy()` in schema.ts). Schema migration framework (`migrations.ts`) for localStorage data — passthrough for v4, ready for future versions. All 12 modals/dialogs render via React `createPortal` to `document.body` (`Portal.tsx`), eliminating CSS overflow/transform clipping risks.
 - **v2.4.0-beta** (2026-03-23): Hindi and Arabic translations (274 keys each, 18 languages total). Arabic is the first RTL language — dynamic `dir` attribute on `<html>`, CSS logical properties (margin-inline-start, border-inline-end, etc.), anatomical chart containers isolated with `dir="ltr"` to prevent Left/Right column mirroring. Font stack extended with Tahoma (Arabic) and Nirmala UI (Devanagari). Hindi uses transliterated English clinical terms per Indian medical convention (ASSI). Arabic uses Saudi Spine Society / Pan Arab Spine Society terminology with Western numerals. 232 tests across 5 files.
@@ -134,8 +135,8 @@ spine-planner/
 - **Zod validation:** `src/state/schema.ts` validates both v4 and legacy v2/v3 JSON on file load. Invalid files are rejected with a typed error rather than silently corrupting state.
 - **Migrations:** `src/state/migrations.ts` runs sequential schema migrations on localStorage data before validation. Currently a passthrough for v4 (latest), but the chain is ready for future schema versions.
 - **Chart rendering:** `ChartPaper` and `LevelRow` render SVG content (not HTML flexbox). Enables crisp export at any scale without html-to-image layout quirks.
-- **i18n:** `src/i18n/translations.json` (~274 keys × 18 languages), `t(key, replacements)` function with `??` fallback chain in `src/i18n/i18n.ts`. Module-level `_currentLang` synced with React state via `changeLang()`.
-- **Supported languages:** en, ar, de, fr, es, hi, it, pt, sv, nb, da, fi, nl, pl, el, tr, ru, uk
+- **i18n:** `src/i18n/translations.json` (~274 keys × 22 languages), `t(key, replacements)` function with `??` fallback chain in `src/i18n/i18n.ts`. Module-level `_currentLang` synced with React state via `changeLang()`.
+- **Supported languages:** en, ar, da, de, el, es, fi, fr, he, hi, it, ja, ko, nb, nl, pl, pt, ru, sv, tr, uk, zh-Hans
 - **Language detection:** `detectLanguage()` checks `localStorage('spine_planner_lang')` → `navigator.language` → `'en'`. `LANG_ALIASES` maps `no`/`nn` → `nb`.
 - **Modals:** All modals (8 component files + 4 inline dialogs) render via `createPortal` to `document.body` through `Portal.tsx`. Each modal owns its own focus trapping and keyboard handling.
 - **Disclaimer:** `DisclaimerModal` — shown on first load and on New Patient. Uses `sessionStorage` (not a timer). Resets when New Patient clears state.
@@ -164,7 +165,7 @@ spine-planner/
 - **Tier B (current):** Machine translation verified against clinical glossary (~48 terms × 13 languages)
 - **Tier C (future):** Native-speaker review via disclaimer feedback email
 - **Verification tests:** 3 browser-based HTML test suites in `tests/`
-- **Glossary sources:** AO Spine, DWG, SFCR, GEER, SICV&GIS, SPP, NVWC, NOV, PTOiTr, HOA, TOTBİD, AO Spine Ukraine, RASS, Saudi Spine Society, Pan Arab Spine Society, ASSI
+- **Glossary sources:** AO Spine, DWG, SFCR, GEER, SICV&GIS, SPP, NVWC, NOV, PTOiTr, HOA, TOTBİD, AO Spine Ukraine, RASS, Saudi Spine Society, Pan Arab Spine Society, ASSI, Israeli Spine Society, Chinese Spine Society (CSS), JSSR, Korean Spine Society (KSS)
 - **What stays English:** Vertebral labels, company/screw names, international abbreviations (ACDF, PLIF, etc.), Schwab grades, changelog, "Designed in Leeds" origin line
 
 ## Data Model (v0.9.7)
