@@ -18,6 +18,9 @@ export const CHANGE_LOG: ChangeLogEntry[] = [
         "measureText() utility replaces character-count heuristic for SVG text width — fixes note labels, osteotomy labels for CJK double-width characters.",
         "SVG export font URLs absolutified for blob context rendering.",
         "detectLanguage() updated to handle script subtags (zh-Hans, zh-Hant).",
+        "Scroll-to-change on hover for all modal pickers — screw diameter/length, osteotomy type/angle, cage dimensions/lordosis.",
+        "Cervical cage hint text reduced to 8px for whole-spine view.",
+        "Crosslink remove button repositioned closer and vertically centred.",
         "252 tests across 5 files.",
     ]},
     { version: "v2.4.2-beta", date: "2026-03-23", changes: [
