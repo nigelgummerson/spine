@@ -6,13 +6,48 @@ import { ALL_LEVELS, VERT_SVG_SCALE, VERT_PAD, getLevelHeight, getDiscHeight,
 import { FORCE_TYPES } from '../../data/clinical';
 import { InstrumentIcon } from './InstrumentIcon';
 import { LevelRow } from './LevelRow';
+import type { Placement, Cage, Connector, Note, Level, ToolDefinition } from '../../types';
 
-export const ChartPaper = ({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements, ghostConnectors, onGhostConnectorClick, ghostCages, onGhostCageClick, reconLabelPositions, onReconLabelUpdate }) => {
-    const contentRef = useRef(null);
-    const [draggingId, setDraggingId] = useState(null);
-    const dragStartRef = useRef(null);
-    const [draggingNoteId, setDraggingNoteId] = useState(null);
-    const noteDragStartRef = useRef(null);
+export interface ChartPaperProps {
+    title: string;
+    placements: Placement[];
+    ghostPlacements?: Placement[];
+    onZoneClick: (levelId: string, zone: string) => void;
+    onPlacementClick: (placement: Placement) => void;
+    onGhostClick?: (placement: Placement) => void;
+    tools: ToolDefinition[];
+    readOnly: boolean;
+    levels: Level[];
+    showForces: boolean;
+    heightScale: number;
+    cages: Cage[];
+    onDiscClick: (levelId: string) => void;
+    connectors: Connector[];
+    onConnectorUpdate: (id: string, pos: { levelId: string; fraction: number }) => void;
+    onConnectorRemove: (id: string) => void;
+    rodHeader?: React.ReactElement;
+    viewMode: string;
+    notes: Note[];
+    onNoteUpdate: (id: string, pos: { offsetX: number; offsetY: number }) => void;
+    onNoteRemove: (id: string) => void;
+    onNoteClick: (note: Note) => void;
+    ghostNotes?: Note[];
+    onGhostNoteClick?: (note: Note) => void;
+    forcePlacements?: Placement[];
+    ghostConnectors?: Connector[];
+    onGhostConnectorClick?: (connector: Connector) => void;
+    ghostCages?: Cage[];
+    onGhostCageClick?: (cage: Cage) => void;
+    reconLabelPositions?: Record<string, { offsetX: number; offsetY: number }>;
+    onReconLabelUpdate?: (id: string, pos: { offsetX: number; offsetY: number }) => void;
+}
+
+export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements, ghostConnectors, onGhostConnectorClick, ghostCages, onGhostCageClick, reconLabelPositions, onReconLabelUpdate }) => {
+    const contentRef = useRef<HTMLDivElement>(null);
+    const [draggingId, setDraggingId] = useState<string | null>(null);
+    const dragStartRef = useRef<{ y: number } | null>(null);
+    const [draggingNoteId, setDraggingNoteId] = useState<string | null>(null);
+    const noteDragStartRef = useRef<{ clientX: number; clientY: number; offsetX: number; offsetY: number } | null>(null);
     const didDragRef = useRef(false);
     const reconPositions = reconLabelPositions || {};
     const scaledWidth = 160 * heightScale;
@@ -30,7 +65,7 @@ export const ChartPaper = ({ title, placements, ghostPlacements, onZoneClick, on
     }, [placements]);
 
     // Convert connector {levelId, fraction} to rendered Y pixel position
-    const connectorToRenderedY = (conn) => {
+    const connectorToRenderedY = (conn: Connector) => {
         const viewMap = buildHeightMap(levels, heightScale);
         const entry = viewMap.map.find(e => e.levelId === conn.levelId);
         if (!entry) return null;
@@ -38,7 +73,7 @@ export const ChartPaper = ({ title, placements, ghostPlacements, onZoneClick, on
     };
 
     // Convert rendered Y to {levelId, fraction}, snapping to nearest level
-    const renderedYToConnector = (localY) => {
+    const renderedYToConnector = (localY: number) => {
         const viewMap = buildHeightMap(levels, heightScale);
         // Use <= endY to include the exact boundary pixel; also handles gap pixels between levels
         let entry = viewMap.map.find(e => localY >= e.startY && localY <= e.endY);
@@ -73,7 +108,7 @@ export const ChartPaper = ({ title, placements, ghostPlacements, onZoneClick, on
     }, [draggingId, levels, heightScale, readOnly, onConnectorUpdate]);
 
     // Note position: convert note to pixel coords within contentRef
-    const getNotePixelPos = (note) => {
+    const getNotePixelPos = (note: { levelId: string; offsetX?: number; offsetY?: number }) => {
         const viewMap = buildHeightMap(levels, heightScale);
         const entry = viewMap.map.find(e => e.levelId === note.levelId);
         if (!entry) return null;

@@ -8,9 +8,30 @@ import { InstrumentIcon } from './InstrumentIcon';
 import { SpineVertebra } from './SpineVertebra';
 import { CageVisualization } from './CageVisualization';
 import { IconCardinal } from '../icons';
+import type { Placement, Cage, Level, ToolDefinition } from '../../types';
 
-export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tools, onPlacementClick, onGhostClick, readOnly, showForces, heightScale, onDiscClick, cages, levels, viewMode, forcePlacements, ghostCages, onGhostCageClick }) => {
-    const getItems = (z) => {
+export interface LevelRowProps {
+    level: Level;
+    placements: Placement[];
+    ghostPlacements?: Placement[];
+    onZoneClick: (levelId: string, zone: string) => void;
+    tools: ToolDefinition[];
+    onPlacementClick: (placement: Placement) => void;
+    onGhostClick?: (placement: Placement) => void;
+    readOnly: boolean;
+    showForces: boolean;
+    heightScale: number;
+    onDiscClick: (levelId: string) => void;
+    cages: Cage[];
+    levels: Level[];
+    viewMode: string;
+    forcePlacements?: Placement[];
+    ghostCages?: Cage[];
+    onGhostCageClick?: (cage: Cage) => void;
+}
+
+export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlacements, onZoneClick, tools, onPlacementClick, onGhostClick, readOnly, showForces, heightScale, onDiscClick, cages, levels, viewMode, forcePlacements, ghostCages, onGhostCageClick }) => {
+    const getItems = (z: string) => {
         const src = (forcePlacements && z.startsWith('force')) ? forcePlacements : placements;
         return src.filter(p => p.levelId === level.id && p.zone === z);
     };
@@ -46,12 +67,12 @@ export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tool
     const discOsteo = placements.find(p => p.levelId === level.id && p.zone === 'disc');
     const ghostDiscOsteo = !discOsteo && ghostPlacements ? ghostPlacements.find(p => p.levelId === level.id && p.zone === 'disc') : null;
 
-    const GhostTarget = ({ type }) => {
+    const GhostTarget = ({ type }: { type: string }) => {
         if (type === 'force') return <div className="flex items-center justify-center h-full w-full"><IconCardinal /></div>;
         return (<div style={{ width: screwPx, height: screwPx }} className="rounded-full border-2 border-slate-400 border-dashed flex items-center justify-center opacity-60 hover:opacity-100 hover:border-amber-400 hover:bg-amber-50 transition-all"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full"></div></div>);
     };
 
-    const ZoneContent = ({ zone, align }) => {
+    const ZoneContent = ({ zone, align }: { zone: string; align: string }) => {
         const items = getItems(zone);
         const ghostItem = (!items.length && ghostPlacements && !zone.startsWith('force'))
             ? ghostPlacements.find(p => p.levelId === level.id && p.zone === zone)

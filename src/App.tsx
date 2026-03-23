@@ -32,6 +32,7 @@ import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, getDisclaimerT
 import { useDocumentState } from './hooks/useDocumentState';
 import { serializeState as serializeDocState, deserializeDocument } from './state/documentReducer';
 import { validateV4, ValidationError } from './state/schema';
+import type { ColourScheme, ToolDefinition, Placement, Level } from './types';
 
 const App = () => {
     const [selectedTool, setSelectedTool] = useState('implant');
@@ -48,14 +49,14 @@ const App = () => {
     const [showFinalInventory, setShowFinalInventory] = useState(false);
     const [currentLang, setCurrentLangState] = useState(detectLanguage());
 
-    const changeLang = (code) => {
+    const changeLang = (code: string) => {
         setCurrentLang(code);
         setCurrentLangState(code);
         document.documentElement.lang = code;
         localStorage.setItem('spine_planner_lang', code);
     };
 
-    const changeTheme = (id) => {
+    const changeTheme = (id: string) => {
         setColourScheme(id);
         localStorage.setItem('spine_planner_theme', id);
     };
@@ -67,12 +68,12 @@ const App = () => {
     // TOAST NOTIFICATIONS (defined before useDocumentState so showToast can be passed as parameter)
     const [toasts, setToasts] = useState([]);
     const toastIdRef = useRef(0);
-    const showToast = useCallback((message, type = 'info') => {
+    const showToast = useCallback((message: string, type: string = 'info') => {
         const id = ++toastIdRef.current;
         setToasts(prev => [...prev, { id, message, type }]);
         if (type !== 'error') setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
     }, []);
-    const dismissToast = useCallback((id) => setToasts(prev => prev.filter(t => t.id !== id)), []);
+    const dismissToast = useCallback((id: number) => setToasts(prev => prev.filter(t => t.id !== id)), []);
 
     // DOCUMENT STATE (clinical data, sync, auto-save)
     const { state, dispatch, serialize, syncChannelRef, syncConnected, hasLoaded } = useDocumentState({
@@ -83,7 +84,7 @@ const App = () => {
         plannedCages, completedCages, plannedConnectors, completedConnectors,
         plannedNotes, completedNotes, reconLabelPositions,
     } = state;
-    const setPatientField = (field, value) => dispatch({ type: 'SET_PATIENT_FIELD', field, value });
+    const setPatientField = (field: string, value: string) => dispatch({ type: 'SET_PATIENT_FIELD', field, value });
 
     // MODALS
     const [screwModalOpen, setScrewModalOpen] = useState(false);
@@ -141,7 +142,7 @@ const App = () => {
         const n = saved ? parseInt(saved, 10) : 0;
         return (n >= 0 && n <= 2) ? n : 0;
     });
-    const switchPortraitTab = useCallback((tab) => {
+    const switchPortraitTab = useCallback((tab: number) => {
         setPortraitTab(tab);
         localStorage.setItem('spine_planner_tab', String(tab));
         if (tab === 1) setActiveChart('planned');
@@ -189,7 +190,7 @@ const App = () => {
         return lvls;
     }, [viewMode]);
 
-    const scheme = COLOUR_SCHEMES.find(s => s.id === colourScheme) || COLOUR_SCHEMES[0];
+    const scheme: ColourScheme = COLOUR_SCHEMES.find(s => s.id === colourScheme) || COLOUR_SCHEMES[0];
 
 
     // SYNC LANGUAGE ON MOUNT
@@ -231,7 +232,7 @@ const App = () => {
     }, [isPortrait]);
 
     // ALL TOOL DEFINITIONS (for rendering and lookup)
-    const allTools = [
+    const allTools: ToolDefinition[] = [
         { id: 'monoaxial', labelKey: 'tool.monoaxial', icon: 'monoaxial', needsSize: true, type: 'implant' },
         { id: 'polyaxial', labelKey: 'tool.polyaxial', icon: 'polyaxial', needsSize: true, type: 'implant' },
         { id: 'uniplanar', labelKey: 'tool.uniplanar', icon: 'uniplanar', needsSize: true, type: 'implant' },
@@ -263,7 +264,7 @@ const App = () => {
     ];
 
     // LOGIC HANDLERS - zone determines behaviour
-    const handleZoneClick = (levelId, zone) => {
+    const handleZoneClick = (levelId: string, zone: string) => {
         const isForceZone = zone.startsWith('force');
 
         // Force zones → always open ForceModal, regardless of selected tool
@@ -325,14 +326,14 @@ const App = () => {
         }
     };
 
-    const handleForceConfirm = (forceType) => {
+    const handleForceConfirm = (forceType: string) => {
         if (pendingForceZone) {
             addPlacement(pendingForceZone.levelId, pendingForceZone.zone, forceType, null);
             setPendingForceZone(null);
         }
     };
 
-    const handleDiscClick = (levelId) => {
+    const handleDiscClick = (levelId: string) => {
         if (levelId === 'Oc' || levelId === 'C1' || levelId === 'S1' || levelId === 'Pelvis') return showToast(t('alert.no_disc_space'), 'error');
 
         // If disc-level osteotomy exists, edit it
@@ -367,7 +368,7 @@ const App = () => {
         setOsteoModalOpen(true);
     };
 
-    const handleCageConfirm = (data) => {
+    const handleCageConfirm = (data: any) => {
         const lvl = editingCageLevel;
         const permitted = CAGE_PERMISSIBILITY[data.type] || [];
         if (!permitted.includes(lvl)) {
@@ -387,7 +388,7 @@ const App = () => {
         setCageModalOpen(false);
     };
 
-    const handlePlacementClick = (p) => {
+    const handlePlacementClick = (p: Placement) => {
         const tool = allTools.find(item => item.id === p.tool);
         const isHookType = NO_SIZE_TYPES.includes(p.tool);
         if (tool.needsSize || isHookType) { setEditingPlacementId(p.id); setEditingData(p.data); setEditingTool(p.tool); setEditingAnnotation(p.annotation || ''); setScrewModalOpen(true); }
@@ -395,7 +396,7 @@ const App = () => {
         else { removePlacement(p.id); }
     };
 
-    const handleGhostClick = (ghost) => {
+    const handleGhostClick = (ghost: Placement) => {
         // Ensure we're editing construct side
         setActiveChart('completed');
 
@@ -420,34 +421,34 @@ const App = () => {
         }
     };
 
-    const handleScrewConfirm = (sizeData, components, finalType, annotation) => {
+    const handleScrewConfirm = (sizeData: any, components: any, finalType: string, annotation: string) => {
         if (components) { setDefaultDiameter(components.diameter); setDefaultLength(components.length); setDefaultScrewMode(components.mode); setDefaultCustomText(components.customText || ''); }
         setLastUsedScrewType(finalType);
         if (editingPlacementId) { updatePlacement(editingPlacementId, finalType, sizeData, annotation); setEditingPlacementId(null); }
         else if (pendingPlacement) { addPlacement(pendingPlacement.levelId, pendingPlacement.zone, finalType, sizeData, annotation); setPendingPlacement(null); }
     };
 
-    const handleOsteoConfirm = (data) => {
+    const handleOsteoConfirm = (data: any) => {
         setDefaultOsteoType(data.type);
         if (editingPlacementId) { updatePlacement(editingPlacementId, 'osteotomy', data); setEditingPlacementId(null); } 
         else if (pendingPlacement) { addPlacement(pendingPlacement.levelId, pendingPlacement.zone, 'osteotomy', data); setPendingPlacement(null); }
     };
 
-    const addPlacement = (levelId, zone, tool, data, annotation) => {
+    const addPlacement = (levelId: string, zone: string, tool: string, data: any, annotation?: string) => {
         dispatch({
             type: 'ADD_PLACEMENT',
             chart: activeChart === 'planned' ? 'plan' : 'construct',
             placement: { id: genId(), levelId, zone, tool, data, annotation: annotation || '' },
         });
     };
-    const updatePlacement = (id, tool, data, annotation) => {
+    const updatePlacement = (id: string, tool: string, data: any, annotation?: string) => {
         dispatch({
             type: 'UPDATE_PLACEMENT',
             chart: activeChart === 'planned' ? 'plan' : 'construct',
             id, tool, data, annotation,
         });
     };
-    const removePlacement = (id) => {
+    const removePlacement = (id: string) => {
         dispatch({
             type: 'REMOVE_PLACEMENT',
             chart: activeChart === 'planned' ? 'plan' : 'construct',
@@ -458,21 +459,21 @@ const App = () => {
     };
 
     // CONNECTOR HANDLERS
-    const addConnector = (levelId) => {
+    const addConnector = (levelId: string) => {
         dispatch({
             type: 'ADD_CONNECTOR',
             chart: activeChart === 'planned' ? 'plan' : 'construct',
             connector: { id: genId(), levelId, fraction: 0.5, tool: 'connector' },
         });
     };
-    const updateConnector = (connId, { levelId, fraction }) => {
+    const updateConnector = (connId: string, { levelId, fraction }: { levelId: string; fraction: number }) => {
         dispatch({
             type: 'UPDATE_CONNECTOR',
             chart: activeChart === 'planned' ? 'plan' : 'construct',
             id: connId, levelId, fraction,
         });
     };
-    const removeConnector = (connId) => {
+    const removeConnector = (connId: string) => {
         dispatch({
             type: 'REMOVE_CONNECTOR',
             chart: activeChart === 'planned' ? 'plan' : 'construct',
@@ -481,7 +482,7 @@ const App = () => {
     };
 
     // NOTE HANDLERS
-    const handleNoteConfirm = (text, showArrow) => {
+    const handleNoteConfirm = (text: string, showArrow: boolean) => {
         const chart = activeChart === 'planned' ? 'plan' : 'construct';
         if (editingNote) {
             const currentNotes = activeChart === 'planned' ? plannedNotes : completedNotes;
@@ -504,35 +505,35 @@ const App = () => {
             setNoteModalOpen(false);
         }
     };
-    const handleNoteClick = (note) => {
+    const handleNoteClick = (note: any) => {
         setEditingNote(note);
         setPendingNoteTool(null);
         setNoteModalOpen(true);
     };
-    const handleGhostNoteClick = (ghostNote) => {
+    const handleGhostNoteClick = (ghostNote: any) => {
         setActiveChart('completed');
         setEditingNote({ ...ghostNote });
         setPendingNoteTool(null);
         setNoteModalOpen(true);
     };
 
-    const handleGhostConnectorClick = (ghostConn) => {
+    const handleGhostConnectorClick = (ghostConn: any) => {
         dispatch({ type: 'ADD_CONNECTOR', chart: 'construct', connector: { id: genId(), levelId: ghostConn.levelId, fraction: ghostConn.fraction, tool: 'connector' } });
     };
 
-    const handleGhostCageClick = (ghostCage) => {
+    const handleGhostCageClick = (ghostCage: any) => {
         setActiveChart('completed');
         setEditingCageLevel(ghostCage.levelId);
         setEditingData(ghostCage);
         setCageModalOpen(true);
     };
-    const updateNotePosition = (noteId, { offsetX, offsetY }) => {
+    const updateNotePosition = (noteId: string, { offsetX, offsetY }: { offsetX: number; offsetY: number }) => {
         dispatch({ type: 'UPDATE_NOTE_POSITION', chart: activeChart === 'planned' ? 'plan' : 'construct', id: noteId, offsetX, offsetY });
     };
-    const removeNote = (noteId) => {
+    const removeNote = (noteId: string) => {
         dispatch({ type: 'REMOVE_NOTE', chart: activeChart === 'planned' ? 'plan' : 'construct', id: noteId });
     };
-    const updateReconLabelPosition = (reconId, { offsetX, offsetY }) => {
+    const updateReconLabelPosition = (reconId: string, { offsetX, offsetY }: { offsetX: number; offsetY: number }) => {
         dispatch({ type: 'SET_RECON_LABEL_POSITION', id: reconId, offsetX, offsetY });
     };
 
@@ -569,7 +570,7 @@ const App = () => {
     };
     const promptExportJPG = () => setExportPicker('jpg');
     const promptExportPDF = () => setExportPicker('pdf');
-    const runExportWithChoice = async (format, useFinal) => {
+    const runExportWithChoice = async (format: string, useFinal: boolean) => {
         setExportPicker(null);
         setActiveChart(useFinal ? 'completed' : 'planned');
         setShowFinalInventory(useFinal);
@@ -631,12 +632,12 @@ const App = () => {
         document.body.removeChild(link);
         if (incognitoMode) localStorage.removeItem('spine_planner_v2');
     };
-    const loadProjectJSON = (e) => {
+    const loadProjectJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = (ev) => {
             try {
-                const json = JSON.parse(ev.target.result);
+                const json = JSON.parse(ev.target?.result as string);
                 if (json.schema?.version === 4) {
                     validateV4(json);
                     const result = deserializeDocument(json);
