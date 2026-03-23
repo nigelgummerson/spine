@@ -23,7 +23,15 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_DIR = SCRIPT_DIR.parent
 TRANSLATIONS_FILE = PROJECT_DIR / "src" / "i18n" / "translations.json"
+CHANGELOG_FILE = PROJECT_DIR / "src" / "data" / "changelog.js"
 OUTPUT_DIR = PROJECT_DIR / "public" / "review-forms"
+
+
+def read_app_version() -> str:
+    """Extract CURRENT_VERSION from changelog.js."""
+    text = CHANGELOG_FILE.read_text(encoding="utf-8")
+    match = re.search(r'CURRENT_VERSION\s*=\s*"([^"]+)"', text)
+    return match.group(1) if match else "unknown"
 
 # Language metadata: code -> (English name, native name)
 LANG_NAMES = {
@@ -262,7 +270,7 @@ def group_keys(en_keys: list[str]) -> list[tuple[str, str, list[str]]]:
     return result
 
 
-def generate_html(lang: str, translations: dict) -> str:
+def generate_html(lang: str, translations: dict, app_version: str = "unknown") -> str:
     """Generate a self-contained HTML review form for a single language."""
     en_name, native_name = LANG_NAMES.get(lang, (lang, lang))
     en_dict = translations.get("en", {})
@@ -533,7 +541,7 @@ def generate_html(lang: str, translations: dict) -> str:
         <div class="header-top">
             <div>
                 <h1>Spinal Instrumentation Plan & Record: Translation Review</h1>
-                <span class="lang-badge">{escape(en_name)} / {escape(native_name)} ({lang})</span>
+                <span class="lang-badge">{escape(en_name)} / {escape(native_name)} ({lang}) — {escape(app_version)}</span>
             </div>
             <div class="header-actions">
                 <a href="../guide.html" target="_blank" style="color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: none; padding: 6px 10px;" title="How to use this form">Guide</a>
@@ -1119,7 +1127,8 @@ def main():
         sys.exit(1)
 
     translations = load_translations(TRANSLATIONS_FILE)
-    print(f"Loaded translations from {TRANSLATIONS_FILE.relative_to(PROJECT_DIR)}")
+    app_version = read_app_version()
+    print(f"Loaded translations from {TRANSLATIONS_FILE.relative_to(PROJECT_DIR)} (app {app_version})")
     langs = [code for code in translations.keys() if code != "en"]
     en_keys = list(translations.get("en", {}).keys())
     print(f"Found {len(en_keys)} English keys, {len(langs)} target languages: {', '.join(sorted(langs))}")
@@ -1132,7 +1141,7 @@ def main():
         lang_dict = translations.get(lang, {})
         missing = [k for k in en_keys if k not in lang_dict]
         outfile = lang_dir / f"{lang}-review.html"
-        html_content = generate_html(lang, translations)
+        html_content = generate_html(lang, translations, app_version)
         outfile.write_text(html_content, encoding="utf-8")
         status = f"({len(missing)} missing keys)" if missing else "(complete)"
         en_name = LANG_NAMES.get(lang, (lang, lang))[0]
