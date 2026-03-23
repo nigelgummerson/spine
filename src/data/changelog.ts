@@ -1,6 +1,6 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION: string = "v2.2.11-beta";
+export const CURRENT_VERSION: string = "v2.3.0-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -9,6 +9,20 @@ interface ChangeLogEntry {
 }
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
+    { version: "v2.3.0-beta", date: "2026-03-23", changes: [
+        "Chart rendering rebuilt using SVG — cleaner, faster, and more reliable exports across all browsers.",
+        "PDF and JPG export files are now half the previous size with no loss of quality.",
+        "Notes now support line breaks — type \\n to split text across multiple lines.",
+        "Cervical screws default to lateral mass size (3.5x14mm). Upper cervical levels (Oc, C1, C2) open without a default size.",
+        "Cervical implant icons are 25% smaller, matching the anatomy.",
+        "Disc spaces highlight on hover and respond to clicks reliably.",
+        "Inventory columns balance evenly by line count. Screws grouped by diameter with visual spacing.",
+        "All modals support Tab key cycling with visible focus rings.",
+        "Disclaimer now appears on first load and after New Patient, not on a timer.",
+        "Loaded files validated against the v4 schema — corrupted files are rejected with a clear error message.",
+        "Full TypeScript migration with strict mode — catches type errors at compile time.",
+        "181 automated tests covering state management, schema validation, clinical logic, anatomy, and translations.",
+    ]},
     { version: "v2.2.11-beta", date: "2026-03-23", changes: [
         "Full TypeScript migration — all source files now have static type checking with strict mode enabled.",
         "Fixed a bug where internal IDs were numbers instead of strings, which caused crashes when clicking notes.",
