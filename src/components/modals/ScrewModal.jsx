@@ -46,15 +46,15 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
                  else { setMode(defaultMode || 'standard'); }
             } else if (initialData === null && initialData !== undefined) { setMode('none'); }
             else { setMode(defaultMode || 'standard'); setDiameter(defaultDiameter); setLength(defaultLength); setCustomText(defaultCustomText || ''); }
-            setAnnotation(initialAnnotation || '');
-            setFixationText((initialData && typeof initialData === 'string' && ['band','wire','cable'].includes(initialTool)) ? initialData : '');
+            // For fixation types, legacy data (description) maps to annotation
+            const legacyFixationAnn = (initialData && typeof initialData === 'string' && ['band','wire','cable'].includes(initialTool)) ? initialData : '';
+            setAnnotation(initialAnnotation || legacyFixationAnn || '');
         }
     }, [isOpen, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation]);
 
     const handleSubmit = () => {
         let finalSize = null;
-        if (isHookOnly) { finalSize = null; }
-        else if (isFixation) { finalSize = fixationText || null; }
+        if (isHookOnly || isFixation) { finalSize = null; }
         else if (mode === 'custom') finalSize = customText || "Custom";
         else if (mode === 'standard') finalSize = `${diameter}x${length}`;
         onConfirm(
@@ -88,17 +88,13 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1 mb-0.5">{t('modal.screw.section_bands')}</div>
                         <div className="grid grid-cols-3 gap-0.5">{['band', 'wire', 'cable'].map(typ => (<button key={typ} onClick={() => setSelectedType(typ)} className={`py-1 px-0.5 text-[10px] font-bold uppercase rounded transition-all ${selectedType === typ ? 'bg-white shadow text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}>{t('clinical.fixation.' + typ)}</button>))}</div>
                     </div>
-                    {isHookOnly ? (
-                        <div className="text-center py-4 text-slate-400 text-xs italic">{t('modal.screw.hook_no_sizing')}</div>
-                    ) : isFixation ? (
-                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.screw.description')}</label><input type="text" value={fixationText} onChange={(e) => setFixationText(e.target.value)} placeholder={t('modal.screw.description_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-amber-500 outline-none" autoFocus /></div>
-                    ) : (<>
+                    {isScrew && (<>
                         <div className="flex gap-2 mb-4">{['standard','custom','none'].map(m => { const labels = { standard: t('modal.screw.mode_standard'), custom: t('modal.screw.mode_custom'), none: t('modal.screw.mode_none') }; const active = mode === m; return <button key={m} onClick={() => setMode(m)} className={`flex-1 py-1 text-xs font-bold rounded border transition-all ${active ? 'bg-amber-500 text-slate-900 border-amber-600' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>{labels[m]}</button>; })}</div>
                         {mode === 'standard' && (<div className="space-y-4"><div className="grid grid-cols-4 gap-2"><select value={diameter} onChange={(e) => setDiameter(e.target.value)} className="col-span-4 w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{DIAMETER_OPTIONS.map(d => <option key={d} value={d}>{d} mm</option>)}</select></div><select value={length} onChange={(e) => setLength(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{LENGTH_OPTIONS.map(l => <option key={l} value={l}>{l} mm</option>)}</select></div>)}
                         {mode === 'custom' && <input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} placeholder={t('modal.screw.custom_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg focus:border-amber-500 outline-none" autoFocus />}
                         {mode === 'none' && <div className="text-center py-6 text-slate-400 text-sm italic">{t('modal.screw.icon_only')}</div>}
                     </>)}
-                    {(isScrew || isHookOnly) && <div className="mt-3"><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.screw.annotation')}</label><input type="text" value={annotation} onChange={(e) => setAnnotation(e.target.value)} placeholder={t('modal.screw.annotation_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-amber-500 outline-none" /></div>}
+                    <div className="mt-3"><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.screw.annotation')}</label><input type="text" value={annotation} onChange={(e) => setAnnotation(e.target.value)} placeholder={t('modal.screw.annotation_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-amber-500 outline-none" /></div>
                 </div>
                 <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center" title={t('shortcut.delete')}><IconTrash/> {t('button.remove')}</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title={t('shortcut.escape')}>{t('button.cancel')}</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg" title={t('shortcut.enter')}>{t('button.confirm')}</button></div></div>
             </div>

@@ -7,13 +7,13 @@ import { IconTrash, IconX } from '../icons';
 export const NoteModal = ({ isOpen, onClose, onConfirm, onDelete, initialText, initialShowArrow, isEditing }) => {
     if (!isOpen) return null;
     const [text, setText] = useState(initialText || '');
-    const [showArrow, setShowArrow] = useState(initialShowArrow || false);
+    const [showArrow, setShowArrow] = useState(initialShowArrow !== false);
     const noteRef = useRef(null);
 
     useEffect(() => {
         if (isOpen) {
             setText(initialText || '');
-            setShowArrow(initialShowArrow || false);
+            setShowArrow(initialShowArrow !== false);
         }
     }, [isOpen, initialText, initialShowArrow]);
 

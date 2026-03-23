@@ -9,6 +9,7 @@ body { font-family: 'Inter', sans-serif; font-feature-settings: "tnum"; overflow
 /* EXPORT CONTAINER */
 #export-container {
     width: 1485px;
+    max-width: 1485px;
     height: 1050px;
     background: white;
     margin: 0 auto;
@@ -17,6 +18,11 @@ body { font-family: 'Inter', sans-serif; font-feature-settings: "tnum"; overflow
     flex-shrink: 0;
     transform-origin: top center;
     position: relative;
+    overflow: hidden;
+}
+#export-container > * {
+    min-width: 0;
+    overflow: hidden;
 }
 
 /* EDITABLE FIELDS */

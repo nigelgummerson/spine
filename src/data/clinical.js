@@ -18,7 +18,7 @@ export const NOTE_PRESET_KEYS = [
 ];
 
 export const CAGE_TYPES = [ // International abbreviations - not translated
-  { id: 'acdf', label: 'ACDF', descKey: 'clinical.cage.acdf.desc', approach: 'anterior', defaultSide: 'left', sideOptions: ['left','right'], defaults: { height:'6', width:'16', length:'14', lordosis:'0' } },
+  { id: 'acdf', label: 'ACDF', descKey: 'clinical.cage.acdf.desc', approach: 'anterior', defaultSide: 'midline', defaults: { height:'6', width:'16', length:'14', lordosis:'0' } },
   { id: 'plif', label: 'PLIF', descKey: 'clinical.cage.plif.desc', approach: 'posterior', defaultSide: 'bilateral', sideOptions: null, defaults: { height:'10', width:'10', length:'25', lordosis:'0' } },
   { id: 'tlif', label: 'TLIF', descKey: 'clinical.cage.tlif.desc', approach: 'posterior', defaultSide: 'left', sideOptions: ['left','right'], defaults: { height:'10', width:'10', length:'30', lordosis:'0' } },
   { id: 'xlif', label: 'XLIF/LLIF', descKey: 'clinical.cage.xlif.desc', approach: 'lateral', defaultSide: 'left', sideOptions: ['left','right'], defaults: { height:'10', width:'18', length:'50', lordosis:'0' } },
@@ -54,6 +54,5 @@ export const INVENTORY_CATEGORIES = [
     { key: 'hooks', labelKey: 'inventory.hooks', toolIds: HOOK_TYPES },
     { key: 'cages', labelKey: 'inventory.cages', toolIds: ['acdf','plif','tlif','xlif','olif','alif'] },
     { key: 'fixation', labelKey: 'inventory.fixation', toolIds: ['band','wire','cable'] },
-    { key: 'osteotomies', labelKey: 'inventory.osteotomies', toolIds: ['osteotomy'] },
     { key: 'other', labelKey: 'inventory.other', toolIds: ['connector','unstable'] },
 ];

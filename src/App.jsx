@@ -95,6 +95,8 @@ const App = () => {
     const [editingNote, setEditingNote] = useState(null); // full note object when editing
     
     const [confirmNewPatient, setConfirmNewPatient] = useState(false);
+    const [confirmClearConstruct, setConfirmClearConstruct] = useState(false);
+    const [reconLabelPositions, setReconLabelPositions] = useState({});
     const [exportPicker, setExportPicker] = useState(null); // 'jpg' or 'pdf'
     // Disclaimer: derive from sessionStorage on every render, use counter to force re-render on accept
     const [disclaimerTick, setDisclaimerTick] = useState(0);
@@ -319,7 +321,7 @@ const App = () => {
         });
         // Notes - restore pixel offsets
         (chartData.notes || []).forEach(n => {
-            const pos = notePositions?.[n.id] || { offsetX: -100, offsetY: 0 };
+            const pos = notePositions?.[n.id] || { offsetX: -140, offsetY: 0 };
             notes.push({ id: n.id, tool: 'note', levelId: n.level, text: n.text, offsetX: pos.offsetX, offsetY: pos.offsetY, showArrow: n.showArrow || false });
         });
         // Rod free text
@@ -339,7 +341,7 @@ const App = () => {
             implantSystem: { manufacturer: patientData.company, system: patientData.screwSystem },
             plan: { elements: planChart.elements, rods: planChart.rods, forces: planChart.forces, boneGraft: { types: (patientData.boneGraft?.types || []).map(t => BONEGRAFT_TO_V4[t] || t), notes: patientData.boneGraft?.notes || '' }, notes: planChart.notes },
             construct: { elements: constChart.elements, rods: constChart.rods, forces: constChart.forces, boneGraft: { types: [], notes: '' }, notes: constChart.notes },
-            ui: { colourScheme, viewMode, notePositions: { ...planChart.notePositions, ...constChart.notePositions } }
+            ui: { colourScheme, viewMode, notePositions: { ...planChart.notePositions, ...constChart.notePositions, ...reconLabelPositions } }
         };
     };
 
@@ -369,7 +371,7 @@ const App = () => {
                 date: json.case?.date || new Date().toISOString().split('T')[0],
                 company: json.implantSystem?.manufacturer || '', screwSystem: json.implantSystem?.system || '',
                 leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '',
-                boneGraft: { types: (json.plan?.boneGraft?.types || []).map(t => V4_BONEGRAFT_TO_TOOL[t] || t), notes: json.plan?.boneGraft?.notes || '' }
+                boneGraft: { types: (json.plan?.boneGraft?.types || []).map(t => V4_BONEGRAFT_TO_TOOL[t] || t), notes: json.plan?.boneGraft?.notes || '' },
             };
             const notePos = json.ui?.notePositions || {};
             if (json.plan) {
@@ -383,6 +385,10 @@ const App = () => {
                 pd.leftRod = c.rodLeft; pd.rightRod = c.rodRight;
             }
             setPatientData(pd);
+            // Restore recon label positions from notePositions
+            const reconPos = {};
+            Object.entries(notePos).forEach(([k, v]) => { if (k.startsWith('recon-')) reconPos[k] = v; });
+            if (Object.keys(reconPos).length > 0) setReconLabelPositions(reconPos);
             if (json.ui?.viewMode) setViewMode(json.ui.viewMode);
             if (json.ui?.colourScheme) changeTheme(json.ui.colourScheme);
             return;
@@ -446,7 +452,7 @@ const App = () => {
                 }
             }, 200);
         }
-    }, [plannedPlacements, completedPlacements, plannedCages, completedCages, plannedConnectors, completedConnectors, plannedNotes, completedNotes, patientData, viewMode, colourScheme, hasLoaded, incognitoMode]);
+    }, [plannedPlacements, completedPlacements, plannedCages, completedCages, plannedConnectors, completedConnectors, plannedNotes, completedNotes, patientData, viewMode, colourScheme, hasLoaded, incognitoMode, reconLabelPositions]);
 
     // BROADCAST CHANNEL SYNC
     useEffect(() => {
@@ -600,7 +606,7 @@ const App = () => {
             const hs = calculateAutoScale(levels);
             const levelObj = levels.find(l => l.id === levelId);
             const vertH = levelObj ? getLevelHeight(levelObj) * hs : 30;
-            setPendingNoteTool({ tool: selectedTool, levelId, offsetX: -100, offsetY: Math.round(vertH / 2) });
+            setPendingNoteTool({ tool: selectedTool, levelId, offsetX: -140, offsetY: Math.round(vertH / 2) });
             setEditingNote(null);
             setNoteModalOpen(true);
             return;
@@ -855,6 +861,9 @@ const App = () => {
         const filter = prev => prev.filter(n => n.id !== noteId);
         if (activeChart === 'planned') setPlannedNotes(filter); else setCompletedNotes(filter);
     };
+    const updateReconLabelPosition = (reconId, { offsetX, offsetY }) => {
+        setReconLabelPositions(prev => ({ ...prev, [reconId]: { offsetX, offsetY } }));
+    };
 
     // EXPORT
     const prepareExportCanvas = async () => {
@@ -877,8 +886,9 @@ const App = () => {
                 else opt.removeAttribute('selected');
             });
         });
+        // 300 DPI: A4 landscape (297x210mm) at 300 DPI = 3508x2480px → pixelRatio 3508/1485 ≈ 2.36
         const canvas = await htmlToImage.toCanvas(element, {
-            pixelRatio: 2,
+            pixelRatio: 3508 / 1485,
             backgroundColor: '#ffffff',
             width: 1485,
             height: 1050,
@@ -908,9 +918,33 @@ const App = () => {
     const runExportPDF = async () => {
         const canvas = await prepareExportCanvas();
         const imgData = canvas.toDataURL('image/jpeg', 1.0);
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1485, 1050] });
-        pdf.addImage(imgData, 'JPEG', 0, 0, 1485, 1050);
+        const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
+        // Check if demographics panel overflows — if so, add inventory page
+        const demoCol = exportRef.current?.querySelector('.w-\\[370px\\]');
+        if (demoCol && demoCol.scrollHeight > demoCol.clientHeight + 20) {
+            // Build a standalone inventory page off-screen
+            const invPage = document.createElement('div');
+            invPage.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:595px;height:842px;background:white;padding:40px;font-family:Inter,sans-serif;box-sizing:border-box;';
+            invPage.innerHTML = `<div style="border-bottom:2px solid #1e293b;padding-bottom:8px;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:#1e293b">${patientData.name || 'Patient'}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${patientData.id ? patientData.id + ' — ' : ''}${formatDate(patientData.date)}${patientData.surgeon ? ' — ' + patientData.surgeon : ''}</div></div>`;
+            // Clone the inventory content
+            const invSource = demoCol.querySelector('.mt-2.border-t');
+            if (invSource) {
+                const invClone = invSource.cloneNode(true);
+                invClone.style.cssText = 'columns:1;margin:0;padding:0;';
+                // Remove 2-column layout for full-page rendering
+                const colDiv = invClone.querySelector('[style*="columns"]');
+                if (colDiv) colDiv.style.columns = '2';
+                invPage.appendChild(invClone);
+            }
+            document.body.appendChild(invPage);
+            try {
+                const invCanvas = await htmlToImage.toCanvas(invPage, { pixelRatio: 2, backgroundColor: '#ffffff', width: 595, height: 842 });
+                pdf.addPage('a4', 'portrait');
+                pdf.addImage(invCanvas.toDataURL('image/jpeg', 1.0), 'JPEG', 0, 0, 210, 297);
+            } catch (e) { console.error('Inventory page export failed:', e); }
+            document.body.removeChild(invPage);
+        }
         pdf.save(`SpinePlan_${patientData.name || 'Patient'}.pdf`);
         if (incognitoMode) localStorage.removeItem('spine_planner_v2');
         setPortraitExporting(false);
@@ -972,11 +1006,32 @@ const App = () => {
             return showToast(t('alert.all_confirmed'));
         }
 
-        setCompletedPlacements(prev => [...prev, ...newPlacements.map(p => ({...p, id: genId()}))]);
+        // Copy essential data only — implant type, size, position.
+        // Strip: annotations, notes, fixation descriptions, osteotomy angles.
+        const FIXATION_IDS = ['band', 'wire', 'cable'];
+        setCompletedPlacements(prev => [...prev, ...newPlacements.map(p => {
+            let data = p.data;
+            if (FIXATION_IDS.includes(p.tool)) data = null;
+            if (p.tool === 'osteotomy' && typeof p.data === 'object') data = { ...p.data, angle: null, reconstructionCage: '' };
+            return { ...p, id: genId(), annotation: '', data };
+        })]);
         setCompletedCages(prev => [...prev, ...newCages.map(c => ({...c}))]);
         setCompletedConnectors(prev => [...prev, ...newConnectors.map(c => ({...c, id: genId()}))]);
-        setCompletedNotes(prev => [...prev, ...newNotes.map(n => ({...n, id: genId()}))]);
         setActiveChart('completed');
+    };
+
+    const clearConstruct = () => {
+        if (completedPlacements.length === 0 && completedCages.length === 0 && completedConnectors.length === 0 && completedNotes.length === 0) return showToast(t('alert.construct_empty'));
+        setConfirmClearConstruct(true);
+    };
+    const confirmClearConstructAction = () => {
+        setCompletedPlacements([]);
+        setCompletedCages([]);
+        setCompletedConnectors([]);
+        setCompletedNotes([]);
+        setConfirmClearConstruct(false);
+        setActiveChart('planned');
+        showToast(t('alert.construct_cleared'));
     };
 
     // --- Shared sub-elements (used in both portrait and landscape) ---
@@ -1015,9 +1070,9 @@ const App = () => {
         </React.Fragment>
     );
 
-    const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planLeftRod: e.target.innerText})} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planRightRod: e.target.innerText})} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} />;
+    const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planLeftRod: e.target.innerText})} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, planRightRod: e.target.innerText})} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} />;
 
-    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostNotes={isPortrait ? plannedNotes : undefined} onGhostNoteClick={handleGhostNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} />;
+    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostNotes={isPortrait ? plannedNotes : undefined} onGhostNoteClick={handleGhostNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, leftRod: e.target.innerText})} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientData({...patientData, rightRod: e.target.innerText})} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} />;
 
     const newPatientAction = () => setConfirmNewPatient(true);
     const executeNewPatient = () => {
@@ -1059,7 +1114,17 @@ const App = () => {
                     </div>
                 </div>
             </div>}
-            {confirmNewPatient && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" onClick={() => setConfirmNewPatient(false)}>
+            {confirmClearConstruct && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} autoFocus onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); confirmClearConstructAction(); } else if (e.key === 'Escape') { e.preventDefault(); setConfirmClearConstruct(false); } }} onClick={() => setConfirmClearConstruct(false)} ref={el => el?.focus()}>
+                <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
+                    <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold">{t('sidebar.clear_construct')}</div>
+                    <div className="p-5 text-sm text-slate-600">{t('alert.clear_construct')}</div>
+                    <div className="bg-slate-50 px-4 py-3 flex justify-end gap-2 border-t border-slate-100">
+                        <button onClick={() => setConfirmClearConstruct(false)} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.cancel')}</button>
+                        <button onClick={confirmClearConstructAction} className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 text-sm font-bold">{t('button.confirm')}</button>
+                    </div>
+                </div>
+            </div>}
+            {confirmNewPatient && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); executeNewPatient(); } else if (e.key === 'Escape') { e.preventDefault(); setConfirmNewPatient(false); } }} onClick={() => setConfirmNewPatient(false)} ref={el => el?.focus()}>
                 <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
                     <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold">{t('sidebar.new_patient')}</div>
                     <div className="p-5 text-sm text-slate-600">{t('alert.new_patient')}</div>
@@ -1078,7 +1143,7 @@ const App = () => {
                     </div>
                 </div>
             </div>}
-            <NoteModal isOpen={noteModalOpen} onClose={() => { setNoteModalOpen(false); setEditingNote(null); setPendingNoteTool(null); }} onConfirm={handleNoteConfirm} onDelete={handleNoteDelete} initialText={editingNote?.text || ''} initialShowArrow={editingNote?.showArrow || false} isEditing={!!editingNote} />
+            <NoteModal isOpen={noteModalOpen} onClose={() => { setNoteModalOpen(false); setEditingNote(null); setPendingNoteTool(null); }} onConfirm={handleNoteConfirm} onDelete={handleNoteDelete} initialText={editingNote?.text || ''} initialShowArrow={editingNote ? editingNote.showArrow : undefined} isEditing={!!editingNote} />
         </React.Fragment>
     );
 
@@ -1221,11 +1286,11 @@ const App = () => {
                             <div className="w-[370px] bg-white border-r border-slate-300 flex flex-col p-8">
                                 <CreditsFooter lang={currentLang} />
                             </div>
-                            <div className="flex-[4] flex flex-col h-full">
-                                <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={() => {}} connectors={plannedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.planLeftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.planRightRod}</span></div></React.Fragment>} />
+                            <div className="flex-[4] flex flex-col h-full min-w-0 overflow-hidden">
+                                <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={() => {}} connectors={plannedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.planLeftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.planRightRod}</span></div></React.Fragment>} reconLabelPositions={reconLabelPositions} />
                             </div>
-                            <div className="flex-[3] flex flex-col h-full">
-                                <ChartPaper title={t('export.construct')} placements={completedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={() => {}} connectors={completedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={completedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.leftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.rightRod}</span></div></React.Fragment>} />
+                            <div className="flex-[3] flex flex-col h-full min-w-0 overflow-hidden">
+                                <ChartPaper title={t('export.construct')} placements={completedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={() => {}} connectors={completedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={completedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.leftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.rightRod}</span></div></React.Fragment>} reconLabelPositions={reconLabelPositions} />
                             </div>
                             <div className="absolute bottom-1 right-2 text-[8px] text-slate-300 font-mono">{getDisclaimerTimestamp() ? `${t('disclaimer.accepted_label')} ${getDisclaimerTimestamp()}` : ''} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
                         </div>
@@ -1270,7 +1335,10 @@ const App = () => {
                             <button onClick={() => setActiveChart('planned')} className={`flex-1 px-3 py-1.5 rounded transition-all text-xs ${activeChart==='planned'?'font-bold':'hover:brightness-125'}`} style={activeChart==='planned' ? { backgroundColor: scheme.activeBg, color: scheme.activeText } : undefined}>{t('sidebar.plan')}</button>
                             <button onClick={() => setActiveChart('completed')} className={`flex-1 px-3 py-1.5 rounded transition-all text-xs ${activeChart==='completed'?'font-bold':'hover:brightness-125'}`} style={activeChart==='completed' ? { backgroundColor: scheme.activeBg, color: scheme.activeText } : undefined}>{t('sidebar.construct')}</button>
                         </div>
-                        <button onClick={copyPlanToCompleted} className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded text-xs font-bold border transition-colors hover:brightness-125 mt-2" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder, color: scheme.textSecondary }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
+                        <div className="grid grid-cols-2 gap-1 mt-2">
+                            <button onClick={copyPlanToCompleted} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
+                            <button onClick={clearConstruct} className="flex items-center justify-center gap-1 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:bg-red-50 hover:border-red-300 hover:text-red-600" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }} title={t('sidebar.clear_construct_tooltip')}><IconTrash /> {t('sidebar.clear_construct')}</button>
+                        </div>
                     </div>
 
                     {/* 3. Region View */}
@@ -1368,11 +1436,11 @@ const App = () => {
                     <div style={{ transform: `scale(${scale})` }}>
                         <div id="export-container" ref={exportRef}>
                             <div className="w-[370px] bg-white border-r border-slate-300 flex flex-col p-8">{demographicsContent}</div>
-                            <div className="flex-[4] flex flex-col h-full relative" style={activeChart === 'planned' ? { borderTop: `3px solid ${scheme.activeBg}` } : undefined} onClick={() => activeChart !== 'planned' && setActiveChart('planned')}>
+                            <div className="flex-[4] flex flex-col h-full min-w-0 overflow-hidden relative" style={activeChart === 'planned' ? { borderTop: `3px solid ${scheme.activeBg}` } : undefined} onClick={() => activeChart !== 'planned' && setActiveChart('planned')}>
                                 {planChart}
                                 {activeChart !== 'planned' && !isPortrait && <div className="absolute inset-0 bg-slate-400/20 cursor-pointer z-20" data-export-hide="true" />}
                             </div>
-                            <div className="flex-[3] flex flex-col h-full relative" style={activeChart === 'completed' ? { borderTop: `3px solid ${scheme.activeBg}` } : undefined} onClick={() => activeChart !== 'completed' && setActiveChart('completed')}>
+                            <div className="flex-[3] flex flex-col h-full min-w-0 overflow-hidden relative" style={activeChart === 'completed' ? { borderTop: `3px solid ${scheme.activeBg}` } : undefined} onClick={() => activeChart !== 'completed' && setActiveChart('completed')}>
                                 {constructChart}
                                 {activeChart !== 'completed' && !isPortrait && <div className="absolute inset-0 bg-slate-400/20 cursor-pointer z-20" data-export-hide="true" />}
                             </div>

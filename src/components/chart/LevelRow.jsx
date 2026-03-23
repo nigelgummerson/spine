@@ -3,6 +3,7 @@ import { t } from '../../i18n/i18n';
 import { genId } from '../../utils/id';
 import { getDiscHeight, getLevelHeight, VERT_SVG_SCALE, VERT_PAD , DISC_MIN_PX} from '../../data/anatomy';
 import { CAGE_TYPES, HOOK_TYPES, NO_SIZE_TYPES, FORCE_TYPES, getDiscLabel } from '../../data/clinical';
+const FIXATION_TYPES = ['band', 'wire', 'cable'];
 import { InstrumentIcon } from './InstrumentIcon';
 import { SpineVertebra } from './SpineVertebra';
 import { CageVisualization } from './CageVisualization';
@@ -21,12 +22,14 @@ export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tool
     const screwPx = Math.round(24 * iconScale);
     const hookW = Math.round(30 * iconScale);
     const hookH = Math.round(20 * iconScale);
+    const fixW = Math.round(40 * iconScale);
+    const fixH = Math.round(18 * iconScale);
     const osteoPx = Math.round(32 * iconScale);
     const midPx = Math.round(36 * iconScale);
     // Label font scaling: gentle reduction in compressed views (use hs^0.3 not linear)
     const labelScale = Math.max(0.9, Math.min(1.2, Math.pow(heightScale, 0.3)));
-    const labelPx = Math.max(13, Math.min(16, Math.round(14 * labelScale)));
-    const cageLabelPx = Math.max(12, Math.min(15, Math.round(13 * labelScale)));
+    const labelPx = Math.max(15, Math.min(18, Math.round(16 * labelScale)));
+    const cageLabelPx = Math.max(14, Math.min(17, Math.round(15 * labelScale)));
     const cageMaxW = Math.round(120 / Math.max(1, iconScale));
     const osteoLabelPx = Math.max(13, Math.min(16, Math.round(15 * labelScale)));
 
@@ -69,53 +72,56 @@ export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tool
                         displayLabel = p.data.shortLabel || p.data.type;
                         angle = p.data.angle;
                     }
-                    const iW = isHookItem ? hookW : isOsteo ? osteoPx : screwPx;
-                    const iH = isHookItem ? hookH : isOsteo ? osteoPx : screwPx;
+                    const isFixation = FIXATION_TYPES.includes(p.tool);
+                    const iW = isFixation ? fixW : isHookItem ? hookW : isOsteo ? osteoPx : screwPx;
+                    const iH = isFixation ? fixH : isHookItem ? hookH : isOsteo ? osteoPx : screwPx;
                     const ann = p.annotation || '';
-                    const showData = p.data && !isHookItem;
+                    const showData = p.data && !isHookItem && !isFixation;
                     const showAnn = !!ann;
                     const isInline = heightScale < 0.85 && showData && showAnn;
                     const labelBlock = (showData || showAnn) ? (
                         <div
                             className={`flex ${isInline ? (align === 'left' ? 'flex-row-reverse' : 'flex-row') : 'flex-col'} leading-none`}
                             style={{
-                                alignItems: isInline ? 'center' : (align === 'right' ? 'flex-start' : 'flex-end'),
+                                alignItems: isInline ? 'center' : (align === 'left' ? 'flex-end' : 'flex-start'),
                                 gap: isInline ? '3px' : '0px'
                             }}
                         >
                             {showData && (
                                 <span
-                                    className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight"
+                                    className="font-mono font-bold text-slate-700 px-1 whitespace-nowrap leading-tight"
                                     style={{ fontSize: labelPx + 'px' }}
                                 >
                                     {isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : displayLabel) : displayLabel}
                                 </span>
                             )}
                             {showAnn && (
-                                <span
-                                    className="text-slate-400 italic whitespace-nowrap px-1 leading-tight"
-                                    style={{ fontSize: Math.max(8, labelPx - 2) + 'px' }}
-                                >
-                                    {ann}
-                                </span>
+                                <div style={{ alignSelf: 'stretch', textAlign: align, width: '100%' }}>
+                                    <span
+                                        className="text-slate-400 italic px-1"
+                                        style={{ fontSize: '9px', lineHeight: '1.1', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
+                                    >
+                                        {ann}
+                                    </span>
+                                </div>
                             )}
                         </div>
                     ) : null;
                     return (
                         <div
                             key={p.id}
-                            className={`relative group flex items-center gap-1 ${!readOnly ? 'cursor-pointer' : ''}`}
+                            className={`relative group flex items-center gap-1 ${align === 'center' ? 'justify-center' : 'w-full'} ${!readOnly ? 'cursor-pointer' : ''}`}
                             onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}
                         >
-                            {align === 'left' && labelBlock}
+                            {align === 'left' && <div className="flex-1 min-w-0">{labelBlock}</div>}
                             <div
                                 style={{ width: iW, height: iH, willChange: 'transform' }}
-                                className={`${!readOnly ? 'group-hover:scale-110 transition-transform' : ''}`}
+                                className={`shrink-0 ${!readOnly ? 'group-hover:scale-110 transition-transform' : ''}`}
                             >
                                 <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />
                                 {!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}
                             </div>
-                            {align === 'right' && labelBlock}
+                            {align === 'right' && <div className="flex-1 min-w-0">{labelBlock}</div>}
                         </div>
                     );
                 })}
@@ -129,35 +135,38 @@ export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tool
                         displayLabel = ghostItem.data.shortLabel || ghostItem.data.type;
                         angle = ghostItem.data.angle;
                     }
-                    const iW = isHookItem ? hookW : isOsteo ? osteoPx : screwPx;
-                    const iH = isHookItem ? hookH : isOsteo ? osteoPx : screwPx;
+                    const isFixation = FIXATION_TYPES.includes(ghostItem.tool);
+                    const iW = isFixation ? fixW : isHookItem ? hookW : isOsteo ? osteoPx : screwPx;
+                    const iH = isFixation ? fixH : isHookItem ? hookH : isOsteo ? osteoPx : screwPx;
                     const ann = ghostItem.annotation || '';
-                    const showData = ghostItem.data && !isHookItem;
+                    const showData = ghostItem.data && !isHookItem && !isFixation;
                     const showAnn = !!ann;
                     const isInline = heightScale < 0.85 && showData && showAnn;
                     const ghostLabelBlock = (showData || showAnn) ? (
                         <div
                             className={`flex ${isInline ? (align === 'left' ? 'flex-row-reverse' : 'flex-row') : 'flex-col'} leading-none`}
                             style={{
-                                alignItems: isInline ? 'center' : (align === 'right' ? 'flex-start' : 'flex-end'),
+                                alignItems: isInline ? 'center' : (align === 'left' ? 'flex-end' : 'flex-start'),
                                 gap: isInline ? '3px' : '0px'
                             }}
                         >
                             {showData && (
                                 <span
-                                    className="font-mono font-bold text-slate-700 bg-white/80 px-1 rounded whitespace-nowrap leading-tight"
+                                    className="font-mono font-bold text-slate-700 px-1 whitespace-nowrap leading-tight"
                                     style={{ fontSize: labelPx + 'px' }}
                                 >
                                     {isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : displayLabel) : displayLabel}
                                 </span>
                             )}
                             {showAnn && (
-                                <span
-                                    className="text-slate-400 italic whitespace-nowrap px-1 leading-tight"
-                                    style={{ fontSize: Math.max(8, labelPx - 2) + 'px' }}
-                                >
-                                    {ann}
-                                </span>
+                                <div style={{ alignSelf: 'stretch', textAlign: align, width: '100%' }}>
+                                    <span
+                                        className="text-slate-400 italic px-1"
+                                        style={{ fontSize: '9px', lineHeight: '1.1', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
+                                    >
+                                        {ann}
+                                    </span>
+                                </div>
                             )}
                         </div>
                     ) : null;
@@ -186,11 +195,11 @@ export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tool
 
     return (
         <div data-zone-click="true" className="flex flex-col w-full relative border-b border-slate-100">
-            <div className="flex w-full relative z-20" style={{ height: `${rowHeight}px` }}>
+            <div className="flex w-full relative" style={{ height: `${rowHeight}px` }}>
                 {showForces && <div className={`w-14 border-r border-slate-100/50 bg-blue-50/20 ${!readOnly && !forcePlacements ? 'hover:bg-blue-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && !forcePlacements && onZoneClick(level.id, 'force_left')}><ZoneContent zone="force_left" align="center"/></div>}
-                <div className={`flex-1 overflow-visible min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><div className="flex items-center h-full">{reconCageText && <span className="font-bold text-sky-700 bg-sky-50 border border-sky-200 px-1 rounded shadow-sm whitespace-nowrap ml-1 shrink-0" style={{ fontSize: Math.max(8, cageLabelPx) + 'px' }}>{reconCageText}</span>}<div className="flex-1 h-full"><ZoneContent zone="left" align="left"/></div></div></div>
+                <div className={`flex-1 overflow-hidden min-w-0 relative z-[25] ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'left')}><div className="flex items-center h-full"><div className="flex-1 min-w-0 h-full"><ZoneContent zone="left" align="left"/></div></div></div>
 
-                <div style={{ width: `${scaledWidth}px` }} className={`relative flex justify-center shrink-0 z-10 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}>
+                <div style={{ width: `${scaledWidth}px` }} className={`relative flex justify-center shrink-0 ${!readOnly ? 'hover:brightness-95 cursor-pointer' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'mid')}>
                     <SpineVertebra label={level.id} type={level.type} height={getLevelHeight(level)} isCorpectomy={isCorpectomy} heightScale={heightScale} />
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         {getItems('mid').filter(p => p.tool !== 'connector').map(p => {
@@ -212,7 +221,7 @@ export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tool
                                     </div>
                                     {p.tool === 'osteotomy' && p.data && (
                                         <div
-                                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-amber-300 text-amber-800 px-1 rounded shadow-sm whitespace-nowrap z-20"
+                                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-amber-800 bg-amber-50/80 border border-amber-300 px-1.5 rounded whitespace-nowrap z-[15]"
                                             style={{ fontSize: osteoLabelPx + 'px' }}
                                         >
                                             {displayLabel}{angle != null && angle !== '' ? ` ${angle}\u00B0` : ''}
@@ -243,7 +252,7 @@ export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tool
                                     </div>
                                     {gp.tool === 'osteotomy' && gp.data && (
                                         <div
-                                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-amber-300 text-amber-800 px-1 rounded shadow-sm whitespace-nowrap z-20"
+                                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-amber-800 bg-amber-50/80 border border-amber-300 px-1.5 rounded whitespace-nowrap z-[15]"
                                             style={{ fontSize: osteoLabelPx + 'px' }}
                                         >
                                             {displayLabel}{angle != null && angle !== '' ? ` ${angle}\u00B0` : ''}
@@ -255,13 +264,13 @@ export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tool
                     </div>
                 </div>
 
-                <div className={`flex-1 overflow-visible min-w-0 ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'right')}><ZoneContent zone="right" align="right"/></div>
+                <div className={`flex-1 overflow-hidden min-w-0 relative z-[25] ${!readOnly ? 'hover:bg-blue-50/50 cursor-crosshair' : ''}`} onClick={() => !readOnly && onZoneClick(level.id, 'right')}><ZoneContent zone="right" align="right"/></div>
                 {showForces && <div className={`w-14 border-l border-slate-100/50 bg-blue-50/20 ${!readOnly && !forcePlacements ? 'hover:bg-blue-50 cursor-crosshair' : ''}`} onClick={() => !readOnly && !forcePlacements && onZoneClick(level.id, 'force_right')}><ZoneContent zone="force_right" align="center"/></div>}
             </div>
 
             {/* INTERBODY DISC ZONE (Except after Pelvis or C1) */}
             {level.type !== 'Pelvis' && level.type !== 'S' && level.id !== 'Oc' && level.id !== 'C1' && (
-                <div className="w-full flex justify-center relative z-10">
+                <div className="w-full flex justify-center relative z-[20] overflow-visible">
                     <div style={{ width: `${scaledWidth}px`, height: `${Math.max(DISC_MIN_PX, getDiscHeight(level) * heightScale)}px` }} className={`flex items-center justify-center cursor-pointer transition-all ${!readOnly ? 'hover:bg-sky-100/50' : ''}`} onClick={() => !readOnly && onDiscClick(level.id)}>
                         {cageBelow ? (
                             viewMode === 'whole' && level.type === 'C' ? (
@@ -271,7 +280,7 @@ export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tool
                             ) : (
                             <div className="relative group w-full h-full flex justify-center">
                                 <svg viewBox="0 0 160 20" preserveAspectRatio="none" className="w-full h-full overflow-visible"><CageVisualization cageType={cageBelow.tool} heightScale={1} levelId={level.id} /></svg>
-                                <span className="absolute font-bold text-sky-700 bg-white/80 px-0.5 rounded whitespace-nowrap z-20" style={{ left: 'calc(75% + 2em)', top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{cageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {cageBelow.data.height}H {cageBelow.data.lordosis}°{cageBelow.data.side && cageBelow.data.side !== 'bilateral' && cageBelow.data.side !== 'midline' ? ` (${cageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
+                                <span className="absolute font-bold text-sky-700 px-0.5 whitespace-nowrap z-20" style={{ left: 'calc(75% + 2em)', top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{cageBelow.tool.toUpperCase()} {cageBelow.data.height}H {cageBelow.data.lordosis || '0'}°{cageBelow.data.side && cageBelow.data.side !== 'bilateral' && cageBelow.data.side !== 'midline' ? ` (${cageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
                             </div>)
                         ) : ghostCageBelow ? (
                             viewMode === 'whole' && level.type === 'C' ? (
@@ -281,15 +290,15 @@ export const LevelRow = ({ level, placements, ghostPlacements, onZoneClick, tool
                             ) : (
                             <div className="relative group w-full h-full flex justify-center cursor-pointer" style={{ opacity: 0.4 }} onClick={(e) => { e.stopPropagation(); onGhostCageClick && onGhostCageClick(ghostCageBelow); }}>
                                 <svg viewBox="0 0 160 20" preserveAspectRatio="none" className="w-full h-full overflow-visible"><CageVisualization cageType={ghostCageBelow.tool} heightScale={1} levelId={level.id} /></svg>
-                                <span className="absolute font-bold text-sky-700 bg-white/80 px-0.5 rounded whitespace-nowrap z-20" style={{ left: 'calc(75% + 2em)', top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{ghostCageBelow.tool.toUpperCase()} {getDiscLabel(level.id, levels)} {ghostCageBelow.data.height}H {ghostCageBelow.data.lordosis}°{ghostCageBelow.data.side && ghostCageBelow.data.side !== 'bilateral' && ghostCageBelow.data.side !== 'midline' ? ` (${ghostCageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
+                                <span className="absolute font-bold text-sky-700 px-0.5 whitespace-nowrap z-20" style={{ left: 'calc(75% + 2em)', top: '50%', transform: 'translateY(-50%)', fontSize: cageLabelPx + 'px' }}>{ghostCageBelow.tool.toUpperCase()} {ghostCageBelow.data.height}H {ghostCageBelow.data.lordosis || '0'}°{ghostCageBelow.data.side && ghostCageBelow.data.side !== 'bilateral' && ghostCageBelow.data.side !== 'midline' ? ` (${ghostCageBelow.data.side.charAt(0).toUpperCase()})` : ''}</span>
                             </div>)
                         ) : discOsteo ? (
                             <div className="relative group w-full h-full flex items-center justify-center cursor-pointer" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(discOsteo); }}>
-                                <span className="font-bold text-amber-800 bg-amber-50/80 border border-amber-300 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{discOsteo.data?.shortLabel || t('clinical.osteotomy.fallback')} {getDiscLabel(level.id, levels)}{discOsteo.data?.angle != null && discOsteo.data?.angle !== '' ? ` ${discOsteo.data.angle}\u00B0` : ''}</span>
+                                <span className="font-bold text-amber-800 bg-amber-50/80 border border-amber-300 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{discOsteo.data?.shortLabel || t('clinical.osteotomy.fallback')}{discOsteo.data?.angle != null && discOsteo.data?.angle !== '' ? ` ${discOsteo.data.angle}\u00B0` : ''}</span>
                             </div>
                         ) : ghostDiscOsteo ? (
                             <div className="relative group w-full h-full flex items-center justify-center cursor-pointer" style={{ opacity: 0.4 }} onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostDiscOsteo); }}>
-                                <span className="font-bold text-amber-800 bg-amber-50/80 border border-amber-300 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{ghostDiscOsteo.data?.shortLabel || t('clinical.osteotomy.fallback')} {getDiscLabel(level.id, levels)}{ghostDiscOsteo.data?.angle != null && ghostDiscOsteo.data?.angle !== '' ? ` ${ghostDiscOsteo.data.angle}\u00B0` : ''}</span>
+                                <span className="font-bold text-amber-800 bg-amber-50/80 border border-amber-300 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{ghostDiscOsteo.data?.shortLabel || t('clinical.osteotomy.fallback')}{ghostDiscOsteo.data?.angle != null && ghostDiscOsteo.data?.angle !== '' ? ` ${ghostDiscOsteo.data.angle}\u00B0` : ''}</span>
                             </div>
                         ) : (
                             !readOnly && <div className="h-2 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>

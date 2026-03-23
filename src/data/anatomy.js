@@ -7,7 +7,7 @@ export const REGIONS = {
     T: { height: 36, color: '#f1f5f9' },
     L: { height: 46, color: '#f1f5f9' },
     S: { height: 52, color: '#f1f5f9' },
-    Pelvis: { height: 35, color: '#f1f5f9' }
+    Pelvis: { height: 56, color: '#f1f5f9' }
 };
 
 // Anatomical dimensions (mm): bodyW/bodyH from X-ray measurements interpolated

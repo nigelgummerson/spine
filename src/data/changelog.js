@@ -1,8 +1,35 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION = "v2.1.4-beta";
+export const CURRENT_VERSION = "v2.2.0-beta";
 
 export const CHANGE_LOG = [
+    { version: "v2.2.0-beta", date: "2026-03-23", changes: [
+        "JSON v4 schema updated to cover all SPEC.md features: transition rods, growing rods (traditional/MAGEC), rail profile dimensions, structured bone graft array, connector-to-rod references, universal clamp fixation, VBR cage properties, alignment parameters.",
+        "Comprehensive schema test file with 153 validated checks against SPEC.md.",
+        "PDF export now uses A4 landscape (297x210mm) at 300 DPI — standard high-quality clinical print.",
+        "Screw and cage size text enlarged (15-18px) for theatre readability at distance.",
+        "Annotation text fixed at 9px with tight line height, 2-line clamp, and consistent left/right edge alignment mirroring implant position.",
+        "LEFT/RIGHT column headers enlarged and darkened for laterality safety.",
+        "Inventory summary totals line (e.g. 22 Screws, 3 Hooks, 7 Cages). Osteotomies removed from inventory. Tighter line spacing, aligned two-column layout. Units shown on screw and cage sizes.",
+        "Panel widths locked to 1485px - no content overflow. Columns constrained with min-width:0 and overflow:hidden.",
+        "Z-index rendering stack: Notes (z-35) > Implants (z-25) > Cages (z-20) > Osteotomies (z-15) > Crosslinks (z-10) > Vertebral bodies. Leader lines behind all content (z-3).",
+        "Crosslink connectors rendered lighter (slate-400, no drop shadow) to reduce visual clutter.",
+        "Osteotomy labels use consistent amber badge style (Facet/Ponte matching PSO/VCR). Level names removed from cage and disc-osteotomy labels.",
+        "Reconstruction cage labels are draggable (like notes) with sky-blue badge and dashed leader line to osteotomy. Positions persist across reload and in JSON.",
+        "Note leader lines on by default (toggle renamed to 'Show leader line'). Lines are dashed, no arrowheads, stop short of vertebral body. Labels render in front of all elements, lines behind.",
+        "Copy Plan to Construct strips annotations, notes, osteotomy angles, and fixation descriptions - only essential implant data transferred.",
+        "Clear Construct button with confirmation modal (16 languages). Enter/Escape keyboard support on all confirmation modals.",
+        "Band/Wire/Cable: larger text icons, wider container, annotation-only (no description field), consistent rendering with screws and hooks.",
+        "ScrewModal unified: all implant types show Annotation field consistently. Hooks no longer show empty sizing area.",
+        "Transparent backgrounds on screw size labels and cage labels - no white occlusion of underlying elements.",
+        "Pelvis zone height increased 60% for comfortable text display.",
+        "ACDF cages set to midline (no side selector).",
+        "Cage lordosis displays 0 degrees explicitly.",
+        "Force arrows centred in their columns.",
+        "Clicking reconstruction cage labels opens the osteotomy modal. Click vs drag detection prevents accidental modal opening after repositioning.",
+        "Shadows removed from note and reconstruction cage label badges.",
+        "Corpectomy render crash fixed (missing i18n import in SpineVertebra).",
+    ]},
     { version: "v2.1.4-beta", date: "2026-03-22", changes: [
         "Added Ukrainian and Russian translations (263 keys each) - 16 languages now supported.",
         "Clinical glossary extended with Ukrainian (AO Spine Ukraine) and Russian (RASS/AO Spine) terminology.",
