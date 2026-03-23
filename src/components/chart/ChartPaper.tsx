@@ -43,9 +43,10 @@ export interface ChartPaperProps {
 }
 
 // Header area height in SVG units
-const HEADER_H = 32;
-const ROD_HEADER_H = 16;
-const CONTENT_TOP = HEADER_H + ROD_HEADER_H;
+const TITLE_H = 28;       // Title row (PLAN / CONSTRUCT)
+const COL_HEADER_H = 20;  // Column headers (LEFT / RIGHT / FORCE)
+const ROD_HEADER_H = 22;  // Rod text row
+const CONTENT_TOP = TITLE_H + COL_HEADER_H + ROD_HEADER_H;
 
 export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements, ghostConnectors, onGhostConnectorClick, ghostCages, onGhostCageClick, reconLabelPositions, onReconLabelUpdate }) => {
     const svgRef = useRef<SVGSVGElement>(null);
@@ -201,11 +202,11 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
 
     return (
     <div ref={containerRef} className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative overflow-hidden">
-        <svg ref={svgRef} viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} preserveAspectRatio="xMidYMin meet" className="flex-1 w-full" style={{ overflow: 'visible' }}>
+        <svg ref={svgRef} viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} preserveAspectRatio="xMidYMid meet" className="flex-1 w-full" style={{ overflow: 'visible' }}>
             {/* Title bar */}
-            <rect x={0} y={0} width={chartWidth} height={HEADER_H - (forcePlacements ? 4 : 0)} fill="#f8fafc" />
-            <line x1={0} y1={HEADER_H - (forcePlacements ? 4 : 0)} x2={chartWidth} y2={HEADER_H - (forcePlacements ? 4 : 0)} stroke="#e2e8f0" strokeWidth={1} />
-            <text x={chartCenterX} y={forcePlacements ? 12 : 16}
+            <rect x={0} y={0} width={chartWidth} height={TITLE_H} fill="#f8fafc" />
+            <line x1={0} y1={TITLE_H} x2={chartWidth} y2={TITLE_H} stroke="#e2e8f0" strokeWidth={1} />
+            <text x={chartCenterX} y={forcePlacements ? 10 : TITLE_H / 2}
                 textAnchor="middle" dominantBaseline="middle"
                 fontSize={14} fontWeight="bold" fill="#1e293b" letterSpacing="0.05em"
                 style={{ textTransform: 'uppercase' } as any}>
@@ -221,27 +222,27 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
 
             {/* Column headers */}
             {showForces && (
-                <text x={forceW / 2 + 4} y={HEADER_H + 6}
+                <text x={4} y={TITLE_H + COL_HEADER_H / 2}
                     textAnchor="start" dominantBaseline="middle"
                     fontSize={11} fontWeight="bold" fill="#60a5fa" letterSpacing="0.02em"
                     style={{ textTransform: 'uppercase' } as any}>
                     {t('chart.header.force')}
                 </text>
             )}
-            <text x={vertX - 16} y={HEADER_H + 6}
+            <text x={vertX - 16} y={TITLE_H + COL_HEADER_H / 2}
                 textAnchor="end" dominantBaseline="middle"
                 fontSize={13} fontWeight="bold" fill="#334155" letterSpacing="0.02em"
                 style={{ textTransform: 'uppercase' } as any}>
                 {t('chart.header.left')}
             </text>
-            <text x={rightZoneX + 16} y={HEADER_H + 6}
+            <text x={rightZoneX + 16} y={TITLE_H + COL_HEADER_H / 2}
                 textAnchor="start" dominantBaseline="middle"
                 fontSize={13} fontWeight="bold" fill="#334155" letterSpacing="0.02em"
                 style={{ textTransform: 'uppercase' } as any}>
                 {t('chart.header.right')}
             </text>
             {showForces && (
-                <text x={chartWidth - forceW / 2 - 4} y={HEADER_H + 6}
+                <text x={chartWidth - 4} y={TITLE_H + COL_HEADER_H / 2}
                     textAnchor="end" dominantBaseline="middle"
                     fontSize={11} fontWeight="bold" fill="#60a5fa" letterSpacing="0.02em"
                     style={{ textTransform: 'uppercase' } as any}>
@@ -251,7 +252,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
 
             {/* Rod headers — use foreignObject for contentEditable */}
             {rodHeader && (
-                <foreignObject x={0} y={HEADER_H + 10} width={chartWidth} height={ROD_HEADER_H + 4}>
+                <foreignObject x={0} y={TITLE_H + COL_HEADER_H} width={chartWidth} height={ROD_HEADER_H}>
                     <div style={{ display: 'flex', width: '100%', padding: '0 8px' }}>
                         {showForces && <div style={{ width: 56 }}></div>}
                         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', paddingRight: 4 }}>

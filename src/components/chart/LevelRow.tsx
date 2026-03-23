@@ -43,8 +43,8 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
     // Scaled instrument sizes
     const iconScale = Math.max(0.65, Math.min(1.3, heightScale));
     const screwPx = Math.round(24 * iconScale);
-    const hookW = Math.round(30 * iconScale);
-    const hookH = Math.round(20 * iconScale);
+    const hookW = Math.round(34 * iconScale);
+    const hookH = Math.round(22 * iconScale);
     const fixW = Math.round(40 * iconScale);
     const fixH = Math.round(18 * iconScale);
     const osteoPx = Math.round(32 * iconScale);
@@ -168,10 +168,8 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             if (align === 'center') {
                 iconX = zoneCx - iW / 2;
             } else if (align === 'left') {
-                // Icon on right side of zone (near vertebra)
                 iconX = zoneX + zoneW - iW - 4;
             } else {
-                // Icon on left side of zone (near vertebra)
                 iconX = zoneX + 4;
             }
 
@@ -180,37 +178,37 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                 ? (isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel)) : String(displayLabel))
                 : '';
             const annText = showAnn ? ann : '';
-
-            // Label position: opposite side of icon from vertebra
-            let labelX: number;
-            let labelAnchor: string;
-            if (align === 'left') {
-                labelX = iconX - 4;
-                labelAnchor = 'end';
-            } else if (align === 'right') {
-                labelX = iconX + iW + 4;
-                labelAnchor = 'start';
-            } else {
-                labelX = zoneCx;
-                labelAnchor = 'middle';
-            }
+            const isInline = heightScale < 0.85 && !!labelText && !!annText;
 
             elements.push(
                 <g key={p.id} cursor={!readOnly ? 'pointer' : 'default'}
                     onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}>
+                    {align === 'left' && (labelText || annText) && (
+                        <foreignObject x={zoneX} y={0} width={iconX - zoneX - 2} height={rowHeight}>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end', paddingTop: 2, paddingRight: 2, xmlns: 'http://www.w3.org/1999/xhtml' } as any}>
+                                <div style={{ display: 'flex', flexDirection: isInline ? 'row-reverse' : 'column', alignItems: isInline ? 'center' : 'flex-end', gap: isInline ? 3 : 0, lineHeight: 1 }}>
+                                    {labelText && <span style={{ fontFamily: 'ui-monospace, monospace', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap' }}>{labelText}</span>}
+                                    {annText && <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', textAlign: 'right', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>}
+                                </div>
+                            </div>
+                        </foreignObject>
+                    )}
                     {renderIcon(tool?.icon || '', iconX, iconY, iW, iH)}
-                    {labelText && (
-                        <text x={labelX} y={iconY + iH / 2 - 1}
-                            textAnchor={labelAnchor} dominantBaseline="middle"
+                    {align === 'right' && (labelText || annText) && (
+                        <foreignObject x={iconX + iW + 2} y={0} width={zoneX + zoneW - iconX - iW - 2} height={rowHeight}>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', paddingTop: 2, paddingLeft: 2 } as any}>
+                                <div style={{ display: 'flex', flexDirection: isInline ? 'row' : 'column', alignItems: isInline ? 'center' : 'flex-start', gap: isInline ? 3 : 0, lineHeight: 1 }}>
+                                    {labelText && <span style={{ fontFamily: 'ui-monospace, monospace', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap' }}>{labelText}</span>}
+                                    {annText && <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', textAlign: 'left', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>}
+                                </div>
+                            </div>
+                        </foreignObject>
+                    )}
+                    {align === 'center' && labelText && (
+                        <text x={zoneCx} y={iconY + iH / 2 - 1}
+                            textAnchor="middle" dominantBaseline="middle"
                             fontSize={labelPx} fontFamily="ui-monospace, monospace" fontWeight="bold" fill="#334155">
                             {labelText}
-                        </text>
-                    )}
-                    {annText && (
-                        <text x={labelX} y={iconY + iH / 2 - 1 + (labelText ? labelPx / 2 + 7 : 0)}
-                            textAnchor={labelAnchor} dominantBaseline="middle"
-                            fontSize={9} fontStyle="italic" fill="#94a3b8">
-                            {annText}
                         </text>
                     )}
                 </g>
@@ -249,35 +247,37 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                 ? (isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel)) : String(displayLabel))
                 : '';
             const annText = showAnn ? ann : '';
-            let labelX: number;
-            let labelAnchor: string;
-            if (align === 'left') {
-                labelX = iconX - 4;
-                labelAnchor = 'end';
-            } else if (align === 'right') {
-                labelX = iconX + iW + 4;
-                labelAnchor = 'start';
-            } else {
-                labelX = zoneCx;
-                labelAnchor = 'middle';
-            }
+            const isInline = heightScale < 0.85 && !!labelText && !!annText;
 
             elements.push(
                 <g key={'ghost-' + ghostItem.id} opacity={0.4} cursor="pointer"
                     onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostItem); }}>
+                    {align === 'left' && (labelText || annText) && (
+                        <foreignObject x={zoneX} y={0} width={iconX - zoneX - 2} height={rowHeight}>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end', paddingTop: 2, paddingRight: 2 } as any}>
+                                <div style={{ display: 'flex', flexDirection: isInline ? 'row-reverse' : 'column', alignItems: isInline ? 'center' : 'flex-end', gap: isInline ? 3 : 0, lineHeight: 1 }}>
+                                    {labelText && <span style={{ fontFamily: 'ui-monospace, monospace', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap' }}>{labelText}</span>}
+                                    {annText && <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', textAlign: 'right', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>}
+                                </div>
+                            </div>
+                        </foreignObject>
+                    )}
                     {renderIcon(tool?.icon || '', iconX, iconY, iW, iH)}
-                    {labelText && (
-                        <text x={labelX} y={iconY + iH / 2 - 1}
-                            textAnchor={labelAnchor} dominantBaseline="middle"
+                    {align === 'right' && (labelText || annText) && (
+                        <foreignObject x={iconX + iW + 2} y={0} width={zoneX + zoneW - iconX - iW - 2} height={rowHeight}>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', paddingTop: 2, paddingLeft: 2 } as any}>
+                                <div style={{ display: 'flex', flexDirection: isInline ? 'row' : 'column', alignItems: isInline ? 'center' : 'flex-start', gap: isInline ? 3 : 0, lineHeight: 1 }}>
+                                    {labelText && <span style={{ fontFamily: 'ui-monospace, monospace', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap' }}>{labelText}</span>}
+                                    {annText && <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', textAlign: 'left', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>}
+                                </div>
+                            </div>
+                        </foreignObject>
+                    )}
+                    {align === 'center' && labelText && (
+                        <text x={zoneCx} y={iconY + iH / 2 - 1}
+                            textAnchor="middle" dominantBaseline="middle"
                             fontSize={labelPx} fontFamily="ui-monospace, monospace" fontWeight="bold" fill="#334155">
                             {labelText}
-                        </text>
-                    )}
-                    {annText && (
-                        <text x={labelX} y={iconY + iH / 2 - 1 + (labelText ? labelPx / 2 + 7 : 0)}
-                            textAnchor={labelAnchor} dominantBaseline="middle"
-                            fontSize={9} fontStyle="italic" fill="#94a3b8">
-                            {annText}
                         </text>
                     )}
                 </g>
