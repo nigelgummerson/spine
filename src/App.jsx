@@ -31,6 +31,7 @@ import { InstrumentIcon } from './components/chart/InstrumentIcon';
 import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, getDisclaimerTimestamp } from './components/modals/DisclaimerModal';
 import { useDocumentState } from './hooks/useDocumentState';
 import { serializeState as serializeDocState, deserializeDocument } from './state/documentReducer';
+import { validateV4, ValidationError } from './state/schema';
 
 const App = () => {
     const [selectedTool, setSelectedTool] = useState('implant');
@@ -636,7 +637,14 @@ const App = () => {
         reader.onload = (ev) => {
             try {
                 const json = JSON.parse(ev.target.result);
-                if (json.schema?.version === 4 || json.formatVersion >= 2) {
+                if (json.schema?.version === 4) {
+                    validateV4(json);
+                    const result = deserializeDocument(json);
+                    dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
+                    if (result.viewMode) setViewMode(result.viewMode);
+                    if (result.colourScheme) changeTheme(result.colourScheme);
+                } else if (json.formatVersion >= 2) {
+                    // Legacy v2/v3 — no validation, permissive load
                     const result = deserializeDocument(json);
                     dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
                     if (result.viewMode) setViewMode(result.viewMode);
@@ -646,7 +654,14 @@ const App = () => {
                     return;
                 }
                 showToast(t('alert.loaded'));
-            } catch (err) { showToast(t('alert.invalid_file'), 'error'); }
+            } catch (err) {
+                if (err instanceof ValidationError) {
+                    console.error('Schema validation failed:', err.issues);
+                    showToast(err.message, 'error');
+                } else {
+                    showToast(t('alert.invalid_file'), 'error');
+                }
+            }
         };
         reader.readAsText(file); e.target.value = null;
     };
