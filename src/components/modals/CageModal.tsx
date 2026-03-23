@@ -4,11 +4,43 @@ import { CAGE_TYPES, CAGE_PERMISSIBILITY, APPROACH_GROUPS, getDiscLabel } from '
 import { modalKeyHandler } from './ScrewModal';
 import { IconTrash, IconX } from '../icons';
 
-export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, levelId, levels }) => {
+import type { Level } from '../../types';
+
+interface CageModalInitialData {
+    tool: string;
+    data: {
+        height?: string;
+        width?: string;
+        length?: string;
+        lordosis?: string;
+        side?: string;
+    };
+}
+
+interface CageConfirmData {
+    type: string;
+    height: string;
+    width: string;
+    length: string;
+    lordosis: string;
+    side: string;
+}
+
+interface CageModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: (data: CageConfirmData) => void;
+    onDelete?: () => void;
+    initialData?: CageModalInitialData | null;
+    levelId: string;
+    levels: Level[];
+}
+
+export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, levelId, levels }: CageModalProps) => {
     if (!isOpen) return null;
 
     // Determine smart default type for this level
-    const getDefaultType = (lvl) => {
+    const getDefaultType = (lvl: string | null) => {
         if (!lvl) return 'tlif';
         if (lvl.startsWith('C')) return 'acdf';
         if (lvl === 'T11' || lvl === 'T12') return 'xlif';
@@ -55,7 +87,7 @@ export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, l
         }
     }, [isOpen, initialData]);
 
-    const handleTypeChange = (newType) => {
+    const handleTypeChange = (newType: string) => {
         setType(newType);
         const def = CAGE_TYPES.find(ct => ct.id === newType);
         if (def) {
@@ -74,7 +106,7 @@ export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, l
         onConfirm({ type, height, width, length, lordosis, side });
         onClose();
     };
-    const cageRef = useRef(null);
+    const cageRef = useRef<HTMLDivElement>(null);
     useEffect(() => { if (cageRef.current) cageRef.current.focus(); }, []);
 
     return (

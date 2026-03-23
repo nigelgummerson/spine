@@ -13,7 +13,12 @@ const IconCage = () => (
     </svg>
 );
 
-export const HelpModal = ({ isOpen, onClose }) => {
+interface HelpModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+export const HelpModal = ({ isOpen, onClose }: HelpModalProps) => {
     if (!isOpen) return null;
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onClick={onClose} onKeyDown={e => (e.key === 'Escape' || e.key === 'Enter') && onClose()} ref={el => el && el.focus()}>

@@ -5,9 +5,15 @@ import { InstrumentIcon } from '../chart/InstrumentIcon';
 import { IconX } from '../icons';
 import { modalKeyHandler } from './ScrewModal';
 
-export const ForceModal = ({ isOpen, onClose, onConfirm }) => {
+interface ForceModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: (forceId: string) => void;
+}
+
+export const ForceModal = ({ isOpen, onClose, onConfirm }: ForceModalProps) => {
     if (!isOpen) return null;
-    const forceRef = useRef(null);
+    const forceRef = useRef<HTMLDivElement>(null);
     useEffect(() => { if (forceRef.current) forceRef.current.focus(); }, []);
     return (
         <div ref={forceRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: () => {}, onClose, onDelete: null, isEditing: false })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">

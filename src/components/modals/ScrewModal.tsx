@@ -5,8 +5,15 @@ import { HOOK_TYPES, NO_SIZE_TYPES } from '../../data/clinical';
 import { InstrumentIcon } from '../chart/InstrumentIcon';
 import { IconTrash, IconX } from '../icons';
 
-export const modalKeyHandler = ({ onSubmit, onClose, onDelete, isEditing }) => (e) => {
-    const tag = e.target.tagName;
+interface ModalKeyHandlerParams {
+    onSubmit: () => void;
+    onClose: () => void;
+    onDelete: (() => void) | null | undefined;
+    isEditing: boolean;
+}
+
+export const modalKeyHandler = ({ onSubmit, onClose, onDelete, isEditing }: ModalKeyHandlerParams) => (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const tag = (e.target as HTMLElement).tagName;
     const inTextField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
     if (e.key === 'Enter') { e.preventDefault(); onSubmit(); }
     else if (e.key === 'Escape') { e.preventDefault(); onClose(); }
@@ -14,9 +21,9 @@ export const modalKeyHandler = ({ onSubmit, onClose, onDelete, isEditing }) => (
     else if (e.key === 'Tab') {
         e.preventDefault();
         const modal = e.currentTarget;
-        const focusable = Array.from(modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+        const focusable = Array.from(modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')) as HTMLElement[];
         if (focusable.length === 0) return;
-        const idx = focusable.indexOf(document.activeElement);
+        const idx = focusable.indexOf(document.activeElement as HTMLElement);
         const next = e.shiftKey
             ? (idx <= 0 ? focusable.length - 1 : idx - 1)
             : (idx >= focusable.length - 1 ? 0 : idx + 1);
@@ -24,7 +31,21 @@ export const modalKeyHandler = ({ onSubmit, onClose, onDelete, isEditing }) => (
     }
 };
 
-export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation }) => {
+interface ScrewModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: (size: string | null, details: any, type: string, annotation: string) => void;
+    onDelete?: () => void;
+    initialData?: string | null;
+    initialTool?: string;
+    defaultDiameter: string;
+    defaultLength: string;
+    defaultMode?: string;
+    defaultCustomText?: string;
+    initialAnnotation?: string;
+}
+
+export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation }: ScrewModalProps) => {
     if (!isOpen) return null;
     const [mode, setMode] = useState(defaultMode || 'standard');
     const [diameter, setDiameter] = useState(defaultDiameter);
@@ -67,8 +88,8 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
     };
     const isScrew = ['monoaxial','polyaxial','uniplanar'].includes(selectedType);
     const isEditing = initialData !== undefined;
-    const hookLabels = { pedicle_hook: t('clinical.hook.pedicle_hook'), tp_hook: t('clinical.hook.tp_hook'), tp_hook_up: t('clinical.hook.tp_hook_up'), sl_hook: t('clinical.hook.sl_hook'), il_hook: t('clinical.hook.il_hook') };
-    const modalRef = useRef(null);
+    const hookLabels: Record<string, string> = { pedicle_hook: t('clinical.hook.pedicle_hook'), tp_hook: t('clinical.hook.tp_hook'), tp_hook_up: t('clinical.hook.tp_hook_up'), sl_hook: t('clinical.hook.sl_hook'), il_hook: t('clinical.hook.il_hook') };
+    const modalRef = useRef<HTMLDivElement>(null);
     useEffect(() => { if (modalRef.current) modalRef.current.focus(); }, []);
 
     return (

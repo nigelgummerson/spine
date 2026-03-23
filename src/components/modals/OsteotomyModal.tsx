@@ -3,7 +3,25 @@ import { t } from '../../i18n/i18n';
 import { modalKeyHandler } from './ScrewModal';
 import { IconTrash, IconX } from '../icons';
 
-export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, defaultType, defaultAngle, discLevelOnly }) => {
+interface OsteotomyConfirmData {
+    type: string;
+    angle: string | null;
+    shortLabel: string;
+    reconstructionCage: string;
+}
+
+interface OsteotomyModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: (data: OsteotomyConfirmData) => void;
+    onDelete?: () => void;
+    initialData?: { type: string; angle?: number | string | null; reconstructionCage?: string } | null;
+    defaultType?: string;
+    defaultAngle?: string;
+    discLevelOnly?: boolean | null;
+}
+
+export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, defaultType, defaultAngle, discLevelOnly }: OsteotomyModalProps) => {
     if (!isOpen) return null;
 
     const OSTEOTOMY_TYPES = [
@@ -46,7 +64,7 @@ export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialDa
     }, [isOpen, initialData, defaultType, defaultAngle]);
 
     const selectedDef = filteredTypes.find(ot => ot.id === type) || filteredTypes[0];
-    const handleTypeChange = (e) => {
+    const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newTypeID = e.target.value;
         setType(newTypeID);
         setAngle('');
@@ -61,7 +79,7 @@ export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialDa
         onClose();
     };
     const isEditing = !!initialData;
-    const osteoRef = useRef(null);
+    const osteoRef = useRef<HTMLDivElement>(null);
     useEffect(() => { if (osteoRef.current) osteoRef.current.focus(); }, []);
     return (
         <div ref={osteoRef} tabIndex={-1} style={{outline:'none'}}

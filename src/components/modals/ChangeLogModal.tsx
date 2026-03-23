@@ -3,7 +3,12 @@ import { t } from '../../i18n/i18n';
 import { CURRENT_VERSION, CHANGE_LOG, formatDate } from '../../data/changelog';
 import { IconX , IconHistory} from '../icons';
 
-export const ChangeLogModal = ({ isOpen, onClose }) => {
+interface ChangeLogModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+export const ChangeLogModal = ({ isOpen, onClose }: ChangeLogModalProps) => {
     if (!isOpen) return null;
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onClick={onClose} onKeyDown={e => (e.key === 'Escape' || e.key === 'Enter') && onClose()} ref={el => el && el.focus()}>

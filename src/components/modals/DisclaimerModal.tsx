@@ -8,23 +8,29 @@ function getHalfDayKey() {
     return `spine_disclaimer_${date}_${half}`;
 }
 
-export function isDisclaimerAccepted(lang) {
+export function isDisclaimerAccepted(lang: string): boolean {
     return localStorage.getItem(getHalfDayKey()) === 'accepted'
         && localStorage.getItem(getHalfDayKey() + '_lang') === lang;
 }
 
-export function getDisclaimerTimestamp() {
+export function getDisclaimerTimestamp(): string | null {
     return localStorage.getItem(getHalfDayKey() + '_ts') || null;
 }
 
-export function acceptDisclaimer(lang) {
+export function acceptDisclaimer(lang: string): void {
     const key = getHalfDayKey();
     localStorage.setItem(key, 'accepted');
     localStorage.setItem(key + '_lang', lang);
     localStorage.setItem(key + '_ts', new Date().toISOString().replace('T', ' ').substring(0, 19));
 }
 
-export const DisclaimerModal = ({ lang, onLangChange, onAccept }) => (
+interface DisclaimerModalProps {
+    lang: string;
+    onLangChange: (lang: string) => void;
+    onAccept: () => void;
+}
+
+export const DisclaimerModal = ({ lang, onLangChange, onAccept }: DisclaimerModalProps) => (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={e => e.key === 'Enter' && onAccept()} ref={el => el && el.focus()}>
         <div className="bg-white rounded-lg shadow-2xl w-full max-w-lg overflow-hidden">
             <div className="bg-slate-800 text-white px-5 py-3 flex items-center justify-between">

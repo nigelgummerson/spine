@@ -4,11 +4,21 @@ import { NOTE_PRESET_KEYS } from '../../data/clinical';
 import { modalKeyHandler } from './ScrewModal';
 import { IconTrash, IconX } from '../icons';
 
-export const NoteModal = ({ isOpen, onClose, onConfirm, onDelete, initialText, initialShowArrow, isEditing }) => {
+interface NoteModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: (text: string, showArrow: boolean) => void;
+    onDelete?: () => void;
+    initialText?: string;
+    initialShowArrow?: boolean;
+    isEditing: boolean;
+}
+
+export const NoteModal = ({ isOpen, onClose, onConfirm, onDelete, initialText, initialShowArrow, isEditing }: NoteModalProps) => {
     if (!isOpen) return null;
     const [text, setText] = useState(initialText || '');
     const [showArrow, setShowArrow] = useState(initialShowArrow !== false);
-    const noteRef = useRef(null);
+    const noteRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (isOpen) {
