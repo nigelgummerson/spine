@@ -41,7 +41,7 @@ export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialDa
             : OSTEOTOMY_TYPES;
 
     // Resolve initial type: use defaultType only if it's in the filtered list
-    const resolvedDefault = filteredTypes.find(ot => ot.id === defaultType) ? defaultType : filteredTypes[0]?.id || 'PSO';
+    const resolvedDefault = filteredTypes.find(ot => ot.id === defaultType) ? defaultType! : filteredTypes[0]?.id || 'PSO';
 
     const [type, setType] = useState(resolvedDefault);
     const [angle, setAngle] = useState('');
@@ -73,7 +73,7 @@ export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialDa
     const handleSubmit = () => {
         onConfirm({
             type, angle: angle !== '' ? angle : null,
-            shortLabel: selectedDef.shortLabel,
+            shortLabel: selectedDef?.shortLabel || type,
             reconstructionCage: needsReconCage ? reconstructionCage : ''
         });
         onClose();

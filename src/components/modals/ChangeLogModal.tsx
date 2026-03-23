@@ -11,7 +11,7 @@ interface ChangeLogModalProps {
 export const ChangeLogModal = ({ isOpen, onClose }: ChangeLogModalProps) => {
     if (!isOpen) return null;
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onClick={onClose} onKeyDown={e => (e.key === 'Escape' || e.key === 'Enter') && onClose()} ref={el => el && el.focus()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onClick={onClose} onKeyDown={e => (e.key === 'Escape' || e.key === 'Enter') && onClose()} ref={el => { el?.focus(); }}>
             <div className="bg-white rounded-lg shadow-2xl w-full overflow-hidden flex flex-col max-h-[80vh]" style={{ maxWidth: window.matchMedia('(orientation: landscape)').matches ? '48rem' : '32rem', outline: 'none' }} onClick={e => e.stopPropagation()}>
                 <div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm flex items-center gap-2"><IconHistory/> {t('modal.changelog.title')}</h3><button onClick={onClose} className="hover:text-slate-300"><IconX /></button></div>
                 <div className="p-0 overflow-y-auto flex-1">

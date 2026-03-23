@@ -31,7 +31,7 @@ interface DisclaimerModalProps {
 }
 
 export const DisclaimerModal = ({ lang, onLangChange, onAccept }: DisclaimerModalProps) => (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={e => e.key === 'Enter' && onAccept()} ref={el => el && el.focus()}>
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={e => e.key === 'Enter' && onAccept()} ref={el => { el?.focus(); }}>
         <div className="bg-white rounded-lg shadow-2xl w-full max-w-lg overflow-hidden">
             <div className="bg-slate-800 text-white px-5 py-3 flex items-center justify-between">
                 <h2 className="font-bold text-sm">{t('disclaimer.modal_title')}</h2>

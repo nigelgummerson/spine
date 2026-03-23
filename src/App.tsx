@@ -32,7 +32,7 @@ import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, getDisclaimerT
 import { useDocumentState } from './hooks/useDocumentState';
 import { serializeState as serializeDocState, deserializeDocument } from './state/documentReducer';
 import { validateV4, ValidationError } from './state/schema';
-import type { ColourScheme, ToolDefinition, Placement, Level } from './types';
+import type { ColourScheme, ToolDefinition, Placement, Level, Zone, OsteotomyData, Cage, Note } from './types';
 
 const App = () => {
     const [selectedTool, setSelectedTool] = useState('implant');
@@ -66,7 +66,7 @@ const App = () => {
     const [isEditingDate, setIsEditingDate] = useState(false);
 
     // TOAST NOTIFICATIONS (defined before useDocumentState so showToast can be passed as parameter)
-    const [toasts, setToasts] = useState([]);
+    const [toasts, setToasts] = useState<Array<{id: number; message: string; type: string}>>([]);
     const toastIdRef = useRef(0);
     const showToast = useCallback((message: string, type: string = 'info') => {
         const id = ++toastIdRef.current;
@@ -94,12 +94,12 @@ const App = () => {
     const [helpModalOpen, setHelpModalOpen] = useState(false);
     const [changeLogOpen, setChangeLogOpen] = useState(false);
     const [noteModalOpen, setNoteModalOpen] = useState(false);
-    const [pendingNoteTool, setPendingNoteTool] = useState(null); // { tool: 'note', levelId, offsetX, offsetY }
-    const [editingNote, setEditingNote] = useState(null); // full note object when editing
+    const [pendingNoteTool, setPendingNoteTool] = useState<{ tool: string; levelId: string; offsetX: number; offsetY: number } | null>(null);
+    const [editingNote, setEditingNote] = useState<Note | null>(null);
 
     const [confirmNewPatient, setConfirmNewPatient] = useState(false);
     const [confirmClearConstruct, setConfirmClearConstruct] = useState(false);
-    const [exportPicker, setExportPicker] = useState(null); // 'jpg' or 'pdf'
+    const [exportPicker, setExportPicker] = useState<string | null>(null);
     // Disclaimer: derive from sessionStorage on every render, use counter to force re-render on accept
     const [disclaimerTick, setDisclaimerTick] = useState(0);
     const disclaimerAccepted = isDisclaimerAccepted(currentLang);
@@ -111,12 +111,12 @@ const App = () => {
     }, []);
 
     // EDITING STATE
-    const [pendingPlacement, setPendingPlacement] = useState(null);
-    const [editingPlacementId, setEditingPlacementId] = useState(null);
-    const [editingData, setEditingData] = useState(null);
-    const [editingTool, setEditingTool] = useState(null);
-    const [editingCageLevel, setEditingCageLevel] = useState(null);
-    const [discPickerLevel, setDiscPickerLevel] = useState(null);
+    const [pendingPlacement, setPendingPlacement] = useState<{ levelId: string; zone: string; tool: string } | null>(null);
+    const [editingPlacementId, setEditingPlacementId] = useState<string | null>(null);
+    const [editingData, setEditingData] = useState<any>(undefined);
+    const [editingTool, setEditingTool] = useState<string | null>(null);
+    const [editingCageLevel, setEditingCageLevel] = useState<string | null>(null);
+    const [discPickerLevel, setDiscPickerLevel] = useState<string | null>(null);
     const [editingAnnotation, setEditingAnnotation] = useState('');
 
     const [defaultDiameter, setDefaultDiameter] = useState('6.5');
@@ -125,12 +125,12 @@ const App = () => {
     const [defaultCustomText, setDefaultCustomText] = useState('');
     const [defaultOsteoType, setDefaultOsteoType] = useState('PSO');
     const [defaultOsteoAngle, setDefaultOsteoAngle] = useState('25');
-    const [osteoDiscLevel, setOsteoDiscLevel] = useState(undefined); // true=disc only, false=vertebral only, undefined=all
-    const [pendingForceZone, setPendingForceZone] = useState(null);
+    const [osteoDiscLevel, setOsteoDiscLevel] = useState<boolean | undefined>(undefined);
+    const [pendingForceZone, setPendingForceZone] = useState<{ levelId: string; zone: string } | null>(null);
     
-    const exportRef = useRef(null);
-    const containerWrapperRef = useRef(null);
-    const fileInputRef = useRef(null);
+    const exportRef = useRef<HTMLDivElement>(null);
+    const containerWrapperRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // PORTRAIT MODE
     const isPortrait = usePortrait();
@@ -149,21 +149,21 @@ const App = () => {
         else if (tab === 2) setActiveChart('completed');
     }, []);
     const PORTRAIT_TABS = ['portrait.tab.demographics', 'portrait.tab.plan', 'portrait.tab.construct'];
-    const portraitContentRef = useRef(null);
-    const touchStartRef = useRef(null);
+    const portraitContentRef = useRef<HTMLDivElement>(null);
+    const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
     const [portraitScale, setPortraitScale] = useState(1);
     // Fixed column sizes matching the export container proportions
     const PORTRAIT_COL_W = [370, 637, 637]; // demographics, plan, construct (construct widened for ghost forces)
     const PORTRAIT_COL_H = 1050;
 
     // Swipe gesture detection for portrait tab switching
-    const handleTouchStart = useCallback((e) => {
+    const handleTouchStart = useCallback((e: React.TouchEvent) => {
         if (!isPortrait) return;
         const touch = e.touches[0];
         touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
     }, [isPortrait]);
 
-    const handleTouchEnd = useCallback((e) => {
+    const handleTouchEnd = useCallback((e: React.TouchEvent) => {
         if (!isPortrait || !touchStartRef.current) return;
         const touch = e.changedTouches[0];
         const dx = touch.clientX - touchStartRef.current.x;
@@ -350,7 +350,7 @@ const App = () => {
         setDiscPickerLevel(levelId);
     };
     const handleDiscPickCage = () => {
-        const levelId = discPickerLevel;
+        const levelId = discPickerLevel!;
         setDiscPickerLevel(null);
         const anyPermitted = Object.values(CAGE_PERMISSIBILITY).some(arr => arr.includes(levelId));
         if (!anyPermitted) return showToast(t('alert.no_cage_types', { level: getDiscLabel(levelId, levels) }), 'error');
@@ -359,7 +359,7 @@ const App = () => {
         setCageModalOpen(true);
     };
     const handleDiscPickOsteo = () => {
-        const levelId = discPickerLevel;
+        const levelId = discPickerLevel!;
         setDiscPickerLevel(null);
         setPendingPlacement({ levelId, zone: 'disc', tool: 'osteotomy' });
         setEditingPlacementId(null);
@@ -369,7 +369,7 @@ const App = () => {
     };
 
     const handleCageConfirm = (data: any) => {
-        const lvl = editingCageLevel;
+        const lvl = editingCageLevel!;
         const permitted = CAGE_PERMISSIBILITY[data.type] || [];
         if (!permitted.includes(lvl)) {
             const cageType = CAGE_TYPES.find(ct => ct.id === data.type);
@@ -379,20 +379,20 @@ const App = () => {
         dispatch({
             type: 'SET_CAGE',
             chart: activeChart === 'planned' ? 'plan' : 'construct',
-            cage: { levelId: editingCageLevel, tool: data.type, data: { height: data.height, width: data.width, length: data.length, lordosis: data.lordosis, side: data.side } },
+            cage: { id: genId(), levelId: lvl, tool: data.type, data: { height: data.height, width: data.width, length: data.length, lordosis: data.lordosis, side: data.side } },
         });
     };
 
     const handleDeleteCage = () => {
-        dispatch({ type: 'REMOVE_CAGE', chart: activeChart === 'planned' ? 'plan' : 'construct', levelId: editingCageLevel });
+        dispatch({ type: 'REMOVE_CAGE', chart: activeChart === 'planned' ? 'plan' : 'construct', levelId: editingCageLevel! });
         setCageModalOpen(false);
     };
 
     const handlePlacementClick = (p: Placement) => {
         const tool = allTools.find(item => item.id === p.tool);
         const isHookType = NO_SIZE_TYPES.includes(p.tool);
-        if (tool.needsSize || isHookType) { setEditingPlacementId(p.id); setEditingData(p.data); setEditingTool(p.tool); setEditingAnnotation(p.annotation || ''); setScrewModalOpen(true); }
-        else if (tool.isOsteotomy) { setEditingPlacementId(p.id); setEditingData(p.data); setOsteoDiscLevel(p.zone === 'disc' ? true : false); setOsteoModalOpen(true); }
+        if (tool?.needsSize || isHookType) { setEditingPlacementId(p.id); setEditingData(p.data); setEditingTool(p.tool); setEditingAnnotation(p.annotation || ''); setScrewModalOpen(true); }
+        else if (tool?.isOsteotomy) { setEditingPlacementId(p.id); setEditingData(p.data); setOsteoDiscLevel(p.zone === 'disc' ? true : false); setOsteoModalOpen(true); }
         else { removePlacement(p.id); }
     };
 
@@ -403,7 +403,7 @@ const App = () => {
         const tool = allTools.find(item => item.id === ghost.tool);
         const isHookType = NO_SIZE_TYPES.includes(ghost.tool);
 
-        if (tool.needsSize || isHookType) {
+        if (tool?.needsSize || isHookType) {
             // Screws, hooks, fixation - open ScrewModal pre-filled
             setPendingPlacement({ levelId: ghost.levelId, zone: ghost.zone, tool: ghost.tool });
             setEditingPlacementId(null);
@@ -411,7 +411,7 @@ const App = () => {
             setEditingTool(ghost.tool);
             setEditingAnnotation(ghost.annotation || '');
             setScrewModalOpen(true);
-        } else if (tool.isOsteotomy) {
+        } else if (tool?.isOsteotomy) {
             // Osteotomies - open OsteotomyModal pre-filled
             setPendingPlacement({ levelId: ghost.levelId, zone: ghost.zone, tool: ghost.tool });
             setEditingPlacementId(null);
@@ -434,14 +434,14 @@ const App = () => {
         else if (pendingPlacement) { addPlacement(pendingPlacement.levelId, pendingPlacement.zone, 'osteotomy', data); setPendingPlacement(null); }
     };
 
-    const addPlacement = (levelId: string, zone: string, tool: string, data: any, annotation?: string) => {
+    const addPlacement = (levelId: string, zone: string, tool: string, data: string | OsteotomyData | null, annotation?: string) => {
         dispatch({
             type: 'ADD_PLACEMENT',
             chart: activeChart === 'planned' ? 'plan' : 'construct',
-            placement: { id: genId(), levelId, zone, tool, data, annotation: annotation || '' },
+            placement: { id: genId(), levelId, zone: zone as Zone, tool, data, annotation: annotation || '' },
         });
     };
-    const updatePlacement = (id: string, tool: string, data: any, annotation?: string) => {
+    const updatePlacement = (id: string, tool: string, data: string | OsteotomyData | null, annotation?: string) => {
         dispatch({
             type: 'UPDATE_PLACEMENT',
             chart: activeChart === 'planned' ? 'plan' : 'construct',
@@ -546,16 +546,16 @@ const App = () => {
             // Wait for React to render the export container
             await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
         }
-        const element = exportRef.current;
+        const element = exportRef.current!;
         // Sync DOM properties to attributes so cloneNode preserves them
-        element.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        element.querySelectorAll('input[type="checkbox"]').forEach((cb: any) => {
             if (cb.checked) cb.setAttribute('checked', 'checked');
             else cb.removeAttribute('checked');
         });
-        element.querySelectorAll('select').forEach(sel => {
-            Array.from(sel.options).forEach((opt, i) => {
-                if (i === sel.selectedIndex) opt.setAttribute('selected', 'selected');
-                else opt.removeAttribute('selected');
+        element.querySelectorAll('select').forEach((sel: any) => {
+            Array.from(sel.options).forEach((opt: any, i: number) => {
+                if (i === sel.selectedIndex) (opt as HTMLOptionElement).setAttribute('selected', 'selected');
+                else (opt as HTMLOptionElement).removeAttribute('selected');
             });
         });
         // 300 DPI: A4 landscape (297x210mm) at 300 DPI = 3508x2480px → pixelRatio 3508/1485 ≈ 2.36
@@ -564,7 +564,7 @@ const App = () => {
             backgroundColor: '#ffffff',
             width: 1485,
             height: 1050,
-            filter: (node) => !node.dataset?.exportHide
+            filter: (node: any) => !node.dataset?.exportHide
         });
         return canvas;
     };
@@ -602,10 +602,10 @@ const App = () => {
             // Clone the inventory content
             const invSource = demoCol.querySelector('.mt-2.border-t');
             if (invSource) {
-                const invClone = invSource.cloneNode(true);
+                const invClone = invSource.cloneNode(true) as HTMLElement;
                 invClone.style.cssText = 'columns:1;margin:0;padding:0;';
                 // Remove 2-column layout for full-page rendering
-                const colDiv = invClone.querySelector('[style*="columns"]');
+                const colDiv = invClone.querySelector('[style*="columns"]') as HTMLElement | null;
                 if (colDiv) colDiv.style.columns = '2';
                 invPage.appendChild(invClone);
             }
@@ -633,7 +633,7 @@ const App = () => {
         if (incognitoMode) localStorage.removeItem('spine_planner_v2');
     };
     const loadProjectJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files[0]; if (!file) return;
+        const file = e.target.files?.[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = (ev) => {
             try {
@@ -664,7 +664,7 @@ const App = () => {
                 }
             }
         };
-        reader.readAsText(file); e.target.value = null;
+        reader.readAsText(file); e.target.value = '';
     };
 
     const copyPlanToCompleted = () => {
@@ -721,7 +721,7 @@ const App = () => {
                     </div>
                     <div className="editable-field w-full text-[10px] mt-1" contentEditable suppressContentEditableWarning onBlur={e => dispatch({ type: 'SET_BONE_GRAFT', types: patientData.boneGraft?.types || [], notes: e.target.innerText })} placeholder={t('patient.bone_graft_notes_placeholder')}>{patientData.boneGraft?.notes || ''}</div>
                 </div>
-                <ImplantInventory placements={[...(showFinalInventory ? completedPlacements : plannedPlacements), ...(showFinalInventory ? completedCages : plannedCages).map(c => ({...c, tool: c.tool})), ...(showFinalInventory ? completedConnectors : plannedConnectors).map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid'}))]} tools={[...allTools, {id: 'tlif', labelKey: 'inventory.cage.tlif'}, {id: 'plif', labelKey: 'inventory.cage.plif'}, {id: 'acdf', labelKey: 'inventory.cage.acdf'}, {id: 'xlif', labelKey: 'inventory.cage.xlif'}, {id: 'olif', labelKey: 'inventory.cage.olif'}, {id: 'alif', labelKey: 'inventory.cage.alif'}]} title={showFinalInventory ? t('inventory.title_construct') : t('inventory.title_plan')} visibleLevelIds={levels.map(l => l.id)} levels={levels} rods={showFinalInventory ? { left: patientData.leftRod, right: patientData.rightRod } : { left: patientData.planLeftRod, right: patientData.planRightRod }} />
+                <ImplantInventory placements={[...(showFinalInventory ? completedPlacements : plannedPlacements), ...(showFinalInventory ? completedCages : plannedCages).map(c => ({...c, zone: 'mid' as Zone, annotation: '', tool: c.tool, data: null})), ...(showFinalInventory ? completedConnectors : plannedConnectors).map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid' as Zone, annotation: '', data: null}))] as Placement[]} tools={[...allTools, {id: 'tlif', labelKey: 'inventory.cage.tlif', icon: 'cage', type: 'cage'}, {id: 'plif', labelKey: 'inventory.cage.plif', icon: 'cage', type: 'cage'}, {id: 'acdf', labelKey: 'inventory.cage.acdf', icon: 'cage', type: 'cage'}, {id: 'xlif', labelKey: 'inventory.cage.xlif', icon: 'cage', type: 'cage'}, {id: 'olif', labelKey: 'inventory.cage.olif', icon: 'cage', type: 'cage'}, {id: 'alif', labelKey: 'inventory.cage.alif', icon: 'cage', type: 'cage'}]} title={showFinalInventory ? t('inventory.title_construct') : t('inventory.title_plan')} visibleLevelIds={levels.map(l => l.id)} levels={levels} rods={showFinalInventory ? { left: patientData.leftRod, right: patientData.rightRod } : { left: patientData.planLeftRod, right: patientData.planRightRod }} />
                 <button onClick={() => setShowFinalInventory(!showFinalInventory)} className="mt-1 w-full text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase tracking-wider py-1 border border-slate-200 rounded hover:bg-slate-50 transition-colors">{showFinalInventory ? t('inventory.view_plan') : t('inventory.view_final')}</button>
             </div>
             <CreditsFooter lang={currentLang} />
@@ -746,9 +746,9 @@ const App = () => {
 
     const modals = (
         <React.Fragment>
-            <ScrewModal isOpen={screwModalOpen} onClose={() => setScrewModalOpen(false)} onConfirm={handleScrewConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} initialTool={editingTool} defaultDiameter={defaultDiameter} defaultLength={defaultLength} defaultMode={defaultScrewMode} defaultCustomText={defaultCustomText} initialAnnotation={editingAnnotation} />
-            <OsteotomyModal isOpen={osteoModalOpen} onClose={() => { setOsteoModalOpen(false); setOsteoDiscLevel(undefined); }} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId)} initialData={editingData} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} discLevelOnly={osteoDiscLevel} />
-            <CageModal isOpen={cageModalOpen} onClose={() => setCageModalOpen(false)} onConfirm={handleCageConfirm} onDelete={handleDeleteCage} initialData={editingData} levelId={editingCageLevel} levels={levels} />
+            <ScrewModal isOpen={screwModalOpen} onClose={() => setScrewModalOpen(false)} onConfirm={handleScrewConfirm} onDelete={() => removePlacement(editingPlacementId!)} initialData={editingData} initialTool={editingTool ?? undefined} defaultDiameter={defaultDiameter} defaultLength={defaultLength} defaultMode={defaultScrewMode} defaultCustomText={defaultCustomText} initialAnnotation={editingAnnotation} />
+            <OsteotomyModal isOpen={osteoModalOpen} onClose={() => { setOsteoModalOpen(false); setOsteoDiscLevel(undefined); }} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId!)} initialData={editingData} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} discLevelOnly={osteoDiscLevel} />
+            <CageModal isOpen={cageModalOpen} onClose={() => setCageModalOpen(false)} onConfirm={handleCageConfirm} onDelete={handleDeleteCage} initialData={editingData} levelId={editingCageLevel ?? ''} levels={levels} />
             <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
             <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
             <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
@@ -841,7 +841,7 @@ const App = () => {
                             ))}
                         </select>
                         <div className="flex items-center gap-0">
-                            <button onClick={() => fileInputRef.current.click()} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.load')}><IconUpload /></button>
+                            <button onClick={() => fileInputRef.current?.click()} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.load')}><IconUpload /></button>
                             <button onClick={saveProjectJSON} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.save')}><IconSave /></button>
                             <button onClick={promptExportJPG} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.jpg')}><IconImage /></button>
                             <button onClick={promptExportPDF} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.pdf')}><IconPDF /></button>
@@ -856,7 +856,7 @@ const App = () => {
                             <div className="flex-1 text-[10px] italic" style={{ color: scheme.textMuted }}>{t('portrait.view_only')}</div>
                             <div className="flex gap-0.5 shrink-0">
                                 {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
-                                    const shortLabels = { cervical: 'C', thoracolumbar: 'T', t10_pelvis: 'L', whole: t('sidebar.view.whole_short') };
+                                    const shortLabels: Record<string, string> = { cervical: 'C', thoracolumbar: 'T', t10_pelvis: 'L', whole: t('sidebar.view.whole_short') };
                                     const active = viewMode === vm;
                                     return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{shortLabels[vm]}</button>;
                                 })}
@@ -875,7 +875,7 @@ const App = () => {
                             <div className="w-px h-5 bg-white/20 mx-1"></div>
                             <div className="flex gap-0.5 shrink-0">
                                 {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
-                                    const shortLabels = { cervical: 'C', thoracolumbar: 'T', t10_pelvis: 'L', whole: t('sidebar.view.whole_short') };
+                                    const shortLabels: Record<string, string> = { cervical: 'C', thoracolumbar: 'T', t10_pelvis: 'L', whole: t('sidebar.view.whole_short') };
                                     const active = viewMode === vm;
                                     return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{shortLabels[vm]}</button>;
                                 })}
@@ -993,7 +993,7 @@ const App = () => {
                         <h3 className="text-[10px] uppercase font-bold mb-1.5 tracking-widest" style={{ color: scheme.textMuted }}>{t('sidebar.region_view')}</h3>
                         <div className="grid grid-cols-2 gap-1">
                             {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
-                                const labels = { cervical: t('sidebar.view.cervical'), thoracolumbar: t('sidebar.view.thoracolumbar'), t10_pelvis: t('sidebar.view.t10_pelvis'), whole: t('sidebar.view.whole') };
+                                const labels: Record<string, string> = { cervical: t('sidebar.view.cervical'), thoracolumbar: t('sidebar.view.thoracolumbar'), t10_pelvis: t('sidebar.view.t10_pelvis'), whole: t('sidebar.view.whole') };
                                 const active = viewMode === vm;
                                 return <button key={vm} onClick={() => setViewMode(vm)} className={`py-1.5 px-1 text-[10px] rounded border font-bold transition-all ${active ? 'border-transparent' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{labels[vm]}</button>;
                             })}
@@ -1004,7 +1004,7 @@ const App = () => {
                     <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
                         <input type="file" ref={fileInputRef} onChange={loadProjectJSON} className="hidden" accept=".json" />
                         <div className="grid grid-cols-2 gap-1">
-                            <button onClick={() => fileInputRef.current.click()} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconUpload /> {t('sidebar.load')}</button>
+                            <button onClick={() => fileInputRef.current?.click()} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconUpload /> {t('sidebar.load')}</button>
                             <button onClick={saveProjectJSON} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconSave /> {t('sidebar.save')}</button>
                             <button onClick={promptExportJPG} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconImage /> {t('sidebar.jpg')}</button>
                             <button onClick={promptExportPDF} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconPDF /> {t('sidebar.pdf')}</button>

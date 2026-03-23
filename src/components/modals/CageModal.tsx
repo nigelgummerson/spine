@@ -121,7 +121,7 @@ export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, l
                     {APPROACH_GROUPS.map(group => {
                         const permittedInGroup = group.types
                             .map(id => CAGE_TYPES.find(ct => ct.id === id))
-                            .filter(ct => ct && (CAGE_PERMISSIBILITY[ct.id] || []).includes(levelId));
+                            .filter((ct): ct is NonNullable<typeof ct> => !!ct && (CAGE_PERMISSIBILITY[ct.id] || []).includes(levelId));
                         if (permittedInGroup.length === 0) return null;
                         return (
                             <div key={group.labelKey}>

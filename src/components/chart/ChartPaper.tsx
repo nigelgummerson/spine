@@ -60,8 +60,8 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
     // Reconstruction cage labels from osteotomies with reconstructionCage text
     const reconCageLabels = useMemo(() => {
         return (placements || [])
-            .filter(p => p.tool === 'osteotomy' && typeof p.data === 'object' && p.data.reconstructionCage)
-            .map(p => ({ id: `recon-${p.levelId}`, levelId: p.levelId, text: p.data.reconstructionCage, offsetX: undefined, offsetY: undefined }));
+            .filter(p => p.tool === 'osteotomy' && typeof p.data === 'object' && p.data !== null && (p.data as any).reconstructionCage)
+            .map(p => ({ id: `recon-${p.levelId}`, levelId: p.levelId, text: (p.data as any).reconstructionCage as string, offsetX: undefined as number | undefined, offsetY: undefined as number | undefined }));
     }, [placements]);
 
     // Convert connector {levelId, fraction} to rendered Y pixel position
@@ -94,7 +94,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
 
     useEffect(() => {
         if (!draggingId || readOnly) return;
-        const handleMouseMove = (e) => {
+        const handleMouseMove = (e: MouseEvent) => {
             if (!contentRef.current) return;
             const rect = contentRef.current.getBoundingClientRect();
             const localY = e.clientY - rect.top;
@@ -122,7 +122,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
     useEffect(() => {
         if (!draggingNoteId || readOnly) return;
         const isRecon = typeof draggingNoteId === 'string' && draggingNoteId.startsWith('recon-');
-        const handleMouseMove = (e) => {
+        const handleMouseMove = (e: MouseEvent) => {
             if (!contentRef.current || !noteDragStartRef.current) return;
             const dx = e.clientX - noteDragStartRef.current.clientX;
             const dy = e.clientY - noteDragStartRef.current.clientY;
@@ -153,9 +153,9 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
         </div>
         {rodHeader && <div className="flex w-full absolute top-4 left-0 right-0 px-2 z-10">
             {showForces && <div className="w-14"></div>}
-            <div className="flex-1 flex justify-end pr-1">{React.Children.toArray(rodHeader.props.children)[0]}</div>
+            <div className="flex-1 flex justify-end pr-1">{React.Children.toArray((rodHeader.props as any).children)[0]}</div>
             <div style={{ width: `${scaledWidth * 0.5}px` }}></div>
-            <div className="flex-1 flex justify-start pl-0">{React.Children.toArray(rodHeader.props.children)[1]}</div>
+            <div className="flex-1 flex justify-start pl-0">{React.Children.toArray((rodHeader.props as any).children)[1]}</div>
             {showForces && <div className="w-14"></div>}
         </div>}
         <div ref={contentRef} className="flex flex-col w-full relative">
@@ -212,7 +212,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                 const contentW = contentRef.current?.clientWidth || 600;
                 return (
                     <svg className="absolute inset-0 pointer-events-none z-[3] w-full h-full" style={{ overflow: 'visible' }}>
-                        {allLeaderItems.filter(item => item._type === 'recon' || item.showArrow !== false).map(item => {
+                        {allLeaderItems.filter(item => item._type === 'recon' || ('showArrow' in item && item.showArrow !== false)).map(item => {
                             let pos;
                             if (item._type === 'recon') {
                                 const rPos = reconPositions[item.id] || {};

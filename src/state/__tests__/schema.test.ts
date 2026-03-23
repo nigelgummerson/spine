@@ -4,7 +4,7 @@ import { validateV4, ValidationError } from '../schema';
 import { createInitialState, serializeState } from '../documentReducer';
 
 // Helper: minimal valid v4 JSON
-function validV4() {
+function validV4(): any {
     return {
         schema: { format: 'spinal-instrumentation', version: 4 },
         document: { id: 'test-id', created: '2026-01-01T00:00:00Z' },
@@ -167,7 +167,7 @@ describe('validateV4', () => {
         try {
             validateV4(json);
             expect.fail('Should have thrown');
-        } catch (err) {
+        } catch (err: any) {
             expect(err).toBeInstanceOf(ValidationError);
             expect(err.issues).toBeInstanceOf(Array);
             expect(err.issues.length).toBeGreaterThan(0);

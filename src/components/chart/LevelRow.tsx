@@ -8,7 +8,7 @@ import { InstrumentIcon } from './InstrumentIcon';
 import { SpineVertebra } from './SpineVertebra';
 import { CageVisualization } from './CageVisualization';
 import { IconCardinal } from '../icons';
-import type { Placement, Cage, Level, ToolDefinition } from '../../types';
+import type { Placement, Cage, Level, ToolDefinition, OsteotomyData } from '../../types';
 
 export interface LevelRowProps {
     level: Level;
@@ -55,10 +55,10 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
     const osteoLabelPx = Math.max(13, Math.min(16, Math.round(15 * labelScale)));
 
     // Check if Corpectomy
-    const isCorpectomy = placements.some(p => p.levelId === level.id && p.data?.type === 'Corpectomy');
+    const isCorpectomy = placements.some(p => p.levelId === level.id && typeof p.data === 'object' && p.data !== null && (p.data as OsteotomyData).type === 'Corpectomy');
 
     // Reconstruction cage text from osteotomy
-    const reconCageText = placements.filter(p => p.levelId === level.id && p.tool === 'osteotomy' && p.data?.reconstructionCage).map(p => p.data.reconstructionCage)[0] || '';
+    const reconCageText = placements.filter(p => p.levelId === level.id && p.tool === 'osteotomy' && typeof p.data === 'object' && p.data !== null && (p.data as OsteotomyData).reconstructionCage).map(p => (p.data as OsteotomyData).reconstructionCage)[0] || '';
 
     // Check for Cage below this level
     const cageBelow = cages.find(c => c.levelId === level.id);
@@ -87,11 +87,11 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     const tool = tools.find(item => item.id === p.tool);
                     const isHookItem = HOOK_TYPES.includes(p.tool);
                     const isOsteo = p.tool === 'osteotomy';
-                    let displayLabel = p.data;
-                    let angle = null;
-                    if (isOsteo && typeof p.data === 'object') {
-                        displayLabel = p.data.shortLabel || p.data.type;
-                        angle = p.data.angle;
+                    let displayLabel: any = p.data;
+                    let angle: any = null;
+                    if (isOsteo && typeof p.data === 'object' && p.data !== null) {
+                        displayLabel = (p.data as OsteotomyData).shortLabel || (p.data as OsteotomyData).type;
+                        angle = (p.data as OsteotomyData).angle;
                     }
                     const isFixation = FIXATION_TYPES.includes(p.tool);
                     const iW = isFixation ? fixW : isHookItem ? hookW : isOsteo ? osteoPx : screwPx;
@@ -117,7 +117,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                                 </span>
                             )}
                             {showAnn && (
-                                <div style={{ alignSelf: 'stretch', textAlign: align, width: '100%' }}>
+                                <div style={{ alignSelf: 'stretch', textAlign: align as any, width: '100%' }}>
                                     <span
                                         className="text-slate-400 italic px-1"
                                         style={{ fontSize: '9px', lineHeight: '1.1', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
@@ -139,7 +139,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                                 style={{ width: iW, height: iH, willChange: 'transform' }}
                                 className={`shrink-0 ${!readOnly ? 'group-hover:scale-110 transition-transform' : ''}`}
                             >
-                                <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />
+                                <InstrumentIcon type={tool?.icon || ''} className="w-full h-full drop-shadow-sm text-slate-900" />
                                 {!readOnly && <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />}
                             </div>
                             {align === 'right' && <div className="flex-1 min-w-0">{labelBlock}</div>}
@@ -150,11 +150,11 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     const tool = tools.find(item => item.id === ghostItem.tool);
                     const isHookItem = HOOK_TYPES.includes(ghostItem.tool);
                     const isOsteo = ghostItem.tool === 'osteotomy';
-                    let displayLabel = ghostItem.data;
-                    let angle = null;
-                    if (isOsteo && typeof ghostItem.data === 'object') {
-                        displayLabel = ghostItem.data.shortLabel || ghostItem.data.type;
-                        angle = ghostItem.data.angle;
+                    let displayLabel: any = ghostItem.data;
+                    let angle: any = null;
+                    if (isOsteo && typeof ghostItem.data === 'object' && ghostItem.data !== null) {
+                        displayLabel = (ghostItem.data as OsteotomyData).shortLabel || (ghostItem.data as OsteotomyData).type;
+                        angle = (ghostItem.data as OsteotomyData).angle;
                     }
                     const isFixation = FIXATION_TYPES.includes(ghostItem.tool);
                     const iW = isFixation ? fixW : isHookItem ? hookW : isOsteo ? osteoPx : screwPx;
@@ -180,7 +180,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                                 </span>
                             )}
                             {showAnn && (
-                                <div style={{ alignSelf: 'stretch', textAlign: align, width: '100%' }}>
+                                <div style={{ alignSelf: 'stretch', textAlign: align as any, width: '100%' }}>
                                     <span
                                         className="text-slate-400 italic px-1"
                                         style={{ fontSize: '9px', lineHeight: '1.1', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
@@ -203,7 +203,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                                 style={{ width: iW, height: iH, willChange: 'transform' }}
                                 className="group-hover:scale-110 transition-transform"
                             >
-                                <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-sm text-slate-900" />
+                                <InstrumentIcon type={tool?.icon || ''} className="w-full h-full drop-shadow-sm text-slate-900" />
                                 <div className="hidden group-hover:block absolute -top-1 -right-1 bg-amber-500 rounded-full w-2 h-2" />
                             </div>
                             {align === 'right' && ghostLabelBlock}
@@ -225,11 +225,11 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         {getItems('mid').filter(p => p.tool !== 'connector').map(p => {
                             const tool = tools.find(item => item.id === p.tool);
-                            let displayLabel = '';
-                            let angle = '';
-                            if (p.tool === 'osteotomy' && typeof p.data === 'object') {
-                                displayLabel = p.data.shortLabel || p.data.type;
-                                angle = p.data.angle;
+                            let displayLabel: any = '';
+                            let angle: any = '';
+                            if (p.tool === 'osteotomy' && typeof p.data === 'object' && p.data !== null) {
+                                displayLabel = (p.data as OsteotomyData).shortLabel || (p.data as OsteotomyData).type;
+                                angle = (p.data as OsteotomyData).angle;
                             }
                             return (
                                 <div
@@ -238,7 +238,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                                     onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}
                                 >
                                     <div style={{ width: midPx, height: midPx }}>
-                                        <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-md text-slate-900" />
+                                        <InstrumentIcon type={tool?.icon || ''} className="w-full h-full drop-shadow-md text-slate-900" />
                                     </div>
                                     {p.tool === 'osteotomy' && p.data && (
                                         <div
@@ -255,11 +255,11 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                             const gp = ghostPlacements.find(p => p.levelId === level.id && p.zone === 'mid');
                             if (!gp) return null;
                             const tool = tools.find(item => item.id === gp.tool);
-                            let displayLabel = '';
-                            let angle = '';
-                            if (gp.tool === 'osteotomy' && typeof gp.data === 'object') {
-                                displayLabel = gp.data.shortLabel || gp.data.type;
-                                angle = gp.data.angle;
+                            let displayLabel: any = '';
+                            let angle: any = '';
+                            if (gp.tool === 'osteotomy' && typeof gp.data === 'object' && gp.data !== null) {
+                                displayLabel = (gp.data as OsteotomyData).shortLabel || (gp.data as OsteotomyData).type;
+                                angle = (gp.data as OsteotomyData).angle;
                             }
                             return (
                                 <div
@@ -269,7 +269,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                                     onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(gp); }}
                                 >
                                     <div style={{ width: midPx, height: midPx }}>
-                                        <InstrumentIcon type={tool?.icon} className="w-full h-full drop-shadow-md text-slate-900" />
+                                        <InstrumentIcon type={tool?.icon || ''} className="w-full h-full drop-shadow-md text-slate-900" />
                                     </div>
                                     {gp.tool === 'osteotomy' && gp.data && (
                                         <div
@@ -315,11 +315,11 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                             </div>)
                         ) : discOsteo ? (
                             <div className="relative group w-full h-full flex items-center justify-center cursor-pointer" onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(discOsteo); }}>
-                                <span className="font-bold text-amber-800 bg-amber-50/80 border border-amber-300 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{discOsteo.data?.shortLabel || t('clinical.osteotomy.fallback')}{discOsteo.data?.angle != null && discOsteo.data?.angle !== '' ? ` ${discOsteo.data.angle}\u00B0` : ''}</span>
+                                <span className="font-bold text-amber-800 bg-amber-50/80 border border-amber-300 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{(discOsteo.data as any)?.shortLabel || t('clinical.osteotomy.fallback')}{(discOsteo.data as any)?.angle != null && (discOsteo.data as any)?.angle !== '' ? ` ${(discOsteo.data as any).angle}\u00B0` : ''}</span>
                             </div>
                         ) : ghostDiscOsteo ? (
                             <div className="relative group w-full h-full flex items-center justify-center cursor-pointer" style={{ opacity: 0.4 }} onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostDiscOsteo); }}>
-                                <span className="font-bold text-amber-800 bg-amber-50/80 border border-amber-300 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{ghostDiscOsteo.data?.shortLabel || t('clinical.osteotomy.fallback')}{ghostDiscOsteo.data?.angle != null && ghostDiscOsteo.data?.angle !== '' ? ` ${ghostDiscOsteo.data.angle}\u00B0` : ''}</span>
+                                <span className="font-bold text-amber-800 bg-amber-50/80 border border-amber-300 px-1.5 rounded whitespace-nowrap" style={{ fontSize: cageLabelPx + 'px' }}>{(ghostDiscOsteo.data as any)?.shortLabel || t('clinical.osteotomy.fallback')}{(ghostDiscOsteo.data as any)?.angle != null && (ghostDiscOsteo.data as any)?.angle !== '' ? ` ${(ghostDiscOsteo.data as any).angle}\u00B0` : ''}</span>
                             </div>
                         ) : (
                             !readOnly && <div className="h-2 w-full bg-slate-200/0 hover:bg-sky-200/50 rounded-full"></div>

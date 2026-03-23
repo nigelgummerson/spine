@@ -1,6 +1,7 @@
 // src/state/__tests__/documentReducer.test.js
 import { describe, it, expect } from 'vitest';
 import { createInitialState, documentReducer, serializeState, deserializeDocument } from '../documentReducer';
+import type { Placement, Cage, DocumentAction } from '../../types';
 
 // --- Task 9: createInitialState ---
 
@@ -34,7 +35,7 @@ describe('createInitialState', () => {
 describe('ADD_PLACEMENT', () => {
     it('adds a placement to the plan', () => {
         const state = createInitialState();
-        const placement = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' };
+        const placement = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
         const next = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement });
         expect(next.plannedPlacements).toHaveLength(1);
         expect(next.plannedPlacements[0]).toEqual(placement);
@@ -42,7 +43,7 @@ describe('ADD_PLACEMENT', () => {
 
     it('adds a placement to the construct', () => {
         const state = createInitialState();
-        const placement = { id: 'p1', levelId: 'T5', zone: 'right', tool: 'monoaxial', data: '5.5x40', annotation: '' };
+        const placement = { id: 'p1', levelId: 'T5', zone: 'right', tool: 'monoaxial', data: '5.5x40', annotation: '' } as Placement;
         const next = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'construct', placement });
         expect(next.completedPlacements).toHaveLength(1);
         expect(next.completedPlacements[0]).toEqual(placement);
@@ -50,8 +51,8 @@ describe('ADD_PLACEMENT', () => {
 
     it('enforces one implant per left/right zone — rejects duplicate', () => {
         const state = createInitialState();
-        const p1 = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' };
-        const p2 = { id: 'p2', levelId: 'T5', zone: 'left', tool: 'monoaxial', data: '5.5x40', annotation: '' };
+        const p1 = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
+        const p2 = { id: 'p2', levelId: 'T5', zone: 'left', tool: 'monoaxial', data: '5.5x40', annotation: '' } as Placement;
         const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p1 });
         const s2 = documentReducer(s1, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p2 });
         expect(s2.plannedPlacements).toHaveLength(1);
@@ -60,8 +61,8 @@ describe('ADD_PLACEMENT', () => {
 
     it('allows same level different zones', () => {
         const state = createInitialState();
-        const pL = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' };
-        const pR = { id: 'p2', levelId: 'T5', zone: 'right', tool: 'polyaxial', data: '6.5x45', annotation: '' };
+        const pL = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
+        const pR = { id: 'p2', levelId: 'T5', zone: 'right', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
         const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: pL });
         const s2 = documentReducer(s1, { type: 'ADD_PLACEMENT', chart: 'plan', placement: pR });
         expect(s2.plannedPlacements).toHaveLength(2);
@@ -69,8 +70,8 @@ describe('ADD_PLACEMENT', () => {
 
     it('allows multiple mid-zone placements at same level', () => {
         const state = createInitialState();
-        const p1 = { id: 'p1', levelId: 'T5', zone: 'mid', tool: 'osteotomy', data: { type: 'PSO' }, annotation: '' };
-        const p2 = { id: 'p2', levelId: 'T5', zone: 'mid', tool: 'unstable', data: null, annotation: '' };
+        const p1 = { id: 'p1', levelId: 'T5', zone: 'mid', tool: 'osteotomy', data: { type: 'PSO' }, annotation: '' } as Placement;
+        const p2 = { id: 'p2', levelId: 'T5', zone: 'mid', tool: 'unstable', data: null, annotation: '' } as Placement;
         const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p1 });
         const s2 = documentReducer(s1, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p2 });
         expect(s2.plannedPlacements).toHaveLength(2);
@@ -80,7 +81,7 @@ describe('ADD_PLACEMENT', () => {
 describe('UPDATE_PLACEMENT', () => {
     it('updates tool, data, and annotation of an existing placement', () => {
         const state = createInitialState();
-        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' };
+        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
         const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
         const s2 = documentReducer(s1, { type: 'UPDATE_PLACEMENT', chart: 'plan', id: 'p1', tool: 'monoaxial', data: '5.5x40', annotation: 'fenestrated' });
         expect(s2.plannedPlacements[0].tool).toBe('monoaxial');
@@ -90,7 +91,7 @@ describe('UPDATE_PLACEMENT', () => {
 
     it('preserves existing annotation when annotation is undefined', () => {
         const state = createInitialState();
-        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: 'cortical' };
+        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: 'cortical' } as Placement;
         const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
         const s2 = documentReducer(s1, { type: 'UPDATE_PLACEMENT', chart: 'plan', id: 'p1', tool: 'monoaxial', data: '5.5x40', annotation: undefined });
         expect(s2.plannedPlacements[0].annotation).toBe('cortical');
@@ -100,7 +101,7 @@ describe('UPDATE_PLACEMENT', () => {
 describe('REMOVE_PLACEMENT', () => {
     it('removes a placement by id', () => {
         const state = createInitialState();
-        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' };
+        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
         const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
         const s2 = documentReducer(s1, { type: 'REMOVE_PLACEMENT', chart: 'plan', id: 'p1' });
         expect(s2.plannedPlacements).toHaveLength(0);
@@ -112,15 +113,15 @@ describe('REMOVE_PLACEMENT', () => {
 describe('SET_CAGE / REMOVE_CAGE', () => {
     it('adds a cage', () => {
         const state = createInitialState();
-        const cage = { levelId: 'L4', tool: 'tlif', data: { height: '10', lordosis: '5', side: 'bilateral' } };
+        const cage = { id: 'cage0', levelId: 'L4', tool: 'tlif', data: { height: '10', lordosis: '5', side: 'bilateral' } } as Cage;
         const next = documentReducer(state, { type: 'SET_CAGE', chart: 'plan', cage });
         expect(next.plannedCages).toHaveLength(1);
     });
 
     it('replaces existing cage at same level', () => {
         const state = createInitialState();
-        const c1 = { levelId: 'L4', tool: 'tlif', data: { height: '10', lordosis: '5', side: 'bilateral' } };
-        const c2 = { levelId: 'L4', tool: 'plif', data: { height: '12', lordosis: '8', side: 'bilateral' } };
+        const c1 = { id: 'cage1', levelId: 'L4', tool: 'tlif', data: { height: '10', lordosis: '5', side: 'bilateral' } } as Cage;
+        const c2 = { id: 'cage2', levelId: 'L4', tool: 'plif', data: { height: '12', lordosis: '8', side: 'bilateral' } } as Cage;
         const s1 = documentReducer(state, { type: 'SET_CAGE', chart: 'plan', cage: c1 });
         const s2 = documentReducer(s1, { type: 'SET_CAGE', chart: 'plan', cage: c2 });
         expect(s2.plannedCages).toHaveLength(1);
@@ -129,7 +130,7 @@ describe('SET_CAGE / REMOVE_CAGE', () => {
 
     it('removes a cage by level', () => {
         const state = createInitialState();
-        const cage = { levelId: 'L4', tool: 'tlif', data: { height: '10' } };
+        const cage = { id: 'cage3', levelId: 'L4', tool: 'tlif', data: { height: '10', lordosis: '', side: '' } } as Cage;
         const s1 = documentReducer(state, { type: 'SET_CAGE', chart: 'plan', cage });
         const s2 = documentReducer(s1, { type: 'REMOVE_CAGE', chart: 'plan', levelId: 'L4' });
         expect(s2.plannedCages).toHaveLength(0);
@@ -208,7 +209,7 @@ describe('Edge cases', () => {
 
     it('unknown action type returns unchanged state', () => {
         const state = createInitialState();
-        const next = documentReducer(state, { type: 'NONSENSE' });
+        const next = documentReducer(state, { type: 'NONSENSE' } as any);
         expect(next).toBe(state);
     });
 });
@@ -218,7 +219,7 @@ describe('Edge cases', () => {
 describe('NEW_PATIENT', () => {
     it('resets to fresh state with new document ID', () => {
         const state = createInitialState();
-        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' };
+        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
         const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
         const s2 = documentReducer(s1, { type: 'SET_PATIENT_FIELD', field: 'name', value: 'John' });
         const s3 = documentReducer(s2, { type: 'NEW_PATIENT' });
@@ -231,7 +232,7 @@ describe('NEW_PATIENT', () => {
 describe('CLEAR_CONSTRUCT', () => {
     it('empties all construct arrays', () => {
         const state = createInitialState();
-        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' };
+        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
         const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'construct', placement: p });
         const s2 = documentReducer(s1, { type: 'CLEAR_CONSTRUCT' });
         expect(s2.completedPlacements).toEqual([]);
@@ -242,7 +243,7 @@ describe('CLEAR_CONSTRUCT', () => {
 
     it('does not affect plan arrays', () => {
         const state = createInitialState();
-        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' };
+        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
         const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
         const s2 = documentReducer(s1, { type: 'CLEAR_CONSTRUCT' });
         expect(s2.plannedPlacements).toHaveLength(1);
@@ -256,7 +257,7 @@ describe('COPY_PLAN_TO_CONSTRUCT', () => {
     it('copies plan placements to construct, stripping annotations', () => {
         counter = 0;
         const state = createInitialState();
-        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: 'fenestrated' };
+        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: 'fenestrated' } as Placement;
         const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
         const s2 = documentReducer(s1, { type: 'COPY_PLAN_TO_CONSTRUCT', genId: mockGenId });
         expect(s2.completedPlacements).toHaveLength(1);
@@ -267,8 +268,8 @@ describe('COPY_PLAN_TO_CONSTRUCT', () => {
     it('excludes force placements', () => {
         counter = 0;
         const state = createInitialState();
-        const screw = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' };
-        const force = { id: 'f1', levelId: 'T5', zone: 'force_left', tool: 'compression', data: null, annotation: '' };
+        const screw = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
+        const force = { id: 'f1', levelId: 'T5', zone: 'force_left', tool: 'compression', data: null, annotation: '' } as Placement;
         let s = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: screw });
         s = documentReducer(s, { type: 'ADD_PLACEMENT', chart: 'plan', placement: force });
         s = documentReducer(s, { type: 'COPY_PLAN_TO_CONSTRUCT', genId: mockGenId });
@@ -279,8 +280,8 @@ describe('COPY_PLAN_TO_CONSTRUCT', () => {
     it('skips placements already in construct (deduplication by level+zone)', () => {
         counter = 0;
         const state = createInitialState();
-        const planP = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' };
-        const constP = { id: 'c1', levelId: 'T5', zone: 'left', tool: 'monoaxial', data: '5.5x40', annotation: '' };
+        const planP = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
+        const constP = { id: 'c1', levelId: 'T5', zone: 'left', tool: 'monoaxial', data: '5.5x40', annotation: '' } as Placement;
         let s = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: planP });
         s = documentReducer(s, { type: 'ADD_PLACEMENT', chart: 'construct', placement: constP });
         s = documentReducer(s, { type: 'COPY_PLAN_TO_CONSTRUCT', genId: mockGenId });
@@ -298,19 +299,19 @@ describe('COPY_PLAN_TO_CONSTRUCT', () => {
     it('strips osteotomy angles and reconstruction cage text', () => {
         counter = 0;
         const state = createInitialState();
-        const p = { id: 'p1', levelId: 'T10', zone: 'mid', tool: 'osteotomy', data: { type: 'PSO', angle: 30, reconstructionCage: 'mesh cage' }, annotation: '' };
+        const p = { id: 'p1', levelId: 'T10', zone: 'mid', tool: 'osteotomy', data: { type: 'PSO', angle: 30, shortLabel: 'PSO', reconstructionCage: 'mesh cage' }, annotation: '' } as Placement;
         let s = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
         s = documentReducer(s, { type: 'COPY_PLAN_TO_CONSTRUCT', genId: mockGenId });
-        expect(s.completedPlacements[0].data.angle).toBeNull();
-        expect(s.completedPlacements[0].data.reconstructionCage).toBe('');
+        expect((s.completedPlacements[0].data as any).angle).toBeNull();
+        expect((s.completedPlacements[0].data as any).reconstructionCage).toBe('');
     });
 });
 
 describe('Serialization round-trip', () => {
     it('serialize then deserialize produces equivalent state', () => {
         const state = createInitialState();
-        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: 'cortical' };
-        const cage = { id: 'cage1', levelId: 'L4', tool: 'tlif', data: { height: '10', lordosis: '5', side: 'bilateral' } };
+        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: 'cortical' } as Placement;
+        const cage = { id: 'cage1', levelId: 'L4', tool: 'tlif', data: { height: '10', lordosis: '5', side: 'bilateral' } } as Cage;
         const conn = { id: 'c1', levelId: 'T8', fraction: 0.5, tool: 'connector' };
         const note = { id: 'n1', tool: 'note', levelId: 'T5', text: 'Check pedicle', offsetX: -140, offsetY: 10, showArrow: true };
 
