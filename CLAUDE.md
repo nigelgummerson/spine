@@ -7,43 +7,63 @@ A single-file HTML application for pre-operative spinal surgery planning. Design
 - **Version:** v2.3.0-beta
 - **Last Updated:** 2026-03-23
 - **License:** GNU GPLv3
+- **Language:** TypeScript (strict)
 
 ## Project Structure
 ```
 spine-planner/
 ├── index.html              # Vite entry point (minimal)
 ├── vite.config.js          # Vite + vite-plugin-singlefile config
+├── tsconfig.json           # TypeScript strict config
 ├── postcss.config.js       # Tailwind v4 PostCSS
 ├── package.json            # npm dependencies and scripts
 ├── src/
-│   ├── main.jsx            # React root mount + font imports
-│   ├── App.jsx             # Main app component (~1,370 lines)
+│   ├── main.tsx            # React root mount + font imports
+│   ├── App.tsx             # Main app component
+│   ├── types.ts            # Shared TypeScript types
+│   ├── react-augments.d.ts # React type augmentations
 │   ├── styles.css          # Global CSS + Tailwind import
 │   ├── inter-subset.css    # Inter font (WOFF2, Latin/Greek subsets)
 │   ├── source-serif-4-subset.css  # Source Serif 4 (WOFF2, Latin/Greek)
 │   ├── i18n/
 │   │   ├── translations.json    # All translations (16 languages × 263 keys)
 │   │   ├── languages.json       # SUPPORTED_LANGUAGES array
-│   │   └── i18n.js              # t(), detectLanguage(), lang state
+│   │   ├── i18n.ts              # t(), detectLanguage(), lang state
+│   │   └── __tests__/i18n.test.ts
 │   ├── data/
-│   │   ├── anatomy.js           # VERTEBRA_ANATOMY, REGIONS, coordinate functions
-│   │   ├── implants.js          # IMPLANT_COMPANIES, SCREW_SYSTEMS, sizing
-│   │   ├── clinical.js          # CAGE_PERMISSIBILITY, osteotomy/force types
-│   │   ├── themes.js            # COLOUR_SCHEMES, company theme mapping
-│   │   └── changelog.js         # CURRENT_VERSION, CHANGE_LOG
+│   │   ├── anatomy.ts           # VERTEBRA_ANATOMY, REGIONS, coordinate functions
+│   │   ├── implants.ts          # IMPLANT_COMPANIES, SCREW_SYSTEMS, sizing
+│   │   ├── clinical.ts          # CAGE_PERMISSIBILITY, osteotomy/force types
+│   │   ├── themes.ts            # COLOUR_SCHEMES, company theme mapping
+│   │   ├── changelog.ts         # CURRENT_VERSION, CHANGE_LOG
+│   │   └── __tests__/clinical-anatomy.test.ts
+│   ├── state/
+│   │   ├── documentReducer.ts   # useReducer actions + reducer for all document state
+│   │   ├── schema.ts            # Zod schema — validates v4 JSON on load
+│   │   └── __tests__/
+│   │       ├── documentReducer.test.ts
+│   │       └── schema.test.ts
 │   ├── components/
-│   │   ├── icons.jsx            # 13 SVG icon components
-│   │   ├── ImplantInventory.jsx # Grouped inventory counts
-│   │   ├── ScrewSystemCombo.jsx # Manufacturer screw system dropdown
-│   │   ├── CreditsFooter.jsx    # Version, credits, license footer
+│   │   ├── icons.tsx            # SVG icon components
+│   │   ├── ImplantInventory.tsx # Grouped inventory counts (balanced columns by line count)
+│   │   ├── ScrewSystemCombo.tsx # Manufacturer screw system dropdown
+│   │   ├── CreditsFooter.tsx    # Version, credits, license footer
 │   │   ├── modals/              # ScrewModal, CageModal, OsteotomyModal,
-│   │   │                        # ForceModal, NoteModal, HelpModal, ChangeLogModal
-│   │   └── chart/               # ChartPaper, LevelRow, SpineVertebra,
+│   │   │                        # ForceModal, NoteModal, HelpModal, ChangeLogModal,
+│   │   │                        # DisclaimerModal
+│   │   └── chart/               # ChartPaper (SVG), LevelRow (SVG), SpineVertebra,
 │   │                            # InstrumentIcon, CageVisualization
 │   ├── hooks/
-│   │   └── usePortrait.js       # Orientation detection hook
+│   │   ├── usePortrait.ts       # Orientation detection hook
+│   │   └── useDocumentState.ts  # Wraps documentReducer — primary state hook for App
 │   └── utils/
-│       └── id.js                # Unique ID generator
+│       ├── id.ts                # Unique ID generator
+│       └── svgExport.ts         # SVG-based export utilities
+├── specs/                  # Design docs for major refactors (gitignored)
+│   ├── 2026-03-23-extract-app-state-design.md
+│   ├── 2026-03-23-extract-app-state-plan.md
+│   ├── 2026-03-23-zod-validation-design.md
+│   └── 2026-03-23-zod-validation-plan.md
 ├── dist/                   # Build output (single index.html, ~1.99MB)
 ├── tests/                  # i18n verification (read from src/i18n/*.json)
 ├── tools/                  # Translation review tools (read/write src/i18n/translations.json)
@@ -62,14 +82,18 @@ spine-planner/
 
 ## Tech Stack
 - **Build:** Vite + vite-plugin-singlefile (outputs single HTML file with everything inlined)
+- **Language:** TypeScript (strict mode) — all source files .tsx/.ts
 - **Framework:** React 19 (npm, pre-compiled JSX — no in-browser transpilation)
 - **Styling:** Tailwind CSS v4 (PostCSS)
 - **Fonts:** Inter + Source Serif 4 via fontsource (WOFF2, Latin/Greek subsets, embedded as base64)
-- **Export:** html-to-image (SVG foreignObject) + jsPDF
+- **Validation:** Zod — validates v4 JSON schema on file load
+- **Testing:** Vitest — 181 tests across 4 test files
+- **Export:** html-to-image (SVG foreignObject) + jsPDF (JPEG quality 0.85)
 - **All dependencies bundled** — no CDN calls, fully offline
 
 ## Version History (Recent)
-- **v2.3.0-beta** (2026-03-23): JSON v4 schema — full SPEC.md coverage (transition rods, growing rods, VBR cages, structured bone graft, connector-to-rod refs). PDF export at A4 300 DPI. Major UI polish: screw sizes enlarged, annotation text consistent 9px with edge alignment, LEFT/RIGHT headers prominent, inventory tightened with summary totals and units. Z-index rendering stack reordered (notes > implants > cages > osteotomies > crosslinks > vertebral bodies). Draggable reconstruction cage labels with persistent positions. Copy-plan-to-construct strips annotations/notes/angles. Clear Construct button. Unified ScrewModal (annotation field for all types). Crosslinks lighter. Transparent label backgrounds. Pelvis zone enlarged. ACDF midline. 270 translation keys across 16 languages.
+- **v2.3.0-beta** (2026-03-23): TypeScript migration — all .jsx/.js renamed to .tsx/.ts, strict tsconfig. State extracted from App into useReducer (documentReducer.ts) wrapped by useDocumentState.ts hook. Zod validation of v4 JSON on load (schema.ts). SVG chart rendering — ChartPaper and LevelRow now render SVG content instead of HTML flexbox. Vitest test suite — 181 tests across 4 files (documentReducer, schema, i18n, clinical-anatomy). Note \n line breaks supported. Disclaimer uses sessionStorage, resets on New Patient. Cervical screw defaults: C3-C7 default 3.5×14, Oc/C1/C2 no default. Inventory balanced columns by line count with diameter grouping. JPEG export quality 0.85 (halved PDF size). New files: types.ts, svgExport.ts, react-augments.d.ts, tsconfig.json, specs/ design docs.
+- **v2.2.0-beta** (2026-03-23): JSON v4 schema — full SPEC.md coverage (transition rods, growing rods, VBR cages, structured bone graft, connector-to-rod refs). PDF export at A4 300 DPI. Major UI polish: screw sizes enlarged, annotation text consistent 9px with edge alignment, LEFT/RIGHT headers prominent, inventory tightened with summary totals and units. Z-index rendering stack reordered (notes > implants > cages > osteotomies > crosslinks > vertebral bodies). Draggable reconstruction cage labels with persistent positions. Copy-plan-to-construct strips annotations/notes/angles. Clear Construct button. Unified ScrewModal (annotation field for all types). Crosslinks lighter. Transparent label backgrounds. Pelvis zone enlarged. ACDF midline. 270 translation keys across 16 languages.
 - **v2.1.4-beta** (2026-03-22): Ukrainian and Russian translations (263 keys each, 16 languages total). Clinical glossary extended with AO Spine Ukraine and RASS terminology. Review forms generated for native-speaker review. Language count updated across all existing translations.
 - **v2.1.3-beta** (2026-03-22): Vite build system — modular source, single-file output, embedded fonts, GitHub Actions deployment with auto-regenerated review forms. Custom domain plan.skeletalsurgery.com/spine/. Important Notice disclaimer modal on startup (half-day session expiry, language-aware, syncs acceptance between dual windows). Version shown in portrait toolbar. Force columns widened for i18n. Landing page with SEO and structured data.
 - **v2.0.3-beta** (2026-03-22): Review form UX — persistent backup banner, auto-scroll to next unreviewed, larger touch targets, guide page.
@@ -94,11 +118,18 @@ spine-planner/
 - **v0.9.4-alpha** (2026-03-01): Replaced html2canvas with html-to-image for pixel-perfect export.
 - **v0.9.3-alpha** (2026-03-01): Anatomical proportions (T1-S1), pedicle data, variable disc heights, auto-scale solver.
 
-## Key Architecture (v2.1.0)
-- **i18n:** `src/i18n/translations.json` (~263 keys × 16 languages), `t(key, replacements)` function with `??` fallback chain in `src/i18n/i18n.js`. Module-level `_currentLang` synced with React state via `changeLang()`.
+## Key Architecture (v2.3.0)
+- **State management:** `useDocumentState.ts` hook wraps a `useReducer` backed by `src/state/documentReducer.ts`. All document mutations go through typed actions. App.tsx consumes the hook — no longer manages raw state directly.
+- **Types:** Shared TypeScript interfaces in `src/types.ts`. Strict mode enforced via `tsconfig.json`.
+- **Zod validation:** `src/state/schema.ts` validates v4 JSON on file load. Invalid files are rejected with a typed error rather than silently corrupting state.
+- **Chart rendering:** `ChartPaper` and `LevelRow` render SVG content (not HTML flexbox). Enables crisp export at any scale without html-to-image layout quirks.
+- **i18n:** `src/i18n/translations.json` (~263 keys × 16 languages), `t(key, replacements)` function with `??` fallback chain in `src/i18n/i18n.ts`. Module-level `_currentLang` synced with React state via `changeLang()`.
 - **Supported languages:** en, de, fr, es, it, pt, sv, nb, da, fi, nl, pl, el, tr, ru, uk
 - **Language detection:** `detectLanguage()` checks `localStorage('spine_planner_lang')` → `navigator.language` → `'en'`. `LANG_ALIASES` maps `no`/`nn` → `nb`.
-- **Export container:** Fixed 1485x1050px, 3 columns: patient info (370px) + Plan (flex-4) + Construct (flex-3)
+- **Disclaimer:** `DisclaimerModal` — shown on first load and on New Patient. Uses `sessionStorage` (not a timer). Resets when New Patient clears state.
+- **Notes:** Support `\n` line breaks in note text (rendered as multi-line in SVG).
+- **Screw defaults:** C3-C7 pre-fill 3.5×14mm; Oc/C1/C2 have no default size.
+- **Export container:** Fixed 1485x1050px, 3 columns: patient info (370px) + Plan (flex-4) + Construct (flex-3). JPEG quality 0.85.
 - **Sidebar:** w-[340px] in landscape, colour-themed per company (10 schemes), tool palette, export controls
 - **Portrait mode:** `usePortrait()` hook via `matchMedia('(orientation: portrait)')`. Sidebar becomes 2-row horizontal toolbar. Three tabs (Demographics/Plan/Construct) with `switchPortraitTab()` syncing `portraitTab` and `activeChart`. Each column rendered at fixed export dimensions and CSS-scaled via `portraitScale` (ResizeObserver). Swipe gestures for tab switching (50px threshold, horizontal-dominant). Export mounts off-screen container temporarily via `portraitExporting` state.
 - **View-only mode:** `isSmallScreen` = `Math.min(screen.width, screen.height) < 600`. On phones: tool palette hidden, ChartPaper `readOnly=true`, informational banner shown. Load/Save/Export/Help remain accessible.
@@ -106,14 +137,15 @@ spine-planner/
 - **Company/Screw data:** `IMPLANT_COMPANIES` (16 manufacturers), `SCREW_SYSTEMS` (per-company product lists), `COMPANY_THEME_MAP` (5 mapped companies)
 - **Implant types:** 3 screws (mono/poly/uni), 5 hooks (pedicle, TP down, TP up, supra-lam, infra-lam), 3 fixation (band, wire, cable)
 - **Data arrays:** `allTools`, `INVENTORY_CATEGORIES`, `OSTEOTOMY_TYPES`, `FORCE_TYPES`, `APPROACH_GROUPS` use `labelKey` pattern — data stays English, `t()` called at render time
+- **Inventory:** Balanced columns by line count; screws grouped by diameter.
 - **ScrewModal:** Three-tier visual hierarchy (SCREWS > HOOKS > BANDS & OTHERS), annotations for screws and hooks, free-text description for fixation
 - **Osteotomies:** Schwab 1-6 + Corpectomy, grouped into Posterior/Anterior optgroups. VCR/ML-VCR/Corpectomy show reconstruction cage text input
 - **Bone graft:** Multi-select checkboxes (Local Bone, Autograft, Allograft, Synthetics, DBM, BMP) + free-text notes
 - **JSON v4 format:** `schema.format: 'spinal-instrumentation'`, `schema.version: 4`. Unified `elements` array with typed sub-objects. Forces, rods, notes, boneGraft as separate arrays within plan/construct. Document metadata (UUID, timestamps). UI state separated. Loads v2/v3 legacy files. Schema: `docs/spinal-instrumentation-schema-v4.json`
 - **Connectors:** Level-anchored `{levelId, fraction}` (branch); legacy `{yNorm}` migrated on load
 - **Session cache:** localStorage key `spine_planner_v2`, formatVersion 3
-- **Save/load:** Shared `serializeState()` / `deserializeState()` functions; loads formatVersion >= 2
-- **Export:** html-to-image (SVG foreignObject). `prepareExportCanvas()` syncs checkbox `checked` and select `selected` attributes before capture. jsPDF for PDF generation from canvas.
+- **Save/load:** Shared `serializeState()` / `deserializeState()` functions; loads formatVersion >= 2. Zod validates on load.
+- **Export:** html-to-image (SVG foreignObject) + `svgExport.ts`. `prepareExportCanvas()` syncs checkbox `checked` and select `selected` attributes before capture. jsPDF for PDF generation from canvas.
 - **Translation disclaimer:** Shown in footer and export when language is not English. Feedback email for native-speaker corrections.
 
 ## i18n Translation Quality
@@ -158,6 +190,12 @@ npm run dev                   # Starts Vite dev server (http://localhost:5173)
 # Build single-file output
 npm run build                 # Produces dist/index.html (~1.9MB, fully offline)
 open dist/index.html          # Test built output from file://
+
+# Type checking
+npm run type-check            # tsc --noEmit (no emit, just check types)
+
+# Run tests
+npm test                      # Vitest — 181 tests across 4 files
 
 # Deploy to GitHub Pages
 git push origin main          # GitHub Actions builds and deploys automatically
