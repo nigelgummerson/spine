@@ -94,7 +94,7 @@ export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialDa
                 <div className="p-6 space-y-4">
                     <div>
                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('modal.osteotomy.type')}</label>
-                        <select value={type} onChange={handleTypeChange} onWheel={selectWheelHandler}
+                        <select value={type} onChange={handleTypeChange} onWheel={selectWheelHandler} title={t('hint.scroll_to_change')}
                             className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold text-slate-800 focus:border-amber-500 outline-none">
                             {filteredTypes.some(ot => ot.group === 'posterior') && <optgroup label={t('modal.osteotomy.optgroup_posterior')}>
                                 {filteredTypes.filter(ot => ot.group === 'posterior').map(ot =>
