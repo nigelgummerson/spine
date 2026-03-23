@@ -82,7 +82,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
     // Build height map for Y calculations
     const heightMap = useMemo(() => buildHeightMap(levels, heightScale), [levels, heightScale]);
     const contentHeight = heightMap.totalHeight;
-    const totalSvgHeight = CONTENT_TOP + contentHeight;
+    const totalSvgHeight = contentHeight;
 
     // Reconstruction cage labels
     const reconCageLabels = useMemo(() => {
@@ -107,12 +107,12 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
     const connectorToRenderedY = (conn: Connector) => {
         const entry = heightMap.map.find(e => e.levelId === conn.levelId);
         if (!entry) return null;
-        return CONTENT_TOP + entry.startY + conn.fraction * (entry.vertEnd - entry.startY);
+        return entry.startY + conn.fraction * (entry.vertEnd - entry.startY);
     };
 
     // Convert content-area Y to {levelId, fraction}
     const contentYToConnector = (contentY: number) => {
-        const localY = contentY - CONTENT_TOP;
+        const localY = contentY;
         let entry = heightMap.map.find(e => localY >= e.startY && localY <= e.endY);
         if (!entry) {
             let best = heightMap.map[0], bestDist = Infinity;
@@ -146,7 +146,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
     const getNotePixelPos = (note: { levelId: string; offsetX?: number; offsetY?: number }) => {
         const entry = heightMap.map.find(e => e.levelId === note.levelId);
         if (!entry) return null;
-        const anchorY = CONTENT_TOP + (entry.startY + entry.vertEnd) / 2;
+        const anchorY = (entry.startY + entry.vertEnd) / 2;
         const x = note.offsetX !== undefined ? note.offsetX : -140;
         const y = anchorY + (note.offsetY || 0);
         return { x, y, anchorY };
@@ -202,73 +202,40 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
 
     return (
     <div ref={containerRef} className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative overflow-hidden">
-        <svg ref={svgRef} viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} preserveAspectRatio="xMidYMin meet" className="flex-1 w-full" style={{ overflow: 'visible' }}>
-            {/* Title bar */}
-            <rect x={0} y={0} width={chartWidth} height={TITLE_H} fill="#f8fafc" />
-            <line x1={0} y1={TITLE_H} x2={chartWidth} y2={TITLE_H} stroke="#e2e8f0" strokeWidth={1} />
-            <text x={chartCenterX} y={forcePlacements ? 10 : TITLE_H / 2}
-                textAnchor="middle" dominantBaseline="middle"
-                fontSize={14} fontWeight="bold" fill="#1e293b" letterSpacing="0.05em"
-                style={{ textTransform: 'uppercase' } as any}>
-                {title}
-            </text>
-            {forcePlacements && (
-                <text x={chartCenterX} y={22}
-                    textAnchor="middle" dominantBaseline="middle"
-                    fontSize={10} fontStyle="italic" fill="#60a5fa">
-                    {t('chart.force_plan_only')}
-                </text>
-            )}
+        {/* Title bar — HTML, fixed at top */}
+        <div className={`${forcePlacements ? 'px-2 py-1' : 'p-2'} bg-slate-50 border-b border-slate-200 text-center shrink-0`}>
+            <div className="font-bold text-sm text-slate-800 uppercase tracking-wider">{title}</div>
+            {forcePlacements && <div className="text-[10px] font-normal text-blue-400 italic -mt-0.5">{t('chart.force_plan_only')}</div>}
+        </div>
 
-            {/* Column headers */}
-            {showForces && (
-                <text x={8} y={TITLE_H + COL_HEADER_H / 2}
-                    textAnchor="start" dominantBaseline="middle"
-                    fontSize={11} fontWeight="bold" fill="#60a5fa" letterSpacing="0.02em"
-                    style={{ textTransform: 'uppercase' } as any}>
-                    {t('chart.header.force')}
-                </text>
-            )}
-            <text x={vertX - 16} y={TITLE_H + COL_HEADER_H / 2}
-                textAnchor="end" dominantBaseline="middle"
-                fontSize={13} fontWeight="bold" fill="#334155" letterSpacing="0.02em"
-                style={{ textTransform: 'uppercase' } as any}>
-                {t('chart.header.left')}
-            </text>
-            <text x={rightZoneX + 16} y={TITLE_H + COL_HEADER_H / 2}
-                textAnchor="start" dominantBaseline="middle"
-                fontSize={13} fontWeight="bold" fill="#334155" letterSpacing="0.02em"
-                style={{ textTransform: 'uppercase' } as any}>
-                {t('chart.header.right')}
-            </text>
-            {showForces && (
-                <text x={chartWidth - 8} y={TITLE_H + COL_HEADER_H / 2}
-                    textAnchor="end" dominantBaseline="middle"
-                    fontSize={11} fontWeight="bold" fill="#60a5fa" letterSpacing="0.02em"
-                    style={{ textTransform: 'uppercase' } as any}>
-                    {t('chart.header.force')}
-                </text>
-            )}
+        {/* Column headers — HTML, fixed */}
+        <div className="flex w-full px-2 text-sm font-bold uppercase tracking-tight text-center pointer-events-none shrink-0 py-1">
+            {showForces && <div className="w-14 text-blue-400 text-left text-xs">{t('chart.header.force')}</div>}
+            <div className="flex-1 text-right pr-4 text-slate-700">{t('chart.header.left')}</div>
+            <div style={{ width: `${scaledWidth}px` }}></div>
+            <div className="flex-1 text-left pl-4 text-slate-700">{t('chart.header.right')}</div>
+            {showForces && <div className="w-14 text-blue-400 text-right text-xs">{t('chart.header.force')}</div>}
+        </div>
 
-            {/* Rod headers — use foreignObject for contentEditable */}
-            {rodHeader && (
-                <foreignObject x={0} y={TITLE_H + COL_HEADER_H} width={chartWidth} height={ROD_HEADER_H}>
-                    <div style={{ display: 'flex', width: '100%', padding: '0 8px' }}>
-                        {showForces && <div style={{ width: 56 }}></div>}
-                        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', paddingRight: 4 }}>
-                            {React.Children.toArray((rodHeader.props as any).children)[0]}
-                        </div>
-                        <div style={{ width: scaledWidth * 0.5 }}></div>
-                        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', paddingLeft: 0 }}>
-                            {React.Children.toArray((rodHeader.props as any).children)[1]}
-                        </div>
-                        {showForces && <div style={{ width: 56 }}></div>}
-                    </div>
-                </foreignObject>
-            )}
+        {/* Rod headers — HTML, fixed */}
+        {rodHeader && (
+            <div className="flex w-full px-2 shrink-0 -mt-1">
+                {showForces && <div style={{ width: 56 }}></div>}
+                <div className="flex-1 flex justify-end pr-1">
+                    {React.Children.toArray((rodHeader.props as any).children)[0]}
+                </div>
+                <div style={{ width: `${scaledWidth * 0.5}px` }}></div>
+                <div className="flex-1 flex justify-start pl-0">
+                    {React.Children.toArray((rodHeader.props as any).children)[1]}
+                </div>
+                {showForces && <div style={{ width: 56 }}></div>}
+            </div>
+        )}
 
-            {/* Content area — all level rows */}
-            <g transform={`translate(0, ${CONTENT_TOP})`}>
+        {/* SVG chart content — scales with spine view */}
+        <svg ref={svgRef} viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} preserveAspectRatio="xMidYMid meet" className="flex-1 w-full" style={{ overflow: 'visible' }}>
+            {/* 1. Level rows — vertebral bodies, zones, cages, osteotomies, implant icons */}
+            <g>
                 {levels.map(lvl => (
                     <LevelRow key={lvl.id} level={lvl} placements={placements} ghostPlacements={ghostPlacements}
                         onZoneClick={onZoneClick} onPlacementClick={onPlacementClick} onGhostClick={onGhostClick}
@@ -279,9 +246,30 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                 ))}
             </g>
 
-            {/* Connector overlay */}
+            {/* 1b. Disc zones — separate pass so they paint on top of next level's zone rects */}
+            <g>
+                {levels.map(lvl => {
+                    const rowY = levelYOffsets[lvl.id] || 0;
+                    const entry = heightMap.map.find(e => e.levelId === lvl.id);
+                    if (!entry) return null;
+                    const vertH = entry.vertEnd - entry.startY;
+                    const discH = entry.endY - entry.vertEnd;
+                    if (discH <= 0) return null;
+                    const discY = rowY + vertH;
+                    return (
+                        <rect key={`disc-click-${lvl.id}`} x={0} y={discY} width={chartWidth} height={discH}
+                            fill="transparent" cursor={!readOnly ? 'pointer' : 'default'}
+                            pointerEvents="all"
+                            onMouseEnter={!readOnly ? (e) => { (e.target as SVGRectElement).setAttribute('fill', 'rgba(186, 230, 253, 0.4)'); } : undefined}
+                            onMouseLeave={!readOnly ? (e) => { (e.target as SVGRectElement).setAttribute('fill', 'transparent'); } : undefined}
+                            onClick={(e) => { e.stopPropagation(); if (!readOnly) onDiscClick(lvl.id); }} />
+                    );
+                })}
+            </g>
+
+            {/* 2. Crosslinks — above vertebrae/cages/osteotomies, below notes */}
             {connectors && connectors.length > 0 && (
-                <g>
+                <g opacity={0.55}>
                     {connectors.map(conn => {
                         const y = connectorToRenderedY(conn);
                         if (y === null) return null;
@@ -296,7 +284,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                                     }
                                 }}>
                                 <svg x={vertX} y={y - connH / 2} width={scaledWidth} height={connH} overflow="visible">
-                                    <InstrumentIcon type="connector" className="w-full h-full" color="#94a3b8" />
+                                    <InstrumentIcon type="connector" className="w-full h-full" color="#1e293b" />
                                 </svg>
                                 {!readOnly && (
                                     <g className="connector-remove-btn" opacity={0}
@@ -315,7 +303,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                 </g>
             )}
 
-            {/* Ghost connector overlay */}
+            {/* Ghost crosslinks */}
             {activeGhostConnectors.length > 0 && (
                 <g>
                     {activeGhostConnectors.map(gc => {
@@ -325,7 +313,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                             <g key={gc.id || gc.levelId} opacity={0.4} cursor="pointer"
                                 onClick={() => onGhostConnectorClick && onGhostConnectorClick(gc)}>
                                 <svg x={vertX} y={y - connH / 2} width={scaledWidth} height={connH} overflow="visible">
-                                    <InstrumentIcon type="connector" className="w-full h-full" color="#94a3b8" />
+                                    <InstrumentIcon type="connector" className="w-full h-full" color="#1e293b" />
                                 </svg>
                             </g>
                         );
@@ -333,7 +321,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                 </g>
             )}
 
-            {/* Leader lines */}
+            {/* 3. Leader lines */}
             {(() => {
                 const activeGhostNotes = ghostNotes ? ghostNotes.filter(gn => !notes.some(n => n.levelId === gn.levelId)) : [];
                 const allLeaderItems = [
@@ -389,22 +377,27 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                     if (!pos) return null;
                     const x = chartCenterX + pos.x;
                     const y = pos.y;
-                    const textLen = n.text.length;
-                    const rectW = Math.min(200, Math.max(30, textLen * 6 + 12));
-                    const rectH = 16;
+                    const lines = n.text.split('\\n');
+                    const lineH = 12;
+                    const longestLine = lines.reduce((a, b) => a.length > b.length ? a : b, '');
+                    const rectW = Math.min(200, Math.max(30, longestLine.length * 6 + 12));
+                    const rectH = lines.length * lineH + 4;
+                    const rectTop = y - rectH / 2;
                     return (
                         <g key={n.id} opacity={opts.opacity || 1}
                             cursor={opts.draggable && !readOnly ? 'grab' : (opts.onClick ? 'pointer' : 'default')}
                             onMouseDown={opts.onMouseDown}
                             onClick={opts.onClick}>
-                            <rect x={x - rectW / 2} y={y - rectH / 2} width={rectW} height={rectH}
+                            <rect x={x - rectW / 2} y={rectTop} width={rectW} height={rectH}
                                 rx={3} fill={opts.bgFill || 'rgba(255,255,255,0.9)'}
                                 stroke={opts.borderColor || '#ddd6fe'} strokeWidth={1} />
-                            <text x={x} y={y}
-                                textAnchor="middle" dominantBaseline="middle"
-                                fontSize={10} fontWeight="bold" fill={opts.textColor || '#6d28d9'}>
-                                {n.text}
-                            </text>
+                            {lines.map((line, i) => (
+                                <text key={i} x={x} y={rectTop + 2 + lineH / 2 + i * lineH}
+                                    textAnchor="middle" dominantBaseline="middle"
+                                    fontSize={10} fontWeight="bold" fill={opts.textColor || '#6d28d9'}>
+                                    {line}
+                                </text>
+                            ))}
                             {opts.draggable && !readOnly && (
                                 <g className="note-remove-btn" opacity={0}
                                     onClick={(e) => { e.stopPropagation(); onNoteRemove(n.id); }}

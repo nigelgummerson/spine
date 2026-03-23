@@ -18,7 +18,7 @@ import { IconTrash, IconDownload, IconImage, IconCopy, IconUpload, IconSave,
          IconCC, IconX, IconPDF, IconHelp, IconLink, IconHistory, IconCardinal } from './components/icons';
 import { ChangeLogModal } from './components/modals/ChangeLogModal';
 import { HelpModal } from './components/modals/HelpModal';
-import { ScrewModal } from './components/modals/ScrewModal';
+import { ScrewModal, modalKeyHandler } from './components/modals/ScrewModal';
 import { CageModal } from './components/modals/CageModal';
 import { OsteotomyModal } from './components/modals/OsteotomyModal';
 import { ForceModal } from './components/modals/ForceModal';
@@ -290,9 +290,18 @@ const App = () => {
             }
             setPendingPlacement({ levelId, zone, tool: lastUsedScrewType });
             setEditingPlacementId(null);
-            setEditingData(undefined);
             setEditingTool(lastUsedScrewType);
             setEditingAnnotation('');
+            // Level-aware screw defaults: cervical lateral mass screws are smaller
+            const upperCervical = ['Oc', 'C1', 'C2'].includes(levelId);
+            const cervical = levelId.startsWith('C') && !upperCervical;
+            if (upperCervical) {
+                setEditingData(null); // no default size — highly variable anatomy
+            } else if (cervical) {
+                setEditingData('3.5x14'); // lateral mass screw default
+            } else {
+                setEditingData(undefined); // use last-used defaults
+            }
             setScrewModalOpen(true);
             return;
         }
@@ -748,7 +757,7 @@ const App = () => {
             <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
             <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
             <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
-            {exportPicker && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={e => { if (e.key === 'Escape') { e.preventDefault(); setExportPicker(null); } }} onClick={() => setExportPicker(null)} ref={el => el?.focus()}>
+            {exportPicker && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: () => runExportWithChoice(exportPicker, false), onClose: () => setExportPicker(null), onDelete: undefined, isEditing: false })} onClick={() => setExportPicker(null)} ref={el => el?.focus()}>
                 <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
                     <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold uppercase tracking-wider text-center">{exportPicker.toUpperCase()}</div>
                     <div className="p-3 flex flex-col gap-2">
@@ -757,7 +766,7 @@ const App = () => {
                     </div>
                 </div>
             </div>}
-            {confirmClearConstruct && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} autoFocus onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); confirmClearConstructAction(); } else if (e.key === 'Escape') { e.preventDefault(); setConfirmClearConstruct(false); } }} onClick={() => setConfirmClearConstruct(false)} ref={el => el?.focus()}>
+            {confirmClearConstruct && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: confirmClearConstructAction, onClose: () => setConfirmClearConstruct(false), onDelete: undefined, isEditing: false })} onClick={() => setConfirmClearConstruct(false)} ref={el => el?.focus()}>
                 <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
                     <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold">{t('sidebar.clear_construct')}</div>
                     <div className="p-5 text-sm text-slate-600">{t('alert.clear_construct')}</div>
@@ -767,7 +776,7 @@ const App = () => {
                     </div>
                 </div>
             </div>}
-            {confirmNewPatient && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); executeNewPatient(); } else if (e.key === 'Escape') { e.preventDefault(); setConfirmNewPatient(false); } }} onClick={() => setConfirmNewPatient(false)} ref={el => el?.focus()}>
+            {confirmNewPatient && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: executeNewPatient, onClose: () => setConfirmNewPatient(false), onDelete: undefined, isEditing: false })} onClick={() => setConfirmNewPatient(false)} ref={el => el?.focus()}>
                 <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
                     <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold">{t('sidebar.new_patient')}</div>
                     <div className="p-5 text-sm text-slate-600">{t('alert.new_patient')}</div>
@@ -777,15 +786,43 @@ const App = () => {
                     </div>
                 </div>
             </div>}
-            {discPickerLevel && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" onClick={() => setDiscPickerLevel(null)}>
-                <div className="bg-white rounded-lg shadow-2xl w-full max-w-[200px] overflow-hidden" onClick={e => e.stopPropagation()}>
-                    <div className="bg-slate-700 text-white px-3 py-2 text-center text-xs font-bold uppercase tracking-wider">{getDiscLabel(discPickerLevel, levels)}</div>
-                    <div className="p-2 flex flex-col gap-1">
-                        <button onClick={handleDiscPickCage} className="w-full px-3 py-2 rounded text-sm font-bold text-sky-800 bg-sky-50 border border-sky-200 hover:bg-sky-100 transition-colors">{t('help.cages.title')}</button>
-                        <button onClick={handleDiscPickOsteo} className="w-full px-3 py-2 rounded text-sm font-bold text-amber-800 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors">{t('help.osteotomies.title')}</button>
+            {discPickerLevel && (() => {
+                const pickerButtons = [
+                    { action: handleDiscPickCage, label: t('help.cages.title'), cls: 'text-sky-800 bg-sky-50 border-sky-200 hover:bg-sky-100 focus:ring-2 focus:ring-sky-400' },
+                    { action: handleDiscPickOsteo, label: t('help.osteotomies.title'), cls: 'text-amber-800 bg-amber-50 border-amber-200 hover:bg-amber-100 focus:ring-2 focus:ring-amber-400' },
+                ];
+                return (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true"
+                        onKeyDown={e => {
+                            if (e.key === 'Escape') { e.preventDefault(); setDiscPickerLevel(null); }
+                            else if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const focused = document.activeElement as HTMLElement;
+                                if (focused?.tagName === 'BUTTON') focused.click();
+                                else handleDiscPickCage();
+                            }
+                            else if (e.key === 'Tab') {
+                                e.preventDefault();
+                                const btns = Array.from(document.querySelectorAll('.disc-picker-btn')) as HTMLElement[];
+                                const idx = btns.indexOf(document.activeElement as HTMLElement);
+                                const next = e.shiftKey ? (idx <= 0 ? btns.length - 1 : idx - 1) : (idx >= btns.length - 1 ? 0 : idx + 1);
+                                btns[next]?.focus();
+                            }
+                        }}
+                        onClick={() => setDiscPickerLevel(null)}>
+                        <div className="bg-white rounded-lg shadow-2xl w-full max-w-[200px] overflow-hidden" onClick={e => e.stopPropagation()}>
+                            <div className="bg-slate-700 text-white px-3 py-2 text-center text-xs font-bold uppercase tracking-wider">{getDiscLabel(discPickerLevel, levels)}</div>
+                            <div className="p-2 flex flex-col gap-1">
+                                {pickerButtons.map((btn, i) => (
+                                    <button key={i} onClick={btn.action}
+                                        className={`disc-picker-btn w-full px-3 py-2 rounded text-sm font-bold border transition-colors outline-none ${btn.cls}`}
+                                        autoFocus={i === 0}>{btn.label}</button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>}
+                );
+            })()}
             <NoteModal isOpen={noteModalOpen} onClose={() => { setNoteModalOpen(false); setEditingNote(null); setPendingNoteTool(null); }} onConfirm={handleNoteConfirm} onDelete={handleNoteDelete} initialText={editingNote?.text || ''} initialShowArrow={editingNote ? editingNote.showArrow : undefined} isEditing={!!editingNote} />
         </React.Fragment>
     );

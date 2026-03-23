@@ -24,9 +24,15 @@ export const modalKeyHandler = ({ onSubmit, onClose, onDelete, isEditing }: Moda
         const focusable = Array.from(modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')) as HTMLElement[];
         if (focusable.length === 0) return;
         const idx = focusable.indexOf(document.activeElement as HTMLElement);
-        const next = e.shiftKey
-            ? (idx <= 0 ? focusable.length - 1 : idx - 1)
-            : (idx >= focusable.length - 1 ? 0 : idx + 1);
+        let next: number;
+        if (idx === -1) {
+            // Focus not on a known element — start from beginning or end
+            next = e.shiftKey ? focusable.length - 1 : 0;
+        } else {
+            next = e.shiftKey
+                ? (idx <= 0 ? focusable.length - 1 : idx - 1)
+                : (idx >= focusable.length - 1 ? 0 : idx + 1);
+        }
         focusable[next].focus();
     }
 };
@@ -94,7 +100,7 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
 
     return (
         <div ref={modalRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
-            <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
+            <div className="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden">
                 <div className="bg-slate-900 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{isEditing ? t('modal.screw.title_edit') : t('modal.screw.title_new')}</h3><button onClick={onClose} className="hover:text-red-400"><IconX /></button></div>
                 <div className="p-6">
                     <div className="bg-slate-100 p-1 rounded mb-2">

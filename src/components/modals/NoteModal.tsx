@@ -46,6 +46,7 @@ export const NoteModal = ({ isOpen, onClose, onConfirm, onDelete, initialText, i
                     <div>
                         <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.note.text')}</label>
                         <input type="text" value={text} onChange={e => setText(e.target.value)} placeholder={t('modal.note.text_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-violet-500 outline-none" autoFocus />
+                        <div className="text-[9px] text-slate-400 mt-0.5">{t('modal.note.linebreak_hint')}</div>
                     </div>
                     <div className="flex flex-wrap gap-1">
                         {NOTE_PRESET_KEYS.map(key => { const label = t(key); return (

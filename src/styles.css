@@ -89,9 +89,22 @@ body { font-family: 'Inter', sans-serif; font-feature-settings: "tnum"; overflow
 .portrait-toolbar ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
 .portrait-tab-content { transition: transform 0.3s ease-out; }
 
-/* SVG chart hover effects — connector and note remove buttons */
+/* Modal focus styles — visible ring when tabbing between buttons/inputs */
+.modal-overlay button:focus,
+.modal-overlay input:focus,
+.modal-overlay select:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 1px;
+}
+.modal-overlay input:focus,
+.modal-overlay select:focus {
+    outline-offset: -1px;
+}
+
+/* SVG chart hover effects */
 g:hover > .connector-remove-btn,
 g:hover > .note-remove-btn { opacity: 1 !important; }
+.disc-hover:hover { fill: rgba(186, 230, 253, 0.5); }
 
 @media print {
     .portrait-toolbar, .portrait-tabs { display: none !important; }
