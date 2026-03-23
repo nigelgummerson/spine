@@ -7,6 +7,7 @@ import { FORCE_TYPES } from '../../data/clinical';
 import { InstrumentIcon } from './InstrumentIcon';
 import { LevelRow } from './LevelRow';
 import type { Placement, Cage, Connector, Note, Level, ToolDefinition } from '../../types';
+import { measureText } from '../../utils/measureText';
 
 export interface ChartPaperProps {
     title: string;
@@ -380,7 +381,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                     const lines = n.text.split('\\n');
                     const lineH = 12;
                     const longestLine = lines.reduce((a, b) => a.length > b.length ? a : b, '');
-                    const rectW = Math.min(200, Math.max(30, longestLine.length * 6 + 12));
+                    const rectW = Math.min(200, Math.max(30, measureText(longestLine, '9px Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, Tahoma, sans-serif') + 12));
                     const rectH = lines.length * lineH + 4;
                     const rectTop = y - rectH / 2;
                     return (

@@ -6,6 +6,7 @@ const FIXATION_TYPES = ['band', 'wire', 'cable'];
 import { InstrumentIcon } from './InstrumentIcon';
 import { SpineVertebra } from './SpineVertebra';
 import { CageVisualization } from './CageVisualization';
+import { measureText } from '../../utils/measureText';
 import type { Placement, Cage, Level, ToolDefinition, OsteotomyData } from '../../types';
 
 export interface LevelRowProps {
@@ -318,10 +319,13 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     <svg x={vertX + scaledWidth / 2 - midPx / 2} y={rowHeight / 2 - midPx / 2} width={midPx} height={midPx} overflow="visible">
                         <InstrumentIcon type={tool?.icon || ''} className="w-full h-full" />
                     </svg>
-                    {p.tool === 'osteotomy' && p.data && (
+                    {p.tool === 'osteotomy' && p.data && (() => {
+                        const osteoText = angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel);
+                        const osteoRectW = measureText(osteoText, `bold ${osteoLabelPx}px Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, sans-serif`) + 16;
+                        return (
                         <g>
-                            <rect x={vertX + scaledWidth / 2 - 30} y={rowHeight / 2 - osteoLabelPx / 2 - 2}
-                                width={60} height={osteoLabelPx + 4} rx={3}
+                            <rect x={vertX + scaledWidth / 2 - osteoRectW / 2} y={rowHeight / 2 - osteoLabelPx / 2 - 2}
+                                width={osteoRectW} height={osteoLabelPx + 4} rx={3}
                                 fill="#fffbeb" fillOpacity={0.8} stroke="#fcd34d" strokeWidth={1} />
                             <text x={vertX + scaledWidth / 2} y={rowHeight / 2}
                                 textAnchor="middle" dominantBaseline="middle"
@@ -329,7 +333,8 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                                 {displayLabel}{angle != null && angle !== '' ? ` ${angle}\u00B0` : ''}
                             </text>
                         </g>
-                    )}
+                        );
+                    })()}
                 </g>
             );
         });
@@ -351,10 +356,13 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                         <svg x={vertX + scaledWidth / 2 - midPx / 2} y={rowHeight / 2 - midPx / 2} width={midPx} height={midPx} overflow="visible">
                             <InstrumentIcon type={tool?.icon || ''} className="w-full h-full" />
                         </svg>
-                        {gp.tool === 'osteotomy' && gp.data && (
+                        {gp.tool === 'osteotomy' && gp.data && (() => {
+                            const ghostOsteoText = angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel);
+                            const ghostOsteoRectW = measureText(ghostOsteoText, `bold ${osteoLabelPx}px Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, sans-serif`) + 16;
+                            return (
                             <g>
-                                <rect x={vertX + scaledWidth / 2 - 30} y={rowHeight / 2 - osteoLabelPx / 2 - 2}
-                                    width={60} height={osteoLabelPx + 4} rx={3}
+                                <rect x={vertX + scaledWidth / 2 - ghostOsteoRectW / 2} y={rowHeight / 2 - osteoLabelPx / 2 - 2}
+                                    width={ghostOsteoRectW} height={osteoLabelPx + 4} rx={3}
                                     fill="#fffbeb" fillOpacity={0.8} stroke="#fcd34d" strokeWidth={1} />
                                 <text x={vertX + scaledWidth / 2} y={rowHeight / 2}
                                     textAnchor="middle" dominantBaseline="middle"
@@ -362,7 +370,8 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                                     {displayLabel}{angle != null && angle !== '' ? ` ${angle}\u00B0` : ''}
                                 </text>
                             </g>
-                        )}
+                            );
+                        })()}
                     </g>
                 );
             }
@@ -409,10 +418,12 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const data = osteo.data as any;
             const label = data?.shortLabel || t('clinical.osteotomy.fallback');
             const angleStr = data?.angle != null && data?.angle !== '' ? ` ${data.angle}\u00B0` : '';
+            const discOsteoText = `${label}${angleStr}`;
+            const discOsteoRectW = measureText(discOsteoText, `bold ${cageLabelPx}px Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, sans-serif`) + 16;
             return (
                 <g opacity={opacity}>
-                    <rect x={vertX + scaledWidth / 2 - 30} y={discY + discH / 2 - cageLabelPx / 2 - 2}
-                        width={60} height={cageLabelPx + 4} rx={3}
+                    <rect x={vertX + scaledWidth / 2 - discOsteoRectW / 2} y={discY + discH / 2 - cageLabelPx / 2 - 2}
+                        width={discOsteoRectW} height={cageLabelPx + 4} rx={3}
                         fill="#fffbeb" fillOpacity={0.8} stroke="#fcd34d" strokeWidth={1} />
                     <text x={vertX + scaledWidth / 2} y={discY + discH / 2}
                         textAnchor="middle" dominantBaseline="middle"

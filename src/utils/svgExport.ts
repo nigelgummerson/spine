@@ -6,6 +6,23 @@
  */
 
 /**
+ * Convert relative url() references in CSS to absolute URLs.
+ * SVG blobs have no base URL, so font references must be absolute
+ * for text to render correctly in exported images.
+ */
+function absolutifyFontUrls(cssText: string): string {
+    return cssText.replace(/url\(["']?((?!data:)[^"')]+)["']?\)/g, (match, url) => {
+        if (url.startsWith('http') || url.startsWith('data:')) return match;
+        try {
+            const absolute = new URL(url, document.baseURI).href;
+            return `url("${absolute}")`;
+        } catch {
+            return match; // malformed URL — leave unchanged
+        }
+    });
+}
+
+/**
  * Extract all @font-face rules from the document's stylesheets.
  * Returns a CSS string with the rules, including data: URIs for fonts.
  */
@@ -15,7 +32,7 @@ export function extractFontFaceRules(): string {
         try {
             for (const rule of sheet.cssRules) {
                 if (rule instanceof CSSFontFaceRule) {
-                    rules.push(rule.cssText);
+                    rules.push(absolutifyFontUrls(rule.cssText));
                 }
             }
         } catch {
