@@ -368,7 +368,7 @@ export function serializeState(state, viewMode, colourScheme, currentVersion, cu
     return {
         schema: {
             format: 'spinal-instrumentation', version: 4,
-            schemaUrl: 'https://spine-planner.org/schema/v4/spinal-instrumentation.json',
+            schemaUrl: 'https://plan.skeletalsurgery.com/spine/schema/v4/spinal-instrumentation.json',
             generator: { name: 'Spinal Instrumentation Plan & Record', version: currentVersion, url: 'https://plan.skeletalsurgery.com/spine' },
         },
         document: { id: state.documentId, created: state.documentCreated, modified: new Date().toISOString(), language: currentLang },

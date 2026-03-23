@@ -624,7 +624,7 @@ const App = () => {
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `SpineProject_${patientData.name || 'Unnamed'}.json`;
+        link.download = `SpineProject_${(patientData.name || 'Unnamed').replace(/[^a-zA-Z0-9_\- ]/g, '').trim() || 'Unnamed'}.json`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -1067,11 +1067,11 @@ const App = () => {
                     <div style={{ transform: `scale(${scale})` }}>
                         <div id="export-container" ref={exportRef}>
                             <div className="w-[370px] bg-white border-r border-slate-300 flex flex-col p-8">{demographicsContent}</div>
-                            <div className="flex-[4] flex flex-col h-full min-w-0 overflow-hidden relative" style={activeChart === 'planned' ? { borderTop: `3px solid ${scheme.activeBg}` } : undefined} onClick={() => activeChart !== 'planned' && setActiveChart('planned')}>
+                            <div className="flex-[4] flex flex-col h-full min-w-0 overflow-hidden relative" style={{ borderTop: `3px solid ${activeChart === 'planned' ? scheme.activeBg : '#cbd5e1'}` }} onClick={() => activeChart !== 'planned' && setActiveChart('planned')}>
                                 {planChart}
                                 {activeChart !== 'planned' && !isPortrait && <div className="absolute inset-0 bg-slate-400/20 cursor-pointer z-20" data-export-hide="true" />}
                             </div>
-                            <div className="flex-[3] flex flex-col h-full min-w-0 overflow-hidden relative" style={activeChart === 'completed' ? { borderTop: `3px solid ${scheme.activeBg}` } : undefined} onClick={() => activeChart !== 'completed' && setActiveChart('completed')}>
+                            <div className="flex-[3] flex flex-col h-full min-w-0 overflow-hidden relative" style={{ borderTop: `3px solid ${activeChart === 'completed' ? scheme.activeBg : '#cbd5e1'}` }} onClick={() => activeChart !== 'completed' && setActiveChart('completed')}>
                                 {constructChart}
                                 {activeChart !== 'completed' && !isPortrait && <div className="absolute inset-0 bg-slate-400/20 cursor-pointer z-20" data-export-hide="true" />}
                             </div>
