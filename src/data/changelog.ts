@@ -1,6 +1,6 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION: string = "v2.2.10-beta";
+export const CURRENT_VERSION: string = "v2.2.11-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -9,6 +9,10 @@ interface ChangeLogEntry {
 }
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
+    { version: "v2.2.11-beta", date: "2026-03-23", changes: [
+        "Full TypeScript migration — all source files now have static type checking with strict mode enabled.",
+        "Fixed a bug where internal IDs were numbers instead of strings, which caused crashes when clicking notes.",
+    ]},
     { version: "v2.2.10-beta", date: "2026-03-23", changes: [
         "Loaded files are now validated against the v4 schema before import. Corrupted or invalid files are rejected with a clear error message instead of silently loading bad data.",
     ]},

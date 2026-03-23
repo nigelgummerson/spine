@@ -4,7 +4,7 @@
 A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 16 languages (14 European + Ukrainian and Russian).
 
 ## Current Status
-- **Version:** v2.2.10-beta
+- **Version:** v2.2.11-beta
 - **Last Updated:** 2026-03-23
 - **License:** GNU GPLv3
 
@@ -69,7 +69,7 @@ spine-planner/
 - **All dependencies bundled** — no CDN calls, fully offline
 
 ## Version History (Recent)
-- **v2.2.10-beta** (2026-03-23): JSON v4 schema — full SPEC.md coverage (transition rods, growing rods, VBR cages, structured bone graft, connector-to-rod refs). PDF export at A4 300 DPI. Major UI polish: screw sizes enlarged, annotation text consistent 9px with edge alignment, LEFT/RIGHT headers prominent, inventory tightened with summary totals and units. Z-index rendering stack reordered (notes > implants > cages > osteotomies > crosslinks > vertebral bodies). Draggable reconstruction cage labels with persistent positions. Copy-plan-to-construct strips annotations/notes/angles. Clear Construct button. Unified ScrewModal (annotation field for all types). Crosslinks lighter. Transparent label backgrounds. Pelvis zone enlarged. ACDF midline. 270 translation keys across 16 languages.
+- **v2.2.11-beta** (2026-03-23): JSON v4 schema — full SPEC.md coverage (transition rods, growing rods, VBR cages, structured bone graft, connector-to-rod refs). PDF export at A4 300 DPI. Major UI polish: screw sizes enlarged, annotation text consistent 9px with edge alignment, LEFT/RIGHT headers prominent, inventory tightened with summary totals and units. Z-index rendering stack reordered (notes > implants > cages > osteotomies > crosslinks > vertebral bodies). Draggable reconstruction cage labels with persistent positions. Copy-plan-to-construct strips annotations/notes/angles. Clear Construct button. Unified ScrewModal (annotation field for all types). Crosslinks lighter. Transparent label backgrounds. Pelvis zone enlarged. ACDF midline. 270 translation keys across 16 languages.
 - **v2.1.4-beta** (2026-03-22): Ukrainian and Russian translations (263 keys each, 16 languages total). Clinical glossary extended with AO Spine Ukraine and RASS terminology. Review forms generated for native-speaker review. Language count updated across all existing translations.
 - **v2.1.3-beta** (2026-03-22): Vite build system — modular source, single-file output, embedded fonts, GitHub Actions deployment with auto-regenerated review forms. Custom domain plan.skeletalsurgery.com/spine/. Important Notice disclaimer modal on startup (half-day session expiry, language-aware, syncs acceptance between dual windows). Version shown in portrait toolbar. Force columns widened for i18n. Landing page with SEO and structured data.
 - **v2.0.3-beta** (2026-03-22): Review form UX — persistent backup banner, auto-scroll to next unreviewed, larger touch targets, guide page.
