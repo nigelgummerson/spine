@@ -68,6 +68,10 @@ export const HelpModal = ({ isOpen, onClose }: HelpModalProps) => {
                         <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.shortcuts.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.shortcuts.body')}} /></div>
                     </div>
                     <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
+                        <div className="min-w-[40px] pt-1"><span className="text-lg">&#x2B07;</span></div>
+                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.offline_use.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.offline_use.body')}} /></div>
+                    </div>
+                    <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
                         <div className="min-w-[40px] pt-1"><span className="text-lg">&#x2696;</span></div>
                         <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.disclaimer.title')}</h4><p className="text-xs text-slate-600 leading-relaxed">{t('disclaimer.clinical_short')}</p></div>
                     </div>
