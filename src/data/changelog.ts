@@ -1,6 +1,6 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION: string = "v2.4.2-beta";
+export const CURRENT_VERSION: string = "v2.5.0-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -9,6 +9,17 @@ interface ChangeLogEntry {
 }
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
+    { version: "v2.5.0-beta", date: "2026-03-23", changes: [
+        "CJK + Hebrew i18n expansion — 4 new languages (Hebrew, Chinese Simplified, Japanese, Korean), bringing total to 22.",
+        "Hebrew (he): 19th language, 2nd RTL — uses existing Arabic RTL infrastructure.",
+        "Chinese Simplified (zh-Hans): first CJK language — Noto Sans SC font (web build), language-conditional font stacks.",
+        "Japanese (ja): Noto Sans JP font, correct glyph variants via [lang] CSS selectors.",
+        "Korean (ko): Noto Sans KR font, CJK expansion complete.",
+        "measureText() utility replaces character-count heuristic for SVG text width — fixes note labels, osteotomy labels for CJK double-width characters.",
+        "SVG export font URLs absolutified for blob context rendering.",
+        "detectLanguage() updated to handle script subtags (zh-Hans, zh-Hant).",
+        "252 tests across 5 files.",
+    ]},
     { version: "v2.4.2-beta", date: "2026-03-23", changes: [
         "Component-level tests added — 27 tests covering modal rendering, keyboard handling, focus trapping, portal behaviour, overlay click, and ARIA accessibility.",
         "232 total tests now gate every deployment.",
