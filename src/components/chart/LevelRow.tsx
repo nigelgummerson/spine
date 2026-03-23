@@ -321,7 +321,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     </svg>
                     {p.tool === 'osteotomy' && p.data && (() => {
                         const osteoText = angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel);
-                        const osteoRectW = measureText(osteoText, `bold ${osteoLabelPx}px Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, sans-serif`) + 16;
+                        const osteoRectW = Math.max(measureText(osteoText, `bold ${osteoLabelPx}px Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, sans-serif`) + 16, 60);
                         return (
                         <g>
                             <rect x={vertX + scaledWidth / 2 - osteoRectW / 2} y={rowHeight / 2 - osteoLabelPx / 2 - 2}
@@ -358,7 +358,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                         </svg>
                         {gp.tool === 'osteotomy' && gp.data && (() => {
                             const ghostOsteoText = angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel);
-                            const ghostOsteoRectW = measureText(ghostOsteoText, `bold ${osteoLabelPx}px Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, sans-serif`) + 16;
+                            const ghostOsteoRectW = Math.max(measureText(ghostOsteoText, `bold ${osteoLabelPx}px Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, sans-serif`) + 16, 60);
                             return (
                             <g>
                                 <rect x={vertX + scaledWidth / 2 - ghostOsteoRectW / 2} y={rowHeight / 2 - osteoLabelPx / 2 - 2}
@@ -419,7 +419,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const label = data?.shortLabel || t('clinical.osteotomy.fallback');
             const angleStr = data?.angle != null && data?.angle !== '' ? ` ${data.angle}\u00B0` : '';
             const discOsteoText = `${label}${angleStr}`;
-            const discOsteoRectW = measureText(discOsteoText, `bold ${cageLabelPx}px Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, sans-serif`) + 16;
+            const discOsteoRectW = Math.max(measureText(discOsteoText, `bold ${cageLabelPx}px Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, sans-serif`) + 16, 60);
             return (
                 <g opacity={opacity}>
                     <rect x={vertX + scaledWidth / 2 - discOsteoRectW / 2} y={discY + discH / 2 - cageLabelPx / 2 - 2}
