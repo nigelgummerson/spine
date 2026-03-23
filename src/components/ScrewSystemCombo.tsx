@@ -2,15 +2,22 @@ import React, { useState, useRef, useEffect } from 'react';
 import { t } from '../i18n/i18n';
 import { SCREW_SYSTEMS } from '../data/implants';
 
-export const ScrewSystemCombo = ({ value, onChange, company, placeholder }) => {
+interface ScrewSystemComboProps {
+    value: string;
+    onChange: (value: string) => void;
+    company: string;
+    placeholder: string;
+}
+
+export const ScrewSystemCombo = ({ value, onChange, company, placeholder }: ScrewSystemComboProps) => {
     const [open, setOpen] = useState(false);
     const [editing, setEditing] = useState(false);
     const [filter, setFilter] = useState('');
-    const ref = useRef(null);
-    const inputRef = useRef(null);
+    const ref = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        const handleClickOutside = (e) => { if (ref.current && !ref.current.contains(e.target)) { setOpen(false); setEditing(false); } };
+        const handleClickOutside = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) { setOpen(false); setEditing(false); } };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);

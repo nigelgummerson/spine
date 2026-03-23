@@ -2,7 +2,11 @@ import React from 'react';
 import { t } from '../i18n/i18n';
 import { CURRENT_VERSION } from '../data/changelog';
 
-export const CreditsFooter = ({ lang }) => (
+interface CreditsFooterProps {
+    lang: string;
+}
+
+export const CreditsFooter = ({ lang }: CreditsFooterProps) => (
     <div className="mt-auto pt-3 pb-4 border-t border-slate-200 shrink-0">
         <p className="text-xs text-slate-500 leading-tight text-center">
             {t('credits.app_name')}

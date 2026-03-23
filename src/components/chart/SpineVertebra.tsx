@@ -2,7 +2,15 @@ import React from 'react';
 import { getVertSvgGeometry, VERT_SVG_SCALE, VERT_PAD, getLevelHeight , REGIONS} from '../../data/anatomy';
 import { t } from '../../i18n/i18n';
 
-export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale = 1 }) => {
+interface SpineVertebraProps {
+    label: string;
+    type: string;
+    height: number;
+    isCorpectomy: boolean;
+    heightScale?: number;
+}
+
+export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale = 1 }: SpineVertebraProps) => {
     const common = { fill: REGIONS[type].color, stroke: "#475569", strokeWidth: "1.5" };
     const geom = getVertSvgGeometry(label);
 

@@ -2,7 +2,13 @@ import React from 'react';
 import { t } from '../../i18n/i18n';
 import { getVertSvgGeometry } from '../../data/anatomy';
 
-export const CageVisualization = ({ cageType, heightScale, levelId }) => {
+interface CageVisualizationProps {
+    cageType: string;
+    heightScale: number;
+    levelId: string;
+}
+
+export const CageVisualization = ({ cageType, heightScale, levelId }: CageVisualizationProps) => {
     const h = 12 * heightScale;
     const color = "#0ea5e9";
     const geom = getVertSvgGeometry(levelId);

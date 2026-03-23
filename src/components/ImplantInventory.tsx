@@ -1,23 +1,39 @@
 import React, { useState, useMemo } from 'react';
 import { t } from '../i18n/i18n';
 import { INVENTORY_CATEGORIES, getDiscLabel } from '../data/clinical';
+import type { Placement, ToolDefinition, Level } from '../types';
 
-export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, levels, rods }) => {
+interface Rods {
+    left?: string;
+    right?: string;
+}
+
+interface ImplantInventoryProps {
+    placements: Placement[];
+    tools: ToolDefinition[];
+    title: string;
+    visibleLevelIds: string[];
+    levels: Level[];
+    rods: Rods;
+}
+
+export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, levels, rods }: ImplantInventoryProps) => {
     const grouped = useMemo(() => {
-        const counts = {};
+        const counts: Record<string, Record<string, number>> = {};
         placements.forEach(p => {
             if (!visibleLevelIds.includes(p.levelId)) return;
             const tool = tools.find(item => item.id === p.tool);
             if (!tool || tool.type === 'force' || p.tool === 'osteotomy') return;
-            const toolLabel = tool.labelKey ? t(tool.labelKey) : tool.label;
+            const toolLabel = tool.labelKey ? t(tool.labelKey) : (tool as any).label;
             const isFixation = ['band','wire','cable'].includes(p.tool);
             let key = toolLabel;
             if (p.data && !isFixation) {
                 if (typeof p.data === 'string' && tool.needsSize) { key = `${toolLabel} (${p.data}mm)`; }
-                else if (p.tool === 'osteotomy' && typeof p.data === 'object') { key = p.data.angle != null && p.data.angle !== '' ? `${p.data.shortLabel} (${p.data.angle}°)` : p.data.shortLabel; }
-                else if (typeof p.data === 'object' && p.data.height) {
-                    const sideStr = p.tool !== 'acdf' && p.data.side && p.data.side !== 'bilateral' && p.data.side !== 'midline' ? ` (${p.data.side.charAt(0).toUpperCase()})` : '';
-                    key = `${toolLabel} ${p.data.height}mm ${p.data.lordosis || '0'}°${sideStr}`;
+                else if (p.tool === 'osteotomy' && typeof p.data === 'object') { const od = p.data as any; key = od.angle != null && od.angle !== '' ? `${od.shortLabel} (${od.angle}°)` : od.shortLabel; }
+                else if (typeof p.data === 'object' && (p.data as any).height) {
+                    const cd = p.data as any;
+                    const sideStr = p.tool !== 'acdf' && cd.side && cd.side !== 'bilateral' && cd.side !== 'midline' ? ` (${cd.side.charAt(0).toUpperCase()})` : '';
+                    key = `${toolLabel} ${cd.height}mm ${cd.lordosis || '0'}°${sideStr}`;
                 }
                 else if (p.data !== 'Custom' && typeof p.data !== 'object') { key = `${toolLabel} ${p.data}`; }
             }
@@ -47,7 +63,7 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
                 }).filter(Boolean)}
             </div>
             {(() => {
-                const cats = INVENTORY_CATEGORIES.map(cat => {
+                const cats: React.ReactNode[] = INVENTORY_CATEGORIES.map(cat => {
                     const items = grouped[cat.key];
                     if (!items || Object.keys(items).length === 0) return null;
                     return (
