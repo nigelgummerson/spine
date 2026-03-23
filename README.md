@@ -2,7 +2,7 @@
 
 A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instrumentation diagrams with a visual, exportable chart that documents the pre-operative plan and post-operative construct. Runs offline on hospital computers as a single HTML file — no installation required.
 
-**Version:** v2.1.4-beta | **License:** GNU GPLv3
+**Version:** v2.2.0-beta | **License:** GNU GPLv3
 **Live:** [plan.skeletalsurgery.com/spine](https://plan.skeletalsurgery.com/spine/)
 
 ## Features
@@ -10,7 +10,7 @@ A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instru
 - **16 languages:** English, German, French, Spanish, Italian, Portuguese, Swedish, Norwegian, Danish, Finnish, Dutch, Polish, Greek, Turkish, Russian, Ukrainian — auto-detects browser locale
 - **Screws:** Monoaxial, polyaxial, uniplanar with diameter/length sizing and free-text annotations
 - **Hooks:** Pedicle, TP (down/up), supra-laminar, infra-laminar with annotations
-- **Fixation:** Bands, wires, cables with free-text descriptions
+- **Fixation:** Bands, wires, cables with annotations
 - **Interbody cages:** ACDF, PLIF, TLIF, XLIF/LLIF, OLIF, ALIF with anatomical permissibility engine and approach grouping
 - **Osteotomies:** Schwab grade 1–6 + Corpectomy, with disc-level vs vertebral body placement and optional correction angles
 - **Bone graft:** Multi-select types (Local Bone, Autograft, Allograft, Synthetics, DBM, BMP) with notes
@@ -24,8 +24,9 @@ A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instru
 - **Responsive:** Landscape (sidebar + two columns), portrait/tablet (toolbar + three tabs with swipe), view-only on phones
 - **Accessibility:** WCAG AA contrast, toast notifications, modal focus trapping, prefers-reduced-motion, enlarged touch targets
 - **Rod recording:** Free-text rod descriptions for plan and construct, auto-generated inventory
-- **Implant inventory:** Auto-generated from placed instruments with rod section
-- **Export:** JPG, PDF (print quality 1485x1050px), and JSON v4 (spinal-instrumentation schema with UUID, timestamps, schema self-description)
+- **Implant inventory:** Auto-generated with summary totals and units
+- **Clear Construct:** Reset the surgical record without affecting the plan
+- **Export:** JPG, PDF (A4 300 DPI), and JSON v4 (spinal-instrumentation schema with UUID, timestamps, schema self-description)
 - **Session Privacy Mode:** Prevents patient data being stored on the computer — for GDPR/Caldicott compliance on shared machines
 
 ## Requirements

@@ -1105,7 +1105,7 @@ const App = () => {
             <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
             <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
             <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
-            {exportPicker && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" onClick={() => setExportPicker(null)}>
+            {exportPicker && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={e => { if (e.key === 'Escape') { e.preventDefault(); setExportPicker(null); } }} onClick={() => setExportPicker(null)} ref={el => el?.focus()}>
                 <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
                     <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold uppercase tracking-wider text-center">{exportPicker.toUpperCase()}</div>
                     <div className="p-3 flex flex-col gap-2">
