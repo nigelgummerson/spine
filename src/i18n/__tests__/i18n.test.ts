@@ -55,7 +55,7 @@ function stripHtml(s: string): string {
 //
 // Thresholds are set 5–10% above the longest currently-passing string to
 // catch regressions without failing on existing translations. Values
-// calibrated against all 18 languages in translations.json at v2.4.0-beta.
+// calibrated against all 22 languages in translations.json at v2.5.0-beta.
 // ---------------------------------------------------------------------------
 const OVERFLOW_THRESHOLDS: Array<{
   pattern: RegExp;

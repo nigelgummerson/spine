@@ -2,12 +2,12 @@
 
 A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instrumentation diagrams with a visual, exportable chart that documents the pre-operative plan and post-operative construct. Runs offline on hospital computers as a single HTML file — no installation required.
 
-**Version:** v2.4.2-beta | **License:** GNU GPLv3
+**Version:** v2.5.0-beta | **License:** GNU GPLv3
 **Live:** [plan.skeletalsurgery.com/spine](https://plan.skeletalsurgery.com/spine/)
 
 ## Features
 
-- **18 languages:** English, Arabic (RTL), German, French, Spanish, Hindi, Italian, Portuguese, Swedish, Norwegian, Danish, Finnish, Dutch, Polish, Greek, Turkish, Russian, Ukrainian — auto-detects browser locale
+- **22 languages:** English, Arabic (RTL), Chinese Simplified, Danish, German, Greek, Spanish, Finnish, French, Hebrew (RTL), Hindi, Italian, Japanese, Korean, Norwegian, Dutch, Polish, Portuguese, Russian, Swedish, Turkish, Ukrainian — auto-detects browser locale
 - **Screws:** Monoaxial, polyaxial, uniplanar with diameter/length sizing and free-text annotations
 - **Hooks:** Pedicle, TP (down/up), supra-laminar, infra-laminar with annotations
 - **Fixation:** Bands, wires, cables with annotations
@@ -32,7 +32,7 @@ A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instru
 ## Requirements
 
 - **No install required** — runs in any modern browser, distributable as a single HTML file
-- **Fully offline** — all dependencies and fonts embedded, no network required (connected variant planned for future CJK language support)
+- **Fully offline** — all dependencies and fonts embedded, no network required. CJK fonts (Chinese, Japanese, Korean) included in the web build; Hebrew RTL fully supported
 - **Hospital friendly** — designed for locked-down NHS workstations
 
 ## Tech Stack
@@ -43,7 +43,7 @@ Built with Vite, React 19, Tailwind CSS v4, html-to-image, jsPDF. All dependenci
 
 Open `index.html` in a browser, or visit the [live site](https://plan.skeletalsurgery.com/spine/).
 
-See the [Quick Reference Guide](https://plan.skeletalsurgery.com/spine/quick-reference.html) for a translated quick-start guide (18 languages).
+See the [Quick Reference Guide](https://plan.skeletalsurgery.com/spine/quick-reference.html) for a translated quick-start guide (22 languages).
 
 ## Disclaimer
 
