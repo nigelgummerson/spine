@@ -1,6 +1,6 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION: string = "v2.4.1-beta";
+export const CURRENT_VERSION: string = "v2.4.2-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -9,6 +9,10 @@ interface ChangeLogEntry {
 }
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
+    { version: "v2.4.2-beta", date: "2026-03-23", changes: [
+        "Component-level tests added — 27 tests covering modal rendering, keyboard handling, focus trapping, portal behaviour, overlay click, and ARIA accessibility.",
+        "232 total tests now gate every deployment.",
+    ]},
     { version: "v2.4.1-beta", date: "2026-03-23", changes: [
         "Tests now gate CI deployment — 205 Vitest tests run before every deploy and release build.",
         "Legacy v2/v3 JSON files validated on load via Zod (previously only v4 was validated).",

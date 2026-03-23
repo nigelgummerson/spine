@@ -7,4 +7,12 @@ export default defineConfig({
   build: {
     target: 'es2020',
   },
+  test: {
+    // Component tests use jsdom; data-layer tests use default (node)
+    environmentMatchGlobs: [
+      ['src/components/**/*.test.ts*', 'jsdom'],
+    ],
+    // Node v25 localStorage conflicts with jsdom — polyfill before imports
+    setupFiles: ['src/components/__tests__/setup.ts'],
+  },
 });
