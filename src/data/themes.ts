@@ -1,6 +1,8 @@
+import type { ColourScheme } from '../types';
+
 export const _light = { textPrimary: '#1d1d1f', textSecondary: 'rgba(0,0,0,0.55)', textMuted: 'rgba(0,0,0,0.35)', btnBg: 'rgba(0,0,0,0.06)', btnBorder: 'rgba(0,0,0,0.1)', hoverBg: 'rgba(0,0,0,0.08)', titleText: '#1d1d1f' };
 export const _dark  = { textPrimary: '#FFFFFF', textSecondary: 'rgba(255,255,255,0.7)', textMuted: 'rgba(255,255,255,0.5)', btnBg: 'rgba(255,255,255,0.12)', btnBorder: 'rgba(255,255,255,0.25)', hoverBg: 'rgba(255,255,255,0.15)', titleText: '#FFFFFF' };
-export const COLOUR_SCHEMES = [
+export const COLOUR_SCHEMES: ColourScheme[] = [
     // --- Corporate themes (light sidebar, real brand colours) ---
     { id: 'default', label: 'Default',        sidebarBg: '#f5f5f7', sidebarBorder: '#d1d1d6', sidebarTitleBg: '#e8e8ed', activeBg: '#005EB8', activeBorder: '#003087', activeText: '#FFFFFF', accent: '#005EB8', swatch: '#005EB8', ..._light },
     { id: 'navy',    label: 'Medtronic',       sidebarBg: '#f5f5f7', sidebarBorder: '#d1d1d6', sidebarTitleBg: '#140F4B', activeBg: '#1010EB', activeBorder: '#140F4B', activeText: '#FFFFFF', accent: '#1010EB', swatch: '#140F4B', ..._light, titleText: '#FFFFFF' },
@@ -18,7 +20,7 @@ export const COLOUR_SCHEMES = [
 // Set to false to disable automatic theme switching when a company is selected
 export const AUTO_THEME_FROM_COMPANY = true;
 
-export const COMPANY_THEME_MAP = {
+export const COMPANY_THEME_MAP: Record<string, string> = {
     'Medtronic': 'navy',
     'DePuy Synthes': 'red',
     'Stryker': 'gold',

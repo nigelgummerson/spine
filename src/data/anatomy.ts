@@ -1,7 +1,20 @@
-// SECTION 3: RENDERERS
-// ==========================================
+import type { Level } from '../types';
 
-export const REGIONS = {
+interface VertAnatomyEntry {
+    bodyW: number;
+    bodyH: number;
+    pedW: number;
+    pedH: number;
+}
+
+interface HeightMapEntry {
+    levelId: string;
+    startY: number;
+    vertEnd: number;
+    endY: number;
+}
+
+export const REGIONS: Record<string, { height: number; color: string }> = {
     Oc: { height: 25, color: '#f1f5f9' },
     C: { height: 24, color: '#f1f5f9' },
     T: { height: 36, color: '#f1f5f9' },
@@ -14,7 +27,7 @@ export const REGIONS = {
 // between anchors T2(36x20), T12(48x30), L4(60x36).
 // Pedicle data from Lien et al. 2007 (Eur Spine J, PMC2200778) - averaged L/R.
 // Lumbar pedH cross-checked against Zindrick 1987 (Spine 12:160-166).
-export const VERTEBRA_ANATOMY = {
+export const VERTEBRA_ANATOMY: Record<string, VertAnatomyEntry> = {
     T1:  { bodyW: 34.8, bodyH: 19.0, pedW: 7.7, pedH:  8.7 },
     T2:  { bodyW: 36.0, bodyH: 20.0, pedW: 5.5, pedH: 10.3 },
     T3:  { bodyW: 37.2, bodyH: 21.0, pedW: 4.0, pedH: 10.4 },
@@ -39,14 +52,14 @@ export const VERTEBRA_ANATOMY = {
 // Add padding (6 SVG units) so body path doesn't touch viewBox edges
 export const VERT_SVG_SCALE = 130 / 66.0; // same scale for width and height
 export const VERT_PAD = 3; // top/bottom padding in SVG units
-export const getLevelHeight = (level) => {
+export const getLevelHeight = (level: Level): number => {
     const a = VERTEBRA_ANATOMY[level.id];
     if (a) return Math.round(a.bodyH * VERT_SVG_SCALE) + VERT_PAD * 2;
     return REGIONS[level.type].height;
 };
 
 // Convert mm anatomy data to SVG coordinates within the 160-unit viewBox
-export const getVertSvgGeometry = (levelId) => {
+export const getVertSvgGeometry = (levelId: string) => {
     const a = VERTEBRA_ANATOMY[levelId];
     if (!a) return null;
     const maxBodySvg = 130;
@@ -69,7 +82,7 @@ export const getVertSvgGeometry = (levelId) => {
     return { left, right, cx, bw, pedLeftCx, pedRightCx, pedRx, pedRy, isLumbar };
 };
 
-export const ALL_LEVELS = [
+export const ALL_LEVELS: Level[] = [
     { id: 'Oc', type: 'Oc' },
     ...['C1','C2','C3','C4','C5','C6','C7'].map(id => ({ id, type: 'C' })),
     ...['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'].map(id => ({ id, type: 'T' })),
@@ -80,7 +93,7 @@ export const ALL_LEVELS = [
 
 // Disc height varies by region: lumbar ~30% body height, thoracic ~18%, cervical ~5mm
 export const DISC_MIN_PX = 8; // minimum rendered disc zone height in pixels
-export const getDiscHeight = (level) => {
+export const getDiscHeight = (level: Level): number => {
     if (level.type === 'Pelvis' || level.type === 'S' || level.id === 'Oc' || level.id === 'C1') return 0;
     const h = getLevelHeight(level);
     if (level.type === 'L') return Math.round(h * 0.30);
@@ -88,9 +101,9 @@ export const getDiscHeight = (level) => {
     return Math.round(5 * VERT_SVG_SCALE); // cervical ~5mm
 };
 
-export const buildHeightMap = (lvls, hScale) => {
+export const buildHeightMap = (lvls: Level[], hScale: number): { map: HeightMapEntry[]; totalHeight: number } => {
     let y = 0;
-    const map = [];
+    const map: HeightMapEntry[] = [];
     lvls.forEach(level => {
         const vertH = getLevelHeight(level) * hScale;
         const rawDiscH = getDiscHeight(level) * hScale;
@@ -105,14 +118,14 @@ export const buildHeightMap = (lvls, hScale) => {
 
 export const WHOLE_SPINE_MAP = buildHeightMap(ALL_LEVELS, 1);
 
-export const levelToYNorm = (levelId) => {
+export const levelToYNorm = (levelId: string): number => {
     const entry = WHOLE_SPINE_MAP.map.find(e => e.levelId === levelId);
     if (!entry) return 500;
     const midY = (entry.startY + entry.vertEnd) / 2;
     return (midY / WHOLE_SPINE_MAP.totalHeight) * 1000;
 };
 
-export const yNormToRenderedY = (yNorm, viewLevels, hScale) => {
+export const yNormToRenderedY = (yNorm: number, viewLevels: Level[], hScale: number): number | null => {
     const anatomicalY = (yNorm / 1000) * WHOLE_SPINE_MAP.totalHeight;
     const allEntry = WHOLE_SPINE_MAP.map.find(e => anatomicalY >= e.startY && anatomicalY < e.endY);
     if (!allEntry) {
@@ -136,7 +149,7 @@ export const yNormToRenderedY = (yNorm, viewLevels, hScale) => {
     return viewEntry.startY + fraction * viewSegLen;
 };
 
-export const renderedYToYNorm = (renderedY, viewLevels, hScale) => {
+export const renderedYToYNorm = (renderedY: number, viewLevels: Level[], hScale: number): number => {
     const viewMap = buildHeightMap(viewLevels, hScale);
     let entry = viewMap.map.find(e => renderedY >= e.startY && renderedY < e.endY);
     if (!entry) {
@@ -153,7 +166,7 @@ export const renderedYToYNorm = (renderedY, viewLevels, hScale) => {
 };
 
 export const CHART_CONTENT_HEIGHT = 920;
-export const calculateAutoScale = (levels) => {
+export const calculateAutoScale = (levels: Level[]): number => {
     let totalUnscaled = 0;
     let discCount = 0;
     levels.forEach(level => {

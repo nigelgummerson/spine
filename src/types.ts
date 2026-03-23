@@ -1,0 +1,145 @@
+export type LevelId = string;
+
+export type Zone = 'left' | 'right' | 'mid' | 'disc' | 'force_left' | 'force_right';
+
+export type Side = 'left' | 'right' | 'bilateral' | 'midline';
+
+export type Chart = 'plan' | 'construct';
+
+export interface OsteotomyData {
+    type: string;
+    shortLabel: string;
+    angle: number | null;
+    reconstructionCage: string;
+}
+
+export interface Placement {
+    id: string;
+    levelId: string;
+    zone: Zone;
+    tool: string;
+    data: string | OsteotomyData | null;
+    annotation: string;
+}
+
+export interface CageData {
+    height: string;
+    lordosis: string;
+    side: string;
+    width?: string;
+    length?: string;
+}
+
+export interface Cage {
+    id: string;
+    levelId: string;
+    tool: string;
+    data: CageData;
+}
+
+export interface Connector {
+    id: string;
+    levelId: string;
+    fraction: number;
+    tool: string;
+}
+
+export interface Note {
+    id: string;
+    levelId: string;
+    tool: string;
+    text: string;
+    offsetX: number;
+    offsetY: number;
+    showArrow: boolean;
+}
+
+export interface BoneGraft {
+    types: string[];
+    notes: string;
+}
+
+export interface PatientData {
+    name: string;
+    id: string;
+    surgeon: string;
+    location: string;
+    date: string;
+    company: string;
+    screwSystem: string;
+    leftRod: string;
+    rightRod: string;
+    planLeftRod: string;
+    planRightRod: string;
+    boneGraft: BoneGraft;
+}
+
+export interface DocumentState {
+    documentId: string;
+    documentCreated: string;
+    patientData: PatientData;
+    plannedPlacements: Placement[];
+    completedPlacements: Placement[];
+    plannedCages: Cage[];
+    completedCages: Cage[];
+    plannedConnectors: Connector[];
+    completedConnectors: Connector[];
+    plannedNotes: Note[];
+    completedNotes: Note[];
+    reconLabelPositions: Record<string, { offsetX: number; offsetY: number }>;
+}
+
+export type DocumentAction =
+    | { type: 'ADD_PLACEMENT'; chart: Chart; placement: Placement }
+    | { type: 'UPDATE_PLACEMENT'; chart: Chart; id: string; tool: string; data: string | OsteotomyData | null; annotation?: string }
+    | { type: 'REMOVE_PLACEMENT'; chart: Chart; id: string }
+    | { type: 'SET_CAGE'; chart: Chart; cage: Cage }
+    | { type: 'REMOVE_CAGE'; chart: Chart; levelId: string }
+    | { type: 'ADD_CONNECTOR'; chart: Chart; connector: Connector }
+    | { type: 'UPDATE_CONNECTOR'; chart: Chart; id: string; levelId: string; fraction: number }
+    | { type: 'REMOVE_CONNECTOR'; chart: Chart; id: string }
+    | { type: 'ADD_NOTE'; chart: Chart; note: Note }
+    | { type: 'UPDATE_NOTE'; chart: Chart; id: string; text: string; showArrow: boolean }
+    | { type: 'UPDATE_NOTE_POSITION'; chart: Chart; id: string; offsetX: number; offsetY: number }
+    | { type: 'REMOVE_NOTE'; chart: Chart; id: string }
+    | { type: 'SET_PATIENT_FIELD'; field: string; value: string }
+    | { type: 'SET_BONE_GRAFT'; types: string[]; notes: string }
+    | { type: 'SET_RECON_LABEL_POSITION'; id: string; offsetX: number; offsetY: number }
+    | { type: 'NEW_PATIENT' }
+    | { type: 'COPY_PLAN_TO_CONSTRUCT'; genId: () => string }
+    | { type: 'CLEAR_CONSTRUCT' }
+    | { type: 'LOAD_DOCUMENT'; document: DocumentState };
+
+export interface ColourScheme {
+    id: string;
+    label: string;
+    sidebarBg: string;
+    sidebarBorder: string;
+    sidebarTitleBg: string;
+    activeBg: string;
+    activeBorder: string;
+    activeText: string;
+    accent: string;
+    swatch: string;
+    textPrimary: string;
+    textSecondary: string;
+    textMuted: string;
+    btnBg: string;
+    btnBorder: string;
+    hoverBg: string;
+    titleText: string;
+}
+
+export interface Level {
+    id: string;
+    type: string;
+}
+
+export interface ToolDefinition {
+    id: string;
+    labelKey: string;
+    icon: string;
+    needsSize?: boolean;
+    type: string;
+    isOsteotomy?: boolean;
+}

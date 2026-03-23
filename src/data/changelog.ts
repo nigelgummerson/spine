@@ -1,8 +1,14 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION = "v2.2.10-beta";
+export const CURRENT_VERSION: string = "v2.2.10-beta";
 
-export const CHANGE_LOG = [
+interface ChangeLogEntry {
+    version: string;
+    date: string;
+    changes: string[];
+}
+
+export const CHANGE_LOG: ChangeLogEntry[] = [
     { version: "v2.2.10-beta", date: "2026-03-23", changes: [
         "Loaded files are now validated against the v4 schema before import. Corrupted or invalid files are rejected with a clear error message instead of silently loading bad data.",
     ]},
@@ -88,7 +94,7 @@ export const CHANGE_LOG = [
     ]}
 ];
 
-export const formatDate = (isoString) => {
+export const formatDate = (isoString: string): string => {
     if (!isoString) return '';
     const date = new Date(isoString);
     if (isNaN(date.getTime())) return isoString;
