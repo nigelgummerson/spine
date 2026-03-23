@@ -30,7 +30,6 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
 
     const hasImplants = Object.values(grouped).some(cat => Object.keys(cat).length > 0);
     const hasRods = rods && (rods.left || rods.right);
-    if (!hasImplants && !hasRods) return null;
 
     const totalItems = Object.values(grouped).reduce((sum, cat) => sum + Object.keys(cat).length, 0);
     const useColumns = totalItems > 6;
@@ -38,6 +37,7 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
     return (
         <div className="mt-2 border-t border-slate-200 pt-1 shrink-0">
             <h3 className="text-[10px] font-bold text-slate-900 uppercase tracking-widest mb-1 border-b border-slate-100 pb-1">{title}</h3>
+            {!hasImplants && !hasRods && <div className="text-[10px] text-slate-400 italic py-1">{t('inventory.empty')}</div>}
             <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-slate-500 mb-1.5">
                 {INVENTORY_CATEGORIES.map(cat => {
                     const items = grouped[cat.key];

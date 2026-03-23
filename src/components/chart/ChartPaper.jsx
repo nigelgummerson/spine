@@ -231,7 +231,7 @@ export const ChartPaper = ({ title, placements, ghostPlacements, onZoneClick, on
                                         noteDragStartRef.current = { clientX: e.clientX, clientY: e.clientY, offsetX: n.offsetX || 80, offsetY: n.offsetY || 0 };
                                         setDraggingNoteId(n.id);
                                     }}
-                                    onClick={(e) => { e.stopPropagation(); if (!readOnly && !draggingNoteId && !didDragRef.current) onNoteClick(n); }}
+                                    onClick={(e) => { e.stopPropagation(); if (!readOnly && !didDragRef.current) { setDraggingNoteId(null); onNoteClick(n); } }}
                                 >
                                     <span className="text-[10px] font-bold text-violet-700 bg-white/90 border border-violet-200 px-1.5 py-0.5 rounded" style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block' }}>{n.text}</span>
                                     {!readOnly && <button

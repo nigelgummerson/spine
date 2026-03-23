@@ -184,6 +184,7 @@
     "inventory.fixation": "Fixation",
     "inventory.osteotomies": "Osteotomies",
     "inventory.other": "Other",
+    "inventory.empty": "No implants",
     "inventory.rods": "Rods",
     "inventory.cage.tlif": "TLIF Cage",
     "inventory.cage.plif": "PLIF Cage",
