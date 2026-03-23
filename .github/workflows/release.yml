@@ -1,0 +1,33 @@
+name: Build Standalone Release
+
+on:
+  push:
+    tags: ['v*.*.0', 'v*.*.0-*']
+
+permissions:
+  contents: write
+
+jobs:
+  standalone:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build:standalone
+      - name: Rename standalone build
+        run: |
+          VERSION=${GITHUB_REF_NAME}
+          mv dist/index.html "spine-planner-${VERSION}.html"
+      - name: Create GitHub Release
+        run: |
+          VERSION=${GITHUB_REF_NAME}
+          gh release create "$VERSION" \
+            "spine-planner-${VERSION}.html" \
+            --title "Spine Planner ${VERSION}" \
+            --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -163,6 +163,9 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   'PI 55°, PT 25°, SVA 8cm, LL 35°, TK 45°',
   'e.g. 5.5mm CoCr 120mm',
   'e.g. 5.5mm TiAlV 120mm',
+  // Offline use — English placeholders pending native-speaker translation review
+  'Offline Use',
+  'This app works best online for automatic updates. For use without internet, <a href="https://github.com/nigelgummerson/spine/releases/latest" target="_blank" rel="noopener noreferrer" class="underline hover:text-slate-800">download the standalone version</a>.',
 ]);
 
 function isAllowedValue(value: string): boolean {
