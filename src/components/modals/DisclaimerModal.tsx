@@ -1,27 +1,27 @@
 import React from 'react';
 import { t, SUPPORTED_LANGUAGES } from '../../i18n/i18n';
 
-function getHalfDayKey() {
-    const now = new Date();
-    const date = now.toISOString().slice(0, 10);
-    const half = now.getHours() < 12 ? 'AM' : 'PM';
-    return `spine_disclaimer_${date}_${half}`;
-}
+const SESSION_KEY = 'spine_disclaimer_accepted';
 
 export function isDisclaimerAccepted(lang: string): boolean {
-    return localStorage.getItem(getHalfDayKey()) === 'accepted'
-        && localStorage.getItem(getHalfDayKey() + '_lang') === lang;
+    return sessionStorage.getItem(SESSION_KEY) === 'accepted'
+        && sessionStorage.getItem(SESSION_KEY + '_lang') === lang;
 }
 
 export function getDisclaimerTimestamp(): string | null {
-    return localStorage.getItem(getHalfDayKey() + '_ts') || null;
+    return sessionStorage.getItem(SESSION_KEY + '_ts') || null;
 }
 
 export function acceptDisclaimer(lang: string): void {
-    const key = getHalfDayKey();
-    localStorage.setItem(key, 'accepted');
-    localStorage.setItem(key + '_lang', lang);
-    localStorage.setItem(key + '_ts', new Date().toISOString().replace('T', ' ').substring(0, 19));
+    sessionStorage.setItem(SESSION_KEY, 'accepted');
+    sessionStorage.setItem(SESSION_KEY + '_lang', lang);
+    sessionStorage.setItem(SESSION_KEY + '_ts', new Date().toISOString().replace('T', ' ').substring(0, 19));
+}
+
+export function resetDisclaimer(): void {
+    sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY + '_lang');
+    sessionStorage.removeItem(SESSION_KEY + '_ts');
 }
 
 interface DisclaimerModalProps {

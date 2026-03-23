@@ -28,7 +28,7 @@ import { CreditsFooter } from './components/CreditsFooter';
 import { ImplantInventory } from './components/ImplantInventory';
 import { ChartPaper } from './components/chart/ChartPaper';
 import { InstrumentIcon } from './components/chart/InstrumentIcon';
-import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, getDisclaimerTimestamp } from './components/modals/DisclaimerModal';
+import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, resetDisclaimer, getDisclaimerTimestamp } from './components/modals/DisclaimerModal';
 import { useDocumentState } from './hooks/useDocumentState';
 import { serializeState as serializeDocState, deserializeDocument } from './state/documentReducer';
 import { validateV4, ValidationError } from './state/schema';
@@ -100,15 +100,9 @@ const App = () => {
     const [confirmNewPatient, setConfirmNewPatient] = useState(false);
     const [confirmClearConstruct, setConfirmClearConstruct] = useState(false);
     const [exportPicker, setExportPicker] = useState<string | null>(null);
-    // Disclaimer: derive from sessionStorage on every render, use counter to force re-render on accept
+    // Disclaimer: shown on first load and after New Patient
     const [disclaimerTick, setDisclaimerTick] = useState(0);
     const disclaimerAccepted = isDisclaimerAccepted(currentLang);
-
-    // Re-check disclaimer at half-day boundary (AM/PM)
-    useEffect(() => {
-        const interval = setInterval(() => setDisclaimerTick(n => n + 1), 60000);
-        return () => clearInterval(interval);
-    }, []);
 
     // EDITING STATE
     const [pendingPlacement, setPendingPlacement] = useState<{ levelId: string; zone: string; tool: string } | null>(null);
@@ -737,6 +731,8 @@ const App = () => {
         setConfirmNewPatient(false);
         dispatch({ type: 'NEW_PATIENT' });
         setActiveChart('planned');
+        resetDisclaimer();
+        setDisclaimerTick(n => n + 1);
         // Broadcast empty state to synced windows
         if (syncChannelRef.current) {
             const emptyState = serializeDocState(state, viewMode, colourScheme, CURRENT_VERSION, currentLang);
