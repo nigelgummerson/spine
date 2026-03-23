@@ -1,8 +1,14 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION = "v2.2.0-beta";
+export const CURRENT_VERSION = "v2.2.1-beta";
 
 export const CHANGE_LOG = [
+    { version: "v2.2.1-beta", date: "2026-03-23", changes: [
+        "Internal architecture: app state extracted into a dedicated state manager for improved reliability and maintainability.",
+        "Automated test suite added covering all state operations and data format conversions.",
+        "File export no longer produces unexpected filenames when patient name contains special characters.",
+        "Plan and Construct panels no longer shift when switching between them.",
+    ]},
     { version: "v2.2.0-beta", date: "2026-03-23", changes: [
         "PDF exports at A4 300 DPI for high-quality clinical printing.",
         "Screw and cage sizes larger and easier to read from distance.",
