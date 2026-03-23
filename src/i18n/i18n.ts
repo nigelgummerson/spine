@@ -9,7 +9,7 @@ type TranslationsMap = Record<string, TranslationDict>;
 const TRANS = TRANSLATIONS as TranslationsMap;
 
 export const LOCALE_MAP: Record<string, string> = {
-    en: 'en-GB', fr: 'fr-FR', de: 'de-DE', es: 'es-ES',
+    ar: 'ar-SA', en: 'en-GB', fr: 'fr-FR', de: 'de-DE', es: 'es-ES',
     pt: 'pt-PT', it: 'it-IT', nl: 'nl-NL', pl: 'pl-PL',
     tr: 'tr-TR', nb: 'nb-NO', da: 'da-DK', sv: 'sv-SE',
     el: 'el-GR', fi: 'fi-FI', hi: 'hi-IN', ru: 'ru-RU', uk: 'uk-UA',

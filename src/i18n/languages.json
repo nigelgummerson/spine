@@ -1,5 +1,6 @@
 [
   { "code": "en", "name": "English" },
+  { "code": "ar", "name": "العربية" },
   { "code": "da", "name": "Dansk" },
   { "code": "de", "name": "Deutsch" },
   { "code": "el", "name": "Ελληνικά" },
