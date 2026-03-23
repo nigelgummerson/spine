@@ -1,18 +1,39 @@
-// src/hooks/useDocumentState.js
+// src/hooks/useDocumentState.ts
 import { useReducer, useState, useRef, useEffect, useCallback } from 'react';
 import { documentReducer, createInitialState, serializeState, deserializeDocument } from '../state/documentReducer';
 import { CURRENT_VERSION } from '../data/changelog';
 import { acceptDisclaimer } from '../components/modals/DisclaimerModal';
 import { validateV4, ValidationError } from '../state/schema';
+import type { DocumentState, DocumentAction } from '../types';
 
-export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLang, incognitoMode, currentLang, setViewMode, showToast }) {
+interface UseDocumentStateParams {
+    viewMode: string;
+    colourScheme: string;
+    changeTheme: (scheme: string) => void;
+    changeLang: (lang: string) => void;
+    incognitoMode: boolean;
+    currentLang: string;
+    setViewMode: (mode: string) => void;
+    showToast?: (message: string, level?: string) => void;
+}
+
+interface UseDocumentStateReturn {
+    state: DocumentState;
+    dispatch: React.Dispatch<DocumentAction>;
+    serialize: () => any;
+    syncChannelRef: React.MutableRefObject<BroadcastChannel | null>;
+    syncConnected: boolean;
+    hasLoaded: boolean;
+}
+
+export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLang, incognitoMode, currentLang, setViewMode, showToast }: UseDocumentStateParams): UseDocumentStateReturn {
     const [state, dispatch] = useReducer(documentReducer, undefined, createInitialState);
     const [hasLoaded, setHasLoaded] = useState(false);
     const [syncConnected, setSyncConnected] = useState(false);
 
     const receivingSync = useRef(false);
-    const syncChannelRef = useRef(null);
-    const syncTimerRef = useRef(null);
+    const syncChannelRef = useRef<BroadcastChannel | null>(null);
+    const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const lastPongRef = useRef(0);
     const syncVersionRef = useRef(0);
     const syncVersionMismatchRef = useRef(false);
@@ -79,7 +100,7 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
         }
         if (hasLoaded && syncChannelRef.current) {
             syncVersionRef.current++;
-            clearTimeout(syncTimerRef.current);
+            clearTimeout(syncTimerRef.current!);
             syncTimerRef.current = setTimeout(() => {
                 if (syncChannelRef.current) {
                     syncChannelRef.current.postMessage({
@@ -98,7 +119,7 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
         const ch = new BroadcastChannel('spine-planner-sync');
         syncChannelRef.current = ch;
 
-        ch.onmessage = (e) => {
+        ch.onmessage = (e: MessageEvent) => {
             const msg = e.data;
             if (!msg.appVersion) return;
             if (msg.appVersion !== CURRENT_VERSION) {
@@ -114,7 +135,7 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
                 lastPongRef.current = Date.now();
                 setSyncConnected(true);
                 if (msg.payload) {
-                    clearTimeout(syncTimerRef.current);
+                    clearTimeout(syncTimerRef.current!);
                     receivingSync.current = true;
                     const result = deserializeDocument(msg.payload);
                     dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
@@ -123,7 +144,7 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
                 }
             } else if (msg.type === 'state') {
                 if (msg.payload) {
-                    clearTimeout(syncTimerRef.current);
+                    clearTimeout(syncTimerRef.current!);
                     receivingSync.current = true;
                     const result = deserializeDocument(msg.payload);
                     dispatch({ type: 'LOAD_DOCUMENT', document: result.state });

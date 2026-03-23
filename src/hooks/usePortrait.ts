@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 
-const usePortrait = () => {
+const usePortrait = (): boolean => {
     const [isPortrait, setIsPortrait] = useState(() => window.matchMedia('(orientation: portrait)').matches);
     useEffect(() => {
         const mql = window.matchMedia('(orientation: portrait)');
-        const handler = (e) => setIsPortrait(e.matches);
+        const handler = (e: MediaQueryListEvent) => setIsPortrait(e.matches);
         mql.addEventListener('change', handler);
         return () => mql.removeEventListener('change', handler);
     }, []);
