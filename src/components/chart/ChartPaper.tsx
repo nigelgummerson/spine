@@ -292,8 +292,8 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                                         style={{ pointerEvents: 'all' } as any}
                                         onClick={(e) => { e.stopPropagation(); onConnectorRemove(conn.id); }}
                                         onMouseDown={(e) => e.stopPropagation()}>
-                                        <circle cx={vertX + scaledWidth + 10} cy={y - connH / 2 - 2} r={8} fill="#ef4444" />
-                                        <text x={vertX + scaledWidth + 10} y={y - connH / 2 - 2}
+                                        <circle cx={vertX + scaledWidth + 4} cy={y} r={7} fill="#ef4444" />
+                                        <text x={vertX + scaledWidth + 4} y={y}
                                             textAnchor="middle" dominantBaseline="middle"
                                             fontSize={10} fontWeight="bold" fill="white">x</text>
                                     </g>
