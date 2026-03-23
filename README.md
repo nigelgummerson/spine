@@ -2,12 +2,12 @@
 
 A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instrumentation diagrams with a visual, exportable chart that documents the pre-operative plan and post-operative construct. Runs offline on hospital computers as a single HTML file — no installation required.
 
-**Version:** v2.3.0-beta | **License:** GNU GPLv3
+**Version:** v2.4.0-beta | **License:** GNU GPLv3
 **Live:** [plan.skeletalsurgery.com/spine](https://plan.skeletalsurgery.com/spine/)
 
 ## Features
 
-- **16 languages:** English, German, French, Spanish, Italian, Portuguese, Swedish, Norwegian, Danish, Finnish, Dutch, Polish, Greek, Turkish, Russian, Ukrainian — auto-detects browser locale
+- **18 languages:** English, Arabic (RTL), German, French, Spanish, Hindi, Italian, Portuguese, Swedish, Norwegian, Danish, Finnish, Dutch, Polish, Greek, Turkish, Russian, Ukrainian — auto-detects browser locale
 - **Screws:** Monoaxial, polyaxial, uniplanar with diameter/length sizing and free-text annotations
 - **Hooks:** Pedicle, TP (down/up), supra-laminar, infra-laminar with annotations
 - **Fixation:** Bands, wires, cables with annotations
@@ -43,7 +43,7 @@ Built with Vite, React 19, Tailwind CSS v4, html-to-image, jsPDF. All dependenci
 
 Open `index.html` in a browser, or visit the [live site](https://plan.skeletalsurgery.com/spine/).
 
-See the [Quick Reference Guide](https://plan.skeletalsurgery.com/spine/quick-reference.html) for a translated quick-start guide (16 languages).
+See the [Quick Reference Guide](https://plan.skeletalsurgery.com/spine/quick-reference.html) for a translated quick-start guide (18 languages).
 
 ## Disclaimer
 

@@ -1,6 +1,6 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION: string = "v2.3.1-beta";
+export const CURRENT_VERSION: string = "v2.4.0-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -9,6 +9,11 @@ interface ChangeLogEntry {
 }
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
+    { version: "v2.4.0-beta", date: "2026-03-23", changes: [
+        "Hindi and Arabic translations added (18 languages now supported).",
+        "Right-to-left (RTL) layout support — Arabic is the first RTL language. Sidebar, modals, and UI chrome mirror automatically. Anatomical chart columns remain fixed.",
+        "CSS converted to logical properties for direction-aware layout (margin-inline-start, border-inline-end, etc.).",
+    ]},
     { version: "v2.3.1-beta", date: "2026-03-23", changes: [
         "Web build — the app now loads faster on connected hospital computers with cached fonts and libraries. Code-split assets with content-hashed filenames for efficient browser caching.",
         "Standalone offline version available as a single-file download from GitHub Releases for use without internet.",

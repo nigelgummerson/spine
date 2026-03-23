@@ -35,19 +35,23 @@ def read_app_version() -> str:
 
 # Language metadata: code -> (English name, native name)
 LANG_NAMES = {
+    "ar": ("Arabic", "العربية"),
     "da": ("Danish", "Dansk"),
     "de": ("German", "Deutsch"),
     "el": ("Greek", "Ελληνικά"),
     "es": ("Spanish", "Español"),
     "fi": ("Finnish", "Suomi"),
     "fr": ("French", "Français"),
+    "hi": ("Hindi", "हिन्दी"),
     "it": ("Italian", "Italiano"),
     "nb": ("Norwegian", "Norsk bokmål"),
     "nl": ("Dutch", "Nederlands"),
     "pl": ("Polish", "Polski"),
     "pt": ("Portuguese", "Português"),
+    "ru": ("Russian", "Русский"),
     "sv": ("Swedish", "Svenska"),
     "tr": ("Turkish", "Türkçe"),
+    "uk": ("Ukrainian", "Українська"),
 }
 
 # Keys to exclude from review: untranslatable proper nouns, universal abbreviations,

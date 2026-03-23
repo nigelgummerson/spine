@@ -71,6 +71,7 @@ The single most impactful addition. Transforms the planner from a screw map into
 - [x] JSON v4 schema updated to cover all SPEC.md features (2026-03-22)
 - [x] Comprehensive test file — 153 checks, all SPEC.md requirements validated (2026-03-22)
 - [x] Ukrainian and Russian translations — 16 languages total (2026-03-22)
+- [x] Hindi and Arabic translations with RTL support — 18 languages total (2026-03-23)
 - [x] Vite build system — modular source, single-file output, GitHub Actions deploy (2026-03-22)
 - [x] i18n review tooling — Python generator + import pipeline (2026-03-22)
 - [x] Offline bundling — Vite + vite-plugin-singlefile (2026-03-22)
