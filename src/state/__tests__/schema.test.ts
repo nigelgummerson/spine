@@ -1,7 +1,8 @@
 // src/state/__tests__/schema.test.js
 import { describe, it, expect } from 'vitest';
-import { validateV4, ValidationError } from '../schema';
+import { validateV4, validateLegacy, ValidationError } from '../schema';
 import { createInitialState, serializeState } from '../documentReducer';
+import { migrateStoredData, LATEST_SCHEMA_VERSION } from '../migrations';
 
 // Helper: minimal valid v4 JSON
 function validV4(): any {
@@ -174,5 +175,110 @@ describe('validateV4', () => {
             expect(err.message).toContain('Invalid file');
             expect(err.message).toContain('error');
         }
+    });
+});
+
+// --- Legacy v2/v3 validation ---
+
+function validLegacy(): any {
+    return {
+        formatVersion: 3,
+        patient: { name: 'Test Patient', id: '123' },
+        plan: {
+            implants: [
+                { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial' },
+            ],
+            cages: [],
+            connectors: [],
+            notes: [],
+        },
+        construct: { implants: [], cages: [], connectors: [], notes: [] },
+        preferences: { viewMode: 'thoracolumbar' },
+    };
+}
+
+describe('validateLegacy', () => {
+
+    it('accepts a valid v3 file', () => {
+        expect(() => validateLegacy(validLegacy())).not.toThrow();
+    });
+
+    it('accepts a valid v2 file', () => {
+        const json = validLegacy();
+        json.formatVersion = 2;
+        expect(() => validateLegacy(json)).not.toThrow();
+    });
+
+    it('accepts a file with no placements', () => {
+        const json = { formatVersion: 3 };
+        expect(() => validateLegacy(json)).not.toThrow();
+    });
+
+    it('accepts unknown extra fields', () => {
+        const json = validLegacy();
+        json.futureField = 'something';
+        expect(() => validateLegacy(json)).not.toThrow();
+    });
+
+    it('rejects formatVersion 1', () => {
+        const json = validLegacy();
+        json.formatVersion = 1;
+        expect(() => validateLegacy(json)).toThrow(ValidationError);
+    });
+
+    it('rejects formatVersion 4+', () => {
+        const json = validLegacy();
+        json.formatVersion = 4;
+        expect(() => validateLegacy(json)).toThrow(ValidationError);
+    });
+
+    it('rejects missing formatVersion', () => {
+        const json = validLegacy();
+        delete json.formatVersion;
+        expect(() => validateLegacy(json)).toThrow(ValidationError);
+    });
+
+    it('rejects placement missing id', () => {
+        const json = validLegacy();
+        json.plan.implants = [{ levelId: 'T5', zone: 'left', tool: 'polyaxial' }];
+        expect(() => validateLegacy(json)).toThrow(ValidationError);
+    });
+
+    it('rejects placement with invalid zone', () => {
+        const json = validLegacy();
+        json.plan.implants = [{ id: 'p1', levelId: 'T5', zone: 'top', tool: 'polyaxial' }];
+        expect(() => validateLegacy(json)).toThrow(ValidationError);
+    });
+});
+
+// --- Migrations ---
+
+describe('migrateStoredData', () => {
+
+    it('passes v4 data through unchanged', () => {
+        const json = validV4();
+        const result = migrateStoredData(json);
+        expect(result).toEqual(json);
+    });
+
+    it('passes legacy v2/v3 data through unchanged', () => {
+        const json = validLegacy();
+        const result = migrateStoredData(json);
+        expect(result).toEqual(json);
+    });
+
+    it('throws on unrecognised data with no version', () => {
+        expect(() => migrateStoredData({ foo: 'bar' })).toThrow('Unrecognised data format');
+    });
+
+    it('exports LATEST_SCHEMA_VERSION as 4', () => {
+        expect(LATEST_SCHEMA_VERSION).toBe(4);
+    });
+
+    it('round-trip: serialised state survives migration + validation', () => {
+        const state = createInitialState();
+        const json = serializeState(state, 'thoracolumbar', 'default', '2.3.0', 'en');
+        const migrated = migrateStoredData(json);
+        expect(() => validateV4(migrated)).not.toThrow();
     });
 });

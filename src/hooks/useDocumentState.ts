@@ -3,7 +3,8 @@ import { useReducer, useState, useRef, useEffect, useCallback } from 'react';
 import { documentReducer, createInitialState, serializeState, deserializeDocument } from '../state/documentReducer';
 import { CURRENT_VERSION } from '../data/changelog';
 import { acceptDisclaimer } from '../components/modals/DisclaimerModal';
-import { validateV4, ValidationError } from '../state/schema';
+import { validateV4, validateLegacy, ValidationError } from '../state/schema';
+import { migrateStoredData } from '../state/migrations';
 import type { DocumentState, DocumentAction } from '../types';
 
 interface UseDocumentStateParams {
@@ -59,7 +60,7 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
         const saved = localStorage.getItem('spine_planner_v2');
         if (saved) {
             try {
-                const parsed = JSON.parse(saved);
+                const parsed = migrateStoredData(JSON.parse(saved));
                 if (parsed.schema?.version === 4) {
                     validateV4(parsed);
                     const result = deserializeDocument(parsed);
@@ -67,7 +68,7 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
                     if (result.viewMode) setViewMode(result.viewMode);
                     if (result.colourScheme) changeTheme(result.colourScheme);
                 } else if (parsed.formatVersion >= 2) {
-                    // Legacy v2/v3 — no validation
+                    validateLegacy(parsed);
                     const result = deserializeDocument(parsed);
                     dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
                     if (result.viewMode) setViewMode(result.viewMode);

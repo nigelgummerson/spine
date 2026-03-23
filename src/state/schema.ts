@@ -162,10 +162,67 @@ export const v4Schema = z.object({
 
 export type V4Document = z.infer<typeof v4Schema>;
 
-// --- Validate ---
+// --- Validate v4 ---
 
 export function validateV4(json: unknown): V4Document {
     const result = v4Schema.safeParse(json);
+    if (!result.success) {
+        throw new ValidationError(result.error.issues);
+    }
+    return result.data;
+}
+
+// --- Legacy v2/v3 schema (loose — validates basic shape only) ---
+
+const legacyZone = z.enum(['left', 'right', 'mid', 'disc', 'force_left', 'force_right']);
+
+const legacyPlacement = z.object({
+    id: z.string(),
+    levelId: z.string(),
+    zone: legacyZone,
+    tool: z.string(),
+}).passthrough();
+
+const legacyCage = z.object({
+    id: z.string(),
+    levelId: z.string(),
+}).passthrough();
+
+const legacyConnector = z.object({
+    id: z.string(),
+}).passthrough();
+
+const legacyNote = z.object({
+    id: z.string(),
+    levelId: z.string(),
+    text: z.string(),
+}).passthrough();
+
+const legacyChartData = z.object({
+    implants: z.array(legacyPlacement).optional(),
+    cages: z.array(legacyCage).optional(),
+    connectors: z.array(legacyConnector).optional(),
+    notes: z.array(legacyNote).optional(),
+}).passthrough().optional();
+
+const legacyPatient = z.object({
+    name: z.string().optional(),
+    id: z.string().optional(),
+}).passthrough().optional();
+
+export const legacySchema = z.object({
+    formatVersion: z.number().min(2).max(3),
+    patient: legacyPatient,
+    plan: legacyChartData,
+    construct: legacyChartData,
+}).passthrough();
+
+export type LegacyDocument = z.infer<typeof legacySchema>;
+
+// --- Validate legacy ---
+
+export function validateLegacy(json: unknown): LegacyDocument {
+    const result = legacySchema.safeParse(json);
     if (!result.success) {
         throw new ValidationError(result.error.issues);
     }

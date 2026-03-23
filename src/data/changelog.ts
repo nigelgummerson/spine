@@ -1,6 +1,6 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION: string = "v2.4.0-beta";
+export const CURRENT_VERSION: string = "v2.4.1-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -9,6 +9,12 @@ interface ChangeLogEntry {
 }
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
+    { version: "v2.4.1-beta", date: "2026-03-23", changes: [
+        "Tests now gate CI deployment — 205 Vitest tests run before every deploy and release build.",
+        "Legacy v2/v3 JSON files validated on load via Zod (previously only v4 was validated).",
+        "Schema migration framework for localStorage — ready for future schema version changes.",
+        "All modals render via React portals — immune to parent CSS overflow/transform clipping.",
+    ]},
     { version: "v2.4.0-beta", date: "2026-03-23", changes: [
         "Hindi and Arabic translations added (18 languages now supported).",
         "Right-to-left (RTL) layout support — Arabic is the first RTL language. Sidebar, modals, and UI chrome mirror automatically. Anatomical chart columns remain fixed.",

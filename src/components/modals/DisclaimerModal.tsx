@@ -1,5 +1,6 @@
 import React from 'react';
 import { t, SUPPORTED_LANGUAGES } from '../../i18n/i18n';
+import { Portal } from '../Portal';
 
 const SESSION_KEY = 'spine_disclaimer_accepted';
 
@@ -30,7 +31,7 @@ interface DisclaimerModalProps {
     onAccept: () => void;
 }
 
-export const DisclaimerModal = ({ lang, onLangChange, onAccept }: DisclaimerModalProps) => (
+export const DisclaimerModal = ({ lang, onLangChange, onAccept }: DisclaimerModalProps) => (<Portal>
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={e => e.key === 'Enter' && onAccept()} ref={el => { el?.focus(); }}>
         <div className="bg-white rounded-lg shadow-2xl w-full max-w-lg overflow-hidden">
             <div className="bg-slate-800 text-white px-5 py-3 flex items-center justify-between">
@@ -58,4 +59,4 @@ export const DisclaimerModal = ({ lang, onLangChange, onAccept }: DisclaimerModa
             </div>
         </div>
     </div>
-);
+</Portal>);

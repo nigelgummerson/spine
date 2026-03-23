@@ -4,6 +4,7 @@ import { FORCE_TYPES } from '../../data/clinical';
 import { InstrumentIcon } from '../chart/InstrumentIcon';
 import { IconX } from '../icons';
 import { modalKeyHandler } from './ScrewModal';
+import { Portal } from '../Portal';
 
 interface ForceModalProps {
     isOpen: boolean;
@@ -15,7 +16,7 @@ export const ForceModal = ({ isOpen, onClose, onConfirm }: ForceModalProps) => {
     if (!isOpen) return null;
     const forceRef = useRef<HTMLDivElement>(null);
     useEffect(() => { if (forceRef.current) forceRef.current.focus(); }, []);
-    return (
+    return (<Portal>
         <div ref={forceRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: () => {}, onClose, onDelete: null, isEditing: false })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden">
                 <div className="bg-blue-700 text-white px-4 py-3 flex justify-between items-center">
@@ -36,5 +37,5 @@ export const ForceModal = ({ isOpen, onClose, onConfirm }: ForceModalProps) => {
                 </div>
             </div>
         </div>
-    );
+    </Portal>);
 };

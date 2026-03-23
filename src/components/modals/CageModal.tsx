@@ -3,6 +3,7 @@ import { t } from '../../i18n/i18n';
 import { CAGE_TYPES, CAGE_PERMISSIBILITY, APPROACH_GROUPS, getDiscLabel } from '../../data/clinical';
 import { modalKeyHandler } from './ScrewModal';
 import { IconTrash, IconX } from '../icons';
+import { Portal } from '../Portal';
 
 import type { Level } from '../../types';
 
@@ -109,7 +110,7 @@ export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, l
     const cageRef = useRef<HTMLDivElement>(null);
     useEffect(() => { if (cageRef.current) cageRef.current.focus(); }, []);
 
-    return (
+    return (<Portal>
         <div ref={cageRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing: !!initialData })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden">
                 <div className="bg-sky-800 text-white px-4 py-3 flex justify-between items-center">
@@ -168,5 +169,5 @@ export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, l
                 <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{initialData ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center"><IconTrash/> {t('button.remove')}</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.cancel')}</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-sky-800 text-white hover:bg-sky-700 text-sm font-bold shadow-lg">{t('button.confirm')}</button></div></div>
             </div>
         </div>
-    );
+    </Portal>);
 };

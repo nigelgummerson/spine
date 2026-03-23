@@ -2,6 +2,7 @@ import React from 'react';
 import { t } from '../../i18n/i18n';
 import { CURRENT_VERSION, CHANGE_LOG, formatDate } from '../../data/changelog';
 import { IconX , IconHistory} from '../icons';
+import { Portal } from '../Portal';
 
 interface ChangeLogModalProps {
     isOpen: boolean;
@@ -10,7 +11,7 @@ interface ChangeLogModalProps {
 
 export const ChangeLogModal = ({ isOpen, onClose }: ChangeLogModalProps) => {
     if (!isOpen) return null;
-    return (
+    return (<Portal>
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onClick={onClose} onKeyDown={e => (e.key === 'Escape' || e.key === 'Enter') && onClose()} ref={el => { el?.focus(); }}>
             <div className="bg-white rounded-lg shadow-2xl w-full overflow-hidden flex flex-col max-h-[80vh]" style={{ maxWidth: window.matchMedia('(orientation: landscape)').matches ? '48rem' : '32rem', outline: 'none' }} onClick={e => e.stopPropagation()}>
                 <div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm flex items-center gap-2"><IconHistory/> {t('modal.changelog.title')}</h3><button onClick={onClose} className="hover:text-slate-300"><IconX /></button></div>
@@ -25,5 +26,5 @@ export const ChangeLogModal = ({ isOpen, onClose }: ChangeLogModalProps) => {
                 <div className="bg-slate-50 px-4 py-3 text-end border-t border-slate-200"><button onClick={onClose} className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold">{t('button.close')}</button></div>
             </div>
         </div>
-    );
+    </Portal>);
 };

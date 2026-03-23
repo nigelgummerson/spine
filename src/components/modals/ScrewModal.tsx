@@ -4,6 +4,7 @@ import { DIAMETER_OPTIONS, LENGTH_OPTIONS } from '../../data/implants';
 import { HOOK_TYPES, NO_SIZE_TYPES } from '../../data/clinical';
 import { InstrumentIcon } from '../chart/InstrumentIcon';
 import { IconTrash, IconX } from '../icons';
+import { Portal } from '../Portal';
 
 interface ModalKeyHandlerParams {
     onSubmit: () => void;
@@ -98,7 +99,7 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
     const modalRef = useRef<HTMLDivElement>(null);
     useEffect(() => { if (modalRef.current) modalRef.current.focus(); }, []);
 
-    return (
+    return (<Portal>
         <div ref={modalRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden">
                 <div className="bg-slate-900 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{isEditing ? t('modal.screw.title_edit') : t('modal.screw.title_new')}</h3><button onClick={onClose} className="hover:text-red-400"><IconX /></button></div>
@@ -126,5 +127,5 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
                 <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center" title={t('shortcut.delete')}><IconTrash/> {t('button.remove')}</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title={t('shortcut.escape')}>{t('button.cancel')}</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg" title={t('shortcut.enter')}>{t('button.confirm')}</button></div></div>
             </div>
         </div>
-    );
+    </Portal>);
 };

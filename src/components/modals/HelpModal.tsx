@@ -3,6 +3,7 @@ import { t } from '../../i18n/i18n';
 import { CURRENT_VERSION } from '../../data/changelog';
 import { IconX , IconCopy, IconSave, IconCC, IconLink} from '../icons';
 import { InstrumentIcon } from '../chart/InstrumentIcon';
+import { Portal } from '../Portal';
 
 const IconCage = () => (
     <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none">
@@ -20,7 +21,7 @@ interface HelpModalProps {
 
 export const HelpModal = ({ isOpen, onClose }: HelpModalProps) => {
     if (!isOpen) return null;
-    return (
+    return (<Portal>
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onClick={onClose} onKeyDown={e => (e.key === 'Escape' || e.key === 'Enter') && onClose()} ref={el => { el?.focus(); }}>
             <div className="bg-white rounded-lg shadow-2xl w-full overflow-hidden flex flex-col max-h-[85vh]" style={{ maxWidth: window.matchMedia('(orientation: landscape)').matches ? '48rem' : '32rem', outline: 'none' }} onClick={e => e.stopPropagation()}>
                 <div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center">
@@ -93,5 +94,5 @@ export const HelpModal = ({ isOpen, onClose }: HelpModalProps) => {
                 </div>
             </div>
         </div>
-    );
+    </Portal>);
 };

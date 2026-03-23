@@ -28,10 +28,11 @@ import { CreditsFooter } from './components/CreditsFooter';
 import { ImplantInventory } from './components/ImplantInventory';
 import { ChartPaper } from './components/chart/ChartPaper';
 import { InstrumentIcon } from './components/chart/InstrumentIcon';
+import { Portal } from './components/Portal';
 import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, resetDisclaimer, getDisclaimerTimestamp } from './components/modals/DisclaimerModal';
 import { useDocumentState } from './hooks/useDocumentState';
 import { serializeState as serializeDocState, deserializeDocument } from './state/documentReducer';
-import { validateV4, ValidationError } from './state/schema';
+import { validateV4, validateLegacy, ValidationError } from './state/schema';
 import type { ColourScheme, ToolDefinition, Placement, Level, Zone, OsteotomyData, Cage, Note } from './types';
 
 const App = () => {
@@ -660,7 +661,7 @@ const App = () => {
                     if (result.viewMode) setViewMode(result.viewMode);
                     if (result.colourScheme) changeTheme(result.colourScheme);
                 } else if (json.formatVersion >= 2) {
-                    // Legacy v2/v3 — no validation, permissive load
+                    validateLegacy(json);
                     const result = deserializeDocument(json);
                     dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
                     if (result.viewMode) setViewMode(result.viewMode);
@@ -769,7 +770,7 @@ const App = () => {
             <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
             <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
             <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
-            {exportPicker && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: () => runExportWithChoice(exportPicker, false), onClose: () => setExportPicker(null), onDelete: undefined, isEditing: false })} onClick={() => setExportPicker(null)} ref={el => el?.focus()}>
+            {exportPicker && <Portal><div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: () => runExportWithChoice(exportPicker, false), onClose: () => setExportPicker(null), onDelete: undefined, isEditing: false })} onClick={() => setExportPicker(null)} ref={el => el?.focus()}>
                 <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
                     <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold uppercase tracking-wider text-center">{exportPicker.toUpperCase()}</div>
                     <div className="p-3 flex flex-col gap-2">
@@ -777,8 +778,8 @@ const App = () => {
                         <button onClick={() => runExportWithChoice(exportPicker, true)} className="w-full px-4 py-3 rounded text-sm font-bold text-white bg-slate-800 hover:bg-slate-700">{t('export.construct')}</button>
                     </div>
                 </div>
-            </div>}
-            {confirmClearConstruct && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: confirmClearConstructAction, onClose: () => setConfirmClearConstruct(false), onDelete: undefined, isEditing: false })} onClick={() => setConfirmClearConstruct(false)} ref={el => el?.focus()}>
+            </div></Portal>}
+            {confirmClearConstruct && <Portal><div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: confirmClearConstructAction, onClose: () => setConfirmClearConstruct(false), onDelete: undefined, isEditing: false })} onClick={() => setConfirmClearConstruct(false)} ref={el => el?.focus()}>
                 <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
                     <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold">{t('sidebar.clear_construct')}</div>
                     <div className="p-5 text-sm text-slate-600">{t('alert.clear_construct')}</div>
@@ -787,8 +788,8 @@ const App = () => {
                         <button onClick={confirmClearConstructAction} className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 text-sm font-bold">{t('button.confirm')}</button>
                     </div>
                 </div>
-            </div>}
-            {confirmNewPatient && <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: executeNewPatient, onClose: () => setConfirmNewPatient(false), onDelete: undefined, isEditing: false })} onClick={() => setConfirmNewPatient(false)} ref={el => el?.focus()}>
+            </div></Portal>}
+            {confirmNewPatient && <Portal><div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: executeNewPatient, onClose: () => setConfirmNewPatient(false), onDelete: undefined, isEditing: false })} onClick={() => setConfirmNewPatient(false)} ref={el => el?.focus()}>
                 <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
                     <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold">{t('sidebar.new_patient')}</div>
                     <div className="p-5 text-sm text-slate-600">{t('alert.new_patient')}</div>
@@ -797,13 +798,13 @@ const App = () => {
                         <button onClick={executeNewPatient} className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 text-sm font-bold">{t('button.confirm')}</button>
                     </div>
                 </div>
-            </div>}
+            </div></Portal>}
             {discPickerLevel && (() => {
                 const pickerButtons = [
                     { action: handleDiscPickCage, label: t('help.cages.title'), cls: 'text-sky-800 bg-sky-50 border-sky-200 hover:bg-sky-100 focus:ring-2 focus:ring-sky-400' },
                     { action: handleDiscPickOsteo, label: t('help.osteotomies.title'), cls: 'text-amber-800 bg-amber-50 border-amber-200 hover:bg-amber-100 focus:ring-2 focus:ring-amber-400' },
                 ];
-                return (
+                return (<Portal>
                     <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true"
                         onKeyDown={e => {
                             if (e.key === 'Escape') { e.preventDefault(); setDiscPickerLevel(null); }
@@ -833,7 +834,7 @@ const App = () => {
                             </div>
                         </div>
                     </div>
-                );
+                </Portal>);
             })()}
             <NoteModal isOpen={noteModalOpen} onClose={() => { setNoteModalOpen(false); setEditingNote(null); setPendingNoteTool(null); }} onConfirm={handleNoteConfirm} onDelete={handleNoteDelete} initialText={editingNote?.text || ''} initialShowArrow={editingNote ? editingNote.showArrow : undefined} isEditing={!!editingNote} />
         </React.Fragment>

@@ -3,6 +3,7 @@ import { t } from '../../i18n/i18n';
 import { NOTE_PRESET_KEYS } from '../../data/clinical';
 import { modalKeyHandler } from './ScrewModal';
 import { IconTrash, IconX } from '../icons';
+import { Portal } from '../Portal';
 
 interface NoteModalProps {
     isOpen: boolean;
@@ -35,7 +36,7 @@ export const NoteModal = ({ isOpen, onClose, onConfirm, onDelete, initialText, i
         onClose();
     };
 
-    return (
+    return (<Portal>
         <div ref={noteRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
                 <div className="bg-violet-800 text-white px-4 py-3 flex justify-between items-center">
@@ -67,5 +68,5 @@ export const NoteModal = ({ isOpen, onClose, onConfirm, onDelete, initialText, i
                 </div>
             </div>
         </div>
-    );
+    </Portal>);
 };

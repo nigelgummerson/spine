@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { t } from '../../i18n/i18n';
 import { modalKeyHandler } from './ScrewModal';
 import { IconTrash, IconX } from '../icons';
+import { Portal } from '../Portal';
 
 interface OsteotomyConfirmData {
     type: string;
@@ -81,7 +82,7 @@ export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialDa
     const isEditing = !!initialData;
     const osteoRef = useRef<HTMLDivElement>(null);
     useEffect(() => { if (osteoRef.current) osteoRef.current.focus(); }, []);
-    return (
+    return (<Portal>
         <div ref={osteoRef} tabIndex={-1} style={{outline:'none'}}
             onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })}
             className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
@@ -142,5 +143,5 @@ export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialDa
                 </div>
             </div>
         </div>
-    );
+    </Portal>);
 };
