@@ -185,10 +185,10 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}>
                     {align === 'left' && (labelText || annText) && (
                         <foreignObject x={zoneX} y={0} width={iconX - zoneX - 2} height={rowHeight}>
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end', paddingTop: 2, paddingRight: 2, xmlns: 'http://www.w3.org/1999/xhtml' } as any}>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end', paddingTop: 2, paddingRight: 2, overflow: 'hidden', xmlns: 'http://www.w3.org/1999/xhtml' } as any}>
                                 <div style={{ display: 'flex', flexDirection: isInline ? 'row-reverse' : 'column', alignItems: isInline ? 'center' : 'flex-end', gap: isInline ? 3 : 0, lineHeight: 1 }}>
                                     {labelText && <span style={{ fontFamily: 'ui-monospace, monospace', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap' }}>{labelText}</span>}
-                                    {annText && <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', textAlign: 'right', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>}
+                                    {annText && <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', textAlign: 'left', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>}
                                 </div>
                             </div>
                         </foreignObject>
@@ -196,10 +196,10 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     {renderIcon(tool?.icon || '', iconX, iconY, iW, iH)}
                     {align === 'right' && (labelText || annText) && (
                         <foreignObject x={iconX + iW + 2} y={0} width={zoneX + zoneW - iconX - iW - 2} height={rowHeight}>
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', paddingTop: 2, paddingLeft: 2 } as any}>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', paddingTop: 2, paddingLeft: 2, overflow: 'hidden' } as any}>
                                 <div style={{ display: 'flex', flexDirection: isInline ? 'row' : 'column', alignItems: isInline ? 'center' : 'flex-start', gap: isInline ? 3 : 0, lineHeight: 1 }}>
                                     {labelText && <span style={{ fontFamily: 'ui-monospace, monospace', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap' }}>{labelText}</span>}
-                                    {annText && <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', textAlign: 'left', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>}
+                                    {annText && <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', textAlign: 'right', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>}
                                 </div>
                             </div>
                         </foreignObject>
@@ -254,10 +254,10 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostItem); }}>
                     {align === 'left' && (labelText || annText) && (
                         <foreignObject x={zoneX} y={0} width={iconX - zoneX - 2} height={rowHeight}>
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end', paddingTop: 2, paddingRight: 2 } as any}>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end', paddingTop: 2, paddingRight: 2, overflow: 'hidden' } as any}>
                                 <div style={{ display: 'flex', flexDirection: isInline ? 'row-reverse' : 'column', alignItems: isInline ? 'center' : 'flex-end', gap: isInline ? 3 : 0, lineHeight: 1 }}>
                                     {labelText && <span style={{ fontFamily: 'ui-monospace, monospace', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap' }}>{labelText}</span>}
-                                    {annText && <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', textAlign: 'right', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>}
+                                    {annText && <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', textAlign: 'left', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>}
                                 </div>
                             </div>
                         </foreignObject>
@@ -265,10 +265,10 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     {renderIcon(tool?.icon || '', iconX, iconY, iW, iH)}
                     {align === 'right' && (labelText || annText) && (
                         <foreignObject x={iconX + iW + 2} y={0} width={zoneX + zoneW - iconX - iW - 2} height={rowHeight}>
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', paddingTop: 2, paddingLeft: 2 } as any}>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', paddingTop: 2, paddingLeft: 2, overflow: 'hidden' } as any}>
                                 <div style={{ display: 'flex', flexDirection: isInline ? 'row' : 'column', alignItems: isInline ? 'center' : 'flex-start', gap: isInline ? 3 : 0, lineHeight: 1 }}>
                                     {labelText && <span style={{ fontFamily: 'ui-monospace, monospace', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap' }}>{labelText}</span>}
-                                    {annText && <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', textAlign: 'left', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>}
+                                    {annText && <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', textAlign: 'right', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>}
                                 </div>
                             </div>
                         </foreignObject>
@@ -419,7 +419,11 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                 <rect x={vertX} y={discY} width={scaledWidth} height={discH}
                     fill="transparent" cursor={!readOnly ? 'pointer' : 'default'}
                     onClick={() => !readOnly && onDiscClick(level.id)} />
-                {cageBelow ? renderCageInfo(cageBelow)
+                {cageBelow ? (
+                        <g cursor={!readOnly ? 'pointer' : 'default'} onClick={(e) => { e.stopPropagation(); !readOnly && onDiscClick(level.id); }}>
+                            {renderCageInfo(cageBelow)}
+                        </g>
+                    )
                     : ghostCageBelow ? (
                         <g cursor="pointer" onClick={(e) => { e.stopPropagation(); onGhostCageClick && onGhostCageClick(ghostCageBelow); }}>
                             {renderCageInfo(ghostCageBelow, 0.4)}

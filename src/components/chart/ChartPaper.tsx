@@ -202,7 +202,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
 
     return (
     <div ref={containerRef} className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative overflow-hidden">
-        <svg ref={svgRef} viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} preserveAspectRatio="xMidYMid meet" className="flex-1 w-full" style={{ overflow: 'visible' }}>
+        <svg ref={svgRef} viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} preserveAspectRatio="xMidYMin meet" className="flex-1 w-full" style={{ overflow: 'visible' }}>
             {/* Title bar */}
             <rect x={0} y={0} width={chartWidth} height={TITLE_H} fill="#f8fafc" />
             <line x1={0} y1={TITLE_H} x2={chartWidth} y2={TITLE_H} stroke="#e2e8f0" strokeWidth={1} />
@@ -222,7 +222,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
 
             {/* Column headers */}
             {showForces && (
-                <text x={4} y={TITLE_H + COL_HEADER_H / 2}
+                <text x={8} y={TITLE_H + COL_HEADER_H / 2}
                     textAnchor="start" dominantBaseline="middle"
                     fontSize={11} fontWeight="bold" fill="#60a5fa" letterSpacing="0.02em"
                     style={{ textTransform: 'uppercase' } as any}>
@@ -242,7 +242,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                 {t('chart.header.right')}
             </text>
             {showForces && (
-                <text x={chartWidth - 4} y={TITLE_H + COL_HEADER_H / 2}
+                <text x={chartWidth - 8} y={TITLE_H + COL_HEADER_H / 2}
                     textAnchor="end" dominantBaseline="middle"
                     fontSize={11} fontWeight="bold" fill="#60a5fa" letterSpacing="0.02em"
                     style={{ textTransform: 'uppercase' } as any}>
@@ -296,7 +296,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                                     }
                                 }}>
                                 <svg x={vertX} y={y - connH / 2} width={scaledWidth} height={connH} overflow="visible">
-                                    <InstrumentIcon type="connector" className="w-full h-full text-slate-400" />
+                                    <InstrumentIcon type="connector" className="w-full h-full" color="#94a3b8" />
                                 </svg>
                                 {!readOnly && (
                                     <g className="connector-remove-btn" opacity={0}
@@ -325,7 +325,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                             <g key={gc.id || gc.levelId} opacity={0.4} cursor="pointer"
                                 onClick={() => onGhostConnectorClick && onGhostConnectorClick(gc)}>
                                 <svg x={vertX} y={y - connH / 2} width={scaledWidth} height={connH} overflow="visible">
-                                    <InstrumentIcon type="connector" className="w-full h-full text-slate-900" />
+                                    <InstrumentIcon type="connector" className="w-full h-full" color="#94a3b8" />
                                 </svg>
                             </g>
                         );
