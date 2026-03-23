@@ -1,8 +1,11 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION = "v2.2.1-beta";
+export const CURRENT_VERSION = "v2.2.2-beta";
 
 export const CHANGE_LOG = [
+    { version: "v2.2.2-beta", date: "2026-03-23", changes: [
+        "Loaded files are now validated against the v4 schema before import. Corrupted or invalid files are rejected with a clear error message instead of silently loading bad data.",
+    ]},
     { version: "v2.2.1-beta", date: "2026-03-23", changes: [
         "Internal architecture: app state extracted into a dedicated state manager for improved reliability and maintainability.",
         "Automated test suite added covering all state operations and data format conversions.",
