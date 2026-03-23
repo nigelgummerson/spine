@@ -391,7 +391,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     <g opacity={opacity}>
                         <text x={vertX + scaledWidth / 2} y={discY + discH / 2}
                             textAnchor="middle" dominantBaseline="middle"
-                            fontSize={Math.max(9, cageLabelPx - 1)} fontStyle="italic" fill="#d97706">
+                            fontSize={8} fontStyle="italic" fill="#d97706">
                             {t('chart.cervical_cage_hint')}
                         </text>
                     </g>
