@@ -13,7 +13,8 @@
       "AO Spine Ukraine",
       "RASS",
       "Israeli Spine Society",
-      "Chinese Spine Society (CSS)"
+      "Chinese Spine Society (CSS)",
+      "JSSR"
     ],
     "last_updated": "2026-03-20",
     "notes": "All translations marked verified: false pending review by native-speaking spine surgeons. Sources indicate the national/international society whose published terminology was referenced."
@@ -128,6 +129,11 @@
           "expected": "关节突关节松解",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "椎間関節解離",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -218,6 +224,11 @@
         "zh-Hans": {
           "expected": "Schwab 1级",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "Schwab Grade 1",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -310,6 +321,11 @@
           "expected": "下关节突切除；关节囊切除。",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "下関節突起切除；関節包除去。",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -400,6 +416,11 @@
         "zh-Hans": {
           "expected": "Ponte / Smith Petersen",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -492,6 +513,11 @@
           "expected": "Schwab 2级",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "Schwab Grade 2",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -582,6 +608,11 @@
         "zh-Hans": {
           "expected": "完全关节突切除；黄韧带+椎板。",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "完全椎間関節切除；黄色靭帯＋椎弓。",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -674,6 +705,11 @@
           "expected": "标准PSO",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "標準PSO",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -764,6 +800,11 @@
         "zh-Hans": {
           "expected": "Schwab 3级",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "Schwab Grade 3",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -856,6 +897,11 @@
           "expected": "椎弓根截骨；部分椎体楔形截骨。",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "椎弓根短縮骨切り；椎体部分楔状骨切り。",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -946,6 +992,11 @@
         "zh-Hans": {
           "expected": "扩大PSO",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "拡大PSO",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -1038,6 +1089,11 @@
           "expected": "Schwab 4级",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "Schwab Grade 4",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -1128,6 +1184,11 @@
         "zh-Hans": {
           "expected": "PSO + 邻近椎间盘切除。",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "PSO＋隣接椎間板切除。",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -1220,6 +1281,11 @@
           "expected": "VCR",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "VCR",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -1310,6 +1376,11 @@
         "zh-Hans": {
           "expected": "Schwab 5级",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "Schwab Grade 5",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -1402,6 +1473,11 @@
           "expected": "全脊椎切除术。",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "全脊椎切除術。",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -1492,6 +1568,11 @@
         "zh-Hans": {
           "expected": "多节段VCR",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "多椎体VCR",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -1584,6 +1665,11 @@
           "expected": "Schwab 6级",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "Schwab Grade 6",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -1674,6 +1760,11 @@
         "zh-Hans": {
           "expected": "多个椎体及椎间盘切除。",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "複数椎体および椎間板の切除。",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -1766,6 +1857,11 @@
           "expected": "椎体次全切除术 (前路)",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "椎体亜全摘術 (前方)",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -1856,6 +1952,11 @@
         "zh-Hans": {
           "expected": "前路",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "前方",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -1948,6 +2049,11 @@
           "expected": "椎体切除。",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "椎体切除。",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -2038,6 +2144,11 @@
         "zh-Hans": {
           "expected": "颈椎前路椎间盘切除融合术",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "前方頚椎椎間板切除固定術",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -2130,6 +2241,11 @@
           "expected": "后路腰椎椎间融合术",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "後方腰椎椎体間固定術",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -2220,6 +2336,11 @@
         "zh-Hans": {
           "expected": "经椎间孔腰椎椎间融合术",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "経椎間孔腰椎椎体間固定術",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -2312,6 +2433,11 @@
           "expected": "侧方腰椎椎间融合术",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "側方腰椎椎体間固定術",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -2402,6 +2528,11 @@
         "zh-Hans": {
           "expected": "斜外侧腰椎椎间融合术",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "斜外側腰椎椎体間固定術",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -2494,6 +2625,11 @@
           "expected": "前路腰椎椎间融合术",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "前方腰椎椎体間固定術",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -2584,6 +2720,11 @@
         "zh-Hans": {
           "expected": "后路",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "後方",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -2676,6 +2817,11 @@
           "expected": "前路",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "前方",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -2766,6 +2912,11 @@
         "zh-Hans": {
           "expected": "侧方",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "側方",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -2858,6 +3009,11 @@
           "expected": "局部骨",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "局所骨",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -2948,6 +3104,11 @@
         "zh-Hans": {
           "expected": "自体骨",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "自家骨",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -3040,6 +3201,11 @@
           "expected": "异体骨",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "同種骨",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -3130,6 +3296,11 @@
         "zh-Hans": {
           "expected": "人工骨",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "人工骨",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -3222,6 +3393,11 @@
           "expected": "椎弓根",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "椎弓根",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -3312,6 +3488,11 @@
         "zh-Hans": {
           "expected": "横突 (下)",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "横突起 (下)",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -3404,6 +3585,11 @@
           "expected": "横突 (上)",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "横突起 (上)",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -3494,6 +3680,11 @@
         "zh-Hans": {
           "expected": "椎板上",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "椎弓上",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -3586,6 +3777,11 @@
           "expected": "椎板下",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "椎弓下",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -3676,6 +3872,11 @@
         "zh-Hans": {
           "expected": "向左平移",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "左方移動",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -3768,6 +3969,11 @@
           "expected": "向右平移",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "右方移動",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -3858,6 +4064,11 @@
         "zh-Hans": {
           "expected": "加压",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "圧迫",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -3950,6 +4161,11 @@
           "expected": "撑开",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "伸延",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -4040,6 +4256,11 @@
         "zh-Hans": {
           "expected": "顺时针去旋转",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "回旋矯正 時計回り",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -4132,6 +4353,11 @@
           "expected": "逆时针去旋转",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "回旋矯正 反時計回り",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -4222,6 +4448,11 @@
         "zh-Hans": {
           "expected": "内植物供应商",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "インプラントメーカー",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -4314,6 +4545,11 @@
           "expected": "螺钉系统",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "スクリューシステム",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -4404,6 +4640,11 @@
         "zh-Hans": {
           "expected": "重建融合器",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "再建ケージ",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -4496,6 +4737,11 @@
           "expected": "会话隐私",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "セッションプライバシー",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -4586,6 +4832,11 @@
         "zh-Hans": {
           "expected": "复制计划到术中记录",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "計画を術中記録にコピー",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -4678,6 +4929,11 @@
           "expected": "单轴",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "単軸",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -4768,6 +5024,11 @@
         "zh-Hans": {
           "expected": "万向",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "多軸",
+          "source": "JSSR",
           "verified": false
         }
       }
@@ -4860,6 +5121,11 @@
           "expected": "单平面",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "一方向",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -4951,6 +5217,11 @@
           "expected": "植骨",
           "source": "Chinese Spine Society (CSS)/AO Spine",
           "verified": false
+        },
+        "ja": {
+          "expected": "骨移植",
+          "source": "JSSR",
+          "verified": false
         }
       }
     },
@@ -5041,6 +5312,11 @@
         "zh-Hans": {
           "expected": "最终手术记录",
           "source": "Chinese Spine Society (CSS)/AO Spine",
+          "verified": false
+        },
+        "ja": {
+          "expected": "最終手術記録",
+          "source": "JSSR",
           "verified": false
         }
       }

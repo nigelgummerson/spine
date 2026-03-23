@@ -12,7 +12,7 @@ export const LOCALE_MAP: Record<string, string> = {
     ar: 'ar-SA', en: 'en-GB', fr: 'fr-FR', de: 'de-DE', es: 'es-ES',
     pt: 'pt-PT', it: 'it-IT', nl: 'nl-NL', pl: 'pl-PL',
     tr: 'tr-TR', nb: 'nb-NO', da: 'da-DK', sv: 'sv-SE',
-    el: 'el-GR', fi: 'fi-FI', he: 'he-IL', hi: 'hi-IN', ru: 'ru-RU', uk: 'uk-UA',
+    el: 'el-GR', fi: 'fi-FI', he: 'he-IL', hi: 'hi-IN', ja: 'ja-JP', ru: 'ru-RU', uk: 'uk-UA',
     'zh-Hans': 'zh-CN',
 };
 
