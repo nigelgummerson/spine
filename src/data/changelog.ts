@@ -1,6 +1,6 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION: string = "v2.3.0-beta";
+export const CURRENT_VERSION: string = "v2.3.1-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -9,6 +9,11 @@ interface ChangeLogEntry {
 }
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
+    { version: "v2.3.1-beta", date: "2026-03-23", changes: [
+        "Web build — the app now loads faster on connected hospital computers with cached fonts and libraries. Code-split assets with content-hashed filenames for efficient browser caching.",
+        "Standalone offline version available as a single-file download from GitHub Releases for use without internet.",
+        "Help modal includes an Offline Use section with a download link.",
+    ]},
     { version: "v2.3.0-beta", date: "2026-03-23", changes: [
         "PDF and JPG exports are now half the previous file size with no loss of quality.",
         "Notes support line breaks — type \\n to split text across multiple lines.",

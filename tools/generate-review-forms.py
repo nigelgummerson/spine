@@ -28,9 +28,9 @@ OUTPUT_DIR = PROJECT_DIR / "public" / "review-forms"
 
 
 def read_app_version() -> str:
-    """Extract CURRENT_VERSION from changelog.js."""
+    """Extract CURRENT_VERSION from changelog.ts."""
     text = CHANGELOG_FILE.read_text(encoding="utf-8")
-    match = re.search(r'CURRENT_VERSION\s*=\s*"([^"]+)"', text)
+    match = re.search(r'CURRENT_VERSION[^=]*=\s*"([^"]+)"', text)
     return match.group(1) if match else "unknown"
 
 # Language metadata: code -> (English name, native name)
