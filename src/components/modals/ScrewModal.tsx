@@ -6,6 +6,21 @@ import { InstrumentIcon } from '../chart/InstrumentIcon';
 import { IconTrash, IconX } from '../icons';
 import { Portal } from '../Portal';
 
+/** Scroll wheel increments/decrements a number input on hover. */
+export const numberWheelHandler = (
+    setter: (v: string) => void,
+    step: number = 1,
+    min?: number,
+    max?: number
+) => (e: React.WheelEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const current = parseFloat(e.currentTarget.value) || 0;
+    const next = e.deltaY < 0 ? current + step : current - step;
+    if (min !== undefined && next < min) return;
+    if (max !== undefined && next > max) return;
+    setter(String(Math.round(next * 100) / 100));
+};
+
 /** Scroll wheel cycles through <select> options without opening the dropdown. */
 export const selectWheelHandler = (e: React.WheelEvent<HTMLSelectElement>) => {
     e.preventDefault();

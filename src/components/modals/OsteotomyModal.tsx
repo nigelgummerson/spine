@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { t } from '../../i18n/i18n';
-import { modalKeyHandler, selectWheelHandler } from './ScrewModal';
+import { modalKeyHandler, selectWheelHandler, numberWheelHandler } from './ScrewModal';
 import { IconTrash, IconX } from '../icons';
 import { Portal } from '../Portal';
 
@@ -115,7 +115,7 @@ export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialDa
                     <div>
                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('modal.osteotomy.angle')}</label>
                         <div className="flex items-center gap-2">
-                            <input type="number" value={angle} onChange={(e) => setAngle(e.target.value)} placeholder={selectedDef.defaultAngle}
+                            <input type="number" value={angle} onChange={(e) => setAngle(e.target.value)} onWheel={numberWheelHandler(setAngle, 5, 0, 90)} title={t('hint.scroll_to_change')} placeholder={selectedDef.defaultAngle}
                                 className="w-24 p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none text-center" />
                             <span className="italic text-slate-400 text-sm">{t('modal.osteotomy.degrees')}</span>
                         </div>

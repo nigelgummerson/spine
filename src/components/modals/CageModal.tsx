@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { t } from '../../i18n/i18n';
 import { CAGE_TYPES, CAGE_PERMISSIBILITY, APPROACH_GROUPS, getDiscLabel } from '../../data/clinical';
-import { modalKeyHandler } from './ScrewModal';
+import { modalKeyHandler, numberWheelHandler } from './ScrewModal';
 import { IconTrash, IconX } from '../icons';
 import { Portal } from '../Portal';
 
@@ -160,10 +160,10 @@ export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, l
 
                     {/* Dimensions */}
                     <div className="grid grid-cols-2 gap-3">
-                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.height')}</label><input type="number" value={height} onChange={e => setHeight(e.target.value)} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
-                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.lordosis')}</label><input type="number" value={lordosis} onChange={e => setLordosis(e.target.value)} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
-                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.length')}</label><input type="number" value={length} onChange={e => setLength(e.target.value)} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
-                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.width')}</label><input type="number" value={width} onChange={e => setWidth(e.target.value)} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
+                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.height')}</label><input type="number" value={height} onChange={e => setHeight(e.target.value)} onWheel={numberWheelHandler(setHeight, 1, 0)} title={t('hint.scroll_to_change')} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
+                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.lordosis')}</label><input type="number" value={lordosis} onChange={e => setLordosis(e.target.value)} onWheel={numberWheelHandler(setLordosis, 1, 0, 30)} title={t('hint.scroll_to_change')} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
+                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.length')}</label><input type="number" value={length} onChange={e => setLength(e.target.value)} onWheel={numberWheelHandler(setLength, 1, 0)} title={t('hint.scroll_to_change')} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
+                        <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.width')}</label><input type="number" value={width} onChange={e => setWidth(e.target.value)} onWheel={numberWheelHandler(setWidth, 1, 0)} title={t('hint.scroll_to_change')} className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
                     </div>
                 </div>
                 <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{initialData ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center"><IconTrash/> {t('button.remove')}</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.cancel')}</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-sky-800 text-white hover:bg-sky-700 text-sm font-bold shadow-lg">{t('button.confirm')}</button></div></div>
