@@ -3,6 +3,7 @@ import { useReducer, useState, useRef, useEffect, useCallback } from 'react';
 import { documentReducer, createInitialState, serializeState, deserializeDocument } from '../state/documentReducer';
 import { CURRENT_VERSION } from '../data/changelog';
 import { acceptDisclaimer } from '../components/modals/DisclaimerModal';
+import { validateV4, ValidationError } from '../state/schema';
 
 export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLang, incognitoMode, currentLang, setViewMode, showToast }) {
     const [state, dispatch] = useReducer(documentReducer, undefined, createInitialState);
@@ -38,13 +39,26 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                if (parsed.schema?.version === 4 || parsed.formatVersion >= 2) {
+                if (parsed.schema?.version === 4) {
+                    validateV4(parsed);
+                    const result = deserializeDocument(parsed);
+                    dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
+                    if (result.viewMode) setViewMode(result.viewMode);
+                    if (result.colourScheme) changeTheme(result.colourScheme);
+                } else if (parsed.formatVersion >= 2) {
+                    // Legacy v2/v3 — no validation
                     const result = deserializeDocument(parsed);
                     dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
                     if (result.viewMode) setViewMode(result.viewMode);
                     if (result.colourScheme) changeTheme(result.colourScheme);
                 }
-            } catch (e) { console.error('Data load error'); }
+            } catch (e) {
+                if (e instanceof ValidationError) {
+                    console.error('Cached data failed validation — starting fresh:', e.issues);
+                } else {
+                    console.error('Data load error');
+                }
+            }
         }
         setHasLoaded(true);
     }, []);
