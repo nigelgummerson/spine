@@ -22,7 +22,7 @@ export const ChangeLogModal = ({ isOpen, onClose }: ChangeLogModalProps) => {
                         </div>
                     ))}
                 </div>
-                <div className="bg-slate-50 px-4 py-3 text-right border-t border-slate-200"><button onClick={onClose} className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold">{t('button.close')}</button></div>
+                <div className="bg-slate-50 px-4 py-3 text-end border-t border-slate-200"><button onClick={onClose} className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold">{t('button.close')}</button></div>
             </div>
         </div>
     );

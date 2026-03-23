@@ -88,7 +88,7 @@ export const HelpModal = ({ isOpen, onClose }: HelpModalProps) => {
                         <p className="text-[10px] text-slate-400 mt-2"><a href="https://plan.skeletalsurgery.com/spine/quick-reference.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600">{t('credits.quick_reference')}</a></p>
                     </div>
                 </div>
-                <div className="bg-slate-50 px-4 py-3 text-right border-t border-slate-200">
+                <div className="bg-slate-50 px-4 py-3 text-end border-t border-slate-200">
                     <button onClick={onClose} className="px-4 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold">{t('button.close')}</button>
                 </div>
             </div>

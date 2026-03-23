@@ -98,7 +98,7 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
                                         return (
                                             <div key={name} className={`flex justify-between text-[10px] leading-tight py-px border-b border-slate-50${newGroup ? ' mt-1' : ''}`}>
                                                 <span className="text-slate-700 font-medium">{name}</span>
-                                                <span className="font-bold text-slate-900 ml-2">{count}</span>
+                                                <span className="font-bold text-slate-900 ms-2">{count}</span>
                                             </div>
                                         );
                                     });

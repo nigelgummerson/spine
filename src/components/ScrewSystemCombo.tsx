@@ -40,7 +40,7 @@ export const ScrewSystemCombo = ({ value, onChange, company, placeholder }: Scre
                 <div className="editable-field w-full text-xs cursor-pointer" style={{ whiteSpace: 'normal', wordBreak: 'break-word' }} onClick={() => { setEditing(true); setOpen(true); }}>{value || <span style={{ color: '#6b7280' }}>{placeholder}</span>}</div>
             )}
             {open && (matchedCompany.length > 0 || matchedOther.length > 0) && (
-                <div className="absolute z-50 left-0 right-0 top-full mt-0.5 bg-white border border-slate-300 rounded shadow-lg max-h-48 overflow-y-auto text-xs">
+                <div className="absolute z-50 inset-x-0 top-full mt-0.5 bg-white border border-slate-300 rounded shadow-lg max-h-48 overflow-y-auto text-xs">
                     {matchedCompany.length > 0 && <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase bg-slate-50">{company}</div>}
                     {matchedCompany.map(s => <div key={s} className="px-2 py-1.5 cursor-pointer hover:bg-amber-50 font-semibold text-slate-800" onClick={() => { onChange(s); setFilter(''); setOpen(false); }}>{s}</div>)}
                     {matchedOther.length > 0 && <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase bg-slate-50 border-t border-slate-200">{t('patient.other_companies')}</div>}

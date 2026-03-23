@@ -49,12 +49,21 @@ const App = () => {
     const [showFinalInventory, setShowFinalInventory] = useState(false);
     const [currentLang, setCurrentLangState] = useState(detectLanguage());
 
+    const RTL_LANGUAGES = ['ar', 'he', 'fa', 'ur'];
+    const isRTL = RTL_LANGUAGES.includes(currentLang);
+
     const changeLang = (code: string) => {
         setCurrentLang(code);
         setCurrentLangState(code);
         document.documentElement.lang = code;
+        document.documentElement.dir = RTL_LANGUAGES.includes(code) ? 'rtl' : 'ltr';
         localStorage.setItem('spine_planner_lang', code);
     };
+
+    // Set initial dir attribute on mount
+    useEffect(() => {
+        document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+    }, [isRTL]);
 
     const changeTheme = (id: string) => {
         setColourScheme(id);
@@ -838,7 +847,7 @@ const App = () => {
                 ))}
             </button>
             {themeOpen && (
-                <div className="absolute right-0 top-full mt-1 rounded-lg shadow-xl border p-1.5 z-50" style={{ backgroundColor: scheme.sidebarTitleBg, borderColor: scheme.sidebarBorder }}>
+                <div className="absolute end-0 top-full mt-1 rounded-lg shadow-xl border p-1.5 z-50" style={{ backgroundColor: scheme.sidebarTitleBg, borderColor: scheme.sidebarBorder }}>
                     {COLOUR_SCHEMES.map(s => (
                         <button key={s.id} onClick={() => { changeTheme(s.id); setThemeOpen(false); }}
                             className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-all ${colourScheme === s.id ? 'ring-1 ring-white/50' : 'hover:bg-white/10'}`}>
@@ -882,7 +891,7 @@ const App = () => {
                             <button onClick={promptExportJPG} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.jpg')}><IconImage /></button>
                             <button onClick={promptExportPDF} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.pdf')}><IconPDF /></button>
                             <button onClick={() => setHelpModalOpen(true)} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.help')}><IconHelp /></button>
-                            <div className="p-2.5 rounded" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? t('sync.linked') : t('sync.no_peer')}><IconLink />{syncConnected && <span className="inline-block ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
+                            <div className="p-2.5 rounded" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? t('sync.linked') : t('sync.no_peer')}><IconLink />{syncConnected && <span className="inline-block ms-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
                         </div>
                     </div>
 
@@ -949,12 +958,12 @@ const App = () => {
                                 </div>
                             )}
                             {portraitTab === 1 && (
-                                <div className="w-full h-full flex flex-col bg-white">
+                                <div dir="ltr" className="w-full h-full flex flex-col bg-white">
                                     {planChart}
                                 </div>
                             )}
                             {portraitTab === 2 && (
-                                <div className="w-full h-full flex flex-col bg-white">
+                                <div dir="ltr" className="w-full h-full flex flex-col bg-white">
                                     {constructChart}
                                 </div>
                             )}
@@ -966,16 +975,16 @@ const App = () => {
                 {portraitExporting && (
                     <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', pointerEvents: 'none' }}>
                         <div id="export-container" ref={exportRef}>
-                            <div className="w-[370px] bg-white border-r border-slate-300 flex flex-col p-8">
+                            <div className="w-[370px] bg-white border-e border-slate-300 flex flex-col p-8">
                                 <CreditsFooter lang={currentLang} />
                             </div>
-                            <div className="flex-[4] flex flex-col h-full min-w-0 overflow-hidden">
+                            <div dir="ltr" className="flex-[4] flex flex-col h-full min-w-0 overflow-hidden">
                                 <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={() => {}} connectors={plannedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.planLeftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.planRightRod}</span></div></React.Fragment>} reconLabelPositions={reconLabelPositions} />
                             </div>
-                            <div className="flex-[3] flex flex-col h-full min-w-0 overflow-hidden">
+                            <div dir="ltr" className="flex-[3] flex flex-col h-full min-w-0 overflow-hidden">
                                 <ChartPaper title={t('export.construct')} placements={completedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={() => {}} connectors={completedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={completedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.leftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.rightRod}</span></div></React.Fragment>} reconLabelPositions={reconLabelPositions} />
                             </div>
-                            <div className="absolute bottom-1 right-2 text-[8px] text-slate-300 font-mono">{getDisclaimerTimestamp() ? `${t('disclaimer.accepted_label')} ${getDisclaimerTimestamp()}` : ''} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
+                            <div className="absolute bottom-1 end-2 text-[8px] text-slate-300 font-mono">{getDisclaimerTimestamp() ? `${t('disclaimer.accepted_label')} ${getDisclaimerTimestamp()}` : ''} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
                         </div>
                     </div>
                 )}
@@ -992,7 +1001,7 @@ const App = () => {
             {modals}
 
             <div className="flex-1 overflow-hidden bg-slate-200 flex relative">
-                <aside className="w-[340px] flex flex-col z-20 overflow-y-auto no-print shadow-xl" style={{ backgroundColor: scheme.sidebarBg, borderRight: `1px solid ${scheme.sidebarBorder}`, color: scheme.textPrimary }}>
+                <aside className="w-[340px] flex flex-col z-20 overflow-y-auto no-print shadow-xl" style={{ backgroundColor: scheme.sidebarBg, borderInlineEnd: `1px solid ${scheme.sidebarBorder}`, color: scheme.textPrimary }}>
                     {/* 1. Tool Palette - most used, top position */}
                     <div className="p-3 space-y-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
                         {tools.map((g,i) => (
@@ -1069,7 +1078,7 @@ const App = () => {
                                     </div>
                                 </button>
                                 {themeOpen && (
-                                    <div className="absolute left-0 bottom-full mb-1 rounded-lg shadow-xl border p-1.5 z-50" style={{ backgroundColor: scheme.sidebarTitleBg, borderColor: scheme.sidebarBorder }}>
+                                    <div className="absolute start-0 bottom-full mb-1 rounded-lg shadow-xl border p-1.5 z-50" style={{ backgroundColor: scheme.sidebarTitleBg, borderColor: scheme.sidebarBorder }}>
                                         {COLOUR_SCHEMES.map(s => (
                                             <button key={s.id} onClick={() => { changeTheme(s.id); setThemeOpen(false); }}
                                                 className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-all ${colourScheme === s.id ? 'ring-1 ring-white/50' : 'hover:bg-white/10'}`}>
@@ -1104,7 +1113,7 @@ const App = () => {
 
                     {/* 8. Utility row - version, new patient, sync */}
                     <div className="px-3 pb-1 flex items-center gap-1">
-                        <div className="flex items-center justify-center px-1.5 py-1.5 rounded text-[10px]" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? t('sync.linked') : t('sync.no_peer')}><IconLink />{syncConnected && <span className="ml-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
+                        <div className="flex items-center justify-center px-1.5 py-1.5 rounded text-[10px]" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? t('sync.linked') : t('sync.no_peer')}><IconLink />{syncConnected && <span className="ms-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
                         <button onClick={() => setChangeLogOpen(true)} className="flex items-center justify-center px-2 py-1.5 rounded text-[10px] font-mono" style={{ color: scheme.textMuted }}>{CURRENT_VERSION}</button>
                         <div className="flex-1"></div>
                         <button onClick={newPatientAction} className="flex items-center justify-center gap-1 px-2 py-1.5 rounded text-[10px] font-bold" style={{ color: '#dc2626' }}>
@@ -1118,16 +1127,16 @@ const App = () => {
                 <div ref={containerWrapperRef} id="print-wrapper" className="flex-1 flex items-center justify-center p-8 bg-slate-300 overflow-hidden relative">
                     <div style={{ transform: `scale(${scale})` }}>
                         <div id="export-container" ref={exportRef}>
-                            <div className="w-[370px] bg-white border-r border-slate-300 flex flex-col p-8">{demographicsContent}</div>
-                            <div className="flex-[4] flex flex-col h-full min-w-0 overflow-hidden relative" style={{ borderTop: `3px solid ${activeChart === 'planned' ? scheme.activeBg : '#cbd5e1'}` }} onClick={() => activeChart !== 'planned' && setActiveChart('planned')}>
+                            <div className="w-[370px] bg-white border-e border-slate-300 flex flex-col p-8">{demographicsContent}</div>
+                            <div dir="ltr" className="flex-[4] flex flex-col h-full min-w-0 overflow-hidden relative" style={{ borderTop: `3px solid ${activeChart === 'planned' ? scheme.activeBg : '#cbd5e1'}` }} onClick={() => activeChart !== 'planned' && setActiveChart('planned')}>
                                 {planChart}
                                 {activeChart !== 'planned' && !isPortrait && <div className="absolute inset-0 bg-slate-400/20 cursor-pointer z-20" data-export-hide="true" />}
                             </div>
-                            <div className="flex-[3] flex flex-col h-full min-w-0 overflow-hidden relative" style={{ borderTop: `3px solid ${activeChart === 'completed' ? scheme.activeBg : '#cbd5e1'}` }} onClick={() => activeChart !== 'completed' && setActiveChart('completed')}>
+                            <div dir="ltr" className="flex-[3] flex flex-col h-full min-w-0 overflow-hidden relative" style={{ borderTop: `3px solid ${activeChart === 'completed' ? scheme.activeBg : '#cbd5e1'}` }} onClick={() => activeChart !== 'completed' && setActiveChart('completed')}>
                                 {constructChart}
                                 {activeChart !== 'completed' && !isPortrait && <div className="absolute inset-0 bg-slate-400/20 cursor-pointer z-20" data-export-hide="true" />}
                             </div>
-                            <div className="absolute bottom-1 right-2 text-[8px] text-slate-300 font-mono">{getDisclaimerTimestamp() ? `${t('disclaimer.accepted_label')} ${getDisclaimerTimestamp()}` : ''} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
+                            <div className="absolute bottom-1 end-2 text-[8px] text-slate-300 font-mono">{getDisclaimerTimestamp() ? `${t('disclaimer.accepted_label')} ${getDisclaimerTimestamp()}` : ''} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
                         </div>
                     </div>
                 </div>
@@ -1137,7 +1146,7 @@ const App = () => {
                 {toasts.map(toast => (
                     <div key={toast.id} className={`pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium animate-[fadeIn_0.2s_ease-out] ${toast.type === 'error' ? 'bg-red-800 text-white' : 'bg-slate-800 text-white'}`}>
                         <span>{toast.message}</span>
-                        <button onClick={() => dismissToast(toast.id)} className="ml-1 hover:brightness-125 text-xs font-bold">✕</button>
+                        <button onClick={() => dismissToast(toast.id)} className="ms-1 hover:brightness-125 text-xs font-bold">✕</button>
                     </div>
                 ))}
             </div>}

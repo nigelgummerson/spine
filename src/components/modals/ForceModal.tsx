@@ -31,7 +31,7 @@ export const ForceModal = ({ isOpen, onClose, onConfirm }: ForceModalProps) => {
                         </button>
                     ))}
                 </div>
-                <div className="bg-slate-50 px-4 py-2 text-right border-t border-slate-100">
+                <div className="bg-slate-50 px-4 py-2 text-end border-t border-slate-100">
                     <button onClick={onClose} className="px-4 py-1.5 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.cancel')}</button>
                 </div>
             </div>
