@@ -546,22 +546,25 @@ const App = () => {
         // In portrait mode, mount the off-screen export container temporarily
         if (isPortrait) {
             setPortraitExporting(true);
-            // Wait for React to render the export container
             await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
         }
         const element = exportRef.current!;
-        // Sync DOM properties to attributes so cloneNode preserves them
-        element.querySelectorAll('input[type="checkbox"]').forEach((cb: any) => {
-            if (cb.checked) cb.setAttribute('checked', 'checked');
-            else cb.removeAttribute('checked');
-        });
-        element.querySelectorAll('select').forEach((sel: any) => {
-            Array.from(sel.options).forEach((opt: any, i: number) => {
-                if (i === sel.selectedIndex) (opt as HTMLOptionElement).setAttribute('selected', 'selected');
-                else (opt as HTMLOptionElement).removeAttribute('selected');
+        // Sync demographics form state to DOM attributes (checkboxes, selects)
+        // Chart columns are SVG-native and don't need this
+        const demoCol = element.querySelector('.w-\\[370px\\]');
+        if (demoCol) {
+            demoCol.querySelectorAll('input[type="checkbox"]').forEach((cb: any) => {
+                if (cb.checked) cb.setAttribute('checked', 'checked');
+                else cb.removeAttribute('checked');
             });
-        });
-        // 300 DPI: A4 landscape (297x210mm) at 300 DPI = 3508x2480px → pixelRatio 3508/1485 ≈ 2.36
+            demoCol.querySelectorAll('select').forEach((sel: any) => {
+                Array.from(sel.options).forEach((opt: any, i: number) => {
+                    if (i === sel.selectedIndex) (opt as HTMLOptionElement).setAttribute('selected', 'selected');
+                    else (opt as HTMLOptionElement).removeAttribute('selected');
+                });
+            });
+        }
+        // 300 DPI: A4 landscape (297x210mm) at 300 DPI = 3508x2480px
         const canvas = await htmlToImage.toCanvas(element, {
             pixelRatio: 3508 / 1485,
             backgroundColor: '#ffffff',
@@ -585,14 +588,14 @@ const App = () => {
         const canvas = await prepareExportCanvas();
         const link = document.createElement('a');
         link.download = `SpinePlan_${patientData.name || 'Patient'}.jpg`;
-        link.href = canvas.toDataURL('image/jpeg', 0.9);
+        link.href = canvas.toDataURL('image/jpeg', 0.85);
         link.click();
         if (incognitoMode) localStorage.removeItem('spine_planner_v2');
         setPortraitExporting(false);
     };
     const runExportPDF = async () => {
         const canvas = await prepareExportCanvas();
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        const imgData = canvas.toDataURL('image/jpeg', 0.85);
         const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
         // Check if demographics panel overflows — if so, add inventory page

@@ -233,7 +233,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
         )}
 
         {/* SVG chart content — scales with spine view */}
-        <svg ref={svgRef} viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} preserveAspectRatio="xMidYMid meet" className="flex-1 w-full" style={{ overflow: 'visible' }}>
+        <svg ref={svgRef} data-chart-svg="true" viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} preserveAspectRatio="xMidYMid meet" className="flex-1 w-full" style={{ overflow: 'visible' }}>
             {/* 1. Level rows — vertebral bodies, zones, cages, osteotomies, implant icons */}
             <g>
                 {levels.map(lvl => (
