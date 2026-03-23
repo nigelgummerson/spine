@@ -13,7 +13,8 @@ A single-file HTML application for pre-operative spinal surgery planning. Design
 ```
 spine-planner/
 ├── index.html              # Vite entry point (minimal)
-├── vite.config.js          # Vite + vite-plugin-singlefile config
+├── vite.config.js          # Vite web build config (code-split)
+├── vite.config.singlefile.js # Vite single-file build config (standalone)
 ├── tsconfig.json           # TypeScript strict config
 ├── postcss.config.js       # Tailwind v4 PostCSS
 ├── package.json            # npm dependencies and scripts
@@ -70,6 +71,7 @@ spine-planner/
 ├── public/review-forms/    # Per-language review HTML + responses (auto-generated)
 ├── _archive/               # Historical notes and prompts (alpha-notes.txt, design-review.md)
 ├── .github/workflows/deploy.yml  # GitHub Actions: build + deploy to Pages
+├── .github/workflows/release.yml  # GitHub Actions: standalone build on v*.*.0 tags
 ├── data/ -> Dropbox        # Symlink: reference PDFs, rod data, anatomical images
 ├── docs/ -> Dropbox        # Symlink: SPECIFICATION.md, JSON v4 schema
 └── .gitignore              # + node_modules/, dist/
@@ -79,6 +81,7 @@ spine-planner/
 - **Repository:** github.com/nigelgummerson/spine
 - **Live Site:** plan.skeletalsurgery.com/spine (GitHub Pages, custom domain)
 - **Deployment:** GitHub Actions — `npm ci && npm run build`, deploys `dist/` on push to main
+- **Standalone Releases:** GitHub Releases — standalone HTML attached on `v*.*.0` tags
 
 ## Tech Stack
 - **Build:** Vite + vite-plugin-singlefile (outputs single HTML file with everything inlined)
@@ -173,7 +176,7 @@ spine-planner/
 See **TODO.md** for the full task list, organised by SPEC.md implementation phases.
 
 ## Key Constraints
-- **Single-file build (current)** - Vite produces one self-contained HTML file via vite-plugin-singlefile for offline distribution (USB, email, intranet). Not a hard constraint — a future connected variant could lazy-load translation files and fonts from GitHub Pages, which would be needed if CJK languages are added (5-20MB font files cannot be embedded)
+- **Dual build** - Web build (default) produces code-split assets deployed to GitHub Pages. Standalone build produces a single self-contained HTML file via vite-plugin-singlefile for offline distribution (USB, email, intranet). CJK fonts can be added to the web build without bloating the standalone.
 - **Offline-first** - All dependencies and fonts embedded, no network required
 - **Hospital environment** - Assumes locked-down Windows machines with restricted permissions
 - **Print-friendly** - PDF export must be high quality for clinical records
@@ -187,9 +190,12 @@ See **TODO.md** for the full task list, organised by SPEC.md implementation phas
 # Development (hot module replacement)
 npm run dev                   # Starts Vite dev server (http://localhost:5173)
 
-# Build single-file output
-npm run build                 # Produces dist/index.html (~1.9MB, fully offline)
-open dist/index.html          # Test built output from file://
+# Build code-split web output (default — deployed to GitHub Pages)
+npm run build                 # Produces dist/ with index.html + assets/
+
+# Build standalone single-file output (for offline distribution)
+npm run build:standalone      # Produces dist/index.html (~2.0MB, fully offline)
+open dist/index.html          # Test standalone build from file://
 
 # Type checking
 npm run type-check            # tsc --noEmit (no emit, just check types)
