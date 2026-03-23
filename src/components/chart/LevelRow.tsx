@@ -112,8 +112,10 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             : null;
         const isForceZone = zone.startsWith('force');
 
-        // Centre of zone for ghost targets
-        const zoneCx = zoneX + zoneW / 2;
+        // Ghost targets should be near the vertebra (inner edge of zone), not at zone centre
+        const zoneCx = zone === 'left' ? zoneX + zoneW - screwPx * 0.75
+            : zone === 'right' ? zoneX + screwPx * 0.75
+            : zoneX + zoneW / 2;
         const zoneCy = rowHeight / 2;
 
         // Click zone background
@@ -205,7 +207,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                         </text>
                     )}
                     {annText && (
-                        <text x={labelX} y={iconY + iH / 2 + (labelText ? labelPx * 0.7 : 0)}
+                        <text x={labelX} y={iconY + iH / 2 - 1 + (labelText ? labelPx / 2 + 7 : 0)}
                             textAnchor={labelAnchor} dominantBaseline="middle"
                             fontSize={9} fontStyle="italic" fill="#94a3b8">
                             {annText}
@@ -272,7 +274,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                         </text>
                     )}
                     {annText && (
-                        <text x={labelX} y={iconY + iH / 2 + (labelText ? labelPx * 0.7 : 0)}
+                        <text x={labelX} y={iconY + iH / 2 - 1 + (labelText ? labelPx / 2 + 7 : 0)}
                             textAnchor={labelAnchor} dominantBaseline="middle"
                             fontSize={9} fontStyle="italic" fill="#94a3b8">
                             {annText}

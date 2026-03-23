@@ -13,7 +13,7 @@ interface HookBaseProps {
 }
 
 export const InstrumentIcon = ({ type, className = "w-5 h-5", color = "black" }: InstrumentIconProps) => {
-    const strokeWidth = 2.5; const HookBase = ({ direction, label }: HookBaseProps) => (<svg viewBox="0 0 40 24" className="w-full h-full">{direction === 'up' ? <path d="M12 18V6m0 0l-4 4m4-4l4 4m-8 12h8" stroke={color} fill="none" strokeWidth={strokeWidth} /> : <path d="M12 6v12m0 0l-4-4m4 4l4-4m-8-12h8" stroke={color} fill="none" strokeWidth={strokeWidth} />}<text x="22" y="17" fontSize="14" fontWeight="bold" fontFamily="serif" fill={color}>{label}</text></svg>);
+    const strokeWidth = 2.5; const HookBase = ({ direction, label }: HookBaseProps) => (<svg viewBox="0 0 40 24" className={className}>{direction === 'up' ? <path d="M12 18V6m0 0l-4 4m4-4l4 4m-8 12h8" stroke={color} fill="none" strokeWidth={strokeWidth} /> : <path d="M12 6v12m0 0l-4-4m4 4l4-4m-8-12h8" stroke={color} fill="none" strokeWidth={strokeWidth} />}<text x="22" y="17" fontSize="14" fontWeight="bold" fontFamily="serif" fill={color}>{label}</text></svg>);
     switch (type) {
         // ... Implants ...
         case 'monoaxial': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /></svg>;

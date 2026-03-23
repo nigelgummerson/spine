@@ -201,7 +201,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
 
     return (
     <div ref={containerRef} className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative overflow-hidden">
-        <svg ref={svgRef} viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} className="flex-1 w-full" style={{ overflow: 'visible' }}>
+        <svg ref={svgRef} viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} preserveAspectRatio="xMidYMin meet" className="flex-1 w-full" style={{ overflow: 'visible' }}>
             {/* Title bar */}
             <rect x={0} y={0} width={chartWidth} height={HEADER_H - (forcePlacements ? 4 : 0)} fill="#f8fafc" />
             <line x1={0} y1={HEADER_H - (forcePlacements ? 4 : 0)} x2={chartWidth} y2={HEADER_H - (forcePlacements ? 4 : 0)} stroke="#e2e8f0" strokeWidth={1} />
