@@ -1,10 +1,10 @@
 # Spinal Instrumentation Plan & Record
 
 ## What This Project Is
-A single-file HTML application for pre-operative spinal surgery planning. Designed to run offline on hospital computers without installation. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 16 languages (14 European + Ukrainian and Russian).
+A web application for pre-operative spinal surgery planning. Deployed as a code-split web build to GitHub Pages for connected hospital computers, with a standalone single-file download for offline use. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 16 languages (14 European + Ukrainian and Russian).
 
 ## Current Status
-- **Version:** v2.3.0-beta
+- **Version:** v2.3.1-beta
 - **Last Updated:** 2026-03-23
 - **License:** GNU GPLv3
 - **Language:** TypeScript (strict)
@@ -84,7 +84,7 @@ spine-planner/
 - **Standalone Releases:** GitHub Releases — standalone HTML attached on `v*.*.0` tags
 
 ## Tech Stack
-- **Build:** Vite + vite-plugin-singlefile (outputs single HTML file with everything inlined)
+- **Build:** Vite — code-split web build (default) + vite-plugin-singlefile for standalone offline HTML
 - **Language:** TypeScript (strict mode) — all source files .tsx/.ts
 - **Framework:** React 19 (npm, pre-compiled JSX — no in-browser transpilation)
 - **Styling:** Tailwind CSS v4 (PostCSS)
@@ -95,6 +95,7 @@ spine-planner/
 - **All dependencies bundled** — no CDN calls, fully offline
 
 ## Version History (Recent)
+- **v2.3.1-beta** (2026-03-23): Dual-build output — code-split web build (default) deployed to GitHub Pages for fast cached loading on connected hospital computers. Standalone single-file build preserved via `vite.config.singlefile.js` and `npm run build:standalone`. GitHub Actions release workflow (`.github/workflows/release.yml`) auto-builds standalone HTML on `v*.*.0` tags. Help modal "Offline Use" section with GitHub Releases download link. Landing page updated for web-first messaging. Quick reference and review forms version-synced. Fixed `generate-review-forms.py` regex for TypeScript type annotations.
 - **v2.3.0-beta** (2026-03-23): TypeScript migration — all .jsx/.js renamed to .tsx/.ts, strict tsconfig. State extracted from App into useReducer (documentReducer.ts) wrapped by useDocumentState.ts hook. Zod validation of v4 JSON on load (schema.ts). SVG chart rendering — ChartPaper and LevelRow now render SVG content instead of HTML flexbox. Vitest test suite — 181 tests across 4 files (documentReducer, schema, i18n, clinical-anatomy). Note \n line breaks supported. Disclaimer uses sessionStorage, resets on New Patient. Cervical screw defaults: C3-C7 default 3.5×14, Oc/C1/C2 no default. Inventory balanced columns by line count with diameter grouping. JPEG export quality 0.85 (halved PDF size). New files: types.ts, svgExport.ts, react-augments.d.ts, tsconfig.json, specs/ design docs.
 - **v2.2.0-beta** (2026-03-23): JSON v4 schema — full SPEC.md coverage (transition rods, growing rods, VBR cages, structured bone graft, connector-to-rod refs). PDF export at A4 300 DPI. Major UI polish: screw sizes enlarged, annotation text consistent 9px with edge alignment, LEFT/RIGHT headers prominent, inventory tightened with summary totals and units. Z-index rendering stack reordered (notes > implants > cages > osteotomies > crosslinks > vertebral bodies). Draggable reconstruction cage labels with persistent positions. Copy-plan-to-construct strips annotations/notes/angles. Clear Construct button. Unified ScrewModal (annotation field for all types). Crosslinks lighter. Transparent label backgrounds. Pelvis zone enlarged. ACDF midline. 270 translation keys across 16 languages.
 - **v2.1.4-beta** (2026-03-22): Ukrainian and Russian translations (263 keys each, 16 languages total). Clinical glossary extended with AO Spine Ukraine and RASS terminology. Review forms generated for native-speaker review. Language count updated across all existing translations.
