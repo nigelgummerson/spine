@@ -86,7 +86,7 @@ export const ChartPaper = ({ title, placements, ghostPlacements, onZoneClick, on
     // Note + recon label drag handler
     useEffect(() => {
         if (!draggingNoteId || readOnly) return;
-        const isRecon = draggingNoteId.startsWith('recon-');
+        const isRecon = typeof draggingNoteId === 'string' && draggingNoteId.startsWith('recon-');
         const handleMouseMove = (e) => {
             if (!contentRef.current || !noteDragStartRef.current) return;
             const dx = e.clientX - noteDragStartRef.current.clientX;
