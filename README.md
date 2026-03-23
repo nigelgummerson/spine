@@ -2,7 +2,7 @@
 
 A digital surgical planning tool for spinal surgeons. Replaces hand-drawn instrumentation diagrams with a visual, exportable chart that documents the pre-operative plan and post-operative construct. Runs offline on hospital computers as a single HTML file — no installation required.
 
-**Version:** v2.4.0-beta | **License:** GNU GPLv3
+**Version:** v2.4.2-beta | **License:** GNU GPLv3
 **Live:** [plan.skeletalsurgery.com/spine](https://plan.skeletalsurgery.com/spine/)
 
 ## Features
