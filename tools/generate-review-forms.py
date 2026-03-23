@@ -23,7 +23,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_DIR = SCRIPT_DIR.parent
 TRANSLATIONS_FILE = PROJECT_DIR / "src" / "i18n" / "translations.json"
-CHANGELOG_FILE = PROJECT_DIR / "src" / "data" / "changelog.js"
+CHANGELOG_FILE = PROJECT_DIR / "src" / "data" / "changelog.ts"
 OUTPUT_DIR = PROJECT_DIR / "public" / "review-forms"
 
 
