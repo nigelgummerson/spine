@@ -11,7 +11,8 @@
       "NVWC",
       "NOV",
       "AO Spine Ukraine",
-      "RASS"
+      "RASS",
+      "Israeli Spine Society"
     ],
     "last_updated": "2026-03-20",
     "notes": "All translations marked verified: false pending review by native-speaking spine surgeons. Sources indicate the national/international society whose published terminology was referenced."
@@ -116,6 +117,11 @@
           "expected": "Релиз фасеточного сустава",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "שחרור מפרק פאסטי",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -196,6 +202,11 @@
         "ru": {
           "expected": "Schwab степень 1",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "Schwab דרגה 1",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -278,6 +289,11 @@
           "expected": "Резекция нижней фасетки; удаление суставной капсулы.",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "כריתת פאסט תחתון; הסרת קפסולת המפרק.",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -358,6 +374,11 @@
         "ru": {
           "expected": "Ponte / Smith Petersen",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "Ponte / Smith Petersen",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -440,6 +461,11 @@
           "expected": "Schwab степень 2",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "Schwab דרגה 2",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -520,6 +546,11 @@
         "ru": {
           "expected": "Полная фасетэктомия; жёлтая связка + пластинка.",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "כריתת פאסט מלאה; ליגמנטום פלאבום + למינה.",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -602,6 +633,11 @@
           "expected": "Стандартная PSO",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "PSO סטנדרטי",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -682,6 +718,11 @@
         "ru": {
           "expected": "Schwab степень 3",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "Schwab דרגה 3",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -764,6 +805,11 @@
           "expected": "Педикулярная субтракция; частичный клин тела.",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "חיסור פדיקולרי; טריז גוף חלקי.",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -844,6 +890,11 @@
         "ru": {
           "expected": "Расширенная PSO",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "PSO מורחב",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -926,6 +977,11 @@
           "expected": "Schwab степень 4",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "Schwab דרגה 4",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -1006,6 +1062,11 @@
         "ru": {
           "expected": "PSO + резекция смежного диска.",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "PSO + כריתת דיסק סמוך.",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -1088,6 +1149,11 @@
           "expected": "VCR",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "VCR",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -1168,6 +1234,11 @@
         "ru": {
           "expected": "Schwab степень 5",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "Schwab דרגה 5",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -1250,6 +1321,11 @@
           "expected": "Полная резекция позвоночного столба.",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "כריתה מלאה של עמוד השדרה.",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -1330,6 +1406,11 @@
         "ru": {
           "expected": "Многоуровневая VCR",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "VCR רב-רמתי",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -1412,6 +1493,11 @@
           "expected": "Schwab степень 6",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "Schwab דרגה 6",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -1492,6 +1578,11 @@
         "ru": {
           "expected": "Резекция нескольких позвонков и дисков.",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "כריתת חוליות ודיסקים מרובים.",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -1574,6 +1665,11 @@
           "expected": "Корпэктомия (передняя)",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "כריתת גוף חוליה (קדמי)",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -1654,6 +1750,11 @@
         "ru": {
           "expected": "Передний",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "קדמי",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -1736,6 +1837,11 @@
           "expected": "Удаление тела позвонка.",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "הסרת גוף החוליה.",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -1816,6 +1922,11 @@
         "ru": {
           "expected": "Передняя шейная дискэктомия и спондилодез",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "כריתת דיסק צווארית קדמית והיתוך",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -1898,6 +2009,11 @@
           "expected": "Задний поясничный межтеловой спондилодез",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "היתוך בין-גופי מותני אחורי",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -1978,6 +2094,11 @@
         "ru": {
           "expected": "Трансфораминальный поясничный межтеловой спондилодез",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "היתוך בין-גופי מותני טרנספורמינלי",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -2060,6 +2181,11 @@
           "expected": "Латеральный поясничный межтеловой спондилодез",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "היתוך בין-גופי מותני צידי",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -2140,6 +2266,11 @@
         "ru": {
           "expected": "Косой поясничный межтеловой спондилодез",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "היתוך בין-גופי מותני אלכסוני",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -2222,6 +2353,11 @@
           "expected": "Передний поясничный межтеловой спондилодез",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "היתוך בין-גופי מותני קדמי",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -2302,6 +2438,11 @@
         "ru": {
           "expected": "Задний",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "אחורי",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -2384,6 +2525,11 @@
           "expected": "Передний",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "קדמי",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -2464,6 +2610,11 @@
         "ru": {
           "expected": "Латеральный",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "צידי",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -2546,6 +2697,11 @@
           "expected": "Местная кость",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "עצם מקומית",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -2626,6 +2782,11 @@
         "ru": {
           "expected": "Аутотрансплантат",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "שתל עצמי",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -2708,6 +2869,11 @@
           "expected": "Аллотрансплантат",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "שתל אלוגני",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -2788,6 +2954,11 @@
         "ru": {
           "expected": "Синтетики",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "חומרים סינתטיים",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -2870,6 +3041,11 @@
           "expected": "Ножка дуги",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "פדיקל",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -2950,6 +3126,11 @@
         "ru": {
           "expected": "ПО (Вниз)",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "זיז רוחבי (למטה)",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -3032,6 +3213,11 @@
           "expected": "ПО (Вверх)",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "זיז רוחבי (למעלה)",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -3112,6 +3298,11 @@
         "ru": {
           "expected": "Супра-лам",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "סופרה-למינרי",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -3194,6 +3385,11 @@
           "expected": "Инфра-лам",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "אינפרה-למינרי",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -3274,6 +3470,11 @@
         "ru": {
           "expected": "Трансляция влево",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "הסטה שמאלה",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -3356,6 +3557,11 @@
           "expected": "Трансляция вправо",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "הסטה ימינה",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -3436,6 +3642,11 @@
         "ru": {
           "expected": "Компрессия",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "דחיסה",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -3518,6 +3729,11 @@
           "expected": "Дистракция",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "הסחה",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -3598,6 +3814,11 @@
         "ru": {
           "expected": "Деротация по ЧС",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "הסרת סיבוב עם השעון",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -3680,6 +3901,11 @@
           "expected": "Деротация против ЧС",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "הסרת סיבוב נגד השעון",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -3760,6 +3986,11 @@
         "ru": {
           "expected": "Поставщик имплантов",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "ספק שתלים",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -3842,6 +4073,11 @@
           "expected": "Система винтов",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "מערכת ברגים",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -3922,6 +4158,11 @@
         "ru": {
           "expected": "Реконструктивный кейдж",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "כלוב שחזור",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -4004,6 +4245,11 @@
           "expected": "Конфиденциальность сеанса",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "פרטיות הפעלה",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -4084,6 +4330,11 @@
         "ru": {
           "expected": "Копировать план в конструкцию",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "העתק תוכנית למבנה",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -4166,6 +4417,11 @@
           "expected": "Моноаксиальный",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "מונואקסיאלי",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -4246,6 +4502,11 @@
         "ru": {
           "expected": "Полиаксиальный",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "פוליאקסיאלי",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
@@ -4328,6 +4589,11 @@
           "expected": "Унипланарный",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "יוניפלנרי",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -4409,6 +4675,11 @@
           "expected": "Костный трансплантат",
           "source": "RASS/AO Spine",
           "verified": false
+        },
+        "he": {
+          "expected": "שתל עצם",
+          "source": "Israeli Spine Society",
+          "verified": false
         }
       }
     },
@@ -4489,6 +4760,11 @@
         "ru": {
           "expected": "Итоговая хирургическая конструкция",
           "source": "RASS/AO Spine",
+          "verified": false
+        },
+        "he": {
+          "expected": "מבנה ניתוחי סופי",
+          "source": "Israeli Spine Society",
           "verified": false
         }
       }
