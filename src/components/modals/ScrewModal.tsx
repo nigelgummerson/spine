@@ -6,6 +6,18 @@ import { InstrumentIcon } from '../chart/InstrumentIcon';
 import { IconTrash, IconX } from '../icons';
 import { Portal } from '../Portal';
 
+/** Scroll wheel cycles through <select> options without opening the dropdown. */
+export const selectWheelHandler = (e: React.WheelEvent<HTMLSelectElement>) => {
+    e.preventDefault();
+    const sel = e.currentTarget;
+    const dir = e.deltaY > 0 ? 1 : -1;
+    const next = sel.selectedIndex + dir;
+    if (next >= 0 && next < sel.options.length) {
+        sel.selectedIndex = next;
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+};
+
 interface ModalKeyHandlerParams {
     onSubmit: () => void;
     onClose: () => void;
@@ -118,7 +130,7 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
                     </div>
                     {isScrew && (<>
                         <div className="flex gap-2 mb-4">{['standard','custom','none'].map(m => { const labels: Record<string, string> = { standard: t('modal.screw.mode_standard'), custom: t('modal.screw.mode_custom'), none: t('modal.screw.mode_none') }; const active = mode === m; return <button key={m} onClick={() => setMode(m)} className={`flex-1 py-1 text-xs font-bold rounded border transition-all ${active ? 'bg-amber-500 text-slate-900 border-amber-600' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>{labels[m]}</button>; })}</div>
-                        {mode === 'standard' && (<div className="space-y-4"><div className="grid grid-cols-4 gap-2"><select value={diameter} onChange={(e) => setDiameter(e.target.value)} className="col-span-4 w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{DIAMETER_OPTIONS.map(d => <option key={d} value={d}>{d} mm</option>)}</select></div><select value={length} onChange={(e) => setLength(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{LENGTH_OPTIONS.map(l => <option key={l} value={l}>{l} mm</option>)}</select></div>)}
+                        {mode === 'standard' && (<div className="space-y-4"><div className="grid grid-cols-4 gap-2"><select value={diameter} onChange={(e) => setDiameter(e.target.value)} onWheel={selectWheelHandler} className="col-span-4 w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{DIAMETER_OPTIONS.map(d => <option key={d} value={d}>{d} mm</option>)}</select></div><select value={length} onChange={(e) => setLength(e.target.value)} onWheel={selectWheelHandler} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{LENGTH_OPTIONS.map(l => <option key={l} value={l}>{l} mm</option>)}</select></div>)}
                         {mode === 'custom' && <input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} placeholder={t('modal.screw.custom_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg focus:border-amber-500 outline-none" autoFocus />}
                         {mode === 'none' && <div className="text-center py-6 text-slate-400 text-sm italic">{t('modal.screw.icon_only')}</div>}
                     </>)}
