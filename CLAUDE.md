@@ -63,11 +63,7 @@ spine-planner/
 │   └── utils/
 │       ├── id.ts                # Unique ID generator
 │       └── svgExport.ts         # SVG-based export utilities
-├── specs/                  # Design docs for major refactors (gitignored)
-│   ├── 2026-03-23-extract-app-state-design.md
-│   ├── 2026-03-23-extract-app-state-plan.md
-│   ├── 2026-03-23-zod-validation-design.md
-│   └── 2026-03-23-zod-validation-plan.md
+├── RELEASING.md            # Version bump checklist and release workflow
 ├── dist/                   # Build output (single index.html, ~1.99MB)
 ├── tests/                  # i18n verification (read from src/i18n/*.json)
 ├── tools/                  # Translation review tools (read/write src/i18n/translations.json)
@@ -236,4 +232,5 @@ python tools/generate-review-forms.py                     # Regenerate forms wit
 - **Obsidian Notes:** [[spine-planner]] in vault
 - **Context File:** alpha-notes.txt (version history and feature notes)
 - **User Guide:** Built into app (Help button)
-- **i18n Design Spec:** docs/superpowers/specs/2026-03-20-i18n-european-languages-design.md (local only, gitignored)
+- **Expert Reviews:** docs/expert-reviews/ (Dropbox — consolidated in REVIEW-SUMMARY.md)
+- **Archived Specs/Plans:** docs/_archive/ (Dropbox — completed design docs)

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useLayoutEffect } from 'react';
 import { t, SUPPORTED_LANGUAGES } from '../../i18n/i18n';
 import { CURRENT_VERSION } from '../../data/changelog';
 import { IconX , IconCopy, IconSave, IconCC, IconLink} from '../icons';
@@ -20,15 +20,33 @@ interface HelpModalProps {
 }
 
 export const HelpModal = ({ isOpen, onClose }: HelpModalProps) => {
+    const contentRef = useRef<HTMLDivElement>(null);
+    const [cols, setCols] = useState(window.matchMedia('(orientation: landscape)').matches ? 2 : 1);
+
+    useLayoutEffect(() => {
+        if (!isOpen || !contentRef.current) return;
+        const el = contentRef.current;
+        const isLandscape = window.matchMedia('(orientation: landscape)').matches;
+        if (!isLandscape) { setCols(1); return; }
+        // Start with 2 columns; if content overflows (needs scrolling) and viewport is wide enough, use 3
+        setCols(2);
+        requestAnimationFrame(() => {
+            if (el.scrollHeight > el.clientHeight && window.innerWidth >= 1100) {
+                setCols(3);
+            }
+        });
+    }, [isOpen]);
+
     if (!isOpen) return null;
+    const maxW = cols === 3 ? '68rem' : cols === 2 ? '48rem' : '32rem';
     return (<Portal>
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onClick={onClose} onKeyDown={e => (e.key === 'Escape' || e.key === 'Enter') && onClose()} ref={el => { el?.focus(); }}>
-            <div className="bg-white rounded-lg shadow-2xl w-full overflow-hidden flex flex-col max-h-[85vh]" style={{ maxWidth: window.matchMedia('(orientation: landscape)').matches ? '48rem' : '32rem', outline: 'none' }} onClick={e => e.stopPropagation()}>
+            <div className="bg-white rounded-lg shadow-2xl w-full overflow-hidden flex flex-col max-h-[85vh]" style={{ maxWidth: maxW, outline: 'none' }} onClick={e => e.stopPropagation()}>
                 <div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center">
                     <h3 className="font-bold text-sm">{t('help.title')}</h3>
                     <button onClick={onClose} className="hover:text-slate-300"><IconX /></button>
                 </div>
-                <div className="p-6 space-y-4 overflow-y-auto flex-1" style={{ columns: window.matchMedia('(orientation: landscape)').matches ? 2 : 1, columnGap: '24px' }}>
+                <div ref={contentRef} className="p-6 space-y-4 overflow-y-auto flex-1" style={{ columns: cols, columnGap: '24px' }}>
                     <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
                         <div className="min-w-[40px] pt-1"><div className="w-8 h-4 rounded-full border border-red-500 bg-white relative"><div className="absolute right-0 top-0 w-3.5 h-3.5 bg-red-500 rounded-full"></div></div></div>
                         <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.session_privacy.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.session_privacy.body')}} /></div>
