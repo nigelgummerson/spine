@@ -37,7 +37,10 @@ const GLOSSARY = JSON.parse(readFileSync(glossaryPath, 'utf-8')) as {
 type TranslationMap = Record<string, Record<string, string>>;
 const translations = TRANSLATIONS as TranslationMap;
 
-const langCodes: string[] = LANGUAGES.map((l: { code: string }) => l.code);
+// en-YK (Yorkshire) is a partial dialect overlay — falls back to en for missing keys
+const DIALECT_CODES = ['en-YK'];
+const langCodes: string[] = LANGUAGES.map((l: { code: string }) => l.code).filter(c => !DIALECT_CODES.includes(c));
+const allLangCodes: string[] = LANGUAGES.map((l: { code: string }) => l.code);
 const enKeys: string[] = Object.keys(translations.en ?? {});
 
 /** Strip HTML tags for length measurement (mirrors HTML test behaviour). */
@@ -177,7 +180,7 @@ function isAllowedValue(value: string): boolean {
 // ---------------------------------------------------------------------------
 describe('i18n completeness', () => {
   it('every language code in languages.json has an entry in translations.json', () => {
-    const missingLangs = langCodes.filter(code => !(code in translations));
+    const missingLangs = allLangCodes.filter(code => !(code in translations));
     expect(missingLangs, `Missing translation entries for: ${missingLangs.join(', ')}`).toEqual([]);
   });
 
