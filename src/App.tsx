@@ -888,7 +888,7 @@ const App = () => {
                         {themeDropdown}
                         <select value={currentLang} onChange={e => changeLang(e.target.value)}
                             className="bg-transparent text-[10px] border-none outline-none cursor-pointer w-14" style={{ color: scheme.textSecondary }}>
-                            {SUPPORTED_LANGUAGES.map(l => (
+                            {SUPPORTED_LANGUAGES.filter(l => !(l as any).hidden || l.code === currentLang).map(l => (
                                 <option key={l.code} value={l.code} style={{color: '#1e293b'}}>{l.code.toUpperCase()}</option>
                             ))}
                         </select>
@@ -1122,7 +1122,7 @@ const App = () => {
                                 <span className="font-bold text-[10px] uppercase tracking-widest shrink-0" style={{ color: scheme.textMuted }}>{t('sidebar.language')}</span>
                                 <select value={currentLang} onChange={e => changeLang(e.target.value)}
                                     className="flex-1 min-w-0 bg-transparent text-[10px] border-none outline-none cursor-pointer" style={{ color: scheme.textSecondary }}>
-                                    {SUPPORTED_LANGUAGES.map(l => (
+                                    {SUPPORTED_LANGUAGES.filter(l => !(l as any).hidden || l.code === currentLang).map(l => (
                                         <option key={l.code} value={l.code} style={{color: '#1e293b'}}>{l.name}</option>
                                     ))}
                                 </select>
