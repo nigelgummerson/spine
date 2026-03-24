@@ -91,6 +91,7 @@
     "modal.cage.lordosis": "Lordosis (°)",
     "modal.cage.length": "Length (A-P)",
     "modal.cage.width": "Width (M-L)",
+    "modal.cage.clear_dimensions": "Clear dimensions",
     "clinical.cage.acdf.desc": "Anterior Cervical Discectomy & Fusion",
     "clinical.cage.plif.desc": "Posterior Lumbar Interbody Fusion",
     "clinical.cage.tlif.desc": "Transforaminal Lumbar Interbody Fusion",
@@ -248,7 +249,7 @@
     "credits.developer": "Developed by",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3 License</a>. For commercial distribution enquiries, contact the developer.",
-    "credits.quick_reference": "Quick Reference Guide (18 languages)",
+    "credits.quick_reference": "Quick Reference Guide ({count} languages)",
     "disclaimer.text": "Translation unverified",
     "disclaimer.review": "Help improve this translation",
     "disclaimer.clinical": "This is a documentation and communication aid, not a medical device. It is not CE marked, FDA cleared, or approved by any regulatory body. The operating surgeon is responsible for all clinical decisions, implant verification, and record accuracy.",
@@ -274,7 +275,8 @@
     "disclaimer.modal_title": "Important Notice",
     "disclaimer.modal_body": "This tool is a <strong>documentation and communication aid</strong> for surgical planning. It is not a medical device and has not been approved by any regulatory body (MHRA, EU MDR, FDA).<br/><br/>It does not provide clinical decision support or treatment recommendations. The <strong>operating surgeon is responsible</strong> for all clinical decisions, implant verification (WHO Surgical Safety Checklist), and ensuring the record accurately reflects the procedure performed.<br/><br/>All data remains on this device. Nothing is transmitted to any server.",
     "disclaimer.modal_accept": "I understand",
-    "disclaimer.accepted_label": "Notice accepted"
+    "disclaimer.accepted_label": "Notice accepted",
+    "portrait.tab.inventory": "Inventory"
   },
   "de": {
     "sidebar.title": "Spinale Instrumentierung",
@@ -525,7 +527,7 @@
     "credits.developer": "Entwickelt von",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Lizenziert unter der <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3-Lizenz</a>. Für kommerzielle Vertriebsanfragen kontaktieren Sie den Entwickler.",
-    "credits.quick_reference": "Kurzanleitung (18 Sprachen)",
+    "credits.quick_reference": "Kurzanleitung ({count} Sprachen)",
     "disclaimer.text": "Übersetzung nicht verifiziert",
     "disclaimer.review": "Helfen Sie, diese Übersetzung zu verbessern",
     "disclaimer.clinical": "Dies ist ein Dokumentations- und Kommunikationshilfsmittel, kein Medizinprodukt. Es ist nicht CE-gekennzeichnet, FDA-zugelassen oder von einer Aufsichtsbehörde genehmigt. Der operierende Chirurg ist für alle klinischen Entscheidungen, die Implantatverifizierung und die Genauigkeit der Dokumentation verantwortlich.",
@@ -551,7 +553,9 @@
     "disclaimer.modal_title": "Wichtiger Hinweis",
     "disclaimer.modal_body": "Dieses Tool ist ein <strong>Dokumentations- und Kommunikationshilfsmittel</strong> für die Operationsplanung. Es ist kein Medizinprodukt und wurde von keiner Aufsichtsbehörde (MHRA, EU-MDR, FDA) zugelassen.<br/><br/>Es bietet keine klinische Entscheidungsunterstützung oder Behandlungsempfehlungen. Der <strong>operierende Chirurg ist verantwortlich</strong> für alle klinischen Entscheidungen, die Implantatverifizierung (WHO-Checkliste für chirurgische Sicherheit) und die Gewährleistung, dass die Dokumentation den durchgeführten Eingriff korrekt widerspiegelt.<br/><br/>Alle Daten verbleiben auf diesem Gerät. Es werden keine Daten an einen Server übertragen.",
     "disclaimer.modal_accept": "Ich verstehe",
-    "disclaimer.accepted_label": "Hinweis akzeptiert"
+    "disclaimer.accepted_label": "Hinweis akzeptiert",
+    "modal.cage.clear_dimensions": "Maße löschen",
+    "portrait.tab.inventory": "Inventar"
   },
   "fr": {
     "sidebar.title": "Instrumentation rachidienne",
@@ -802,7 +806,7 @@
     "credits.developer": "Développé par",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Sous licence <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3</a>. Pour les demandes de distribution commerciale, contactez le développeur.",
-    "credits.quick_reference": "Guide rapide (18 langues)",
+    "credits.quick_reference": "Guide rapide ({count} langues)",
     "disclaimer.text": "Traduction non vérifiée",
     "disclaimer.review": "Aidez à améliorer cette traduction",
     "modal.changelog.title": "Historique des versions",
@@ -828,7 +832,9 @@
     "disclaimer.modal_title": "Avis important",
     "disclaimer.modal_body": "Cet outil est un <strong>outil de documentation et de communication</strong> pour la planification chirurgicale. Ce n'est pas un dispositif médical et il n'a été approuvé par aucun organisme de réglementation (MHRA, MDR UE, FDA).<br/><br/>Il ne fournit pas d'aide à la décision clinique ni de recommandations thérapeutiques. Le <strong>chirurgien opérateur est responsable</strong> de toutes les décisions cliniques, de la vérification des implants (Checklist OMS pour la sécurité chirurgicale) et de l'exactitude du dossier opératoire.<br/><br/>Toutes les données restent sur cet appareil. Rien n'est transmis à un serveur.",
     "disclaimer.modal_accept": "Je comprends",
-    "disclaimer.accepted_label": "Avis accepté"
+    "disclaimer.accepted_label": "Avis accepté",
+    "modal.cage.clear_dimensions": "Effacer dimensions",
+    "portrait.tab.inventory": "Inventaire"
   },
   "es": {
     "sidebar.title": "Instrumentación espinal",
@@ -1079,7 +1085,7 @@
     "credits.developer": "Desarrollado por",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Licenciado bajo la <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">Licencia GNU GPLv3</a>. Para consultas de distribución comercial, contacte al desarrollador.",
-    "credits.quick_reference": "Guía rápida (18 idiomas)",
+    "credits.quick_reference": "Guía rápida ({count} idiomas)",
     "disclaimer.text": "Traducción no verificada",
     "disclaimer.review": "Ayude a mejorar esta traducción",
     "modal.changelog.title": "Historial de versiones",
@@ -1105,7 +1111,9 @@
     "disclaimer.modal_title": "Aviso importante",
     "disclaimer.modal_body": "Esta herramienta es un <strong>instrumento de documentación y comunicación</strong> para la planificación quirúrgica. No es un dispositivo médico y no ha sido aprobado por ningún organismo regulador (MHRA, MDR UE, FDA).<br/><br/>No proporciona soporte de decisión clínica ni recomendaciones de tratamiento. El <strong>cirujano operador es responsable</strong> de todas las decisiones clínicas, la verificación de implantes (Lista de verificación de seguridad quirúrgica de la OMS) y de asegurar que el registro refleje con precisión el procedimiento realizado.<br/><br/>Todos los datos permanecen en este dispositivo. Nada se transmite a ningún servidor.",
     "disclaimer.modal_accept": "Entiendo",
-    "disclaimer.accepted_label": "Aviso aceptado"
+    "disclaimer.accepted_label": "Aviso aceptado",
+    "modal.cage.clear_dimensions": "Borrar dimensiones",
+    "portrait.tab.inventory": "Inventario"
   },
   "it": {
     "sidebar.title": "Strumentazione vertebrale",
@@ -1356,7 +1364,7 @@
     "credits.developer": "Sviluppato da",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Rilasciato sotto <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">Licenza GNU GPLv3</a>. Per richieste di distribuzione commerciale, contattare lo sviluppatore.",
-    "credits.quick_reference": "Guida rapida (18 lingue)",
+    "credits.quick_reference": "Guida rapida ({count} lingue)",
     "disclaimer.text": "Traduzione non verificata",
     "disclaimer.review": "Aiuta a migliorare questa traduzione",
     "modal.changelog.title": "Cronologia versioni",
@@ -1382,7 +1390,9 @@
     "disclaimer.modal_title": "Avviso importante",
     "disclaimer.modal_body": "Questo strumento è un <strong>ausilio per la documentazione e la comunicazione</strong> nella pianificazione chirurgica. Non è un dispositivo medico e non è stato approvato da alcun ente regolatorio (MHRA, MDR UE, FDA).<br/><br/>Non fornisce supporto decisionale clinico né raccomandazioni terapeutiche. Il <strong>chirurgo operatore è responsabile</strong> di tutte le decisioni cliniche, della verifica degli impianti (Checklist OMS per la sicurezza chirurgica) e dell'accuratezza della documentazione operatoria.<br/><br/>Tutti i dati rimangono su questo dispositivo. Nulla viene trasmesso a un server.",
     "disclaimer.modal_accept": "Ho capito",
-    "disclaimer.accepted_label": "Avviso accettato"
+    "disclaimer.accepted_label": "Avviso accettato",
+    "modal.cage.clear_dimensions": "Cancella dimensioni",
+    "portrait.tab.inventory": "Inventario"
   },
   "pt": {
     "sidebar.title": "Instrumentação vertebral",
@@ -1633,7 +1643,7 @@
     "credits.developer": "Desenvolvido por",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Licenciado sob a <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">Licença GNU GPLv3</a>. Para pedidos de distribuição comercial, contacte o desenvolvedor.",
-    "credits.quick_reference": "Guia rápido (18 idiomas)",
+    "credits.quick_reference": "Guia rápido ({count} idiomas)",
     "disclaimer.text": "Tradução não verificada",
     "disclaimer.review": "Ajude a melhorar esta tradução",
     "modal.changelog.title": "Histórico de versões",
@@ -1659,7 +1669,9 @@
     "disclaimer.modal_title": "Aviso importante",
     "disclaimer.modal_body": "Esta ferramenta é um <strong>instrumento de documentação e comunicação</strong> para planeamento cirúrgico. Não é um dispositivo médico e não foi aprovado por qualquer entidade reguladora (MHRA, MDR UE, FDA).<br/><br/>Não fornece apoio à decisão clínica nem recomendações de tratamento. O <strong>cirurgião operador é responsável</strong> por todas as decisões clínicas, verificação de implantes (Lista de Verificação de Segurança Cirúrgica da OMS) e pela precisão do registo operativo.<br/><br/>Todos os dados permanecem neste dispositivo. Nada é transmitido para qualquer servidor.",
     "disclaimer.modal_accept": "Compreendo",
-    "disclaimer.accepted_label": "Aviso aceite"
+    "disclaimer.accepted_label": "Aviso aceite",
+    "modal.cage.clear_dimensions": "Limpar dimensões",
+    "portrait.tab.inventory": "Inventário"
   },
   "sv": {
     "sidebar.title": "Spinal instrumentering",
@@ -1910,7 +1922,7 @@
     "credits.developer": "Utvecklad av",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Licensierad under <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3-licens</a>. För kommersiella distributionsförfrågningar, kontakta utvecklaren.",
-    "credits.quick_reference": "Snabbreferens (18 språk)",
+    "credits.quick_reference": "Snabbreferens ({count} språk)",
     "disclaimer.text": "Översättning ej verifierad",
     "disclaimer.review": "Hjälp förbättra denna översättning",
     "modal.changelog.title": "Versionshistorik",
@@ -1936,7 +1948,9 @@
     "disclaimer.modal_title": "Viktig information",
     "disclaimer.modal_body": "Detta verktyg är ett <strong>dokumentations- och kommunikationshjälpmedel</strong> för kirurgisk planering. Det är inte en medicinteknisk produkt och har inte godkänts av något tillsynsorgan (MHRA, EU MDR, FDA).<br/><br/>Det ger inget kliniskt beslutsstöd eller behandlingsrekommendationer. Den <strong>opererande kirurgen ansvarar</strong> för alla kliniska beslut, implantatverifiering (WHO:s checklista för säker kirurgi) och för att dokumentationen korrekt återspeglar det utförda ingreppet.<br/><br/>All data stannar på denna enhet. Inget överförs till någon server.",
     "disclaimer.modal_accept": "Jag förstår",
-    "disclaimer.accepted_label": "Information bekräftad"
+    "disclaimer.accepted_label": "Information bekräftad",
+    "modal.cage.clear_dimensions": "Rensa mått",
+    "portrait.tab.inventory": "Inventarium"
   },
   "nb": {
     "sidebar.title": "Spinal instrumentering",
@@ -2187,7 +2201,7 @@
     "credits.developer": "Utviklet av",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Lisensiert under <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3-lisens</a>. For kommersielle distribusjonsforespørsler, kontakt utvikleren.",
-    "credits.quick_reference": "Hurtigreferanse (18 språk)",
+    "credits.quick_reference": "Hurtigreferanse ({count} språk)",
     "disclaimer.text": "Oversettelse ikke verifisert",
     "disclaimer.review": "Hjelp med å forbedre denne oversettelsen",
     "modal.changelog.title": "Versjonshistorikk",
@@ -2213,7 +2227,9 @@
     "disclaimer.modal_title": "Viktig informasjon",
     "disclaimer.modal_body": "Dette verktøyet er et <strong>dokumentasjons- og kommunikasjonshjelpemiddel</strong> for kirurgisk planlegging. Det er ikke medisinsk utstyr og har ikke blitt godkjent av noe tilsynsorgan (MHRA, EU MDR, FDA).<br/><br/>Det gir ikke klinisk beslutningsstøtte eller behandlingsanbefalinger. Den <strong>opererende kirurgen er ansvarlig</strong> for alle kliniske beslutninger, implantatverifisering (WHOs sjekkliste for trygg kirurgi) og for at dokumentasjonen nøyaktig gjenspeiler det utførte inngrepet.<br/><br/>Alle data forblir på denne enheten. Ingenting overføres til noen server.",
     "disclaimer.modal_accept": "Jeg forstår",
-    "disclaimer.accepted_label": "Informasjon bekreftet"
+    "disclaimer.accepted_label": "Informasjon bekreftet",
+    "modal.cage.clear_dimensions": "Fjern mål",
+    "portrait.tab.inventory": "Inventar"
   },
   "da": {
     "sidebar.title": "Spinal instrumentering",
@@ -2464,7 +2480,7 @@
     "credits.developer": "Udviklet af",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Licenseret under <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3-licens</a>. For kommercielle distributionsforespørgsler, kontakt udvikleren.",
-    "credits.quick_reference": "Hurtigreference (18 sprog)",
+    "credits.quick_reference": "Hurtigreference ({count} sprog)",
     "disclaimer.text": "Oversættelse ikke verificeret",
     "disclaimer.review": "Hjælp med at forbedre denne oversættelse",
     "modal.changelog.title": "Versionshistorik",
@@ -2490,7 +2506,9 @@
     "disclaimer.modal_title": "Vigtig information",
     "disclaimer.modal_body": "Dette værktøj er et <strong>dokumentations- og kommunikationshjælpemiddel</strong> til kirurgisk planlægning. Det er ikke medicinsk udstyr og er ikke blevet godkendt af nogen tilsynsmyndighed (MHRA, EU MDR, FDA).<br/><br/>Det giver ikke klinisk beslutningsstøtte eller behandlingsanbefalinger. Den <strong>opererende kirurg er ansvarlig</strong> for alle kliniske beslutninger, implantatverificering (WHO's tjekliste for sikker kirurgi) og for at dokumentationen nøjagtigt afspejler det udførte indgreb.<br/><br/>Alle data forbliver på denne enhed. Intet overføres til nogen server.",
     "disclaimer.modal_accept": "Jeg forstår",
-    "disclaimer.accepted_label": "Information bekræftet"
+    "disclaimer.accepted_label": "Information bekræftet",
+    "modal.cage.clear_dimensions": "Ryd mål",
+    "portrait.tab.inventory": "Inventar"
   },
   "fi": {
     "sidebar.title": "Spinaalinen instrumentointi",
@@ -2741,7 +2759,7 @@
     "credits.developer": "Kehittänyt",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Lisensoitu <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3 -lisenssillä</a>. Kaupallisia jakelukyselyjä varten ota yhteyttä kehittäjään.",
-    "credits.quick_reference": "Pikaopas (18 kieltä)",
+    "credits.quick_reference": "Pikaopas ({count} kieltä)",
     "disclaimer.text": "Käännöstä ei ole vahvistettu",
     "disclaimer.review": "Auta parantamaan tätä käännöstä",
     "modal.changelog.title": "Versiohistoria",
@@ -2767,7 +2785,9 @@
     "disclaimer.modal_title": "Tärkeä ilmoitus",
     "disclaimer.modal_body": "Tämä työkalu on <strong>dokumentointi- ja viestintäapuväline</strong> kirurgiseen suunnitteluun. Se ei ole lääkinnällinen laite eikä sitä ole hyväksynyt mikään valvontaviranomainen (MHRA, EU MDR, FDA).<br/><br/>Se ei tarjoa kliinistä päätöksentukea eikä hoitosuosituksia. <strong>Leikkaava kirurgi vastaa</strong> kaikista kliinisistä päätöksistä, implanttien tarkistamisesta (WHO:n kirurgisen turvallisuuden tarkistuslista) ja dokumentaation oikeellisuudesta.<br/><br/>Kaikki tiedot pysyät tällä laitteella. Mitään ei lähetetä palvelimelle.",
     "disclaimer.modal_accept": "Ymmärrän",
-    "disclaimer.accepted_label": "Ilmoitus hyväksytty"
+    "disclaimer.accepted_label": "Ilmoitus hyväksytty",
+    "modal.cage.clear_dimensions": "Tyhjennä mitat",
+    "portrait.tab.inventory": "Inventaario"
   },
   "nl": {
     "sidebar.title": "Spinale instrumentatie",
@@ -3018,7 +3038,7 @@
     "credits.developer": "Ontwikkeld door",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Gelicentieerd onder de <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3-licentie</a>. Voor commerciële distributieverzoeken, neem contact op met de ontwikkelaar.",
-    "credits.quick_reference": "Snelgids (18 talen)",
+    "credits.quick_reference": "Snelgids ({count} talen)",
     "disclaimer.text": "Vertaling niet geverifieerd",
     "disclaimer.review": "Help deze vertaling te verbeteren",
     "modal.changelog.title": "Versiegeschiedenis",
@@ -3044,7 +3064,9 @@
     "disclaimer.modal_title": "Belangrijke mededeling",
     "disclaimer.modal_body": "Dit hulpmiddel is een <strong>documentatie- en communicatiehulpmiddel</strong> voor chirurgische planning. Het is geen medisch hulpmiddel en is niet goedgekeurd door enig toezichthoudend orgaan (MHRA, EU MDR, FDA).<br/><br/>Het biedt geen klinische beslissingsondersteuning of behandelaanbevelingen. De <strong>opererende chirurg is verantwoordelijk</strong> voor alle klinische beslissingen, implantatverificatie (WHO-checklist voor chirurgische veiligheid) en voor de nauwkeurigheid van de documentatie.<br/><br/>Alle gegevens blijven op dit apparaat. Er wordt niets naar een server verzonden.",
     "disclaimer.modal_accept": "Ik begrijp het",
-    "disclaimer.accepted_label": "Mededeling aanvaard"
+    "disclaimer.accepted_label": "Mededeling aanvaard",
+    "modal.cage.clear_dimensions": "Wis afmetingen",
+    "portrait.tab.inventory": "Inventaris"
   },
   "pl": {
     "sidebar.title": "Instrumentacja kręgosłupa",
@@ -3295,7 +3317,7 @@
     "credits.developer": "Opracowane przez",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Na licencji <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3</a>. W sprawie dystrybucji komercyjnej prosimy o kontakt z autorem.",
-    "credits.quick_reference": "Skrócona instrukcja (18 języków)",
+    "credits.quick_reference": "Skrócona instrukcja ({count} języków)",
     "disclaimer.text": "Tłumaczenie niezweryfikowane",
     "disclaimer.review": "Pomóż ulepszyć to tłumaczenie",
     "modal.changelog.title": "Historia wersji",
@@ -3321,7 +3343,9 @@
     "disclaimer.modal_title": "Ważna informacja",
     "disclaimer.modal_body": "To narzędzie jest <strong>pomocą dokumentacyjną i komunikacyjną</strong> do planowania chirurgicznego. Nie jest wyrobem medycznym i nie zostało zatwierdzone przez żaden organ regulacyjny (MHRA, EU MDR, FDA).<br/><br/>Nie zapewnia wsparcia decyzji klinicznych ani zaleceń terapeutycznych. <strong>Operujący chirurg jest odpowiedzialny</strong> za wszystkie decyzje kliniczne, weryfikację implantów (Lista kontrolna bezpieczeństwa chirurgicznego WHO) oraz za to, aby dokumentacja dokładnie odzwierciedlała wykonany zabieg.<br/><br/>Wszystkie dane pozostają na tym urządzeniu. Nic nie jest przesyłane na serwer.",
     "disclaimer.modal_accept": "Rozumiem",
-    "disclaimer.accepted_label": "Informacja zaakceptowana"
+    "disclaimer.accepted_label": "Informacja zaakceptowana",
+    "modal.cage.clear_dimensions": "Wyczyść wymiary",
+    "portrait.tab.inventory": "Inwentarz"
   },
   "el": {
     "sidebar.title": "Σπονδυλική οργανοληψία",
@@ -3572,7 +3596,7 @@
     "credits.developer": "Αναπτύχθηκε από",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Υπό άδεια <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3</a>. Για ερωτήσεις εμπορικής διανομής, επικοινωνήστε με τον προγραμματιστή.",
-    "credits.quick_reference": "Σύντομος οδηγός (18 γλώσσες)",
+    "credits.quick_reference": "Σύντομος οδηγός ({count} γλώσσες)",
     "disclaimer.text": "Η μετάφραση δεν έχει επαληθευτεί",
     "disclaimer.review": "Βοηθήστε να βελτιωθεί αυτή η μετάφραση",
     "modal.changelog.title": "Ιστορικό εκδόσεων",
@@ -3598,7 +3622,9 @@
     "disclaimer.modal_title": "Σημαντική ειδοποίηση",
     "disclaimer.modal_body": "Αυτό το εργαλείο είναι ένα <strong>βοήθημα τεκμηρίωσης και επικοινωνίας</strong> για χειρουργικό σχεδιασμό. Δεν είναι ιατροτεχνολογικό προϊόν και δεν έχει εγκριθεί από κανέναν ρυθμιστικό φορέα (MHRA, EU MDR, FDA).<br/><br/>Δεν παρέχει υποστήριξη κλινικών αποφάσεων ή θεραπευτικές συστάσεις. Ο <strong>χειρουργός που εκτελεί την επέμβαση είναι υπεύθυνος</strong> για όλες τις κλινικές αποφάσεις, την επαλήθευση εμφυτευμάτων (Λίστα ελέγχου χειρουργικής ασφάλειας του ΠΟΥ) και για την ακρίβεια του αρχείου.<br/><br/>Όλα τα δεδομένα παραμένουν σε αυτή τη συσκευή. Δεν μεταδίδεται τίποτα σε κανέναν διακομιστή.",
     "disclaimer.modal_accept": "Καταλαβαίνω",
-    "disclaimer.accepted_label": "Ειδοποίηση αποδεκτή"
+    "disclaimer.accepted_label": "Ειδοποίηση αποδεκτή",
+    "modal.cage.clear_dimensions": "Εκκαθάριση διαστάσεων",
+    "portrait.tab.inventory": "Απόθεμα"
   },
   "tr": {
     "sidebar.title": "Spinal enstrümantasyon",
@@ -3849,7 +3875,7 @@
     "credits.developer": "Geliştiren",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "<a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3 Lisansı</a> kapsamında lisanslanmıştır. Ticari dağıtım sorguları için geliştiriciye başvurun.",
-    "credits.quick_reference": "Hızlı başvuru kılavuzu (18 dil)",
+    "credits.quick_reference": "Hızlı başvuru kılavuzu ({count} dil)",
     "disclaimer.text": "Çeviri doğrulanmamıştır",
     "disclaimer.review": "Bu çeviriyi iyileştirmeye yardımcı olun",
     "modal.changelog.title": "Sürüm geçmişi",
@@ -3875,7 +3901,9 @@
     "disclaimer.modal_title": "Önemli bilgilendirme",
     "disclaimer.modal_body": "Bu araç, cerrahi planlama için bir <strong>dokümantasyon ve iletişim yardımcısıdır</strong>. Tıbbi cihaz değildir ve herhangi bir düzenleyici kuruluş (MHRA, AB MDR, FDA) tarafından onaylanmamıştır.<br/><br/>Klinik karar desteği veya tedavi önerileri sağlamaz. <strong>Ameliyatı yapan cerrah</strong>, tüm klinik kararlardan, implant doğrulamasından (DSÖ Cerrahi Güvenlik Kontrol Listesi) ve kaydın gerçekleştirilen prosedürü doğru yansıtmasından <strong>sorumludur</strong>.<br/><br/>Tüm veriler bu cihazda kalır. Hiçbir şey bir sunucuya iletilmez.",
     "disclaimer.modal_accept": "Anlıyorum",
-    "disclaimer.accepted_label": "Bilgilendirme kabul edildi"
+    "disclaimer.accepted_label": "Bilgilendirme kabul edildi",
+    "modal.cage.clear_dimensions": "Ölçüleri temizle",
+    "portrait.tab.inventory": "Envanter"
   },
   "uk": {
     "sidebar.title": "Спінальна інструментація",
@@ -4126,7 +4154,7 @@
     "credits.developer": "Розроблено",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Ліцензовано за <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3</a>. Для комерційного розповсюдження зверніться до розробника.",
-    "credits.quick_reference": "Короткий довідник (18 мов)",
+    "credits.quick_reference": "Короткий довідник ({count} мов)",
     "disclaimer.text": "Переклад неперевірений",
     "disclaimer.review": "Допоможіть покращити цей переклад",
     "disclaimer.clinical": "Це допоміжний засіб документації та комунікації, а не медичний виріб. Він не має маркування CE, дозволу FDA та не схвалений жодним регуляторним органом. Оперуючий хірург несе відповідальність за всі клінічні рішення, перевірку імплантів та точність записів.",
@@ -4152,7 +4180,9 @@
     "disclaimer.modal_title": "Важливе повідомлення",
     "disclaimer.modal_body": "Цей інструмент є <strong>допоміжним засобом документації та комунікації</strong> для хірургічного планування. Він не є медичним виробом і не був схвалений жодним регуляторним органом (MHRA, EU MDR, FDA).<br/><br/>Він не надає підтримки клінічних рішень чи рекомендацій щодо лікування. <strong>Оперуючий хірург несе відповідальність</strong> за всі клінічні рішення, перевірку імплантів (Контрольний список хірургічної безпеки ВООЗ) та забезпечення відповідності запису фактично виконаній процедурі.<br/><br/>Усі дані залишаються на цьому пристрої. Ніщо не передається на жоден сервер.",
     "disclaimer.modal_accept": "Зрозуміло",
-    "disclaimer.accepted_label": "Повідомлення прийнято"
+    "disclaimer.accepted_label": "Повідомлення прийнято",
+    "modal.cage.clear_dimensions": "Очистити розміри",
+    "portrait.tab.inventory": "Інвентар"
   },
   "ru": {
     "sidebar.title": "Спинальная инструментация",
@@ -4403,7 +4433,7 @@
     "credits.developer": "Разработано",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "Лицензировано по <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3</a>. Для коммерческого распространения свяжитесь с разработчиком.",
-    "credits.quick_reference": "Краткое справочное руководство (18 языков)",
+    "credits.quick_reference": "Краткое справочное руководство ({count} языков)",
     "disclaimer.text": "Перевод не проверен",
     "disclaimer.review": "Помогите улучшить этот перевод",
     "disclaimer.clinical": "Это вспомогательное средство документации и коммуникации, а не медицинское изделие. Оно не имеет маркировки CE, разрешения FDA и не одобрено никаким регуляторным органом. Оперирующий хирург несёт ответственность за все клинические решения, проверку имплантов и точность записей.",
@@ -4429,7 +4459,9 @@
     "disclaimer.modal_title": "Важное уведомление",
     "disclaimer.modal_body": "Этот инструмент является <strong>вспомогательным средством документации и коммуникации</strong> для хирургического планирования. Он не является медицинским изделием и не был одобрен никаким регуляторным органом (MHRA, EU MDR, FDA).<br/><br/>Он не предоставляет поддержки клинических решений или рекомендаций по лечению. <strong>Оперирующий хирург несёт ответственность</strong> за все клинические решения, проверку имплантов (Контрольный список хирургической безопасности ВОЗ) и обеспечение соответствия записи фактически выполненной процедуре.<br/><br/>Все данные остаются на этом устройстве. Ничего не передаётся ни на какой сервер.",
     "disclaimer.modal_accept": "Понятно",
-    "disclaimer.accepted_label": "Уведомление принято"
+    "disclaimer.accepted_label": "Уведомление принято",
+    "modal.cage.clear_dimensions": "Очистить размеры",
+    "portrait.tab.inventory": "Инвентарь"
   },
   "hi": {
     "sidebar.title": "स्पाइनल इंस्ट्रूमेंटेशन",
@@ -4680,7 +4712,7 @@
     "credits.developer": "विकसित",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "<a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3 लाइसेंस</a> के तहत लाइसेंस प्राप्त। व्यावसायिक वितरण पूछताछ के लिए, डेवलपर से संपर्क करें।",
-    "credits.quick_reference": "त्वरित संदर्भ गाइड (18 भाषाएँ)",
+    "credits.quick_reference": "त्वरित संदर्भ गाइड ({count} भाषाएँ)",
     "disclaimer.text": "अनुवाद असत्यापित",
     "disclaimer.review": "इस अनुवाद को बेहतर बनाने में मदद करें",
     "disclaimer.clinical": "यह एक डॉक्यूमेंटेशन और कम्युनिकेशन सहायता उपकरण है, मेडिकल डिवाइस नहीं। यह CE मार्क, FDA क्लियर, या किसी नियामक निकाय द्वारा अनुमोदित नहीं है। ऑपरेटिंग सर्जन सभी क्लिनिकल निर्णयों, इम्प्लांट सत्यापन, और रिकॉर्ड सटीकता के लिए जिम्मेदार है।",
@@ -4706,7 +4738,9 @@
     "disclaimer.modal_title": "महत्वपूर्ण सूचना",
     "disclaimer.modal_body": "यह उपकरण सर्जिकल प्लानिंग के लिए एक <strong>डॉक्यूमेंटेशन और कम्युनिकेशन सहायता</strong> है। यह मेडिकल डिवाइस नहीं है और किसी नियामक निकाय (MHRA, EU MDR, FDA) द्वारा अनुमोदित नहीं किया गया है।<br/><br/>यह क्लिनिकल डिसीजन सपोर्ट या ट्रीटमेंट रिकमेंडेशन प्रदान नहीं करता। <strong>ऑपरेटिंग सर्जन</strong> सभी क्लिनिकल निर्णयों, इम्प्लांट सत्यापन (WHO सर्जिकल सेफ्टी चेकलिस्ट), और यह सुनिश्चित करने के लिए जिम्मेदार है कि रिकॉर्ड वास्तव में की गई प्रक्रिया को सटीक रूप से दर्शाता है।<br/><br/>सभी डेटा इस डिवाइस पर रहता है। किसी सर्वर को कुछ भी प्रेषित नहीं किया जाता।",
     "disclaimer.modal_accept": "मैं समझता/समझती हूँ",
-    "disclaimer.accepted_label": "सूचना स्वीकृत"
+    "disclaimer.accepted_label": "सूचना स्वीकृत",
+    "modal.cage.clear_dimensions": "माप हटाएं",
+    "portrait.tab.inventory": "इन्वेंटरी"
   },
   "ar": {
     "sidebar.title": "الأجهزة الشوكية",
@@ -4957,7 +4991,7 @@
     "credits.developer": "طوّره",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "مرخص بموجب <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">رخصة GNU GPLv3</a>. للاستفسارات حول التوزيع التجاري، تواصل مع المطور.",
-    "credits.quick_reference": "دليل مرجعي سريع (18 لغة)",
+    "credits.quick_reference": "دليل مرجعي سريع ({count} لغة)",
     "disclaimer.text": "ترجمة غير موثقة",
     "disclaimer.review": "ساعد في تحسين هذه الترجمة",
     "disclaimer.clinical": "هذه أداة مساعدة للتوثيق والتواصل، وليست جهازًا طبيًا. ليست حاصلة على علامة CE أو موافقة FDA أو أي هيئة تنظيمية. الجراح المعالج مسؤول عن جميع القرارات السريرية والتحقق من الغرسات ودقة السجل.",
@@ -4983,7 +5017,9 @@
     "disclaimer.modal_title": "إشعار مهم",
     "disclaimer.modal_body": "هذه الأداة هي <strong>وسيلة مساعدة للتوثيق والتواصل</strong> للتخطيط الجراحي. ليست جهازًا طبيًا ولم تتم الموافقة عليها من أي هيئة تنظيمية (MHRA، EU MDR، FDA).<br/><br/>لا توفر دعم القرار السريري أو توصيات العلاج. <strong>الجراح المعالج مسؤول</strong> عن جميع القرارات السريرية، والتحقق من الغرسات (قائمة التحقق من السلامة الجراحية لمنظمة الصحة العالمية)، وضمان أن السجل يعكس بدقة الإجراء المنفذ.<br/><br/>جميع البيانات تبقى على هذا الجهاز. لا يتم إرسال أي شيء إلى أي خادم.",
     "disclaimer.modal_accept": "أفهم",
-    "disclaimer.accepted_label": "تم قبول الإشعار"
+    "disclaimer.accepted_label": "تم قبول الإشعار",
+    "modal.cage.clear_dimensions": "مسح الأبعاد",
+    "portrait.tab.inventory": "المخزون"
   },
   "he": {
     "sidebar.title": "אינסטרומנטציה שדרתית",
@@ -5234,7 +5270,7 @@
     "credits.developer": "פותח על ידי",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "מורשה תחת <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">רישיון GNU GPLv3</a>. לבירורים בנושא הפצה מסחרית, פנה למפתח.",
-    "credits.quick_reference": "מדריך עזר מהיר (18 שפות)",
+    "credits.quick_reference": "מדריך עזר מהיר ({count} שפות)",
     "disclaimer.text": "תרגום לא מאומת",
     "disclaimer.review": "עזור לשפר תרגום זה",
     "disclaimer.clinical": "זהו כלי עזר לתיעוד ותקשורת, לא מכשיר רפואי. אינו בעל סימון CE, אישור FDA או אישור של כל גוף רגולטורי. המנתח המטפל אחראי לכל ההחלטות הקליניות, אימות השתלים ודיוק הרשומה.",
@@ -5260,7 +5296,9 @@
     "disclaimer.modal_title": "הודעה חשובה",
     "disclaimer.modal_body": "כלי זה הוא <strong>אמצעי עזר לתיעוד ותקשורת</strong> לתכנון ניתוחי. אינו מכשיר רפואי ולא אושר על ידי כל גוף רגולטורי (MHRA, EU MDR, FDA).<br/><br/>אינו מספק תמיכה בהחלטות קליניות או המלצות טיפול. <strong>המנתח המטפל אחראי</strong> לכל ההחלטות הקליניות, אימות השתלים (רשימת בדיקת בטיחות ניתוחית של WHO), והבטחה שהרשומה משקפת בדיוק את ההליך שבוצע.<br/><br/>כל הנתונים נשארים במכשיר זה. שום דבר אינו מועבר לשרת כלשהו.",
     "disclaimer.modal_accept": "הבנתי",
-    "disclaimer.accepted_label": "ההודעה התקבלה"
+    "disclaimer.accepted_label": "ההודעה התקבלה",
+    "modal.cage.clear_dimensions": "נקה מידות",
+    "portrait.tab.inventory": "מלאי"
   },
   "zh-Hans": {
     "sidebar.title": "脊柱内固定",
@@ -5511,7 +5549,7 @@
     "credits.developer": "开发者",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "基于<a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3许可证</a>授权。如有商业分发需求，请联系开发者。",
-    "credits.quick_reference": "快速参考指南 (18种语言)",
+    "credits.quick_reference": "快速参考指南 ({count}种语言)",
     "disclaimer.text": "翻译未经验证",
     "disclaimer.review": "帮助改进此翻译",
     "disclaimer.clinical": "这是一个文档和沟通辅助工具，不是医疗器械。未经CE认证、FDA批准或任何监管机构认可。主刀医生对所有临床决策、内植物验证和记录准确性负责。",
@@ -5537,7 +5575,9 @@
     "disclaimer.modal_title": "重要提示",
     "disclaimer.modal_body": "本工具是手术规划的<strong>文档和沟通辅助工具</strong>。它不是医疗器械，未经任何监管机构（MHRA、EU MDR、FDA）批准。<br/><br/>它不提供临床决策支持或治疗建议。<strong>主刀医生负责</strong>所有临床决策、内植物验证（WHO手术安全核查表），并确保记录准确反映所执行的手术过程。<br/><br/>所有数据保留在此设备上。不向任何服务器传输任何内容。",
     "disclaimer.modal_accept": "我已了解",
-    "disclaimer.accepted_label": "已接受提示"
+    "disclaimer.accepted_label": "已接受提示",
+    "modal.cage.clear_dimensions": "清除尺寸",
+    "portrait.tab.inventory": "库存"
   },
   "ja": {
     "sidebar.title": "脊椎インストゥルメンテーション",
@@ -5788,7 +5828,7 @@
     "credits.developer": "開発者",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "<a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3ライセンス</a>の下で提供。商用配布についてのお問い合わせは開発者にご連絡ください。",
-    "credits.quick_reference": "クイックリファレンスガイド (18言語)",
+    "credits.quick_reference": "クイックリファレンスガイド ({count}言語)",
     "disclaimer.text": "翻訳未検証",
     "disclaimer.review": "この翻訳の改善にご協力ください",
     "disclaimer.clinical": "これは文書化およびコミュニケーション補助ツールであり、医療機器ではありません。CE認証、FDA承認、またはいかなる規制機関の承認も受けていません。すべての臨床判断、インプラントの確認、記録の正確性について、執刀医が責任を負います。",
@@ -5814,7 +5854,9 @@
     "disclaimer.modal_title": "重要なお知らせ",
     "disclaimer.modal_body": "本ツールは手術計画のための<strong>文書化およびコミュニケーション補助ツール</strong>です。医療機器ではなく、いかなる規制機関（MHRA、EU MDR、FDA）の承認も受けていません。<br/><br/>臨床判断支援や治療推奨を提供するものではありません。<strong>執刀医が</strong>すべての臨床判断、インプラントの確認（WHO手術安全チェックリスト）、および記録が実施された手術を正確に反映していることについて責任を負います。<br/><br/>すべてのデータはこのデバイスに保存されます。サーバーへの送信はありません。",
     "disclaimer.modal_accept": "理解しました",
-    "disclaimer.accepted_label": "お知らせ確認済み"
+    "disclaimer.accepted_label": "お知らせ確認済み",
+    "modal.cage.clear_dimensions": "寸法をクリア",
+    "portrait.tab.inventory": "在庫"
   },
   "ko": {
     "sidebar.title": "척추 기기 삽입술",
@@ -6065,7 +6107,7 @@
     "credits.developer": "개발자",
     "credits.developer_name": "Nigel Gummerson FRCS (Tr & Orth)",
     "credits.license": "<a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline hover:text-slate-600\">GNU GPLv3 라이선스</a>에 따라 배포됩니다. 상업적 배포 문의는 개발자에게 연락하세요.",
-    "credits.quick_reference": "빠른 참조 가이드 (18개 언어)",
+    "credits.quick_reference": "빠른 참조 가이드 ({count}개 언어)",
     "disclaimer.text": "번역 미검증",
     "disclaimer.review": "번역 개선에 참여하기",
     "disclaimer.clinical": "이 도구는 문서화 및 의사소통 보조 도구이며, 의료기기가 아닙니다. CE 마크, FDA 승인 또는 어떤 규제 기관의 인증도 받지 않았습니다. 집도의가 모든 임상 결정, 삽입물 확인 및 기록 정확성에 대한 책임을 집니다.",
@@ -6091,6 +6133,8 @@
     "disclaimer.modal_title": "중요 공지",
     "disclaimer.modal_body": "이 도구는 수술 계획을 위한 <strong>문서화 및 의사소통 보조 도구</strong>입니다. 의료기기가 아니며 어떤 규제 기관(MHRA, EU MDR, FDA)의 승인도 받지 않았습니다.<br/><br/>임상적 의사결정 지원이나 치료 권고를 제공하지 않습니다. <strong>집도의가 모든 임상 결정</strong>, 삽입물 확인(WHO 수술 안전 체크리스트), 기록이 실제 시행된 수술을 정확히 반영하도록 보장하는 것에 대한 책임이 있습니다.<br/><br/>모든 데이터는 이 기기에 남아 있습니다. 서버로 전송되는 것은 없습니다.",
     "disclaimer.modal_accept": "이해했습니다",
-    "disclaimer.accepted_label": "공지 확인 완료"
+    "disclaimer.accepted_label": "공지 확인 완료",
+    "modal.cage.clear_dimensions": "치수 지우기",
+    "portrait.tab.inventory": "재고"
   }
 }

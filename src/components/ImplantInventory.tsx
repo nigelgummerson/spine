@@ -15,9 +15,10 @@ interface ImplantInventoryProps {
     visibleLevelIds: string[];
     levels: Level[];
     rods: Rods;
+    large?: boolean;
 }
 
-export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, levels, rods }: ImplantInventoryProps) => {
+export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, levels, rods, large }: ImplantInventoryProps) => {
     const grouped = useMemo(() => {
         const counts: Record<string, Record<string, number>> = {};
         placements.forEach(p => {
@@ -50,11 +51,16 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
     const totalItems = Object.values(grouped).reduce((sum, cat) => sum + Object.keys(cat).length, 0);
     const useColumns = totalItems > 3;
 
+    const sz = large ? 'text-lg' : 'text-[10px]';
+    const szSm = large ? 'text-base' : 'text-[10px]';
+    const gap = large ? 'gap-x-5 gap-y-1' : 'gap-x-3 gap-y-0.5';
+    const py = large ? 'py-1' : 'py-px';
+
     return (
-        <div className="mt-2 border-t border-slate-200 pt-1 shrink-0">
-            <h3 className="text-[10px] font-bold text-slate-900 uppercase tracking-widest mb-1 border-b border-slate-100 pb-1">{title}</h3>
-            {!hasImplants && !hasRods && <div className="text-[10px] text-slate-400 italic py-1">{t('inventory.empty')}</div>}
-            <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-slate-500 mb-1.5">
+        <div className={`${large ? 'mt-4' : 'mt-2'} border-t border-slate-200 ${large ? 'pt-3' : 'pt-1'} shrink-0`}>
+            <h3 className={`${sz} font-bold text-slate-900 uppercase tracking-widest ${large ? 'mb-3 pb-2' : 'mb-1 pb-1'} border-b border-slate-100`}>{title}</h3>
+            {!hasImplants && !hasRods && <div className={`${sz} text-slate-400 italic py-1`}>{t('inventory.empty')}</div>}
+            <div className={`flex flex-wrap ${gap} ${szSm} text-slate-500 ${large ? 'mb-3' : 'mb-1.5'}`}>
                 {INVENTORY_CATEGORIES.map(cat => {
                     const items = grouped[cat.key];
                     if (!items) return null;
@@ -76,8 +82,8 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
                     catEntries.push({
                         lines: Object.keys(items).length + 1 + diameterGaps * 0.5, // +1 header, +0.5 per gap
                         node: (
-                            <div key={cat.key} className="mb-1">
-                                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-0.5 mb-0">{t(cat.labelKey)}</div>
+                            <div key={cat.key} className={large ? 'mb-3' : 'mb-1'}>
+                                <div className={`${szSm} font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 ${large ? 'pb-1 mb-1' : 'pb-0.5 mb-0'}`}>{t(cat.labelKey)}</div>
                                 {(() => {
                                     const parseSize = (s: string) => {
                                         const m = s.match(/(\d+\.?\d*)x(\d+)/);
@@ -96,7 +102,7 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
                                         const newGroup = diam !== Infinity && prevDiam !== -1 && diam !== prevDiam;
                                         prevDiam = diam;
                                         return (
-                                            <div key={name} className={`flex justify-between text-[10px] leading-tight py-px border-b border-slate-50${newGroup ? ' mt-1' : ''}`}>
+                                            <div key={name} className={`flex justify-between ${sz} leading-tight ${py} border-b border-slate-50${newGroup ? (large ? ' mt-2' : ' mt-1') : ''}`}>
                                                 <span className="text-slate-700 font-medium">{name}</span>
                                                 <span className="font-bold text-slate-900 ms-2">{count}</span>
                                             </div>
@@ -111,10 +117,10 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
                     catEntries.push({
                         lines: 1 + (rods.left ? 1 : 0) + (rods.right ? 1 : 0),
                         node: (
-                            <div key="rods" className="mb-1">
-                                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-0.5 mb-0">{t('inventory.rods')}</div>
-                                {rods.left && <div className="text-[10px] leading-tight py-px border-b border-slate-50"><span className="text-slate-700 font-medium">{t('inventory.rod_left')} {rods.left}</span></div>}
-                                {rods.right && <div className="text-[10px] leading-tight py-px border-b border-slate-50"><span className="text-slate-700 font-medium">{t('inventory.rod_right')} {rods.right}</span></div>}
+                            <div key="rods" className={large ? 'mb-3' : 'mb-1'}>
+                                <div className={`${szSm} font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 ${large ? 'pb-1 mb-1' : 'pb-0.5 mb-0'}`}>{t('inventory.rods')}</div>
+                                {rods.left && <div className={`${sz} leading-tight ${py} border-b border-slate-50`}><span className="text-slate-700 font-medium">{t('inventory.rod_left')} {rods.left}</span></div>}
+                                {rods.right && <div className={`${sz} leading-tight ${py} border-b border-slate-50`}><span className="text-slate-700 font-medium">{t('inventory.rod_right')} {rods.right}</span></div>}
                             </div>
                         ),
                     });

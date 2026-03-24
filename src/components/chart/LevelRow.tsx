@@ -53,7 +53,8 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
     const osteoPx = Math.round(32 * iconScale);
     const midPx = Math.round(36 * iconScale);
     const labelScale = Math.max(0.9, Math.min(1.2, Math.pow(heightScale, 0.3)));
-    const labelPx = Math.max(15, Math.min(18, Math.round(16 * labelScale)));
+    const labelPxBase = Math.max(15, Math.min(18, Math.round(16 * labelScale)));
+    const labelPx = isCervical ? labelPxBase : Math.max(19, Math.min(22, Math.round(20 * labelScale)));
     const cageLabelPx = Math.max(14, Math.min(17, Math.round(15 * labelScale)));
     const osteoLabelPx = Math.max(13, Math.min(16, Math.round(15 * labelScale)));
 
@@ -82,11 +83,15 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
     const discH = hasDisc && rawDiscH > 0 ? Math.max(DISC_MIN_PX, rawDiscH) : 0;
 
     /** Render an instrument icon as a nested SVG */
-    const renderIcon = (type: string, x: number, y: number, w: number, h: number, extraProps?: Record<string, any>) => (
-        <svg x={x} y={y} width={w} height={h} overflow="visible" {...extraProps}>
-            <InstrumentIcon type={type} className="w-full h-full" />
-        </svg>
-    );
+    const renderIcon = (type: string, x: number, y: number, w: number, h: number, colorOrProps?: string | Record<string, any>) => {
+        const color = typeof colorOrProps === 'string' ? colorOrProps : undefined;
+        const extraProps = typeof colorOrProps === 'object' ? colorOrProps : undefined;
+        return (
+            <svg x={x} y={y} width={w} height={h} overflow="visible" {...extraProps}>
+                <InstrumentIcon type={type} className="w-full h-full" color={color} />
+            </svg>
+        );
+    };
 
     /** Render a ghost target (empty zone indicator) */
     const renderGhostTarget = (cx: number, cy: number, isForce: boolean) => {
@@ -126,8 +131,10 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
         const elements: React.ReactElement[] = [];
 
         // Clickable background rect
+        const hoverFill = isForceZone ? 'rgba(191, 219, 254, 0.3)' : 'rgba(148, 163, 184, 0.15)';
+        const bgId = `zone-bg-${level.id}-${zone}`;
         elements.push(
-            <rect key={`zone-bg-${zone}`} x={zoneX} y={0} width={zoneW} height={rowHeight}
+            <rect key={`zone-bg-${zone}`} id={bgId} x={zoneX} y={0} width={zoneW} height={rowHeight}
                 fill="transparent" cursor={clickable ? 'crosshair' : 'default'}
                 onClick={() => clickable && onZoneClick(level.id, zone)} />
         );
@@ -190,7 +197,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                         <foreignObject x={zoneX + 4} y={0} width={iconX - zoneX - 6} height={rowHeight} overflow="visible" pointerEvents="none">
                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' } as any}>
                                 <div style={{ width: '100%', display: 'flex', flexDirection: isInline ? 'row-reverse' : 'column', alignItems: isInline ? 'center' : 'flex-end', gap: isInline ? 3 : 0, lineHeight: 1 }}>
-                                    {labelText && <span style={{ fontFamily: 'ui-monospace, monospace', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>}
+                                    {labelText && <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>}
                                     {annText && <div style={{ alignSelf: 'stretch', textAlign: 'left', width: '100%' }}>
                                         <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', paddingLeft: 1, paddingRight: 1, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>
                                     </div>}
@@ -203,7 +210,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                         <foreignObject x={iconX + iW + 2} y={0} width={zoneX + zoneW - iconX - iW - 12} height={rowHeight} overflow="visible" pointerEvents="none">
                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' } as any}>
                                 <div style={{ width: '100%', display: 'flex', flexDirection: isInline ? 'row' : 'column', alignItems: isInline ? 'center' : 'flex-start', gap: isInline ? 3 : 0, lineHeight: 1 }}>
-                                    {labelText && <span style={{ fontFamily: 'ui-monospace, monospace', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>}
+                                    {labelText && <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>}
                                     {annText && <div style={{ width: '100%', textAlign: 'right', lineHeight: 1.1 }}>
                                         <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', paddingLeft: 1, paddingRight: 1, lineHeight: 1.1, display: 'inline-block' } as any}>{annText}</span>
                                     </div>}
@@ -214,7 +221,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     {align === 'center' && labelText && (
                         <text x={zoneCx} y={iconY + iH / 2 - 1}
                             textAnchor="middle" dominantBaseline="middle"
-                            fontSize={labelPx} fontFamily="ui-monospace, monospace" fontWeight="bold" fill="#334155">
+                            fontSize={labelPx} fontFamily="Inter, sans-serif" fontWeight="bold" fill="#334155">
                             {labelText}
                         </text>
                     )}
@@ -236,9 +243,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const isFixation = FIXATION_TYPES.includes(ghostItem.tool);
             const iW = isFixation ? fixW : isHookItem ? hookW : isOsteo ? osteoPx : screwPx;
             const iH = isFixation ? fixH : isHookItem ? hookH : isOsteo ? osteoPx : screwPx;
-            const ann = ghostItem.annotation || '';
             const showData = ghostItem.data && !isHookItem && !isFixation;
-            const showAnn = !!ann;
 
             let iconX: number;
             const iconY = 2;
@@ -253,33 +258,26 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const labelText = showData
                 ? (isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel)) : String(displayLabel))
                 : '';
-            const annText = showAnn ? ann : '';
-            const isInline = heightScale < 0.85 && !!labelText && !!annText;
 
             elements.push(
-                <g key={'ghost-' + ghostItem.id} opacity={0.4} cursor="pointer"
+                <g key={'ghost-' + ghostItem.id} opacity={0.75} cursor="pointer"
                     onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostItem); }}>
-                    {align === 'left' && (labelText || annText) && (
+                    {align === 'left' && labelText && (
                         <foreignObject x={zoneX + 4} y={0} width={iconX - zoneX - 6} height={rowHeight} overflow="visible" pointerEvents="none">
                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' } as any}>
-                                <div style={{ width: '100%', display: 'flex', flexDirection: isInline ? 'row-reverse' : 'column', alignItems: isInline ? 'center' : 'flex-end', gap: isInline ? 3 : 0, lineHeight: 1 }}>
-                                    {labelText && <span style={{ fontFamily: 'ui-monospace, monospace', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>}
-                                    {annText && <div style={{ alignSelf: 'stretch', textAlign: 'left', width: '100%' }}>
-                                        <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', paddingLeft: 1, paddingRight: 1, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>
-                                    </div>}
+                                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: 1 }}>
+                                    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 'bold', fontSize: labelPx, color: '#0f172a', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>
                                 </div>
                             </div>
                         </foreignObject>
                     )}
-                    {renderIcon(tool?.icon || '', iconX, iconY, iW, iH)}
-                    {align === 'right' && (labelText || annText) && (
+                    <rect x={iconX} y={iconY} width={iW} height={iH} fill="transparent" pointerEvents="all" />
+                    {renderIcon(tool?.icon || '', iconX, iconY, iW, iH, '#14b8a6')}
+                    {align === 'right' && labelText && (
                         <foreignObject x={iconX + iW + 2} y={0} width={zoneX + zoneW - iconX - iW - 12} height={rowHeight} overflow="visible" pointerEvents="none">
                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' } as any}>
-                                <div style={{ width: '100%', display: 'flex', flexDirection: isInline ? 'row' : 'column', alignItems: isInline ? 'center' : 'flex-start', gap: isInline ? 3 : 0, lineHeight: 1 }}>
-                                    {labelText && <span style={{ fontFamily: 'ui-monospace, monospace', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>}
-                                    {annText && <div style={{ width: '100%', textAlign: 'right', lineHeight: 1.1 }}>
-                                        <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', paddingLeft: 1, paddingRight: 1, lineHeight: 1.1, display: 'inline-block' } as any}>{annText}</span>
-                                    </div>}
+                                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
+                                    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 'bold', fontSize: labelPx, color: '#0f172a', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>
                                 </div>
                             </div>
                         </foreignObject>
@@ -287,7 +285,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     {align === 'center' && labelText && (
                         <text x={zoneCx} y={iconY + iH / 2 - 1}
                             textAnchor="middle" dominantBaseline="middle"
-                            fontSize={labelPx} fontFamily="ui-monospace, monospace" fontWeight="bold" fill="#334155">
+                            fontSize={labelPx} fontFamily="Inter, sans-serif" fontWeight="bold" fill="#0f172a">
                             {labelText}
                         </text>
                     )}
@@ -295,7 +293,10 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             );
         }
 
-        return <g key={`zone-${zone}`}>{elements}</g>;
+        return <g key={`zone-${zone}`}
+            onMouseEnter={clickable ? () => { document.getElementById(bgId)?.setAttribute('fill', hoverFill); } : undefined}
+            onMouseLeave={clickable ? () => { document.getElementById(bgId)?.setAttribute('fill', 'transparent'); } : undefined}
+        >{elements}</g>;
     };
 
     /** Render midline zone content (osteotomies on vertebral body) */
@@ -351,10 +352,10 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     angle = (gp.data as OsteotomyData).angle;
                 }
                 elements.push(
-                    <g key={'ghost-' + gp.id} opacity={0.4} cursor="pointer"
+                    <g key={'ghost-' + gp.id} opacity={0.75} cursor="pointer"
                         onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(gp); }}>
                         <svg x={vertX + scaledWidth / 2 - midPx / 2} y={rowHeight / 2 - midPx / 2} width={midPx} height={midPx} overflow="visible">
-                            <InstrumentIcon type={tool?.icon || ''} className="w-full h-full" />
+                            <InstrumentIcon type={tool?.icon || ''} className="w-full h-full" color="#14b8a6" />
                         </svg>
                         {gp.tool === 'osteotomy' && gp.data && (() => {
                             const ghostOsteoText = angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel);
@@ -363,10 +364,10 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                             <g>
                                 <rect x={vertX + scaledWidth / 2 - ghostOsteoRectW / 2} y={rowHeight / 2 - osteoLabelPx / 2 - 2}
                                     width={ghostOsteoRectW} height={osteoLabelPx + 4} rx={3}
-                                    fill="#fffbeb" fillOpacity={0.8} stroke="#fcd34d" strokeWidth={1} />
+                                    fill="#f0fdfa" fillOpacity={0.8} stroke="#5eead4" strokeWidth={1} />
                                 <text x={vertX + scaledWidth / 2} y={rowHeight / 2}
                                     textAnchor="middle" dominantBaseline="middle"
-                                    fontSize={osteoLabelPx} fontWeight="bold" fill="#92400e">
+                                    fontSize={osteoLabelPx} fontWeight="bold" fill="#0d9488">
                                     {displayLabel}{angle != null && angle !== '' ? ` ${angle}\u00B0` : ''}
                                 </text>
                             </g>
@@ -385,7 +386,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
         if (!hasDisc || discH <= 0) return null;
         const discY = rowHeight;
 
-        const renderCageInfo = (cage: Cage, opacity?: number) => {
+        const renderCageInfo = (cage: Cage, opacity?: number, isGhost?: boolean) => {
             if (viewMode === 'whole' && level.type === 'C') {
                 return (
                     <g opacity={opacity}>
@@ -399,22 +400,26 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             }
             const sideChar = cage.data.side && cage.data.side !== 'bilateral' && cage.data.side !== 'midline'
                 ? ` (${cage.data.side.charAt(0).toUpperCase()})` : '';
-            const cageLabel = `${cage.tool.toUpperCase()} ${cage.data.height}H ${cage.data.lordosis || '0'}\u00B0${sideChar}`;
+            const hasDims = cage.data.height || cage.data.lordosis;
+            const cageLabel = hasDims
+                ? `${cage.tool.toUpperCase()} ${cage.data.height}H ${cage.data.lordosis || '0'}\u00B0${sideChar}`
+                : `${cage.tool.toUpperCase()}${sideChar}`;
+            const labelColor = isGhost ? '#14b8a6' : '#0369a1';
             return (
                 <g opacity={opacity}>
                     <svg x={vertX} y={discY} width={scaledWidth} height={discH} viewBox="0 0 160 20" preserveAspectRatio="none" overflow="visible">
-                        <CageVisualization cageType={cage.tool} heightScale={1} levelId={level.id} />
+                        <CageVisualization cageType={cage.tool} heightScale={1} levelId={level.id} color={isGhost ? '#14b8a6' : undefined} />
                     </svg>
                     <text x={rightZoneX + 8} y={discY + discH / 2}
                         textAnchor="start" dominantBaseline="middle"
-                        fontSize={cageLabelPx} fontWeight="bold" fill="#0369a1">
+                        fontSize={cageLabelPx} fontWeight="bold" fill={labelColor}>
                         {cageLabel}
                     </text>
                 </g>
             );
         };
 
-        const renderOsteoLabel = (osteo: Placement, opacity?: number) => {
+        const renderOsteoLabel = (osteo: Placement, opacity?: number, isGhost?: boolean) => {
             const data = osteo.data as any;
             const label = data?.shortLabel || t('clinical.osteotomy.fallback');
             const angleStr = data?.angle != null && data?.angle !== '' ? ` ${data.angle}\u00B0` : '';
@@ -424,10 +429,10 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                 <g opacity={opacity}>
                     <rect x={vertX + scaledWidth / 2 - discOsteoRectW / 2} y={discY + discH / 2 - cageLabelPx / 2 - 2}
                         width={discOsteoRectW} height={cageLabelPx + 4} rx={3}
-                        fill="#fffbeb" fillOpacity={0.8} stroke="#fcd34d" strokeWidth={1} />
+                        fill={isGhost ? '#f0fdfa' : '#fffbeb'} fillOpacity={0.8} stroke={isGhost ? '#5eead4' : '#fcd34d'} strokeWidth={1} />
                     <text x={vertX + scaledWidth / 2} y={discY + discH / 2}
                         textAnchor="middle" dominantBaseline="middle"
-                        fontSize={cageLabelPx} fontWeight="bold" fill="#92400e">
+                        fontSize={cageLabelPx} fontWeight="bold" fill={isGhost ? '#0d9488' : '#92400e'}>
                         {label}{angleStr}
                     </text>
                 </g>
@@ -444,7 +449,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     )
                     : ghostCageBelow ? (
                         <g cursor="pointer" onClick={(e) => { e.stopPropagation(); onGhostCageClick && onGhostCageClick(ghostCageBelow); }}>
-                            {renderCageInfo(ghostCageBelow, 0.4)}
+                            {renderCageInfo(ghostCageBelow, 0.75, true)}
                         </g>
                     )
                     : discOsteo ? (
@@ -454,7 +459,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     )
                     : ghostDiscOsteo ? (
                         <g cursor="pointer" onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostDiscOsteo); }}>
-                            {renderOsteoLabel(ghostDiscOsteo, 0.4)}
+                            {renderOsteoLabel(ghostDiscOsteo, 0.75, true)}
                         </g>
                     )
                     : (!readOnly && <rect x={vertX} y={discY} width={scaledWidth} height={discH} fill="transparent" />)
@@ -470,16 +475,17 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             {/* Level border bottom */}
             <line x1={0} y1={rowHeight} x2={chartWidth} y2={rowHeight} stroke="#f1f5f9" strokeWidth={1} />
 
-            {/* Vertebral body */}
-            <rect x={vertX} y={0} width={scaledWidth} height={rowHeight}
-                fill="transparent" cursor={!readOnly ? 'pointer' : 'default'}
-                onClick={() => !readOnly && onZoneClick(level.id, 'mid')} />
-            <svg x={vertX} y={0} width={scaledWidth} height={rowHeight} overflow="visible" style={{ pointerEvents: 'none' }}>
-                <SpineVertebra label={level.id} type={level.type} height={getLevelHeight(level)} isCorpectomy={isCorpectomy} heightScale={heightScale} />
-            </svg>
-
-            {/* Mid zone content (osteotomies etc) */}
-            {renderMidContent()}
+            {/* Vertebral body + mid zone */}
+            <g onMouseEnter={!readOnly ? () => { document.getElementById(`mid-bg-${level.id}`)?.setAttribute('fill', 'rgba(253, 230, 138, 0.3)'); } : undefined}
+               onMouseLeave={!readOnly ? () => { document.getElementById(`mid-bg-${level.id}`)?.setAttribute('fill', 'transparent'); } : undefined}>
+                <rect id={`mid-bg-${level.id}`} x={vertX} y={0} width={scaledWidth} height={rowHeight}
+                    fill="transparent" cursor={!readOnly ? 'pointer' : 'default'}
+                    onClick={() => !readOnly && onZoneClick(level.id, 'mid')} />
+                <svg x={vertX} y={0} width={scaledWidth} height={rowHeight} overflow="visible" style={{ pointerEvents: 'none' }}>
+                    <SpineVertebra label={level.id} type={level.type} height={getLevelHeight(level)} isCorpectomy={isCorpectomy} heightScale={heightScale} />
+                </svg>
+                {renderMidContent()}
+            </g>
 
             {/* Left/right zones */}
             {showForces && renderZoneContent('force_left', forceLeftX, forceW, 'center')}

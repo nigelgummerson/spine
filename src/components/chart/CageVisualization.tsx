@@ -6,11 +6,12 @@ interface CageVisualizationProps {
     cageType: string;
     heightScale: number;
     levelId: string;
+    color?: string;
 }
 
-export const CageVisualization = ({ cageType, heightScale, levelId }: CageVisualizationProps) => {
+export const CageVisualization = ({ cageType, heightScale, levelId, color: colorProp }: CageVisualizationProps) => {
     const h = 12 * heightScale;
-    const color = "#0ea5e9";
+    const color = colorProp || "#0ea5e9";
     const geom = getVertSvgGeometry(levelId);
     const l = geom ? geom.left : 30;
     const r = geom ? geom.right : 130;

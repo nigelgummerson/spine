@@ -1,5 +1,5 @@
 import React from 'react';
-import { t } from '../../i18n/i18n';
+import { t, SUPPORTED_LANGUAGES } from '../../i18n/i18n';
 import { CURRENT_VERSION } from '../../data/changelog';
 import { IconX , IconCopy, IconSave, IconCC, IconLink} from '../icons';
 import { InstrumentIcon } from '../chart/InstrumentIcon';
@@ -86,7 +86,7 @@ export const HelpModal = ({ isOpen, onClose }: HelpModalProps) => {
                             <div className="mt-0.5 shrink-0"><IconCC /></div>
                             <span dangerouslySetInnerHTML={{__html: t('credits.license')}} />
                         </div>
-                        <p className="text-[10px] text-slate-400 mt-2"><a href="https://plan.skeletalsurgery.com/spine/quick-reference.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600">{t('credits.quick_reference')}</a></p>
+                        <p className="text-[10px] text-slate-400 mt-2"><a href="https://plan.skeletalsurgery.com/spine/quick-reference.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600">{t('credits.quick_reference', { count: SUPPORTED_LANGUAGES.length })}</a></p>
                     </div>
                 </div>
                 <div className="bg-slate-50 px-4 py-3 text-end border-t border-slate-200">

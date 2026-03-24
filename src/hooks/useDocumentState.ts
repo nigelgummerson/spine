@@ -32,12 +32,14 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
     const [hasLoaded, setHasLoaded] = useState(false);
     const [syncConnected, setSyncConnected] = useState(false);
 
-    const receivingSync = useRef(false);
     const syncChannelRef = useRef<BroadcastChannel | null>(null);
     const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const lastPongRef = useRef(0);
     const syncVersionRef = useRef(0);
     const syncVersionMismatchRef = useRef(false);
+    // Sync bounce prevention: track when we last received a sync update.
+    // Suppress outgoing broadcasts for a guard window after receiving.
+    const lastSyncReceiveRef = useRef(0);
 
     // Stable refs for values needed in sync callbacks
     const stateRef = useRef(state);
@@ -94,11 +96,9 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
         }
         if (incognitoMode) localStorage.removeItem('spine_planner_v2');
 
-        // Broadcast to other windows (skip if this update came from sync)
-        if (receivingSync.current) {
-            receivingSync.current = false;
-            return;
-        }
+        // Broadcast to other windows (skip if recently received a sync — guard window prevents bounce)
+        const sinceSyncReceive = Date.now() - lastSyncReceiveRef.current;
+        if (sinceSyncReceive < 500) return;
         if (hasLoaded && syncChannelRef.current) {
             syncVersionRef.current++;
             clearTimeout(syncTimerRef.current!);
@@ -137,7 +137,7 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
                 setSyncConnected(true);
                 if (msg.payload) {
                     clearTimeout(syncTimerRef.current!);
-                    receivingSync.current = true;
+                    lastSyncReceiveRef.current = Date.now();
                     const result = deserializeDocument(msg.payload);
                     dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
                     if (result.viewMode) setViewMode(result.viewMode);
@@ -146,7 +146,7 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
             } else if (msg.type === 'state') {
                 if (msg.payload) {
                     clearTimeout(syncTimerRef.current!);
-                    receivingSync.current = true;
+                    lastSyncReceiveRef.current = Date.now();
                     const result = deserializeDocument(msg.payload);
                     dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
                     if (result.viewMode) setViewMode(result.viewMode);

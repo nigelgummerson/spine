@@ -1,6 +1,6 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION: string = "v2.5.0-beta";
+export const CURRENT_VERSION: string = "v2.5.20-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -9,6 +9,38 @@ interface ChangeLogEntry {
 }
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
+    { version: "v2.5.20-beta", date: "2026-03-24", changes: [
+        "Portrait inventory tab — dedicated fourth tab with large readable text for theatre use.",
+        "Fullscreen toggle in both portrait and landscape (Fullscreen API).",
+        "Confirm Plan and Clear Construct buttons in portrait toolbar.",
+        "Portrait row 1 height matched to row 2; sync icon inline fix.",
+        "Ghost click routing — disc zone overlay now routes to correct modal (cage/osteotomy) with data pre-filled.",
+        "Ghost icon click area — transparent hit rect prevents zone handler stealing clicks.",
+        "Annotations no longer carry over from plan to construct on ghost confirmation.",
+        "Band/wire/cable legacy annotation fallback respects empty string as deliberate.",
+        "Sync bounce fix — timestamp guard (500ms) replaces fragile boolean flag.",
+        "Language count in credits now dynamic from SUPPORTED_LANGUAGES.length.",
+        "Release workflow triggers on all version tags (not just .0 releases).",
+        "RELEASING.md — version bump checklist and release workflow documentation.",
+        "1 new translation key (portrait.tab.inventory) across 22 languages.",
+        "252 tests across 5 files.",
+    ]},
+    { version: "v2.5.10-beta", date: "2026-03-24", changes: [
+        "Ghost placements (plan items on construct view) redesigned for theatre visibility — teal-coloured icons at 75% opacity, darker/larger size text, annotations suppressed.",
+        "Screw size labels switched from slashed-zero monospace to Inter font — clearer 0 vs 8 distinction at distance.",
+        "Thoracolumbar screw size text enlarged (19–22px, up from 15–18px); cervical unchanged.",
+        "Ghost cages render in teal with teal labels to match ghost implant colour language.",
+        "Teal polyaxial icon legend (= Plan) added to construct header in portrait mode.",
+        "Ghost notes from plan no longer shown on portrait construct view — reduces clutter.",
+        "Hover colour feedback on all clickable chart zones — grey for screw zones, blue for force zones, amber for vertebral body, blue for disc zones.",
+        "Disc zone hover highlight and click target narrowed to vertebral body width.",
+        "Toast notifications added to portrait layout (were missing entirely).",
+        "Escape key dismisses all toast notifications.",
+        "Toast dismiss button consistently positioned with shrink-0 styling.",
+        "Cage modal: 'Clear dimensions' button allows placing any cage type with no size data.",
+        "1 new translation key (modal.cage.clear_dimensions) across all 22 languages.",
+        "252 tests across 5 files.",
+    ]},
     { version: "v2.5.0-beta", date: "2026-03-23", changes: [
         "CJK + Hebrew i18n expansion — 4 new languages (Hebrew, Chinese Simplified, Japanese, Korean), bringing total to 22.",
         "Hebrew (he): 19th language, 2nd RTL — uses existing Arabic RTL infrastructure.",

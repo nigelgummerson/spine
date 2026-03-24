@@ -206,7 +206,10 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
         {/* Title bar — HTML, fixed at top */}
         <div className={`${forcePlacements ? 'px-2 py-1' : 'p-2'} bg-slate-50 border-b border-slate-200 text-center shrink-0`}>
             <div className="font-bold text-sm text-slate-800 uppercase tracking-wider">{title}</div>
-            {forcePlacements && <div className="text-[10px] font-normal text-blue-400 italic -mt-0.5">{t('chart.force_plan_only')}</div>}
+            {forcePlacements && <div className="flex items-center justify-center gap-3 -mt-0.5">
+                <span className="text-[10px] font-normal text-blue-400 italic">{t('chart.force_plan_only')}</span>
+                {ghostPlacements && <span className="flex items-center gap-1 text-[10px] font-bold" style={{ color: '#14b8a6' }}><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" strokeWidth="3"><circle cx="12" cy="12" r="9" /><path d="M7 7l10 10M17 7l-10 10" /></svg>= {t('export.plan')}</span>}
+            </div>}
         </div>
 
         {/* Column headers — HTML, fixed */}
@@ -257,13 +260,25 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                     const discH = entry.endY - entry.vertEnd;
                     if (discH <= 0) return null;
                     const discY = rowY + vertH;
+                    // Route disc clicks: ghost cage → ghost cage handler, ghost osteo → ghost click, otherwise → disc picker
+                    const ghostCage = ghostCages?.find(gc => gc.levelId === lvl.id);
+                    const existingCage = cages.find(c => c.levelId === lvl.id);
+                    const ghostOsteo = ghostPlacements?.find(p => p.levelId === lvl.id && p.zone === 'disc');
+                    const existingOsteo = placements.find(p => p.levelId === lvl.id && p.zone === 'disc');
+                    const handleDiscAreaClick = (e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        if (readOnly) return;
+                        if (!existingCage && ghostCage && onGhostCageClick) { onGhostCageClick(ghostCage); }
+                        else if (!existingOsteo && ghostOsteo && onGhostClick) { onGhostClick(ghostOsteo); }
+                        else { onDiscClick(lvl.id); }
+                    };
                     return (
-                        <rect key={`disc-click-${lvl.id}`} x={0} y={discY} width={chartWidth} height={discH}
+                        <rect key={`disc-click-${lvl.id}`} x={vertX} y={discY} width={scaledWidth} height={discH}
                             fill="transparent" cursor={!readOnly ? 'pointer' : 'default'}
                             pointerEvents="all"
                             onMouseEnter={!readOnly ? (e) => { (e.target as SVGRectElement).setAttribute('fill', 'rgba(186, 230, 253, 0.4)'); } : undefined}
                             onMouseLeave={!readOnly ? (e) => { (e.target as SVGRectElement).setAttribute('fill', 'transparent'); } : undefined}
-                            onClick={(e) => { e.stopPropagation(); if (!readOnly) onDiscClick(lvl.id); }} />
+                            onClick={handleDiscAreaClick} />
                     );
                 })}
             </g>
@@ -311,10 +326,10 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                         const y = connectorToRenderedY(gc);
                         if (y === null) return null;
                         return (
-                            <g key={gc.id || gc.levelId} opacity={0.4} cursor="pointer"
+                            <g key={gc.id || gc.levelId} opacity={0.75} cursor="pointer"
                                 onClick={() => onGhostConnectorClick && onGhostConnectorClick(gc)}>
                                 <svg x={vertX} y={y - connH / 2} width={scaledWidth} height={connH} overflow="visible">
-                                    <InstrumentIcon type="connector" className="w-full h-full" color="#1e293b" />
+                                    <InstrumentIcon type="connector" className="w-full h-full" color="#14b8a6" />
                                 </svg>
                             </g>
                         );
@@ -355,7 +370,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                             const endX = anchorX - (dx / dist) * 15;
                             const endY = anchorY - (dy / dist) * 15;
                             const color = item._type === 'recon' ? '#0369a1' : '#c4b5fd';
-                            const opacity = item._type === 'ghost-note' ? 0.4 : 1;
+                            const opacity = item._type === 'ghost-note' ? 0.75 : 1;
                             return <line key={`leader-${item.id}`} x1={startX} y1={startY} x2={endX} y2={endY} stroke={color} strokeWidth={0.75} strokeDasharray="3 2" opacity={opacity} />;
                         })}
                     </g>
@@ -430,8 +445,10 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                             onClick: (e) => { e.stopPropagation(); if (!readOnly && !didDragRef.current) { setDraggingNoteId(null); onNoteClick(n); } },
                         }))}
                         {hasGhosts && activeGhostNotes.map(gn => renderNoteLabel(gn, {
-                            opacity: 0.4,
+                            opacity: 0.75,
                             onClick: (e) => { e.stopPropagation(); if (onGhostNoteClick) onGhostNoteClick(gn); },
+                            borderColor: '#5eead4',
+                            textColor: '#0d9488',
                         }))}
                         {hasRecon && reconCageLabels.map(rc => {
                             const rPos = reconPositions[rc.id] || {};

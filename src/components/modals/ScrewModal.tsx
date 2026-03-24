@@ -81,12 +81,26 @@ interface ScrewModalProps {
 
 export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation }: ScrewModalProps) => {
     if (!isOpen) return null;
-    const [mode, setMode] = useState(defaultMode || 'standard');
-    const [diameter, setDiameter] = useState(defaultDiameter);
-    const [length, setLength] = useState(defaultLength);
-    const [customText, setCustomText] = useState(defaultCustomText || '');
+    // Compute initial values from props (runs on mount since component unmounts when closed)
+    const computeInitial = () => {
+        let mode = defaultMode || 'standard';
+        let dia = defaultDiameter;
+        let len = defaultLength;
+        let custom = defaultCustomText || '';
+        if (initialData && typeof initialData === 'string') {
+            if (initialData === "Custom") { mode = 'custom'; custom = defaultCustomText || ''; }
+            else if (initialData.includes('x')) { const parts = initialData.split('x'); if (parts.length === 2) { mode = 'standard'; dia = parts[0]; len = parts[1]; } else { mode = 'custom'; custom = initialData; } }
+        } else if (initialData === null) { mode = 'none'; }
+        const legacyFixationAnn = (initialData && typeof initialData === 'string' && initialTool && ['band','wire','cable'].includes(initialTool)) ? initialData : '';
+        return { mode, dia, len, custom, ann: initialAnnotation !== undefined && initialAnnotation !== null ? initialAnnotation : legacyFixationAnn };
+    };
+    const init = computeInitial();
+    const [mode, setMode] = useState(init.mode);
+    const [diameter, setDiameter] = useState(init.dia);
+    const [length, setLength] = useState(init.len);
+    const [customText, setCustomText] = useState(init.custom);
     const [selectedType, setSelectedType] = useState(initialTool || 'polyaxial');
-    const [annotation, setAnnotation] = useState(initialAnnotation || '');
+    const [annotation, setAnnotation] = useState(init.ann);
     const [fixationText, setFixationText] = useState('');
     const isHookOnly = HOOK_TYPES.includes(selectedType);
     const isFixation = ['band','wire','cable'].includes(selectedType);
@@ -94,16 +108,9 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
 
     useEffect(() => {
         if (isOpen) {
+            const v = computeInitial();
             if (initialTool) setSelectedType(initialTool);
-            if (initialData && typeof initialData === 'string') {
-                 if (initialData === "Custom") { setMode('custom'); setCustomText(defaultCustomText || ''); }
-                 else if (initialData.includes('x')) { const parts = initialData.split('x'); if (parts.length === 2) { setMode('standard'); setDiameter(parts[0]); setLength(parts[1]); } else { setMode('custom'); setCustomText(initialData); } }
-                 else { setMode(defaultMode || 'standard'); }
-            } else if (initialData === null && initialData !== undefined) { setMode('none'); }
-            else { setMode(defaultMode || 'standard'); setDiameter(defaultDiameter); setLength(defaultLength); setCustomText(defaultCustomText || ''); }
-            // For fixation types, legacy data (description) maps to annotation
-            const legacyFixationAnn = (initialData && typeof initialData === 'string' && initialTool && ['band','wire','cable'].includes(initialTool)) ? initialData : '';
-            setAnnotation(initialAnnotation || legacyFixationAnn || '');
+            setMode(v.mode); setDiameter(v.dia); setLength(v.len); setCustomText(v.custom); setAnnotation(v.ann);
         }
     }, [isOpen, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation]);
 

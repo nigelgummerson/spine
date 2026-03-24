@@ -84,6 +84,12 @@ const App = () => {
         if (type !== 'error') setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
     }, []);
     const dismissToast = useCallback((id: number) => setToasts(prev => prev.filter(t => t.id !== id)), []);
+    const dismissAllToasts = useCallback(() => setToasts([]), []);
+    useEffect(() => {
+        const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && toasts.length > 0) dismissAllToasts(); };
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, [toasts.length, dismissAllToasts]);
 
     // DOCUMENT STATE (clinical data, sync, auto-save)
     const { state, dispatch, serialize, syncChannelRef, syncConnected, hasLoaded } = useDocumentState({
@@ -152,12 +158,12 @@ const App = () => {
         if (tab === 1) setActiveChart('planned');
         else if (tab === 2) setActiveChart('completed');
     }, []);
-    const PORTRAIT_TABS = ['portrait.tab.demographics', 'portrait.tab.plan', 'portrait.tab.construct'];
+    const PORTRAIT_TABS = ['portrait.tab.demographics', 'portrait.tab.plan', 'portrait.tab.construct', 'portrait.tab.inventory'];
     const portraitContentRef = useRef<HTMLDivElement>(null);
     const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
     const [portraitScale, setPortraitScale] = useState(1);
     // Fixed column sizes matching the export container proportions
-    const PORTRAIT_COL_W = [370, 637, 637]; // demographics, plan, construct (construct widened for ghost forces)
+    const PORTRAIT_COL_W = [370, 637, 637, 637]; // demographics, plan, construct, inventory
     const PORTRAIT_COL_H = 1050;
 
     // Swipe gesture detection for portrait tab switching
@@ -176,7 +182,7 @@ const App = () => {
         touchStartRef.current = null;
         // Only trigger on predominantly horizontal swipes with min 50px threshold
         if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5 && elapsed < 500) {
-            if (dx < 0 && portraitTab < 2) switchPortraitTab(portraitTab + 1);
+            if (dx < 0 && portraitTab < 3) switchPortraitTab(portraitTab + 1);
             else if (dx > 0 && portraitTab > 0) switchPortraitTab(portraitTab - 1);
         }
     }, [isPortrait, portraitTab]);
@@ -422,7 +428,7 @@ const App = () => {
             setEditingPlacementId(null);
             setEditingData(ghost.data);
             setEditingTool(ghost.tool);
-            setEditingAnnotation(ghost.annotation || '');
+            setEditingAnnotation(''); // Annotations don't carry over from plan — must be deliberate
             setScrewModalOpen(true);
         } else if (tool?.isOsteotomy) {
             // Osteotomies - open OsteotomyModal pre-filled
@@ -746,7 +752,7 @@ const App = () => {
 
     const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('planLeftRod', e.target.innerText)} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('planRightRod', e.target.innerText)} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} />;
 
-    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostNotes={isPortrait ? plannedNotes : undefined} onGhostNoteClick={handleGhostNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('leftRod', e.target.innerText)} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('rightRod', e.target.innerText)} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} />;
+    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('leftRod', e.target.innerText)} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('rightRod', e.target.innerText)} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} />;
 
     const newPatientAction = () => setConfirmNewPatient(true);
     const executeNewPatient = () => {
@@ -875,7 +881,7 @@ const App = () => {
                 {/* Portrait Toolbar */}
                 <div className="portrait-toolbar flex flex-col z-20 no-print shadow-xl shrink-0" style={{ backgroundColor: scheme.sidebarBg, color: scheme.textPrimary }}>
                     {/* Row 1: Title, Theme, Language, Action icons */}
-                    <div className="flex items-center gap-2 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
+                    <div className="flex items-center gap-1 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
                         <span className="font-bold text-sm tracking-tight shrink-0">{t('sidebar.title')}</span>
                         <button onClick={() => setChangeLogOpen(true)} className="text-[9px] font-mono opacity-50 shrink-0">{CURRENT_VERSION}</button>
                         <div className="flex-1"></div>
@@ -887,12 +893,13 @@ const App = () => {
                             ))}
                         </select>
                         <div className="flex items-center gap-0">
-                            <button onClick={() => fileInputRef.current?.click()} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.load')}><IconUpload /></button>
-                            <button onClick={saveProjectJSON} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.save')}><IconSave /></button>
-                            <button onClick={promptExportJPG} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.jpg')}><IconImage /></button>
-                            <button onClick={promptExportPDF} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.pdf')}><IconPDF /></button>
-                            <button onClick={() => setHelpModalOpen(true)} className="p-2.5 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.help')}><IconHelp /></button>
-                            <div className="p-2.5 rounded" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? t('sync.linked') : t('sync.no_peer')}><IconLink />{syncConnected && <span className="inline-block ms-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
+                            <button onClick={() => fileInputRef.current?.click()} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.load')}><IconUpload /></button>
+                            <button onClick={saveProjectJSON} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.save')}><IconSave /></button>
+                            <button onClick={promptExportJPG} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.jpg')}><IconImage /></button>
+                            <button onClick={promptExportPDF} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.pdf')}><IconPDF /></button>
+                            <button onClick={() => setHelpModalOpen(true)} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.help')}><IconHelp /></button>
+                            <button onClick={() => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title="Fullscreen"><svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+                            <div className="p-2 rounded flex items-center" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? t('sync.linked') : t('sync.no_peer')}><IconLink />{syncConnected && <span className="inline-block ms-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>}</div>
                         </div>
                     </div>
 
@@ -928,6 +935,7 @@ const App = () => {
                             </div>
                             <div className="w-px h-5 bg-white/20 mx-1"></div>
                             <button onClick={() => { copyPlanToCompleted(); switchPortraitTab(2); }} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold hover:bg-white/10 hover:brightness-125 shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)' }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
+                            <button onClick={() => setConfirmClearConstruct(true)} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold hover:bg-white/10 hover:brightness-125 shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)', color: '#dc2626' }} title={t('sidebar.clear_construct')}><IconTrash /> {t('sidebar.clear_construct')}</button>
                             <div className={`shrink-0 w-5 h-5 rounded-full cursor-pointer ${incognitoMode ? 'bg-red-500' : 'bg-white/20'}`} onClick={() => setIncognitoMode(!incognitoMode)} title={t('sidebar.session_privacy')}></div>
                             <button onClick={newPatientAction} className="p-2.5 rounded shrink-0" style={{ color: '#dc2626' }} title={t('sidebar.new_patient')}><IconTrash /></button>
                         </div>
@@ -968,6 +976,15 @@ const App = () => {
                                     {constructChart}
                                 </div>
                             )}
+                            {portraitTab === 3 && (
+                                <div className="w-full h-full overflow-y-auto bg-white p-8 flex flex-col">
+                                    <div className="text-lg font-bold text-slate-800 uppercase tracking-wider mb-4 text-center">{t('portrait.tab.inventory')}</div>
+                                    <div className="flex-1 text-base">
+                                        <ImplantInventory large placements={[...(showFinalInventory ? completedPlacements : plannedPlacements), ...(showFinalInventory ? completedCages : plannedCages).map(c => ({...c, zone: 'mid' as Zone, annotation: '', tool: c.tool, data: null})), ...(showFinalInventory ? completedConnectors : plannedConnectors).map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid' as Zone, annotation: '', data: null}))] as Placement[]} tools={[...allTools, {id: 'tlif', labelKey: 'inventory.cage.tlif', icon: 'cage', type: 'cage'}, {id: 'plif', labelKey: 'inventory.cage.plif', icon: 'cage', type: 'cage'}, {id: 'acdf', labelKey: 'inventory.cage.acdf', icon: 'cage', type: 'cage'}, {id: 'xlif', labelKey: 'inventory.cage.xlif', icon: 'cage', type: 'cage'}, {id: 'olif', labelKey: 'inventory.cage.olif', icon: 'cage', type: 'cage'}, {id: 'alif', labelKey: 'inventory.cage.alif', icon: 'cage', type: 'cage'}]} title={showFinalInventory ? t('inventory.title_construct') : t('inventory.title_plan')} visibleLevelIds={levels.map(l => l.id)} levels={levels} rods={showFinalInventory ? { left: patientData.leftRod, right: patientData.rightRod } : { left: patientData.planLeftRod, right: patientData.planRightRod }} />
+                                        <button onClick={() => setShowFinalInventory(!showFinalInventory)} className="mt-3 w-full text-sm font-bold text-slate-400 hover:text-slate-600 uppercase tracking-wider py-2 border border-slate-200 rounded hover:bg-slate-50 transition-colors">{showFinalInventory ? t('inventory.view_plan') : t('inventory.view_final')}</button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -989,6 +1006,15 @@ const App = () => {
                         </div>
                     </div>
                 )}
+            {/* Toast notifications */}
+            {toasts.length > 0 && <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2 pointer-events-none">
+                {toasts.map(toast => (
+                    <div key={toast.id} className={`pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium animate-[fadeIn_0.2s_ease-out] ${toast.type === 'error' ? 'bg-red-800 text-white' : 'bg-slate-800 text-white'}`}>
+                        <span className="flex-1">{toast.message}</span>
+                        <button onClick={() => dismissToast(toast.id)} className="shrink-0 hover:brightness-125 text-xs font-bold">✕</button>
+                    </div>
+                ))}
+            </div>}
             {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerTick(n => n + 1); if (syncChannelRef.current) syncChannelRef.current.postMessage({ type: 'lang_accepted', appVersion: CURRENT_VERSION, lang: currentLang }); }} />}
             </div>
         );
@@ -1107,9 +1133,10 @@ const App = () => {
                     {/* Spacer to push bottom items down */}
                     <div className="flex-1"></div>
 
-                    {/* 7. Help - prominent, bottom right */}
-                    <div className="p-3" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
-                        <button onClick={() => setHelpModalOpen(true)} className="w-full flex items-center justify-center gap-2 hover:brightness-125 px-3 py-2 rounded text-xs font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconHelp /> {t('sidebar.help')}</button>
+                    {/* 7. Help + Fullscreen - prominent, bottom */}
+                    <div className="p-3 flex gap-2" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
+                        <button onClick={() => setHelpModalOpen(true)} className="flex-1 flex items-center justify-center gap-2 hover:brightness-125 px-3 py-2 rounded text-xs font-bold border transition-colors" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconHelp /> {t('sidebar.help')}</button>
+                        <button onClick={() => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }} className="flex items-center justify-center px-3 py-2 rounded text-xs font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }} title="Fullscreen"><svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
                     </div>
 
                     {/* 8. Utility row - version, new patient, sync */}
@@ -1146,8 +1173,8 @@ const App = () => {
             {toasts.length > 0 && <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2 pointer-events-none">
                 {toasts.map(toast => (
                     <div key={toast.id} className={`pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium animate-[fadeIn_0.2s_ease-out] ${toast.type === 'error' ? 'bg-red-800 text-white' : 'bg-slate-800 text-white'}`}>
-                        <span>{toast.message}</span>
-                        <button onClick={() => dismissToast(toast.id)} className="ms-1 hover:brightness-125 text-xs font-bold">✕</button>
+                        <span className="flex-1">{toast.message}</span>
+                        <button onClick={() => dismissToast(toast.id)} className="shrink-0 hover:brightness-125 text-xs font-bold">✕</button>
                     </div>
                 ))}
             </div>}
