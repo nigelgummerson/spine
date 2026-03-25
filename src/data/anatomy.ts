@@ -77,17 +77,17 @@ export const REGIONS: Record<string, { height: number; color: string }> = {
 // Sacral: PMC6286901 (systematic review).
 // Pedicle data cross-checked against Lien 2007 (Eur Spine J) and Zindrick 1987.
 export const VERTEBRA_ANATOMY: Record<string, VertAnatomyEntry> = {
-    // Cervical: Panjabi et al. (1991), An et al. (1991), Tan et al. (2004),
-    // Gupta & Goel (2000), Xu et al. (1999), Ebraheim et al. (1996, 1997),
-    // Naderi et al. (2005)
+    // Cervical bodyW: Yao et al. (2018) EPWl White male, PMC5838464.
+    // Lateral masses: An et al. (1991), Gupta & Goel (2000), Xu et al. (1999).
+    // Oc: Naderi et al. (2005), Ebraheim et al. (1996).
     Oc:  { region: 'occiput', bodyW: 78, bodyH: 12, foramenMagnumW: 35, condyleW: 22 },
     C1:  { region: 'cervical-upper', bodyW: 22, bodyH: 10, latMassW: 16, latMassH: 12, totalWidth: 80 },
     C2:  { region: 'cervical-upper', bodyW: 18, bodyH: 20, latMassW: 12, latMassH: 14, totalWidth: 54 },
-    C3:  { region: 'cervical-subaxial', bodyW: 16.5, bodyH: 14.5, latMassW: 12.5, latMassH: 12 },
-    C4:  { region: 'cervical-subaxial', bodyW: 17, bodyH: 14.5, latMassW: 13, latMassH: 12.5 },
-    C5:  { region: 'cervical-subaxial', bodyW: 18, bodyH: 14.5, latMassW: 14, latMassH: 13 },
-    C6:  { region: 'cervical-subaxial', bodyW: 19, bodyH: 15.5, latMassW: 14, latMassH: 13 },
-    C7:  { region: 'cervical-subaxial', bodyW: 21.5, bodyH: 16.5, latMassW: 12, latMassH: 11, pedW: 5.5, pedH: 7 },
+    C3:  { region: 'cervical-subaxial', bodyW: 18.0, bodyH: 14.5, latMassW: 12.5, latMassH: 12 },
+    C4:  { region: 'cervical-subaxial', bodyW: 18.3, bodyH: 14.5, latMassW: 13, latMassH: 12.5 },
+    C5:  { region: 'cervical-subaxial', bodyW: 20.1, bodyH: 14.5, latMassW: 14, latMassH: 13 },
+    C6:  { region: 'cervical-subaxial', bodyW: 21.6, bodyH: 15.5, latMassW: 14, latMassH: 13 },
+    C7:  { region: 'cervical-subaxial', bodyW: 23.2, bodyH: 16.5, latMassW: 12, latMassH: 11, pedW: 5.5, pedH: 7 },
     T1:  { region: 'thoracic', bodyW: 33.1, bodyH: 18.9, pedW: 9.3, pedH:  9.0 },
     T2:  { region: 'thoracic', bodyW: 32.0, bodyH: 19.0, pedW: 7.5, pedH: 10.3 },
     T3:  { region: 'thoracic', bodyW: 32.8, bodyH: 20.2, pedW: 6.0, pedH: 10.4 },

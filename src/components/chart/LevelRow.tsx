@@ -159,15 +159,11 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             : null;
         const isForceZone = zone.startsWith('force');
 
-        // Cervical/occiput: position at lateral mass or parasagittal screw zone
         // Sacral: position at L5 pedicle alignment
-        // Thoracolumbar: position at zone edge (unchanged from original layout)
-        const isCervicalOrOc = isCervical;  // includes Oc and all C levels
+        // All others (cervical, thoracolumbar, occiput): position at zone edge
         const zoneCx = isForceZone ? zoneX + zoneW / 2
             : isSacral && zone === 'left' && chartScrewLeftCx !== undefined ? chartScrewLeftCx
             : isSacral && zone === 'right' && chartScrewRightCx !== undefined ? chartScrewRightCx
-            : isCervicalOrOc && chartScrewLeftCx !== undefined && zone === 'left' ? chartScrewLeftCx
-            : isCervicalOrOc && chartScrewRightCx !== undefined && zone === 'right' ? chartScrewRightCx
             : zone === 'left' ? zoneX + zoneW - screwPx / 2 - 4
             : zone === 'right' ? zoneX + screwPx / 2 + 4
             : zoneX + zoneW / 2;
@@ -218,12 +214,12 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const showData = p.data && !isHookItem && !isFixation;
             const showAnn = !!ann;
 
-            // Position icon: cervical/sacral at anatomy-based position; T/L at zone edge
+            // Position icon: sacral at anatomy-based position; all others at zone edge
             let iconX: number;
             const iconY = zoneCy - iH / 2;
             if (align === 'center') {
                 iconX = zoneCx - iW / 2;
-            } else if (isSacral || isCervicalOrOc) {
+            } else if (isSacral) {
                 iconX = zoneCx - iW / 2;
             } else if (align === 'left') {
                 iconX = zoneX + zoneW - iW - 4;
@@ -297,7 +293,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const iconY = zoneCy - iH / 2;
             if (align === 'center') {
                 iconX = zoneCx - iW / 2;
-            } else if (isSacral || isCervicalOrOc) {
+            } else if (isSacral) {
                 iconX = zoneCx - iW / 2;
             } else if (align === 'left') {
                 iconX = zoneX + zoneW - iW - 4;
