@@ -10,17 +10,14 @@ interface ChangeLogEntry {
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
     { version: "v2.5.30-beta", date: "2026-03-25", changes: [
-        "Sacral/pelvic redesign — S2AI, Iliac, SI-J as first-class bilateral levels with anatomical iliac wings.",
-        "ScrewModal level/side selector — level dropdown, side dropdown, occupied level indicators.",
-        "Evidence-based screw size defaults (opt-in) — per-level sizes from published morphometric data.",
-        "Confirm & Next rapid entry — place screws sequentially down the spine (Shift+Enter or preference).",
-        "Preferences modal (gear icon) — region defaults toggle, confirm-next-default toggle.",
-        "Side-aware hook icons — arrow always faces the spine.",
-        "Screw sizes always display with 1 decimal place (7.0x50 not 7x50).",
-        "Pelvic screw labels (Iliac, SI-J) on placed screws.",
-        "Unstable markers now persist in localStorage and sync between dual windows.",
-        "Dual-window sync bounce fixes — local changes protected from stale echo overwrites.",
-        "281 tests across 8 files.",
+        "Pelvic fixation — S2AI, Iliac, and SI-J are now separate levels with anatomical iliac wing rendering.",
+        "Level selector in implant modal — see and change the target level when placing or editing screws.",
+        "Confirm & Next — place screws sequentially down the spine without closing the modal.",
+        "Region size defaults (opt-in) — suggested screw sizes based on vertebral level, from published data.",
+        "Preferences (gear icon) — configure size defaults and confirm behaviour.",
+        "Hook icons now face the spine on both sides.",
+        "Unstable level markers now persist and sync between dual windows.",
+        "Improved dual-window reliability — New Patient and placement changes sync correctly.",
     ]},
     { version: "v2.5.20-beta", date: "2026-03-24", changes: [
         "Portrait inventory tab — dedicated fourth tab with large readable text for theatre use.",
