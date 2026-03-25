@@ -242,10 +242,10 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                 // S1 pedicle screw positions — same medial shift as LevelRow
                 const s1Geom = getVertSvgGeometry('S1');
                 const s2Geom = getVertSvgGeometry('S2');
-                // S1/S2 pedicle screws at anatomical position — no medial shift needed
-                // (pelvic fixation targets are on their own levels now, not crammed onto S1)
-                const s1PedLeftX = s1Geom ? vertX + (s1Geom.pedLeftCx / 160) * scaledWidth : cx - 20;
-                const s1PedRightX = s1Geom ? vertX + (s1Geom.pedRightCx / 160) * scaledWidth : cx + 20;
+                const l5Geom = getVertSvgGeometry('L5');
+                // S1/S2 pedicle screws aligned under L5 pedicles (visually consistent column)
+                const s1PedLeftX = l5Geom ? vertX + (l5Geom.pedLeftCx / 160) * scaledWidth : cx - 20;
+                const s1PedRightX = l5Geom ? vertX + (l5Geom.pedRightCx / 160) * scaledWidth : cx + 20;
                 const s1ViewH = getLevelHeight({ id: 'S1', type: 'S' });
                 const s1PedViewY = s1Geom ? VERT_PAD + s1Geom.pedRy + 5 : s1ViewH / 2;
                 const s1PedY = s1Y + (s1PedViewY / s1ViewH) * s1H;

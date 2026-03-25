@@ -118,14 +118,13 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
     const viewBoxHeight = getLevelHeight(level);
     const viewBoxPedCy = geom ? VERT_PAD + geom.pedRy + 5 : viewBoxHeight / 2;
     const chartPedCy = (viewBoxPedCy / viewBoxHeight) * rowHeight;
-    // Pedicle X in chart coords — sacral screws at anatomical pedicle position
-    // S2 screws aligned directly below S1 screws (same X position)
+    // Pedicle X in chart coords — sacral screws aligned under L5 pedicles (not S1 anatomical position)
     const isSacral = level.type === 'S';
-    const s1Geom = getVertSvgGeometry('S1');
-    const s1LeftX = s1Geom ? vertX + (s1Geom.pedLeftCx / 160) * scaledWidth : undefined;
-    const s1RightX = s1Geom ? vertX + (s1Geom.pedRightCx / 160) * scaledWidth : undefined;
-    const chartPedLeftCx = isSacral ? s1LeftX : (geom ? vertX + (geom.pedLeftCx / 160) * scaledWidth : undefined);
-    const chartPedRightCx = isSacral ? s1RightX : (geom ? vertX + (geom.pedRightCx / 160) * scaledWidth : undefined);
+    const l5Geom = getVertSvgGeometry('L5');
+    const l5LeftX = l5Geom ? vertX + (l5Geom.pedLeftCx / 160) * scaledWidth : undefined;
+    const l5RightX = l5Geom ? vertX + (l5Geom.pedRightCx / 160) * scaledWidth : undefined;
+    const chartPedLeftCx = isSacral ? l5LeftX : (geom ? vertX + (geom.pedLeftCx / 160) * scaledWidth : undefined);
+    const chartPedRightCx = isSacral ? l5RightX : (geom ? vertX + (geom.pedRightCx / 160) * scaledWidth : undefined);
 
     /** Render items for a zone (left, right, force_left, force_right) */
     const renderZoneContent = (zone: string, zoneX: number, zoneW: number, align: 'left' | 'right' | 'center') => {
