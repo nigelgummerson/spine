@@ -211,7 +211,10 @@ const App = () => {
             ['L1','L2','L3','L4','L5'].forEach(l => lvls.push({ id:l, type:'L' }));
             lvls.push({ id:'S1', type:'S' });
             if (showPelvis) {
-                lvls.push({ id:'S2', type:'S' });
+                lvls.push({ id: 'S2', type: 'S' });
+                lvls.push({ id: 'S2AI', type: 'pelvic' });
+                lvls.push({ id: 'Iliac', type: 'pelvic' });
+                lvls.push({ id: 'SI-J', type: 'pelvic' });
             }
         }
         return lvls;
@@ -591,38 +594,8 @@ const App = () => {
         setEditingData(ghostCage);
         setCageModalOpen(true);
     };
-    const handlePelvisZoneClick = (zone: string) => {
-        const side = zone.endsWith('_left') ? 'left' : 'right';
-        const zoneType = zone.replace(/_left$|_right$/, '');
-
-        // S1/S2 pedicle screws — use standard left/right zone on that level
-        if (zoneType === 's1' || zoneType === 's2') {
-            const levelId = zoneType.toUpperCase();
-            // Check for existing placement
-            const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
-            const existing = currentPlacements.find(p => p.levelId === levelId && p.zone === side);
-            if (existing) { handlePlacementClick(existing); return; }
-            setPendingPlacement({ levelId, zone: side, tool: lastUsedScrewType });
-            setEditingPlacementId(null);
-            setEditingTool(lastUsedScrewType);
-            setEditingAnnotation('');
-            setEditingData(undefined);
-            setScrewModalOpen(true);
-            return;
-        }
-
-        // Pelvic fixation — uses pelvic zone names (s2ai_left, iliac_left, si_left etc.)
-        // All stored on S1 level with the pelvic zone type
-        const pelvicZone = zone as Zone;
-        const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
-        const existing = currentPlacements.find(p => p.levelId === 'S1' && p.zone === pelvicZone);
-        if (existing) { handlePlacementClick(existing); return; }
-        setPendingPlacement({ levelId: 'S1', zone: pelvicZone, tool: 'polyaxial' });
-        setEditingPlacementId(null);
-        setEditingData(null);
-        setEditingTool('polyaxial');
-        setEditingAnnotation('');
-        setScrewModalOpen(true);
+    const handlePelvisZoneClick = (levelId: string, zone: string) => {
+        handleZoneClick(levelId, zone);
     };
 
     const updateNotePosition = (noteId: string, { offsetX, offsetY }: { offsetX: number; offsetY: number }) => {
@@ -858,7 +831,6 @@ const App = () => {
                 zone={(pendingPlacement?.zone || (editingPlacementId ? [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId)?.zone : 'left') || 'left') as Zone}
                 levels={levels}
                 placements={activeChart === 'planned' ? plannedPlacements : completedPlacements}
-                showPelvis={showPelvis}
                 useRegionDefaults={useRegionDefaults}
                 confirmAndNextDefault={confirmAndNextDefault} />
             <OsteotomyModal isOpen={osteoModalOpen} onClose={() => { setOsteoModalOpen(false); setOsteoDiscLevel(undefined); }} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId!)} initialData={editingData} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} discLevelOnly={osteoDiscLevel} />
