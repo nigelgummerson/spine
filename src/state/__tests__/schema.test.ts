@@ -181,7 +181,7 @@ describe('validateV4', () => {
 // --- Pelvic zone round-trip ---
 
 describe('pelvic zone round-trip', () => {
-    it('serializes and validates pelvic placements, preserving zones after deserialization', () => {
+    it('migrates old pelvic zone placements to new level IDs on deserialization', () => {
         const state = createInitialState();
         const pS2ai = { id: 'pv1', levelId: 'S1', zone: 's2ai_left', tool: 'polyaxial', data: '7.0x50', annotation: '' };
         const pIliac = { id: 'pv2', levelId: 'S1', zone: 'iliac_right', tool: 'polyaxial', data: '7.5x80', annotation: '' };
@@ -195,10 +195,11 @@ describe('pelvic zone round-trip', () => {
 
         const result = deserializeDocument(json);
         expect(result.state.plannedPlacements).toHaveLength(3);
-        const zones = result.state.plannedPlacements.map((p: any) => p.zone);
-        expect(zones).toContain('s2ai_left');
-        expect(zones).toContain('iliac_right');
-        expect(zones).toContain('si_left');
+        // After migration, old pelvic zone placements are promoted to new level IDs with standard zones
+        const placements = result.state.plannedPlacements;
+        expect(placements.find((p: any) => p.levelId === 'S2AI' && p.zone === 'left')).toBeDefined();
+        expect(placements.find((p: any) => p.levelId === 'Iliac' && p.zone === 'right')).toBeDefined();
+        expect(placements.find((p: any) => p.levelId === 'SI-J' && p.zone === 'left')).toBeDefined();
     });
 });
 

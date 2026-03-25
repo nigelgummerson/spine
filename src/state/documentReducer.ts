@@ -18,7 +18,6 @@ export const V4_FORCE_TO_TOOL: Record<string, string> = { 'translation-left': 't
 
 export const ZONE_TO_SIDE: Record<string, string> = {
     left: 'left', right: 'right', mid: 'midline', disc: 'midline', force_left: 'left', force_right: 'right',
-    s2ai_left: 'left', s2ai_right: 'right', iliac_left: 'left', iliac_right: 'right', si_left: 'left', si_right: 'right',
 };
 
 export const BONEGRAFT_TO_V4: Record<string, string> = { 'Local Bone': 'local-bone', 'Autograft': 'iliac-crest-autograft', 'Allograft': 'allograft', 'Synthetics': 'synthetic', 'DBM': 'DBM', 'BMP': 'BMP' };
@@ -437,6 +436,23 @@ export function migrateConnectors(conns: any[]): any[] {
     });
 }
 
+/** Migrate old pelvic zone placements (stored on S1 with s2ai_left etc.)
+ * to new pelvic level IDs (S2AI, Iliac, SI-J) with standard left/right zones. */
+function migratePelvicPlacements(placements: Placement[]): Placement[] {
+    const MIGRATION: Record<string, { levelId: string; zone: 'left' | 'right' }> = {
+        s2ai_left:   { levelId: 'S2AI',  zone: 'left' },
+        s2ai_right:  { levelId: 'S2AI',  zone: 'right' },
+        iliac_left:  { levelId: 'Iliac', zone: 'left' },
+        iliac_right: { levelId: 'Iliac', zone: 'right' },
+        si_left:     { levelId: 'SI-J',  zone: 'left' },
+        si_right:    { levelId: 'SI-J',  zone: 'right' },
+    };
+    return placements.map(p => {
+        const m = MIGRATION[p.zone];
+        return m ? { ...p, levelId: m.levelId, zone: m.zone } : p;
+    });
+}
+
 export function deserializeDocument(json: any): { state: DocumentState; viewMode?: string; colourScheme?: string } {
     const state = createInitialState();
 
@@ -458,7 +474,7 @@ export function deserializeDocument(json: any): { state: DocumentState; viewMode
 
         if (json.plan) {
             const p = v4ChartToInternal(json.plan, notePos);
-            state.plannedPlacements = p.placements;
+            state.plannedPlacements = migratePelvicPlacements(p.placements);
             state.plannedCages = p.cages;
             state.plannedConnectors = p.connectors;
             state.plannedNotes = p.notes;
@@ -467,7 +483,7 @@ export function deserializeDocument(json: any): { state: DocumentState; viewMode
         }
         if (json.construct) {
             const c = v4ChartToInternal(json.construct, notePos);
-            state.completedPlacements = c.placements;
+            state.completedPlacements = migratePelvicPlacements(c.placements);
             state.completedCages = c.cages;
             state.completedConnectors = c.connectors;
             state.completedNotes = c.notes;
@@ -488,13 +504,13 @@ export function deserializeDocument(json: any): { state: DocumentState; viewMode
     // v3 / v2 legacy format
     if (json.patient) state.patientData = json.patient;
     if (json.plan) {
-        if (json.plan.implants) state.plannedPlacements = json.plan.implants;
+        if (json.plan.implants) state.plannedPlacements = migratePelvicPlacements(json.plan.implants);
         if (json.plan.cages) state.plannedCages = json.plan.cages;
         if (json.plan.connectors) state.plannedConnectors = migrateConnectors(json.plan.connectors);
         if (json.plan.notes) state.plannedNotes = json.plan.notes;
     }
     if (json.construct) {
-        if (json.construct.implants) state.completedPlacements = json.construct.implants;
+        if (json.construct.implants) state.completedPlacements = migratePelvicPlacements(json.construct.implants);
         if (json.construct.cages) state.completedCages = json.construct.cages;
         if (json.construct.connectors) state.completedConnectors = migrateConnectors(json.construct.connectors);
         if (json.construct.notes) state.completedNotes = json.construct.notes;

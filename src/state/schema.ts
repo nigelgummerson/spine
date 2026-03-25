@@ -17,8 +17,8 @@ export class ValidationError extends Error {
 }
 
 // --- Vertebral level pattern ---
-// Matches: Oc, C1-C7, T1-T12, L1-L5, S1-S5, Pelvis
-const levelPattern = /^(Oc|C[1-7]|T([1-9]|1[0-2])|L[1-5]|S[1-5]|Pelvis)$/;
+// Matches: Oc, C1-C7, T1-T12, L1-L5, S1-S5, Pelvis, S2AI, Iliac, SI-J
+const levelPattern = /^(Oc|C[1-7]|T([1-9]|1[0-2])|L[1-5]|S[1-5]|Pelvis|S2AI|Iliac|SI-J)$/;
 const level = z.string().regex(levelPattern, 'Invalid vertebral level');
 
 // --- Side enum ---
@@ -63,7 +63,7 @@ const connectorObj = z.object({
 
 // --- Element ---
 
-const elementType = z.enum(['screw', 'hook', 'fixation', 'cage', 'osteotomy', 'connector']);
+const elementType = z.enum(['screw', 'hook', 'fixation', 'cage', 'osteotomy', 'connector', 'marker']);
 
 const element = z.object({
     id: z.string(),
