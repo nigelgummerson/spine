@@ -37,9 +37,11 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
     const lastPongRef = useRef(0);
     const syncVersionRef = useRef(0);
     const syncVersionMismatchRef = useRef(false);
-    // Sync bounce prevention: track when we last received a sync update.
-    // Suppress outgoing broadcasts for a guard window after receiving.
+    // Sync bounce prevention: two guards working together.
+    // 1. lastSyncReceiveRef: suppress outgoing broadcasts for 500ms after receiving
+    // 2. localChangeRef: suppress incoming sync while local changes are pending render
     const lastSyncReceiveRef = useRef(0);
+    const localChangePendingRef = useRef(false);
 
     // Stable refs for values needed in sync callbacks
     const stateRef = useRef(state);
@@ -98,7 +100,13 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
 
         // Broadcast to other windows (skip if recently received a sync — guard window prevents bounce)
         const sinceSyncReceive = Date.now() - lastSyncReceiveRef.current;
-        if (sinceSyncReceive < 500) return;
+        if (sinceSyncReceive < 500) {
+            // State changed from an incoming sync — don't echo back, but clear the pending flag
+            localChangePendingRef.current = false;
+            return;
+        }
+        // Local change — mark as authoritative until broadcast completes
+        if (hasLoaded) localChangePendingRef.current = true;
         if (hasLoaded && syncChannelRef.current) {
             syncVersionRef.current++;
             clearTimeout(syncTimerRef.current!);
@@ -106,9 +114,10 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
                 if (syncChannelRef.current) {
                     syncChannelRef.current.postMessage({
                         type: 'state', appVersion: CURRENT_VERSION,
-                        payload: serializeState(state, viewMode, colourScheme, CURRENT_VERSION, currentLang),
+                        payload: serializeState(stateRef.current, viewModeRef.current, colourSchemeRef.current, CURRENT_VERSION, currentLangRef.current),
                         version: syncVersionRef.current,
                     });
+                    localChangePendingRef.current = false;
                 }
             }, 200);
         }
@@ -145,6 +154,8 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
                 }
             } else if (msg.type === 'state') {
                 if (msg.payload) {
+                    // Reject incoming sync if we have local changes pending broadcast
+                    if (localChangePendingRef.current) return;
                     clearTimeout(syncTimerRef.current!);
                     lastSyncReceiveRef.current = Date.now();
                     const result = deserializeDocument(msg.payload);
