@@ -1,6 +1,6 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION: string = "v2.5.20-beta";
+export const CURRENT_VERSION: string = "v2.5.30-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -9,6 +9,19 @@ interface ChangeLogEntry {
 }
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
+    { version: "v2.5.30-beta", date: "2026-03-25", changes: [
+        "Sacral/pelvic redesign — S2AI, Iliac, SI-J as first-class bilateral levels with anatomical iliac wings.",
+        "ScrewModal level/side selector — level dropdown, side dropdown, occupied level indicators.",
+        "Evidence-based screw size defaults (opt-in) — per-level sizes from published morphometric data.",
+        "Confirm & Next rapid entry — place screws sequentially down the spine (Shift+Enter or preference).",
+        "Preferences modal (gear icon) — region defaults toggle, confirm-next-default toggle.",
+        "Side-aware hook icons — arrow always faces the spine.",
+        "Screw sizes always display with 1 decimal place (7.0x50 not 7x50).",
+        "Pelvic screw labels (Iliac, SI-J) on placed screws.",
+        "Unstable markers now persist in localStorage and sync between dual windows.",
+        "Dual-window sync bounce fixes — local changes protected from stale echo overwrites.",
+        "281 tests across 8 files.",
+    ]},
     { version: "v2.5.20-beta", date: "2026-03-24", changes: [
         "Portrait inventory tab — dedicated fourth tab with large readable text for theatre use.",
         "Fullscreen toggle in both portrait and landscape (Fullscreen API).",
