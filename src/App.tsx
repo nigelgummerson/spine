@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import * as htmlToImage from 'html-to-image';
-import { jsPDF } from 'jspdf';
 import { t, detectLanguage, getCurrentLang, setCurrentLang, SUPPORTED_LANGUAGES, LOCALE_MAP } from './i18n/i18n';
 import { genId } from './utils/id';
 import usePortrait from './hooks/usePortrait';
+import { useExport } from './hooks/useExport';
 import { CURRENT_VERSION, CHANGE_LOG, formatDate } from './data/changelog';
 import { BONE_GRAFT_OPTIONS, BONE_GRAFT_LABEL_KEYS, IMPLANT_COMPANIES, SCREW_SYSTEMS,
          DIAMETER_OPTIONS, LENGTH_OPTIONS } from './data/implants';
@@ -27,7 +26,10 @@ import { ForceModal } from './components/modals/ForceModal';
 import { NoteModal } from './components/modals/NoteModal';
 import { ScrewSystemCombo } from './components/ScrewSystemCombo';
 import { CreditsFooter } from './components/CreditsFooter';
+import { DemographicsPanel } from './components/DemographicsPanel';
 import { ImplantInventory } from './components/ImplantInventory';
+import { Sidebar } from './components/Sidebar';
+import { PortraitToolbar } from './components/PortraitToolbar';
 import { ChartPaper } from './components/chart/ChartPaper';
 import { InstrumentIcon } from './components/chart/InstrumentIcon';
 import { Portal } from './components/Portal';
@@ -35,9 +37,6 @@ import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, resetDisclaime
 import { OnboardingTour } from './components/OnboardingTour';
 import { useDocumentState } from './hooks/useDocumentState';
 import { useToast } from './hooks/useToast';
-import { deserializeDocument } from './state/documentReducer';
-import { validateV4, validateLegacy, ValidationError } from './state/schema';
-import { computeChecksum, verifyChecksum } from './utils/checksum';
 import type { ColourScheme, ToolDefinition, Placement, Level, Zone, OsteotomyData, CageData, Cage, Note } from './types';
 
 /** Data shape returned by CageModal.onConfirm */
@@ -87,7 +86,6 @@ const App = () => {
         const stored = localStorage.getItem('spine_planner_theme');
         return (stored && COLOUR_SCHEMES.some(s => s.id === stored)) ? stored : 'default';
     });
-    const [themeOpen, setThemeOpen] = useState(false);
     const [showFinalInventory, setShowFinalInventory] = useState(false);
     const [currentLang, setCurrentLangState] = useState(detectLanguage());
 
@@ -118,10 +116,8 @@ const App = () => {
     const toggleRegionDefaults = () => { setUseRegionDefaults(v => { const next = !v; localStorage.setItem('spine_planner_region_defaults', String(next)); return next; }); };
     const [confirmAndNextDefault, setConfirmAndNextDefault] = useState(() => localStorage.getItem('spine_planner_confirm_next_default') === 'true');
     const toggleConfirmAndNextDefault = () => { setConfirmAndNextDefault(v => { const next = !v; localStorage.setItem('spine_planner_confirm_next_default', String(next)); return next; }); };
-    const [preferencesModalOpen, setPreferencesModalOpen] = useState(false);
     const [scale, setScale] = useState(1);
     const [incognitoMode, setIncognitoMode] = useState(false);
-    const [isEditingDate, setIsEditingDate] = useState(false);
 
     // TOAST NOTIFICATIONS (via context — ToastProvider wraps App in main.tsx)
     const { showToast } = useToast();
@@ -150,15 +146,10 @@ const App = () => {
     } = state;
     const setPatientField = (field: string, value: string) => dispatch({ type: 'SET_PATIENT_FIELD', field, value });
 
-    // MODALS
-    const [screwModalOpen, setScrewModalOpen] = useState(false);
-    const [osteoModalOpen, setOsteoModalOpen] = useState(false);
-    const [cageModalOpen, setCageModalOpen] = useState(false);
-    const [forceModalOpen, setForceModalOpen] = useState(false);
+    // MODALS — single discriminated state for exclusive modals
+    type ModalId = 'screw' | 'osteotomy' | 'cage' | 'force' | 'help' | 'note' | 'changelog' | 'preferences' | null;
+    const [openModal, setOpenModal] = useState<ModalId>(null);
     const [forcePopover, setForcePopover] = useState<{ x: number; y: number; existingTool: string | null; existingId: string | null } | null>(null);
-    const [helpModalOpen, setHelpModalOpen] = useState(false);
-    const [changeLogOpen, setChangeLogOpen] = useState(false);
-    const [noteModalOpen, setNoteModalOpen] = useState(false);
     const [pendingNoteTool, setPendingNoteTool] = useState<{ tool: string; levelId: string; offsetX: number; offsetY: number } | null>(null);
     const [editingNote, setEditingNote] = useState<Note | null>(null);
 
@@ -214,7 +205,6 @@ const App = () => {
         if (tab === 1) setActiveChart('planned');
         else if (tab === 2) setActiveChart('completed');
     }, []);
-    const PORTRAIT_TABS = ['portrait.tab.demographics', 'portrait.tab.plan', 'portrait.tab.construct', 'portrait.tab.inventory'];
     const portraitContentRef = useRef<HTMLDivElement>(null);
     const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
     const [portraitScale, setPortraitScale] = useState(1);
@@ -269,7 +259,7 @@ const App = () => {
     useEffect(() => {
         const handleShortcut = (e: KeyboardEvent) => {
             // Skip if any modal is open
-            if (screwModalOpen || osteoModalOpen || cageModalOpen || forceModalOpen || forcePopover || helpModalOpen || noteModalOpen || changeLogOpen || preferencesModalOpen || !disclaimerAccepted) return;
+            if (openModal !== null || forcePopover || !disclaimerAccepted) return;
 
             // Undo/Redo — Ctrl+Z, Ctrl+Shift+Z, Ctrl+Y (works even when editable fields are focused)
             const mod = e.ctrlKey || e.metaKey;
@@ -352,7 +342,7 @@ const App = () => {
         };
         window.addEventListener('keydown', handleShortcut);
         return () => window.removeEventListener('keydown', handleShortcut);
-    }, [screwModalOpen, osteoModalOpen, cageModalOpen, forceModalOpen, forcePopover, helpModalOpen, noteModalOpen, changeLogOpen, preferencesModalOpen, disclaimerAccepted, viewMode, canUndo, canRedo, levels, kbFocusLevel, kbFocusZone, kbNavActive]);
+    }, [openModal, forcePopover, disclaimerAccepted, viewMode, canUndo, canRedo, levels, kbFocusLevel, kbFocusZone, kbNavActive]);
 
     const heightScale = useMemo(() => calculateAutoScale(levels), [levels]);
 
@@ -456,7 +446,7 @@ const App = () => {
             const vertH = levelObj ? getLevelHeight(levelObj) * heightScale : 30;
             setPendingNoteTool({ tool: selectedTool, levelId, offsetX: -140, offsetY: Math.round(vertH / 2) });
             setEditingNote(null);
-            setNoteModalOpen(true);
+            setOpenModal('note');
             return;
         }
 
@@ -474,7 +464,7 @@ const App = () => {
             setEditingTool(lastUsedScrewType);
             setEditingAnnotation('');
             setEditingData(undefined); // ScrewModal handles region defaults internally
-            setScrewModalOpen(true);
+            setOpenModal('screw');
             return;
         }
 
@@ -502,7 +492,7 @@ const App = () => {
             setEditingPlacementId(null);
             setEditingData(undefined);
             setOsteoDiscLevel(false);
-            setOsteoModalOpen(true);
+            setOpenModal('osteotomy');
         }
     };
 
@@ -524,7 +514,7 @@ const App = () => {
         // If cage exists, edit it
         const currentCages = activeChart === 'planned' ? plannedCages : completedCages;
         const existingCage = currentCages.find(c => c.levelId === levelId);
-        if (existingCage) { setEditingCageLevel(levelId); setEditingData(existingCage); setCageModalOpen(true); return; }
+        if (existingCage) { setEditingCageLevel(levelId); setEditingData(existingCage); setOpenModal('cage'); return; }
 
         // Nothing exists - show picker (cage vs osteotomy)
         // Cervical disc levels: no disc-level osteotomies permitted (Facet/Ponte blocked, Corpectomy is vertebral-body only)
@@ -536,7 +526,7 @@ const App = () => {
             if (!anyPermitted) return showToast(t('alert.no_cage_types', { level: getDiscLabel(levelId, levels) }), 'error');
             setEditingCageLevel(levelId);
             setEditingData(undefined);
-            setCageModalOpen(true);
+            setOpenModal('cage');
             return;
         }
         setDiscPickerLevel({ levelId, x: lastClickRef.current.x, y: lastClickRef.current.y });
@@ -548,7 +538,7 @@ const App = () => {
         if (!anyPermitted) return showToast(t('alert.no_cage_types', { level: getDiscLabel(levelId, levels) }), 'error');
         setEditingCageLevel(levelId);
         setEditingData(undefined);
-        setCageModalOpen(true);
+        setOpenModal('cage');
     };
     const handleDiscPickOsteo = () => {
         const levelId = discPickerLevel!.levelId;
@@ -557,7 +547,7 @@ const App = () => {
         setEditingPlacementId(null);
         setEditingData(undefined);
         setOsteoDiscLevel(true);
-        setOsteoModalOpen(true);
+        setOpenModal('osteotomy');
     };
 
     const handleCageConfirm = (data: CageConfirmData) => {
@@ -577,14 +567,14 @@ const App = () => {
 
     const handleDeleteCage = () => {
         dispatch({ type: 'REMOVE_CAGE', chart: activeChart === 'planned' ? 'plan' : 'construct', levelId: editingCageLevel! });
-        setCageModalOpen(false);
+        setOpenModal(null);
     };
 
     const handlePlacementClick = (p: Placement) => {
         const tool = allTools.find(item => item.id === p.tool);
         const isHookType = NO_SIZE_TYPES.includes(p.tool);
-        if (tool?.needsSize || isHookType) { setEditingPlacementId(p.id); setEditingData(p.data); setEditingTool(p.tool); setEditingAnnotation(p.annotation || ''); setScrewModalOpen(true); }
-        else if (tool?.isOsteotomy) { setEditingPlacementId(p.id); setEditingData(p.data); setOsteoDiscLevel(p.zone === 'disc' ? true : false); setOsteoModalOpen(true); }
+        if (tool?.needsSize || isHookType) { setEditingPlacementId(p.id); setEditingData(p.data); setEditingTool(p.tool); setEditingAnnotation(p.annotation || ''); setOpenModal('screw'); }
+        else if (tool?.isOsteotomy) { setEditingPlacementId(p.id); setEditingData(p.data); setOsteoDiscLevel(p.zone === 'disc' ? true : false); setOpenModal('osteotomy'); }
         else { removePlacement(p.id); }
     };
 
@@ -602,14 +592,14 @@ const App = () => {
             setEditingData(ghost.data);
             setEditingTool(ghost.tool);
             setEditingAnnotation(''); // Annotations don't carry over from plan — must be deliberate
-            setScrewModalOpen(true);
+            setOpenModal('screw');
         } else if (tool?.isOsteotomy) {
             // Osteotomies - open OsteotomyModal pre-filled
             setPendingPlacement({ levelId: ghost.levelId, zone: ghost.zone, tool: ghost.tool });
             setEditingPlacementId(null);
             setEditingData(ghost.data);
             setOsteoDiscLevel(ghost.zone === 'disc' ? true : false);
-            setOsteoModalOpen(true);
+            setOpenModal('osteotomy');
         }
     };
 
@@ -641,7 +631,7 @@ const App = () => {
 
     const handleScrewConfirmAndNext = (confirmedLevelId: string, confirmedZone: Zone) => {
         const side = confirmedZone as 'left' | 'right';
-        if (side !== 'left' && side !== 'right') { setScrewModalOpen(false); return; }
+        if (side !== 'left' && side !== 'right') { setOpenModal(null); return; }
         // Include both rendered placements AND recently confirmed (not yet rendered) ones
         const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
         const allPlaced = [...currentPlacements, ...recentPlacementsRef.current.map(r => ({ ...r } as Placement))];
@@ -653,7 +643,7 @@ const App = () => {
             setEditingTool(lastUsedScrewType);
             setEditingAnnotation('');
         } else {
-            setScrewModalOpen(false);
+            setOpenModal(null);
         }
     };
 
@@ -684,8 +674,7 @@ const App = () => {
             chart: activeChart === 'planned' ? 'plan' : 'construct',
             id,
         });
-        setScrewModalOpen(false);
-        setOsteoModalOpen(false);
+        setOpenModal(null);
     };
 
     // CONNECTOR HANDLERS
@@ -732,19 +721,19 @@ const App = () => {
         if (editingNote) {
             dispatch({ type: 'REMOVE_NOTE', chart: activeChart === 'planned' ? 'plan' : 'construct', id: editingNote.id });
             setEditingNote(null);
-            setNoteModalOpen(false);
+            setOpenModal(null);
         }
     };
     const handleNoteClick = (note: Note) => {
         setEditingNote(note);
         setPendingNoteTool(null);
-        setNoteModalOpen(true);
+        setOpenModal('note');
     };
     const handleGhostNoteClick = (ghostNote: Note) => {
         setActiveChart('completed');
         setEditingNote({ ...ghostNote });
         setPendingNoteTool(null);
-        setNoteModalOpen(true);
+        setOpenModal('note');
     };
 
     const handleGhostConnectorClick = (ghostConn: { levelId: string; fraction: number }) => {
@@ -755,7 +744,7 @@ const App = () => {
         setActiveChart('completed');
         setEditingCageLevel(ghostCage.levelId);
         setEditingData(ghostCage);
-        setCageModalOpen(true);
+        setOpenModal('cage');
     };
     const handlePelvisZoneClick = (levelId: string, zone: string) => {
         handleZoneClick(levelId, zone);
@@ -771,173 +760,17 @@ const App = () => {
         dispatch({ type: 'SET_RECON_LABEL_POSITION', id: reconId, offsetX, offsetY });
     };
 
-    // EXPORT
-    const prepareExportCanvas = async () => {
-        await document.fonts.ready;
-        // In portrait mode, mount the off-screen export container temporarily
-        if (isPortrait) {
-            setPortraitExporting(true);
-            await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-        }
-        const element = exportRef.current!;
-        // Sync demographics form state to DOM attributes (checkboxes, selects)
-        // Chart columns are SVG-native and don't need this
-        const demoCol = element.querySelector('.w-\\[370px\\]');
-        if (demoCol) {
-            demoCol.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
-                if ((cb as HTMLInputElement).checked) cb.setAttribute('checked', 'checked');
-                else cb.removeAttribute('checked');
-            });
-            demoCol.querySelectorAll('select').forEach((sel) => {
-                const selectEl = sel as HTMLSelectElement;
-                Array.from(selectEl.options).forEach((opt: HTMLOptionElement, i: number) => {
-                    if (i === selectEl.selectedIndex) opt.setAttribute('selected', 'selected');
-                    else opt.removeAttribute('selected');
-                });
-            });
-        }
-        // 300 DPI: A4 landscape (297x210mm) at 300 DPI = 3508x2480px
-        const canvas = await htmlToImage.toCanvas(element, {
-            pixelRatio: 3508 / 1485,
-            backgroundColor: '#ffffff',
-            width: 1485,
-            height: 1050,
-            filter: (node: HTMLElement) => !node.dataset?.exportHide
-        });
-        return canvas;
-    };
+    // EXPORT (extracted to useExport hook)
+    const { runExportWithChoice, saveProjectJSON, loadProjectJSON } = useExport({
+        exportRef, patientData, serialize, dispatch, incognitoMode, isPortrait,
+        setPortraitExporting, showToast, activeChart, setActiveChart,
+        setShowFinalInventory, setViewMode, changeTheme, fileInputRef,
+    });
     const promptExportJPG = () => setExportPicker('jpg');
     const promptExportPDF = () => setExportPicker('pdf');
-    const runExportWithChoice = async (format: string, useFinal: boolean) => {
+    const handleExportWithChoice = async (format: string, useFinal: boolean) => {
         setExportPicker(null);
-        setActiveChart(useFinal ? 'completed' : 'planned');
-        setShowFinalInventory(useFinal);
-        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-        try {
-            if (format === 'jpg') await runExportJPG();
-            else await runExportPDF();
-        } catch (err) {
-            console.error('Export failed:', err);
-            showToast('Export failed', 'error');
-            setPortraitExporting(false);
-        }
-    };
-    const runExportJPG = async () => {
-        try {
-            const canvas = await prepareExportCanvas();
-            const link = document.createElement('a');
-            link.download = `SpinePlan_${patientData.name || 'Patient'}.jpg`;
-            link.href = canvas.toDataURL('image/jpeg', 0.85);
-            link.click();
-            if (incognitoMode) localStorage.removeItem('spine_planner_v2');
-        } catch (err) {
-            console.error('JPG export failed:', err);
-            showToast('Export failed', 'error');
-        } finally {
-            setPortraitExporting(false);
-        }
-    };
-    const runExportPDF = async () => {
-        let invPage: HTMLElement | null = null;
-        try {
-            const canvas = await prepareExportCanvas();
-            const imgData = canvas.toDataURL('image/jpeg', 0.85);
-            const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-            pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
-            // Check if demographics panel overflows — if so, add inventory page
-            const demoCol = exportRef.current?.querySelector('.w-\\[370px\\]');
-            if (demoCol && demoCol.scrollHeight > demoCol.clientHeight + 20) {
-                // Build a standalone inventory page off-screen
-                invPage = document.createElement('div');
-                invPage.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:595px;height:842px;background:white;padding:40px;font-family:Inter,sans-serif;box-sizing:border-box;';
-                invPage.innerHTML = `<div style="border-bottom:2px solid #1e293b;padding-bottom:8px;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:#1e293b">${patientData.name || 'Patient'}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${patientData.id ? patientData.id + ' — ' : ''}${formatDate(patientData.date)}${patientData.surgeon ? ' — ' + patientData.surgeon : ''}</div></div>`;
-                // Clone the inventory content
-                const invSource = demoCol.querySelector('.mt-2.border-t');
-                if (invSource) {
-                    const invClone = invSource.cloneNode(true) as HTMLElement;
-                    invClone.style.cssText = 'columns:1;margin:0;padding:0;';
-                    // Remove 2-column layout for full-page rendering
-                    const colDiv = invClone.querySelector('[style*="columns"]') as HTMLElement | null;
-                    if (colDiv) colDiv.style.columns = '2';
-                    invPage.appendChild(invClone);
-                }
-                document.body.appendChild(invPage);
-                try {
-                    const invCanvas = await htmlToImage.toCanvas(invPage, { pixelRatio: 2, backgroundColor: '#ffffff', width: 595, height: 842 });
-                    pdf.addPage('a4', 'portrait');
-                    pdf.addImage(invCanvas.toDataURL('image/jpeg', 1.0), 'JPEG', 0, 0, 210, 297);
-                } catch (e) { console.error('Inventory page export failed:', e); }
-            }
-            pdf.save(`SpinePlan_${patientData.name || 'Patient'}.pdf`);
-            if (incognitoMode) localStorage.removeItem('spine_planner_v2');
-        } catch (err) {
-            console.error('PDF export failed:', err);
-            showToast('Export failed', 'error');
-        } finally {
-            if (invPage && invPage.parentNode) document.body.removeChild(invPage);
-            setPortraitExporting(false);
-        }
-    };
-    const saveProjectJSON = async () => {
-        let link: HTMLAnchorElement | null = null;
-        let blobUrl: string | null = null;
-        try {
-            const data = serialize() as Record<string, unknown>;
-            const checksum = await computeChecksum(data);
-            (data.document as Record<string, unknown>).checksum = checksum;
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            link = document.createElement('a');
-            blobUrl = URL.createObjectURL(blob);
-            link.href = blobUrl;
-            link.download = `SpineProject_${(patientData.name || 'Unnamed').replace(/[^a-zA-Z0-9_\- ]/g, '').trim() || 'Unnamed'}.json`;
-            document.body.appendChild(link);
-            link.click();
-            if (incognitoMode) localStorage.removeItem('spine_planner_v2');
-        } catch (err) {
-            console.error('Save failed:', err);
-            showToast('Save failed', 'error');
-        } finally {
-            if (link && link.parentNode) document.body.removeChild(link);
-            if (blobUrl) URL.revokeObjectURL(blobUrl);
-        }
-    };
-    const loadProjectJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]; if (!file) return;
-        const reader = new FileReader();
-        reader.onload = async (ev) => {
-            try {
-                const json = JSON.parse(ev.target?.result as string);
-                if (json.schema?.version === 4) {
-                    validateV4(json);
-                    const checksumResult = await verifyChecksum(json);
-                    if (checksumResult === 'mismatch') {
-                        showToast(t('alert.checksum_mismatch'), 'error');
-                    }
-                    const result = deserializeDocument(json);
-                    dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
-                    if (result.viewMode) setViewMode(result.viewMode);
-                    if (result.colourScheme) changeTheme(result.colourScheme);
-                } else if (json.formatVersion >= 2) {
-                    validateLegacy(json);
-                    const result = deserializeDocument(json);
-                    dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
-                    if (result.viewMode) setViewMode(result.viewMode);
-                    if (result.colourScheme) changeTheme(result.colourScheme);
-                } else {
-                    showToast(t('alert.unsupported_format'), 'error');
-                    return;
-                }
-                showToast(t('alert.loaded'));
-            } catch (err) {
-                if (err instanceof ValidationError) {
-                    console.error('Schema validation failed:', err.issues);
-                    showToast(err.message, 'error');
-                } else {
-                    showToast(t('alert.invalid_file'), 'error');
-                }
-            }
-        };
-        reader.readAsText(file); e.target.value = '';
+        await runExportWithChoice(format, useFinal);
     };
 
     const copyPlanToCompleted = () => {
@@ -966,40 +799,7 @@ const App = () => {
     };
 
     // --- Shared sub-elements (used in both portrait and landscape) ---
-    const demographicsContent = (
-        <React.Fragment>
-            <h2 className="font-bold text-2xl text-slate-900 mb-4 border-b-4 border-slate-900 pb-2">{t('export.title')}</h2>
-            <div className="flex-1 flex flex-col overflow-y-auto min-h-0">
-                <div className="space-y-1 shrink-0">
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.name')}</label><div className="editable-field w-full text-sm font-bold" contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('name', e.target.innerText)} placeholder={t('patient.click_to_enter')}>{patientData.name}</div></div>
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.id')}</label><div className="editable-field w-full text-sm font-mono font-bold" contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('id', e.target.innerText)} placeholder={t('patient.click_to_enter')}>{patientData.id}</div></div>
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.surgeon')}</label><div className="editable-field w-full text-xs" contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('surgeon', e.target.innerText)} placeholder={t('patient.click_to_enter')}>{patientData.surgeon}</div></div>
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.date')}</label><div className="editable-field w-full text-xs cursor-pointer" onClick={() => setIsEditingDate(true)}>{isEditingDate ? <input type="date" className="w-full text-xs border-b border-slate-800 bg-transparent outline-none py-0" value={patientData.date} autoFocus onBlur={()=>setIsEditingDate(false)} onChange={e=>setPatientField('date', e.target.value)} /> : formatDate(patientData.date)}</div></div>
-                </div>
-                <div className="border-t border-slate-200 my-3"></div>
-                <div className="space-y-1 shrink-0">
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.supplier')}</label><select className="editable-field w-full text-xs bg-white cursor-pointer" value={patientData.company} onChange={e => { const v = e.target.value; setPatientField('company', v); if (AUTO_THEME_FROM_COMPANY && COMPANY_THEME_MAP[v]) { changeTheme(COMPANY_THEME_MAP[v]); } }}><option value="">{t('patient.select_supplier')}</option>{IMPLANT_COMPANIES.map(c => <option key={c} value={c}>{c}</option>)}<option value="__other">{t('patient.other')}</option></select>{patientData.company === '__other' && <div className="editable-field w-full text-xs mt-0.5" contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('company', e.target.innerText)} placeholder={t('patient.enter_company')}></div>}</div>
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.screw_system')}</label><ScrewSystemCombo value={patientData.screwSystem} onChange={v => setPatientField('screwSystem', v)} company={patientData.company} placeholder={t('patient.screw_system_placeholder')} /></div>
-                </div>
-                <div className="border-t border-slate-200 my-2"></div>
-                <div className="shrink-0">
-                    <h3 className="text-[10px] font-bold text-slate-500 uppercase mb-1">{t('patient.bone_graft')}</h3>
-                    <div className="grid grid-cols-3 gap-x-1 gap-y-0.5">
-                        {BONE_GRAFT_OPTIONS.map(opt => (
-                            <label key={opt} className="flex items-center gap-1 text-[10px] text-slate-700 cursor-pointer hover:text-slate-900 leading-tight">
-                                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500 shrink-0" checked={(patientData.boneGraft?.types || []).includes(opt)} onChange={e => { const types = patientData.boneGraft?.types || []; dispatch({ type: 'SET_BONE_GRAFT', types: e.target.checked ? [...types, opt] : types.filter(v => v !== opt), notes: patientData.boneGraft?.notes || '' }); }} />
-                                <span className="truncate">{BONE_GRAFT_LABEL_KEYS[opt] ? t(BONE_GRAFT_LABEL_KEYS[opt]) : opt}</span>
-                            </label>
-                        ))}
-                    </div>
-                    <div className="editable-field w-full text-[10px] mt-1" contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => dispatch({ type: 'SET_BONE_GRAFT', types: patientData.boneGraft?.types || [], notes: e.target.innerText })} placeholder={t('patient.bone_graft_notes_placeholder')}>{patientData.boneGraft?.notes || ''}</div>
-                </div>
-                <ImplantInventory placements={[...(showFinalInventory ? completedPlacements : plannedPlacements), ...(showFinalInventory ? completedCages : plannedCages).map(c => ({...c, zone: 'mid' as Zone, annotation: '', tool: c.tool, data: null})), ...(showFinalInventory ? completedConnectors : plannedConnectors).map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid' as Zone, annotation: '', data: null}))] as Placement[]} tools={[...allTools, {id: 'tlif', labelKey: 'inventory.cage.tlif', icon: 'cage', type: 'cage'}, {id: 'plif', labelKey: 'inventory.cage.plif', icon: 'cage', type: 'cage'}, {id: 'acdf', labelKey: 'inventory.cage.acdf', icon: 'cage', type: 'cage'}, {id: 'xlif', labelKey: 'inventory.cage.xlif', icon: 'cage', type: 'cage'}, {id: 'olif', labelKey: 'inventory.cage.olif', icon: 'cage', type: 'cage'}, {id: 'alif', labelKey: 'inventory.cage.alif', icon: 'cage', type: 'cage'}]} title={showFinalInventory ? t('inventory.title_construct') : t('inventory.title_plan')} visibleLevelIds={levels.map(l => l.id)} levels={levels} rods={showFinalInventory ? { left: patientData.leftRod, right: patientData.rightRod } : { left: patientData.planLeftRod, right: patientData.planRightRod }} />
-                <button onClick={() => setShowFinalInventory(!showFinalInventory)} className="mt-1 w-full text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase tracking-wider py-1 border border-slate-200 rounded hover:bg-slate-50 transition-colors">{showFinalInventory ? t('inventory.view_plan') : t('inventory.view_final')}</button>
-            </div>
-            <CreditsFooter lang={currentLang} />
-        </React.Fragment>
-    );
+    const demographicsContent = <DemographicsPanel patientData={patientData} dispatch={dispatch} setPatientField={setPatientField} changeTheme={changeTheme} showFinalInventory={showFinalInventory} setShowFinalInventory={setShowFinalInventory} plannedPlacements={plannedPlacements} completedPlacements={completedPlacements} plannedCages={plannedCages} completedCages={completedCages} plannedConnectors={plannedConnectors} completedConnectors={completedConnectors} allTools={allTools} levels={levels} currentLang={currentLang} />;
 
     const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={heightScale} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('planLeftRod', e.target.innerText)} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('planRightRod', e.target.innerText)} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} isActive={activeChart === 'planned'} activeBg={scheme.activeBg} activeText={scheme.activeText} focusedLevelId={activeChart === 'planned' ? kbFocusLevelId : null} focusedZone={kbFocusZone} />;
 
@@ -1018,7 +818,7 @@ const App = () => {
 
     const modals = (
         <React.Fragment>
-            <ScrewModal isOpen={screwModalOpen} onClose={() => setScrewModalOpen(false)}
+            <ScrewModal isOpen={openModal === 'screw'} onClose={() => setOpenModal(null)}
                 onConfirm={handleScrewConfirm}
                 onConfirmAndNext={handleScrewConfirmAndNext}
                 onDelete={() => removePlacement(editingPlacementId!)}
@@ -1032,10 +832,10 @@ const App = () => {
                 placements={activeChart === 'planned' ? plannedPlacements : completedPlacements}
                 useRegionDefaults={useRegionDefaults}
                 confirmAndNextDefault={confirmAndNextDefault} />
-            <OsteotomyModal isOpen={osteoModalOpen} onClose={() => { setOsteoModalOpen(false); setOsteoDiscLevel(undefined); }} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId!)} initialData={editingData as OsteotomyData | null | undefined} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} discLevelOnly={osteoDiscLevel}
+            <OsteotomyModal isOpen={openModal === 'osteotomy'} onClose={() => { setOpenModal(null); setOsteoDiscLevel(undefined); }} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId!)} initialData={editingData as OsteotomyData | null | undefined} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} discLevelOnly={osteoDiscLevel}
                 levelId={pendingPlacement?.levelId || (editingPlacementId ? [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId)?.levelId : undefined)} />
-            <CageModal isOpen={cageModalOpen} onClose={() => setCageModalOpen(false)} onConfirm={handleCageConfirm} onDelete={handleDeleteCage} initialData={editingData as { tool: string; data: CageData } | null | undefined} levelId={editingCageLevel ?? ''} levels={levels} />
-            <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
+            <CageModal isOpen={openModal === 'cage'} onClose={() => setOpenModal(null)} onConfirm={handleCageConfirm} onDelete={handleDeleteCage} initialData={editingData as { tool: string; data: CageData } | null | undefined} levelId={editingCageLevel ?? ''} levels={levels} />
+            <ForceModal isOpen={openModal === 'force'} onClose={() => setOpenModal(null)} onConfirm={handleForceConfirm} />
             {forcePopover && (() => {
                 const popW = 200, popH = forcePopover.existingTool ? 300 : 260;
                 const px = Math.min(forcePopover.x, window.innerWidth - popW - 8);
@@ -1099,15 +899,15 @@ const App = () => {
                     </div>
                 </Portal>);
             })()}
-            <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
-            <PreferencesModal isOpen={preferencesModalOpen} onClose={() => setPreferencesModalOpen(false)} useRegionDefaults={useRegionDefaults} onToggleRegionDefaults={toggleRegionDefaults} confirmAndNextDefault={confirmAndNextDefault} onToggleConfirmAndNextDefault={toggleConfirmAndNextDefault} />
-            <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
-            {exportPicker && <Portal><div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: () => runExportWithChoice(exportPicker, false), onClose: () => setExportPicker(null), onDelete: undefined, isEditing: false })} onClick={() => setExportPicker(null)} ref={el => el?.focus()}>
+            <HelpModal isOpen={openModal === 'help'} onClose={() => setOpenModal(null)} />
+            <PreferencesModal isOpen={openModal === 'preferences'} onClose={() => setOpenModal(null)} useRegionDefaults={useRegionDefaults} onToggleRegionDefaults={toggleRegionDefaults} confirmAndNextDefault={confirmAndNextDefault} onToggleConfirmAndNextDefault={toggleConfirmAndNextDefault} />
+            <ChangeLogModal isOpen={openModal === 'changelog'} onClose={() => setOpenModal(null)} />
+            {exportPicker && <Portal><div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: () => handleExportWithChoice(exportPicker, false), onClose: () => setExportPicker(null), onDelete: undefined, isEditing: false })} onClick={() => setExportPicker(null)} ref={el => el?.focus()}>
                 <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
                     <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold uppercase tracking-wider text-center">{exportPicker.toUpperCase()}</div>
                     <div className="p-3 flex flex-col gap-2">
-                        <button onClick={() => runExportWithChoice(exportPicker, false)} className="w-full px-4 py-3 rounded text-sm font-bold border transition-colors hover:brightness-95" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{t('export.plan')}</button>
-                        <button onClick={() => runExportWithChoice(exportPicker, true)} className="w-full px-4 py-3 rounded text-sm font-bold text-white bg-slate-800 hover:bg-slate-700">{t('export.construct')}</button>
+                        <button onClick={() => handleExportWithChoice(exportPicker, false)} className="w-full px-4 py-3 rounded text-sm font-bold border transition-colors hover:brightness-95" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{t('export.plan')}</button>
+                        <button onClick={() => handleExportWithChoice(exportPicker, true)} className="w-full px-4 py-3 rounded text-sm font-bold text-white bg-slate-800 hover:bg-slate-700">{t('export.construct')}</button>
                     </div>
                 </div>
             </div></Portal>}
@@ -1174,32 +974,10 @@ const App = () => {
                     </div>
                 </Portal>);
             })()}
-            <NoteModal isOpen={noteModalOpen} onClose={() => { setNoteModalOpen(false); setEditingNote(null); setPendingNoteTool(null); }} onConfirm={handleNoteConfirm} onDelete={handleNoteDelete} initialText={editingNote?.text || ''} initialShowArrow={editingNote ? editingNote.showArrow : undefined} isEditing={!!editingNote} />
+            <NoteModal isOpen={openModal === 'note'} onClose={() => { setOpenModal(null); setEditingNote(null); setPendingNoteTool(null); }} onConfirm={handleNoteConfirm} onDelete={handleNoteDelete} initialText={editingNote?.text || ''} initialShowArrow={editingNote ? editingNote.showArrow : undefined} isEditing={!!editingNote} />
         </React.Fragment>
     );
 
-    const themeDropdown = (
-        <div className="relative">
-            <button onClick={() => setThemeOpen(!themeOpen)} className="flex items-center gap-0.5 p-1 rounded hover:bg-white/10">
-                {[scheme.sidebarBg, '#FFFFFF', scheme.activeBg, scheme.activeText].map((c, i) => (
-                    <div key={i} className="w-2.5 h-2.5 rounded-full border" style={{ backgroundColor: c, borderColor: scheme.sidebarBorder }}></div>
-                ))}
-            </button>
-            {themeOpen && (
-                <div className="absolute end-0 top-full mt-1 rounded-lg shadow-xl border p-1.5 z-50" style={{ backgroundColor: scheme.sidebarTitleBg, borderColor: scheme.sidebarBorder }}>
-                    {COLOUR_SCHEMES.map(s => (
-                        <button key={s.id} onClick={() => { changeTheme(s.id); setThemeOpen(false); }}
-                            className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-all ${colourScheme === s.id ? 'ring-1 ring-white/50' : 'hover:bg-white/10'}`}>
-                            <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: s.sidebarBg }}></div>
-                            <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: '#FFFFFF' }}></div>
-                            <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: s.activeBg }}></div>
-                            <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: s.activeText }}></div>
-                        </button>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
 
     // ============================================================
     // PORTRAIT LAYOUT
@@ -1210,86 +988,7 @@ const App = () => {
                 {modals}
                 <input type="file" ref={fileInputRef} onChange={loadProjectJSON} className="hidden" accept=".json" />
 
-                {/* Portrait Toolbar */}
-                <div className="portrait-toolbar flex flex-col z-20 no-print shadow-xl shrink-0" style={{ backgroundColor: scheme.sidebarBg, color: scheme.textPrimary }}>
-                    {/* Row 1: Title, Theme, Language, Action icons */}
-                    <div className="flex items-center gap-1 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                        <span className="font-bold text-sm tracking-tight shrink-0">{t('sidebar.title')}</span>
-                        <button onClick={() => setChangeLogOpen(true)} className="text-[9px] font-mono opacity-50 shrink-0">{CURRENT_VERSION}</button>
-                        <div className="flex-1"></div>
-                        {themeDropdown}
-                        <select value={currentLang} onChange={e => changeLang(e.target.value)}
-                            className="bg-transparent text-[10px] border-none outline-none cursor-pointer w-14" style={{ color: scheme.textSecondary }}>
-                            {SUPPORTED_LANGUAGES.filter(l => !l.hidden || l.code === currentLang).map(l => (
-                                <option key={l.code} value={l.code} style={{color: '#1e293b'}}>{l.code.toUpperCase()}</option>
-                            ))}
-                        </select>
-                        <div className="flex items-center gap-0">
-                            <button onClick={() => fileInputRef.current?.click()} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.load')}><IconUpload /></button>
-                            <button onClick={saveProjectJSON} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.save')}><IconSave /></button>
-                            <button onClick={promptExportJPG} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.jpg')}><IconImage /></button>
-                            <button onClick={promptExportPDF} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.pdf')}><IconPDF /></button>
-                            <button onClick={() => setPreferencesModalOpen(true)} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.preferences')}><IconGear /></button>
-                            <button onClick={() => setHelpModalOpen(true)} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.help')}><IconHelp /></button>
-                            <button onClick={() => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title="Fullscreen"><svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
-                            <div className="p-2 rounded flex items-center" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? t('sync.linked') : t('sync.no_peer')}><IconLink />{syncConnected && <span className="inline-block ms-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>}</div>
-                        </div>
-                    </div>
-
-                    {/* Row 2: Editing tools (tablet+) or view-only banner (phone) */}
-                    {isViewOnly ? (
-                        <div className="flex items-center gap-2 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                            <div className="flex-1 text-[10px] italic" style={{ color: scheme.textMuted }}>{t('portrait.view_only')}</div>
-                            <div className="flex gap-0.5 shrink-0">
-                                {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
-                                    const shortLabels: Record<string, string> = { cervical: 'C', thoracolumbar: 'T', t10_pelvis: 'L', whole: t('sidebar.view.whole_short') };
-                                    const active = viewMode === vm;
-                                    return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{shortLabels[vm]}</button>;
-                                })}
-                                {viewMode !== 'cervical' && <button onClick={togglePelvis} title={showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')} className={`px-2 py-2 text-[10px] rounded border font-bold ${showPelvis ? '' : 'hover:brightness-125'}`} style={showPelvis ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')}</button>}
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-1 px-3 py-1.5" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                            <div className="flex gap-0.5 overflow-x-auto flex-1 min-w-0">
-                                {tools[0].items.map(item => {
-                                    const active = selectedTool === item.id;
-                                    return <button key={item.id} onClick={() => setSelectedTool(item.id)} title={t(item.labelKey)} className={`shrink-0 px-2.5 py-2 rounded border flex items-center gap-1 text-[10px] font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>
-                                        <InstrumentIcon type={item.icon} className="w-3 h-3" color={active ? scheme.activeText : scheme.textSecondary} />
-                                    </button>;
-                                })}
-                            </div>
-                            <div className="w-px h-5 bg-white/20 mx-1"></div>
-                            <div className="flex gap-0.5 shrink-0">
-                                {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
-                                    const shortLabels: Record<string, string> = { cervical: 'C', thoracolumbar: 'T', t10_pelvis: 'L', whole: t('sidebar.view.whole_short') };
-                                    const active = viewMode === vm;
-                                    return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{shortLabels[vm]}</button>;
-                                })}
-                                {viewMode !== 'cervical' && <button onClick={togglePelvis} title={showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')} className={`px-2 py-2 text-[10px] rounded border font-bold ${showPelvis ? '' : 'hover:brightness-125'}`} style={showPelvis ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')}</button>}
-                            </div>
-                            <div className="w-px h-5 bg-white/20 mx-1"></div>
-                            <button onClick={() => { copyPlanToCompleted(); switchPortraitTab(2); }} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold hover:bg-white/10 hover:brightness-125 shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)' }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
-                            <button onClick={() => setConfirmClearConstruct(true)} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold hover:bg-white/10 hover:brightness-125 shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)', color: '#dc2626' }} title={t('sidebar.clear_construct')}><IconTrash /> {t('sidebar.clear_construct')}</button>
-                            <div className={`shrink-0 w-5 h-5 rounded-full cursor-pointer ${incognitoMode ? 'bg-red-500' : 'bg-white/20'}`} onClick={() => setIncognitoMode(!incognitoMode)} title={t('sidebar.session_privacy')}></div>
-                            <button onClick={newPatientAction} className="p-2.5 rounded shrink-0" style={{ color: '#dc2626' }} title={t('sidebar.new_patient')}><IconTrash /></button>
-                        </div>
-                    )}
-                </div>
-
-                {/* Portrait Tab Bar */}
-                <div className="portrait-tabs flex shrink-0 z-10" style={{ backgroundColor: scheme.sidebarTitleBg, color: scheme.titleText }}>
-                    {PORTRAIT_TABS.map((tabKey, i) => {
-                        const active = portraitTab === i;
-                        return (
-                            <button key={tabKey} onClick={() => switchPortraitTab(i)}
-                                className={`flex-1 py-2 text-xs font-bold transition-all border-b-2 ${active ? '' : 'opacity-60 hover:opacity-80 border-transparent'}`}
-                                style={active ? { color: scheme.activeText, backgroundColor: scheme.activeBg, borderColor: scheme.activeText } : undefined}>
-                                {t(tabKey)}
-                            </button>
-                        );
-                    })}
-                </div>
+                <PortraitToolbar scheme={scheme} colourScheme={colourScheme} changeTheme={changeTheme} currentLang={currentLang} changeLang={changeLang} selectedTool={selectedTool} setSelectedTool={setSelectedTool} viewMode={viewMode} setViewMode={setViewMode} showPelvis={showPelvis} togglePelvis={togglePelvis} incognitoMode={incognitoMode} setIncognitoMode={setIncognitoMode} syncConnected={syncConnected} isViewOnly={isViewOnly} tools={tools} fileInputRef={fileInputRef} loadProjectJSON={loadProjectJSON} saveProjectJSON={saveProjectJSON} promptExportJPG={promptExportJPG} promptExportPDF={promptExportPDF} copyPlanToCompleted={() => { copyPlanToCompleted(); switchPortraitTab(2); }} onConfirmClearConstruct={() => setConfirmClearConstruct(true)} newPatientAction={newPatientAction} onOpenPreferences={() => setOpenModal('preferences')} onOpenHelp={() => setOpenModal('help')} onOpenChangelog={() => setOpenModal('changelog')} portraitTab={portraitTab} switchPortraitTab={switchPortraitTab} />
 
                 {/* Portrait Content - swipeable tabs */}
                 <div ref={portraitContentRef} className="flex-1 overflow-hidden relative bg-slate-300"
@@ -1355,133 +1054,7 @@ const App = () => {
             {modals}
 
             <div className="flex-1 overflow-hidden bg-slate-200 flex relative">
-                <aside className="w-[340px] flex flex-col z-20 overflow-y-auto no-print shadow-xl" style={{ backgroundColor: scheme.sidebarBg, borderInlineEnd: `1px solid ${scheme.sidebarBorder}`, color: scheme.textPrimary }}>
-                    {/* 1. Tool Palette - most used, top position */}
-                    <div className="p-3 space-y-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                        {tools.map((g,i) => (
-                            <div key={i}>
-                                <h3 className="text-[10px] uppercase font-bold mb-1.5 tracking-widest" style={{ color: scheme.textMuted }}>{t(g.categoryKey)}</h3>
-                                <div className="grid grid-cols-2 gap-1">
-                                    {g.items.map(item => {
-                                        const active = selectedTool === item.id;
-                                        return <button key={item.id} onClick={() => setSelectedTool(item.id)} className={`p-1 h-10 rounded border flex flex-col items-center justify-center gap-0.5 transition-all text-xs ${active ? 'font-bold' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>
-                                            <InstrumentIcon type={item.icon} className="w-3.5 h-3.5" color={active ? scheme.activeText : scheme.textSecondary} />
-                                            <span className="text-center text-[10px] leading-tight">{t(item.labelKey)}</span>
-                                        </button>;
-                                    })}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* 2. Plan/Construct Toggle + Confirm Plan - workflow controls */}
-                    <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                        <h3 className="text-[10px] uppercase font-bold mb-1.5 tracking-widest" style={{ color: scheme.textMuted }}>{t('sidebar.editing')}</h3>
-                        <div className="flex rounded p-1 border" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>
-                            <button onClick={() => setActiveChart('planned')} className={`flex-1 px-3 py-1.5 rounded transition-all text-xs ${activeChart==='planned'?'font-bold':'hover:brightness-125'}`} style={activeChart==='planned' ? { backgroundColor: scheme.activeBg, color: scheme.activeText } : undefined}>{t('sidebar.plan')}</button>
-                            <button onClick={() => setActiveChart('completed')} className={`flex-1 px-3 py-1.5 rounded transition-all text-xs ${activeChart==='completed'?'font-bold':'hover:brightness-125'}`} style={activeChart==='completed' ? { backgroundColor: scheme.activeBg, color: scheme.activeText } : undefined}>{t('sidebar.construct')}</button>
-                        </div>
-                        <div className="grid grid-cols-2 gap-1 mt-2">
-                            <button onClick={copyPlanToCompleted} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
-                            <button onClick={clearConstruct} className="flex items-center justify-center gap-1 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:bg-red-50 hover:border-red-300 hover:text-red-600" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }} title={t('sidebar.clear_construct_tooltip')}><IconTrash /> {t('sidebar.clear_construct')}</button>
-                        </div>
-                    </div>
-
-                    {/* 3. Region View */}
-                    <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                        <h3 className="text-[10px] uppercase font-bold mb-1.5 tracking-widest" style={{ color: scheme.textMuted }}>{t('sidebar.region_view')}</h3>
-                        <div className="grid grid-cols-2 gap-1">
-                            {['cervical','thoracolumbar','t10_pelvis','whole'].map(vm => {
-                                const labels: Record<string, string> = { cervical: t('sidebar.view.cervical'), thoracolumbar: t('sidebar.view.thoracolumbar'), t10_pelvis: t('sidebar.view.t10_pelvis'), whole: t('sidebar.view.whole') };
-                                const active = viewMode === vm;
-                                return <button key={vm} onClick={() => setViewMode(vm)} className={`py-1.5 px-1 text-[10px] rounded border font-bold transition-all ${active ? 'border-transparent' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{labels[vm]}</button>;
-                            })}
-                        </div>
-                        {viewMode !== 'cervical' && (
-                            <button onClick={togglePelvis} className={`mt-1.5 w-full py-1.5 px-1 text-[10px] rounded border font-bold transition-all ${showPelvis ? 'border-transparent' : 'hover:brightness-125'}`} style={showPelvis ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')}</button>
-                        )}
-                    </div>
-
-                    {/* 4. File Operations */}
-                    <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                        <input type="file" ref={fileInputRef} onChange={loadProjectJSON} className="hidden" accept=".json" />
-                        <div className="grid grid-cols-2 gap-1">
-                            <button onClick={() => fileInputRef.current?.click()} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconUpload /> {t('sidebar.load')}</button>
-                            <button onClick={saveProjectJSON} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconSave /> {t('sidebar.save')}</button>
-                            <button onClick={promptExportJPG} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconImage /> {t('sidebar.jpg')}</button>
-                            <button onClick={promptExportPDF} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconPDF /> {t('sidebar.pdf')}</button>
-                        </div>
-                    </div>
-
-                    {/* 5. Session Privacy */}
-                    <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                        <div className={`flex items-center gap-2 px-2 py-2 rounded border cursor-pointer transition-colors ${incognitoMode ? 'bg-red-900/30 border-red-500/50' : 'bg-transparent border-transparent hover:bg-white/5'}`} onClick={() => setIncognitoMode(!incognitoMode)}>
-                            <div className="relative inline-block w-10 h-5 align-middle select-none shrink-0"><input type="checkbox" className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300" style={{ top: 0, left: 0 }} checked={incognitoMode} onChange={(e) => setIncognitoMode(e.target.checked)}/><label className={`toggle-label block overflow-hidden h-5 rounded-full cursor-pointer border ${incognitoMode ? 'bg-red-600 border-red-600' : 'bg-slate-600 border-slate-600'}`}></label></div>
-                            <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: incognitoMode ? '#dc2626' : scheme.textMuted }}>{t('sidebar.session_privacy')}</span>
-                        </div>
-                    </div>
-
-                    {/* 6. Theme & Language - preferences, rarely changed */}
-                    <div className="p-3" style={{ borderBottom: `1px solid ${scheme.sidebarBorder}` }}>
-                        <div className="flex items-center gap-3">
-                            <div className="relative">
-                                <button onClick={() => setThemeOpen(!themeOpen)} className="flex items-center gap-1.5 hover:brightness-125 py-1 rounded transition-colors">
-                                    <span className="font-bold text-[10px] uppercase tracking-widest" style={{ color: scheme.textMuted }}>{t('sidebar.theme')}</span>
-                                    <div className="flex gap-0.5">
-                                        <div className="w-3 h-3 rounded-full border" style={{ backgroundColor: scheme.sidebarBg, borderColor: scheme.sidebarBorder }}></div>
-                                        <div className="w-3 h-3 rounded-full border" style={{ backgroundColor: '#FFFFFF', borderColor: scheme.sidebarBorder }}></div>
-                                        <div className="w-3 h-3 rounded-full border" style={{ backgroundColor: scheme.activeBg, borderColor: scheme.sidebarBorder }}></div>
-                                        <div className="w-3 h-3 rounded-full border" style={{ backgroundColor: scheme.activeText, borderColor: scheme.sidebarBorder }}></div>
-                                    </div>
-                                </button>
-                                {themeOpen && (
-                                    <div className="absolute start-0 bottom-full mb-1 rounded-lg shadow-xl border p-1.5 z-50" style={{ backgroundColor: scheme.sidebarTitleBg, borderColor: scheme.sidebarBorder }}>
-                                        {COLOUR_SCHEMES.map(s => (
-                                            <button key={s.id} onClick={() => { changeTheme(s.id); setThemeOpen(false); }}
-                                                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-all ${colourScheme === s.id ? 'ring-1 ring-white/50' : 'hover:bg-white/10'}`}>
-                                                <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: s.sidebarBg }}></div>
-                                                <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: '#FFFFFF' }}></div>
-                                                <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: s.activeBg }}></div>
-                                                <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: scheme.sidebarBorder, backgroundColor: s.activeText }}></div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                                <span className="font-bold text-[10px] uppercase tracking-widest shrink-0" style={{ color: scheme.textMuted }}>{t('sidebar.language')}</span>
-                                <select value={currentLang} onChange={e => changeLang(e.target.value)}
-                                    className="flex-1 min-w-0 bg-transparent text-[10px] border-none outline-none cursor-pointer" style={{ color: scheme.textSecondary }}>
-                                    {SUPPORTED_LANGUAGES.filter(l => !l.hidden || l.code === currentLang).map(l => (
-                                        <option key={l.code} value={l.code} style={{color: '#1e293b'}}>{l.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Spacer to push bottom items down */}
-                    <div className="flex-1"></div>
-
-                    {/* 7. Help + Fullscreen - prominent, bottom */}
-                    <div className="p-3 flex gap-2" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
-                        <button onClick={() => setPreferencesModalOpen(true)} className="flex items-center justify-center hover:brightness-125 px-3 py-2 rounded text-xs font-bold border transition-colors" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconGear /></button>
-                        <button onClick={() => setHelpModalOpen(true)} className="flex-1 flex items-center justify-center gap-2 hover:brightness-125 px-3 py-2 rounded text-xs font-bold border transition-colors" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconHelp /> {t('sidebar.help')}</button>
-                        <button onClick={() => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }} className="flex items-center justify-center px-3 py-2 rounded text-xs font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }} title="Fullscreen"><svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
-                    </div>
-
-                    {/* 8. Utility row - version, new patient, sync */}
-                    <div className="px-3 pb-1 flex items-center gap-1">
-                        <div className="flex items-center justify-center px-1.5 py-1.5 rounded text-[10px]" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? t('sync.linked') : t('sync.no_peer')}><IconLink />{syncConnected && <span className="ms-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>}</div>
-                        <button onClick={() => setChangeLogOpen(true)} className="flex items-center justify-center px-2 py-1.5 rounded text-[10px] font-mono" style={{ color: scheme.textMuted }}>{CURRENT_VERSION}</button>
-                        <div className="flex-1"></div>
-                        <button onClick={newPatientAction} className="flex items-center justify-center gap-1 px-2 py-1.5 rounded text-[10px] font-bold" style={{ color: '#dc2626' }}>
-                            <IconTrash /> {t('sidebar.new_patient')}
-                        </button>
-                    </div>
-
-                    <CreditsFooter lang={currentLang} />
-                </aside>
+                <Sidebar scheme={scheme} colourScheme={colourScheme} changeTheme={changeTheme} currentLang={currentLang} changeLang={changeLang} selectedTool={selectedTool} setSelectedTool={setSelectedTool} activeChart={activeChart} setActiveChart={setActiveChart} viewMode={viewMode} setViewMode={setViewMode} showPelvis={showPelvis} togglePelvis={togglePelvis} incognitoMode={incognitoMode} setIncognitoMode={setIncognitoMode} syncConnected={syncConnected} tools={tools} fileInputRef={fileInputRef} loadProjectJSON={loadProjectJSON} saveProjectJSON={saveProjectJSON} promptExportJPG={promptExportJPG} promptExportPDF={promptExportPDF} copyPlanToCompleted={copyPlanToCompleted} clearConstruct={clearConstruct} newPatientAction={newPatientAction} onOpenPreferences={() => setOpenModal('preferences')} onOpenHelp={() => setOpenModal('help')} onOpenChangelog={() => setOpenModal('changelog')} />
 
                 <div ref={containerWrapperRef} id="print-wrapper" className="flex-1 flex items-center justify-center p-8 bg-slate-300 overflow-hidden relative">
                     <div style={{ transform: `scale(${scale})` }}>

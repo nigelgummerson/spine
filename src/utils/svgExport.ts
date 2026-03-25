@@ -10,7 +10,7 @@
  * SVG blobs have no base URL, so font references must be absolute
  * for text to render correctly in exported images.
  */
-function absolutifyFontUrls(cssText: string): string {
+export function absolutifyFontUrls(cssText: string): string {
     return cssText.replace(/url\(["']?((?!data:)[^"')]+)["']?\)/g, (match, url) => {
         if (url.startsWith('http') || url.startsWith('data:')) return match;
         try {
