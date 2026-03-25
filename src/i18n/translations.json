@@ -230,6 +230,7 @@
     "alert.cage_not_permitted": "{cageType} is not permitted at {level}.",
     "alert.unsupported_format": "Unsupported file format. Please use a file saved by this application.",
     "alert.loaded": "Project Loaded Successfully.",
+    "alert.checksum_mismatch": "File checksum mismatch — the file may have been modified.",
     "alert.invalid_file": "Invalid File",
     "alert.no_plan": "No plan to copy.",
     "alert.all_confirmed": "All placements already confirmed.",
@@ -304,7 +305,8 @@
     "onboarding.step3": "Copy your plan to the construct record",
     "onboarding.next": "Next",
     "onboarding.done": "Done",
-    "onboarding.skip": "Skip tour"
+    "onboarding.skip": "Skip tour",
+    "alert.stale_data": "Cached data is {days} days old — start New Patient if this is outdated"
   },
   "de": {
     "sidebar.title": "Spinale Instrumentierung",
@@ -611,7 +613,9 @@
     "onboarding.next": "Weiter",
     "onboarding.done": "Fertig",
     "onboarding.skip": "Tour überspringen",
-    "alert.no_osteotomy_at_level": "Osteotomien sind auf dieser Höhe nicht verfügbar."
+    "alert.no_osteotomy_at_level": "Osteotomien sind auf dieser Höhe nicht verfügbar.",
+    "alert.stale_data": "Zwischengespeicherte Daten sind {days} Tage alt — starten Sie einen neuen Patienten, wenn diese veraltet sind",
+    "alert.checksum_mismatch": "Prüfsummenabweichung — die Datei wurde möglicherweise verändert."
   },
   "fr": {
     "sidebar.title": "Instrumentation rachidienne",
@@ -918,7 +922,9 @@
     "onboarding.next": "Suivant",
     "onboarding.done": "Terminé",
     "onboarding.skip": "Passer la visite",
-    "alert.no_osteotomy_at_level": "Les ostéotomies ne sont pas disponibles à ce niveau."
+    "alert.no_osteotomy_at_level": "Les ostéotomies ne sont pas disponibles à ce niveau.",
+    "alert.stale_data": "Les données en cache ont {days} jours — démarrez un nouveau patient si elles sont obsolètes",
+    "alert.checksum_mismatch": "Non-concordance de la somme de contrôle — le fichier a peut-être été modifié."
   },
   "es": {
     "sidebar.title": "Instrumentación espinal",
@@ -1225,7 +1231,9 @@
     "onboarding.next": "Siguiente",
     "onboarding.done": "Listo",
     "onboarding.skip": "Omitir recorrido",
-    "alert.no_osteotomy_at_level": "Las osteotomías no están disponibles en este nivel."
+    "alert.no_osteotomy_at_level": "Las osteotomías no están disponibles en este nivel.",
+    "alert.stale_data": "Los datos en caché tienen {days} días — inicie un nuevo paciente si están desactualizados",
+    "alert.checksum_mismatch": "Discrepancia en la suma de verificación — el archivo pudo haber sido modificado."
   },
   "it": {
     "sidebar.title": "Strumentazione vertebrale",
@@ -1532,7 +1540,9 @@
     "onboarding.next": "Avanti",
     "onboarding.done": "Fine",
     "onboarding.skip": "Salta il tour",
-    "alert.no_osteotomy_at_level": "Le osteotomie non sono disponibili a questo livello."
+    "alert.no_osteotomy_at_level": "Le osteotomie non sono disponibili a questo livello.",
+    "alert.stale_data": "I dati memorizzati hanno {days} giorni — avvia un nuovo paziente se sono obsoleti",
+    "alert.checksum_mismatch": "Mancata corrispondenza del checksum — il file potrebbe essere stato modificato."
   },
   "pt": {
     "sidebar.title": "Instrumentação vertebral",
@@ -1839,7 +1849,9 @@
     "onboarding.next": "Seguinte",
     "onboarding.done": "Concluído",
     "onboarding.skip": "Ignorar visita",
-    "alert.no_osteotomy_at_level": "Osteotomias não estão disponíveis neste nível."
+    "alert.no_osteotomy_at_level": "Osteotomias não estão disponíveis neste nível.",
+    "alert.stale_data": "Os dados em cache têm {days} dias — inicie um novo paciente se estiverem desatualizados",
+    "alert.checksum_mismatch": "Discrepância na soma de verificação — o ficheiro pode ter sido modificado."
   },
   "sv": {
     "sidebar.title": "Spinal instrumentering",
@@ -2146,7 +2158,9 @@
     "onboarding.next": "Nästa",
     "onboarding.done": "Klar",
     "onboarding.skip": "Hoppa över rundtur",
-    "alert.no_osteotomy_at_level": "Osteotomier är inte tillgängliga på denna nivå."
+    "alert.no_osteotomy_at_level": "Osteotomier är inte tillgängliga på denna nivå.",
+    "alert.stale_data": "Cachad data är {days} dagar gammal — starta en ny patient om den är inaktuell",
+    "alert.checksum_mismatch": "Kontrollsumma stämmer inte — filen kan ha ändrats."
   },
   "nb": {
     "sidebar.title": "Spinal instrumentering",
@@ -2453,7 +2467,9 @@
     "onboarding.next": "Neste",
     "onboarding.done": "Ferdig",
     "onboarding.skip": "Hopp over omvisning",
-    "alert.no_osteotomy_at_level": "Osteotomier er ikke tilgjengelig på dette nivået."
+    "alert.no_osteotomy_at_level": "Osteotomier er ikke tilgjengelig på dette nivået.",
+    "alert.stale_data": "Bufrede data er {days} dager gamle — start en ny pasient hvis de er utdaterte",
+    "alert.checksum_mismatch": "Kontrollsum stemmer ikke — filen kan ha blitt endret."
   },
   "da": {
     "sidebar.title": "Spinal instrumentering",
@@ -2760,7 +2776,9 @@
     "onboarding.next": "Næste",
     "onboarding.done": "Færdig",
     "onboarding.skip": "Spring rundvisning over",
-    "alert.no_osteotomy_at_level": "Osteotomier er ikke tilgængelige på dette niveau."
+    "alert.no_osteotomy_at_level": "Osteotomier er ikke tilgængelige på dette niveau.",
+    "alert.stale_data": "Cachelagrede data er {days} dage gamle — start en ny patient, hvis de er forældede",
+    "alert.checksum_mismatch": "Kontrolsum stemmer ikke — filen kan være blevet ændret."
   },
   "fi": {
     "sidebar.title": "Spinaalinen instrumentointi",
@@ -3067,7 +3085,9 @@
     "onboarding.next": "Seuraava",
     "onboarding.done": "Valmis",
     "onboarding.skip": "Ohita esittely",
-    "alert.no_osteotomy_at_level": "Osteotomiat eivät ole käytettävissä tällä tasolla."
+    "alert.no_osteotomy_at_level": "Osteotomiat eivät ole käytettävissä tällä tasolla.",
+    "alert.stale_data": "Välimuistissa olevat tiedot ovat {days} päivää vanhoja — aloita uusi potilas, jos tiedot ovat vanhentuneita",
+    "alert.checksum_mismatch": "Tarkistussumma ei täsmää — tiedostoa on saatettu muokata."
   },
   "nl": {
     "sidebar.title": "Spinale instrumentatie",
@@ -3374,7 +3394,9 @@
     "onboarding.next": "Volgende",
     "onboarding.done": "Klaar",
     "onboarding.skip": "Rondleiding overslaan",
-    "alert.no_osteotomy_at_level": "Osteotomieën zijn niet beschikbaar op dit niveau."
+    "alert.no_osteotomy_at_level": "Osteotomieën zijn niet beschikbaar op dit niveau.",
+    "alert.stale_data": "Gecachte gegevens zijn {days} dagen oud — start een nieuwe patiënt als deze verouderd zijn",
+    "alert.checksum_mismatch": "Controlesom komt niet overeen — het bestand is mogelijk gewijzigd."
   },
   "pl": {
     "sidebar.title": "Instrumentacja kręgosłupa",
@@ -3681,7 +3703,9 @@
     "onboarding.next": "Dalej",
     "onboarding.done": "Gotowe",
     "onboarding.skip": "Pomiń przewodnik",
-    "alert.no_osteotomy_at_level": "Osteotomie nie są dostępne na tym poziomie."
+    "alert.no_osteotomy_at_level": "Osteotomie nie są dostępne na tym poziomie.",
+    "alert.stale_data": "Dane w pamięci podręcznej mają {days} dni — rozpocznij nowego pacjenta, jeśli są nieaktualne",
+    "alert.checksum_mismatch": "Niezgodność sumy kontrolnej — plik mógł zostać zmodyfikowany."
   },
   "el": {
     "sidebar.title": "Σπονδυλική οργανοληψία",
@@ -3988,7 +4012,9 @@
     "onboarding.next": "Επόμενο",
     "onboarding.done": "Τέλος",
     "onboarding.skip": "Παράλειψη ξενάγησης",
-    "alert.no_osteotomy_at_level": "Οι οστεοτομίες δεν είναι διαθέσιμες σε αυτό το επίπεδο."
+    "alert.no_osteotomy_at_level": "Οι οστεοτομίες δεν είναι διαθέσιμες σε αυτό το επίπεδο.",
+    "alert.stale_data": "Τα αποθηκευμένα δεδομένα είναι {days} ημερών — ξεκινήστε νέο ασθενή αν είναι παλιά",
+    "alert.checksum_mismatch": "Ασυμφωνία αθροίσματος ελέγχου — το αρχείο ενδέχεται να έχει τροποποιηθεί."
   },
   "tr": {
     "sidebar.title": "Spinal enstrümantasyon",
@@ -4295,7 +4321,9 @@
     "onboarding.next": "İleri",
     "onboarding.done": "Tamam",
     "onboarding.skip": "Turu atla",
-    "alert.no_osteotomy_at_level": "Bu seviyede osteotomi uygulanamaz."
+    "alert.no_osteotomy_at_level": "Bu seviyede osteotomi uygulanamaz.",
+    "alert.stale_data": "Önbellekteki veriler {days} gün eski — güncel değilse yeni hasta başlatın",
+    "alert.checksum_mismatch": "Sağlama toplamı uyuşmazlığı — dosya değiştirilmiş olabilir."
   },
   "uk": {
     "sidebar.title": "Спінальна інструментація",
@@ -4602,7 +4630,9 @@
     "onboarding.next": "Далі",
     "onboarding.done": "Готово",
     "onboarding.skip": "Пропустити тур",
-    "alert.no_osteotomy_at_level": "Остеотомії недоступні на цьому рівні."
+    "alert.no_osteotomy_at_level": "Остеотомії недоступні на цьому рівні.",
+    "alert.stale_data": "Кешованим даним {days} днів — розпочніть нового пацієнта, якщо вони застарілі",
+    "alert.checksum_mismatch": "Невідповідність контрольної суми — файл міг бути змінено."
   },
   "ru": {
     "sidebar.title": "Спинальная инструментация",
@@ -4909,7 +4939,9 @@
     "onboarding.next": "Далее",
     "onboarding.done": "Готово",
     "onboarding.skip": "Пропустить тур",
-    "alert.no_osteotomy_at_level": "Остеотомии недоступны на этом уровне."
+    "alert.no_osteotomy_at_level": "Остеотомии недоступны на этом уровне.",
+    "alert.stale_data": "Кешированным данным {days} дней — начните нового пациента, если они устарели",
+    "alert.checksum_mismatch": "Несовпадение контрольной суммы — файл мог быть изменён."
   },
   "hi": {
     "sidebar.title": "स्पाइनल इंस्ट्रूमेंटेशन",
@@ -5216,7 +5248,9 @@
     "onboarding.next": "अगला",
     "onboarding.done": "पूर्ण",
     "onboarding.skip": "टूर छोड़ें",
-    "alert.no_osteotomy_at_level": "इस स्तर पर osteotomy उपलब्ध नहीं है।"
+    "alert.no_osteotomy_at_level": "इस स्तर पर osteotomy उपलब्ध नहीं है।",
+    "alert.stale_data": "कैश्ड डेटा {days} दिन पुराना है — यदि पुराना है तो नया रोगी शुरू करें",
+    "alert.checksum_mismatch": "चेकसम मेल नहीं खाता — फ़ाइल संशोधित की गई हो सकती है।"
   },
   "ar": {
     "sidebar.title": "الأجهزة الشوكية",
@@ -5523,7 +5557,9 @@
     "onboarding.next": "التالي",
     "onboarding.done": "تم",
     "onboarding.skip": "تخطي الجولة",
-    "alert.no_osteotomy_at_level": "قطع العظم غير متاح عند هذا المستوى."
+    "alert.no_osteotomy_at_level": "قطع العظم غير متاح عند هذا المستوى.",
+    "alert.stale_data": "البيانات المخزنة عمرها {days} يوم — ابدأ مريضًا جديدًا إذا كانت قديمة",
+    "alert.checksum_mismatch": "عدم تطابق المجموع الاختباري — ربما تم تعديل الملف."
   },
   "he": {
     "sidebar.title": "אינסטרומנטציה שדרתית",
@@ -5830,7 +5866,9 @@
     "onboarding.next": "הבא",
     "onboarding.done": "סיום",
     "onboarding.skip": "דלגו על הסיור",
-    "alert.no_osteotomy_at_level": "כריתות עצם אינן זמינות ברמה זו."
+    "alert.no_osteotomy_at_level": "כריתות עצם אינן זמינות ברמה זו.",
+    "alert.stale_data": "הנתונים השמורים בני {days} ימים — התחל מטופל חדש אם הם מיושנים",
+    "alert.checksum_mismatch": "אי-התאמת סכום ביקורת — ייתכן שהקובץ שונה."
   },
   "zh-Hans": {
     "sidebar.title": "脊柱内固定",
@@ -6137,7 +6175,9 @@
     "onboarding.next": "下一步",
     "onboarding.done": "完成",
     "onboarding.skip": "跳过导览",
-    "alert.no_osteotomy_at_level": "此节段不可进行截骨术。"
+    "alert.no_osteotomy_at_level": "此节段不可进行截骨术。",
+    "alert.stale_data": "缓存数据已有 {days} 天 — 如果已过时请新建患者",
+    "alert.checksum_mismatch": "校验和不匹配——文件可能已被修改。"
   },
   "ja": {
     "sidebar.title": "脊椎インストゥルメンテーション",
@@ -6444,7 +6484,9 @@
     "onboarding.next": "次へ",
     "onboarding.done": "完了",
     "onboarding.skip": "ツアーをスキップ",
-    "alert.no_osteotomy_at_level": "このレベルでは骨切り術は行えません。"
+    "alert.no_osteotomy_at_level": "このレベルでは骨切り術は行えません。",
+    "alert.stale_data": "キャッシュデータは {days} 日前のものです — 古い場合は新規患者を開始してください",
+    "alert.checksum_mismatch": "チェックサム不一致——ファイルが変更された可能性があります。"
   },
   "ko": {
     "sidebar.title": "척추 기기 삽입술",
@@ -6751,7 +6793,9 @@
     "onboarding.next": "다음",
     "onboarding.done": "완료",
     "onboarding.skip": "투어 건너뛰기",
-    "alert.no_osteotomy_at_level": "이 레벨에서는 절골술을 사용할 수 없습니다."
+    "alert.no_osteotomy_at_level": "이 레벨에서는 절골술을 사용할 수 없습니다.",
+    "alert.stale_data": "캐시 데이터가 {days}일 경과했습니다 — 오래된 경우 새 환자를 시작하세요",
+    "alert.checksum_mismatch": "체크섬 불일치 — 파일이 수정되었을 수 있습니다."
   },
   "en-YK": {
     "sidebar.title": "Spinal Instrumentation",
@@ -6816,6 +6860,7 @@
     "onboarding.next": "Next",
     "onboarding.done": "That'll do",
     "onboarding.skip": "Skip t'tour",
-    "alert.no_osteotomy_at_level": "Can't do osteotomies there, like."
+    "alert.no_osteotomy_at_level": "Can't do osteotomies there, like.",
+    "alert.checksum_mismatch": "File checksum mismatch — summat's been changed in that file."
   }
 }

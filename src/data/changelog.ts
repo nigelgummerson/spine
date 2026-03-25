@@ -51,6 +51,9 @@ export const CHANGE_LOG: ChangeLogEntry[] = [
         "Hook icons now face the spine on both sides.",
         "Unstable level markers now persist and sync between dual windows.",
         "Improved dual-window reliability — New Patient and placement changes sync correctly.",
+        "Keyboard shortcuts — C/L/T/W switch view, P toggle pelvis, I implant tool, N note tool (disabled when modals are open).",
+        "Pelvis toggle in portrait toolbar now shows translated Show/Hide Pelvis text instead of bare P letter.",
+        "Quick reference page expanded to all 22 languages (was 16).",
     ]},
     { version: "v2.5.20-beta", date: "2026-03-24", changes: [
         "Portrait inventory tab — dedicated fourth tab with large readable text for theatre use.",

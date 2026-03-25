@@ -9,10 +9,11 @@ import '@fontsource/noto-sans-jp/400.css';
 import '@fontsource/noto-sans-kr/400.css';
 import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ToastProvider } from './hooks/useToast';
 import './styles.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root')!);
-root.render(<ErrorBoundary><App /></ErrorBoundary>);
+root.render(<ErrorBoundary><ToastProvider><App /></ToastProvider></ErrorBoundary>);
 
 // Register service worker for offline caching (web build only, not file://)
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {

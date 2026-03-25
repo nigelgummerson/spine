@@ -31,10 +31,12 @@ export interface LevelRowProps {
     // Layout props from ChartPaper
     chartWidth: number;
     rowY: number;
+    // Keyboard navigation focus
+    focusedZone?: 'left' | 'right' | 'mid';
 }
 
 /** SVG-native level row — renders as a <g> group at a given Y offset */
-export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements, ghostPlacements, onZoneClick, tools, onPlacementClick, onGhostClick, readOnly, showForces, heightScale, onDiscClick, cages, levels, viewMode, forcePlacements, ghostCages, onGhostCageClick, chartWidth, rowY }) => {
+export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements, ghostPlacements, onZoneClick, tools, onPlacementClick, onGhostClick, readOnly, showForces, heightScale, onDiscClick, cages, levels, viewMode, forcePlacements, ghostCages, onGhostCageClick, chartWidth, rowY, focusedZone }) => {
     const getItems = (z: string) => {
         const src = (forcePlacements && z.startsWith('force')) ? forcePlacements : placements;
         return src.filter(p => p.levelId === level.id && p.zone === z);
@@ -544,6 +546,23 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
                 </>
             }
             {showForces && renderZoneContent('force_right', forceRightX, forceW, 'center')}
+
+            {/* Keyboard navigation focus ring */}
+            {focusedZone && (() => {
+                const inset = 2;
+                let fx: number, fy: number, fw: number, fh: number;
+                if (focusedZone === 'mid') {
+                    fx = vertX + inset; fy = inset; fw = scaledWidth - inset * 2; fh = rowHeight - inset * 2;
+                } else if (focusedZone === 'left') {
+                    const zw = isSacral && !levels.some(l => l.id === 'S2') ? sideZoneW + scaledWidth / 2 : sideZoneW;
+                    fx = leftZoneX + inset; fy = inset; fw = zw - inset * 2; fh = rowHeight - inset * 2;
+                } else {
+                    const zx = isSacral && !levels.some(l => l.id === 'S2') ? vertX + scaledWidth / 2 : rightZoneX;
+                    const zw = isSacral && !levels.some(l => l.id === 'S2') ? sideZoneW + scaledWidth / 2 : sideZoneW;
+                    fx = zx + inset; fy = inset; fw = zw - inset * 2; fh = rowHeight - inset * 2;
+                }
+                return <rect x={fx} y={fy} width={fw} height={fh} rx={3} fill="none" stroke="#3b82f6" strokeWidth={2} pointerEvents="none" />;
+            })()}
 
             {/* Disc zone */}
             {renderDiscZone()}

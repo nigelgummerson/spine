@@ -34,8 +34,10 @@ import { Portal } from './components/Portal';
 import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, resetDisclaimer, getDisclaimerTimestamp } from './components/modals/DisclaimerModal';
 import { OnboardingTour } from './components/OnboardingTour';
 import { useDocumentState } from './hooks/useDocumentState';
+import { useToast } from './hooks/useToast';
 import { deserializeDocument } from './state/documentReducer';
 import { validateV4, validateLegacy, ValidationError } from './state/schema';
+import { computeChecksum, verifyChecksum } from './utils/checksum';
 import type { ColourScheme, ToolDefinition, Placement, Level, Zone, OsteotomyData, CageData, Cage, Note } from './types';
 
 /** Data shape returned by CageModal.onConfirm */
@@ -121,27 +123,19 @@ const App = () => {
     const [incognitoMode, setIncognitoMode] = useState(false);
     const [isEditingDate, setIsEditingDate] = useState(false);
 
-    // TOAST NOTIFICATIONS (defined before useDocumentState so showToast can be passed as parameter)
-    const [toasts, setToasts] = useState<Array<{id: number; message: string; type: string}>>([]);
-    const toastIdRef = useRef(0);
+    // TOAST NOTIFICATIONS (via context — ToastProvider wraps App in main.tsx)
+    const { showToast } = useToast();
     const lastClickRef = useRef({ x: 0, y: 0 });
     useEffect(() => {
-        const capture = (e: MouseEvent) => { lastClickRef.current = { x: e.clientX, y: e.clientY }; };
+        const capture = (e: MouseEvent) => {
+            lastClickRef.current = { x: e.clientX, y: e.clientY };
+            // Deactivate keyboard navigation on mouse click
+            setKbNavActive(false);
+            setKbFocusLevel(null);
+        };
         window.addEventListener('click', capture, true);
         return () => window.removeEventListener('click', capture, true);
     }, []);
-    const showToast = useCallback((message: string, type: string = 'info') => {
-        const id = ++toastIdRef.current;
-        setToasts(prev => [...prev, { id, message, type }]);
-        if (type !== 'error') setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
-    }, []);
-    const dismissToast = useCallback((id: number) => setToasts(prev => prev.filter(t => t.id !== id)), []);
-    const dismissAllToasts = useCallback(() => setToasts([]), []);
-    useEffect(() => {
-        const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && toasts.length > 0) dismissAllToasts(); };
-        window.addEventListener('keydown', handleKey);
-        return () => window.removeEventListener('keydown', handleKey);
-    }, [toasts.length, dismissAllToasts]);
 
     // DOCUMENT STATE (clinical data, sync, auto-save)
     const { state, dispatch, serialize, syncChannelRef, syncConnected, hasLoaded, canUndo, canRedo, undo, redo } = useDocumentState({
@@ -185,6 +179,11 @@ const App = () => {
     const [editingCageLevel, setEditingCageLevel] = useState<string | null>(null);
     const [discPickerLevel, setDiscPickerLevel] = useState<{ levelId: string; x: number; y: number } | null>(null);
     const [editingAnnotation, setEditingAnnotation] = useState('');
+
+    // KEYBOARD NAVIGATION STATE
+    const [kbFocusLevel, setKbFocusLevel] = useState<number | null>(null); // index into levels array
+    const [kbFocusZone, setKbFocusZone] = useState<'left' | 'right' | 'mid'>('left');
+    const [kbNavActive, setKbNavActive] = useState(false); // true only when navigating via keyboard
 
     const [defaultDiameter, setDefaultDiameter] = useState('6.5');
     const [defaultLength, setDefaultLength] = useState('45');
@@ -244,6 +243,28 @@ const App = () => {
         }
     }, [isPortrait, portraitTab]);
 
+    const levels = useMemo(() => {
+        const lvls = [];
+        // VIEW LOGIC
+        if (viewMode === 'whole' || viewMode === 'cervical') { lvls.push({ id: 'Oc', type: 'Oc' }); ['C1','C2','C3','C4','C5','C6','C7'].forEach(l => lvls.push({ id:l, type:'C' })); }
+
+        if (viewMode === 'cervical') { ['T1','T2','T3','T4'].forEach(l => lvls.push({ id:l, type:'T' })); }
+        else if (viewMode === 't10_pelvis') { ['T10','T11','T12'].forEach(l => lvls.push({ id:l, type:'T' })); }
+        else { ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'].forEach(l => lvls.push({ id:l, type:'T' })); }
+
+        if (viewMode !== 'cervical') {
+            ['L1','L2','L3','L4','L5'].forEach(l => lvls.push({ id:l, type:'L' }));
+            lvls.push({ id:'S1', type:'S' });
+            if (showPelvis) {
+                lvls.push({ id: 'S2', type: 'S' });
+                lvls.push({ id: 'S2AI', type: 'pelvic' });
+                lvls.push({ id: 'Iliac', type: 'pelvic' });
+                lvls.push({ id: 'SI-J', type: 'pelvic' });
+            }
+        }
+        return lvls;
+    }, [viewMode, showPelvis]);
+
     // KEYBOARD SHORTCUTS — only when no modal is open and no editable field is focused
     useEffect(() => {
         const handleShortcut = (e: KeyboardEvent) => {
@@ -267,6 +288,56 @@ const App = () => {
             const tag = (e.target as HTMLElement)?.tagName;
             if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target as HTMLElement)?.isContentEditable) return;
 
+            // Arrow key navigation for spine chart
+            const navLevels = levels.filter(l => l.type !== 'pelvic');
+            const zoneOrder: ('left' | 'mid' | 'right')[] = ['left', 'mid', 'right'];
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                setKbNavActive(true);
+                if (kbFocusLevel === null) {
+                    // Start at first visible level's left zone
+                    setKbFocusLevel(0);
+                    setKbFocusZone('left');
+                    return;
+                }
+                if (e.key === 'ArrowDown') {
+                    setKbFocusLevel(prev => prev !== null && prev < navLevels.length - 1 ? prev + 1 : prev);
+                } else if (e.key === 'ArrowUp') {
+                    setKbFocusLevel(prev => prev !== null && prev > 0 ? prev - 1 : prev);
+                } else if (e.key === 'ArrowRight') {
+                    setKbFocusZone(prev => {
+                        const idx = zoneOrder.indexOf(prev);
+                        return idx < zoneOrder.length - 1 ? zoneOrder[idx + 1] : prev;
+                    });
+                } else if (e.key === 'ArrowLeft') {
+                    setKbFocusZone(prev => {
+                        const idx = zoneOrder.indexOf(prev);
+                        return idx > 0 ? zoneOrder[idx - 1] : prev;
+                    });
+                }
+                return;
+            }
+            // Enter/Space — activate focused zone
+            if ((e.key === 'Enter' || e.key === ' ') && kbNavActive && kbFocusLevel !== null) {
+                e.preventDefault();
+                const focusedLvl = navLevels[kbFocusLevel];
+                if (focusedLvl) {
+                    if (kbFocusZone === 'mid') {
+                        handleZoneClick(focusedLvl.id, 'mid');
+                    } else {
+                        handleZoneClick(focusedLvl.id, kbFocusZone);
+                    }
+                }
+                return;
+            }
+            // Escape — clear keyboard focus
+            if (e.key === 'Escape' && kbNavActive) {
+                e.preventDefault();
+                setKbNavActive(false);
+                setKbFocusLevel(null);
+                return;
+            }
+
             switch (e.key.toLowerCase()) {
                 case 'c': setViewMode('cervical'); break;
                 case 'l': setViewMode('t10_pelvis'); break;
@@ -281,31 +352,16 @@ const App = () => {
         };
         window.addEventListener('keydown', handleShortcut);
         return () => window.removeEventListener('keydown', handleShortcut);
-    }, [screwModalOpen, osteoModalOpen, cageModalOpen, forceModalOpen, forcePopover, helpModalOpen, noteModalOpen, changeLogOpen, preferencesModalOpen, disclaimerAccepted, viewMode, canUndo, canRedo]);
-
-    const levels = useMemo(() => {
-        const lvls = [];
-        // VIEW LOGIC
-        if (viewMode === 'whole' || viewMode === 'cervical') { lvls.push({ id: 'Oc', type: 'Oc' }); ['C1','C2','C3','C4','C5','C6','C7'].forEach(l => lvls.push({ id:l, type:'C' })); }
-        
-        if (viewMode === 'cervical') { ['T1','T2','T3','T4'].forEach(l => lvls.push({ id:l, type:'T' })); }
-        else if (viewMode === 't10_pelvis') { ['T10','T11','T12'].forEach(l => lvls.push({ id:l, type:'T' })); }
-        else { ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'].forEach(l => lvls.push({ id:l, type:'T' })); }
-
-        if (viewMode !== 'cervical') {
-            ['L1','L2','L3','L4','L5'].forEach(l => lvls.push({ id:l, type:'L' }));
-            lvls.push({ id:'S1', type:'S' });
-            if (showPelvis) {
-                lvls.push({ id: 'S2', type: 'S' });
-                lvls.push({ id: 'S2AI', type: 'pelvic' });
-                lvls.push({ id: 'Iliac', type: 'pelvic' });
-                lvls.push({ id: 'SI-J', type: 'pelvic' });
-            }
-        }
-        return lvls;
-    }, [viewMode, showPelvis]);
+    }, [screwModalOpen, osteoModalOpen, cageModalOpen, forceModalOpen, forcePopover, helpModalOpen, noteModalOpen, changeLogOpen, preferencesModalOpen, disclaimerAccepted, viewMode, canUndo, canRedo, levels, kbFocusLevel, kbFocusZone, kbNavActive]);
 
     const heightScale = useMemo(() => calculateAutoScale(levels), [levels]);
+
+    // Compute focused level ID for keyboard navigation (excludes pelvic levels)
+    const navLevels = useMemo(() => levels.filter(l => l.type !== 'pelvic'), [levels]);
+    const kbFocusLevelId = kbNavActive && kbFocusLevel !== null && kbFocusLevel < navLevels.length ? navLevels[kbFocusLevel].id : null;
+
+    // Reset keyboard focus when view mode changes (levels change)
+    useEffect(() => { setKbFocusLevel(null); setKbNavActive(false); }, [viewMode, showPelvis]);
 
     const scheme: ColourScheme = COLOUR_SCHEMES.find(s => s.id === colourScheme) || COLOUR_SCHEMES[0];
 
@@ -757,72 +813,106 @@ const App = () => {
         setActiveChart(useFinal ? 'completed' : 'planned');
         setShowFinalInventory(useFinal);
         await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-        if (format === 'jpg') await runExportJPG();
-        else await runExportPDF();
+        try {
+            if (format === 'jpg') await runExportJPG();
+            else await runExportPDF();
+        } catch (err) {
+            console.error('Export failed:', err);
+            showToast('Export failed', 'error');
+            setPortraitExporting(false);
+        }
     };
     const runExportJPG = async () => {
-        const canvas = await prepareExportCanvas();
-        const link = document.createElement('a');
-        link.download = `SpinePlan_${patientData.name || 'Patient'}.jpg`;
-        link.href = canvas.toDataURL('image/jpeg', 0.85);
-        link.click();
-        if (incognitoMode) localStorage.removeItem('spine_planner_v2');
-        setPortraitExporting(false);
+        try {
+            const canvas = await prepareExportCanvas();
+            const link = document.createElement('a');
+            link.download = `SpinePlan_${patientData.name || 'Patient'}.jpg`;
+            link.href = canvas.toDataURL('image/jpeg', 0.85);
+            link.click();
+            if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+        } catch (err) {
+            console.error('JPG export failed:', err);
+            showToast('Export failed', 'error');
+        } finally {
+            setPortraitExporting(false);
+        }
     };
     const runExportPDF = async () => {
-        const canvas = await prepareExportCanvas();
-        const imgData = canvas.toDataURL('image/jpeg', 0.85);
-        const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
-        // Check if demographics panel overflows — if so, add inventory page
-        const demoCol = exportRef.current?.querySelector('.w-\\[370px\\]');
-        if (demoCol && demoCol.scrollHeight > demoCol.clientHeight + 20) {
-            // Build a standalone inventory page off-screen
-            const invPage = document.createElement('div');
-            invPage.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:595px;height:842px;background:white;padding:40px;font-family:Inter,sans-serif;box-sizing:border-box;';
-            invPage.innerHTML = `<div style="border-bottom:2px solid #1e293b;padding-bottom:8px;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:#1e293b">${patientData.name || 'Patient'}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${patientData.id ? patientData.id + ' — ' : ''}${formatDate(patientData.date)}${patientData.surgeon ? ' — ' + patientData.surgeon : ''}</div></div>`;
-            // Clone the inventory content
-            const invSource = demoCol.querySelector('.mt-2.border-t');
-            if (invSource) {
-                const invClone = invSource.cloneNode(true) as HTMLElement;
-                invClone.style.cssText = 'columns:1;margin:0;padding:0;';
-                // Remove 2-column layout for full-page rendering
-                const colDiv = invClone.querySelector('[style*="columns"]') as HTMLElement | null;
-                if (colDiv) colDiv.style.columns = '2';
-                invPage.appendChild(invClone);
+        let invPage: HTMLElement | null = null;
+        try {
+            const canvas = await prepareExportCanvas();
+            const imgData = canvas.toDataURL('image/jpeg', 0.85);
+            const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
+            // Check if demographics panel overflows — if so, add inventory page
+            const demoCol = exportRef.current?.querySelector('.w-\\[370px\\]');
+            if (demoCol && demoCol.scrollHeight > demoCol.clientHeight + 20) {
+                // Build a standalone inventory page off-screen
+                invPage = document.createElement('div');
+                invPage.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:595px;height:842px;background:white;padding:40px;font-family:Inter,sans-serif;box-sizing:border-box;';
+                invPage.innerHTML = `<div style="border-bottom:2px solid #1e293b;padding-bottom:8px;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:#1e293b">${patientData.name || 'Patient'}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${patientData.id ? patientData.id + ' — ' : ''}${formatDate(patientData.date)}${patientData.surgeon ? ' — ' + patientData.surgeon : ''}</div></div>`;
+                // Clone the inventory content
+                const invSource = demoCol.querySelector('.mt-2.border-t');
+                if (invSource) {
+                    const invClone = invSource.cloneNode(true) as HTMLElement;
+                    invClone.style.cssText = 'columns:1;margin:0;padding:0;';
+                    // Remove 2-column layout for full-page rendering
+                    const colDiv = invClone.querySelector('[style*="columns"]') as HTMLElement | null;
+                    if (colDiv) colDiv.style.columns = '2';
+                    invPage.appendChild(invClone);
+                }
+                document.body.appendChild(invPage);
+                try {
+                    const invCanvas = await htmlToImage.toCanvas(invPage, { pixelRatio: 2, backgroundColor: '#ffffff', width: 595, height: 842 });
+                    pdf.addPage('a4', 'portrait');
+                    pdf.addImage(invCanvas.toDataURL('image/jpeg', 1.0), 'JPEG', 0, 0, 210, 297);
+                } catch (e) { console.error('Inventory page export failed:', e); }
             }
-            document.body.appendChild(invPage);
-            try {
-                const invCanvas = await htmlToImage.toCanvas(invPage, { pixelRatio: 2, backgroundColor: '#ffffff', width: 595, height: 842 });
-                pdf.addPage('a4', 'portrait');
-                pdf.addImage(invCanvas.toDataURL('image/jpeg', 1.0), 'JPEG', 0, 0, 210, 297);
-            } catch (e) { console.error('Inventory page export failed:', e); }
-            document.body.removeChild(invPage);
+            pdf.save(`SpinePlan_${patientData.name || 'Patient'}.pdf`);
+            if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+        } catch (err) {
+            console.error('PDF export failed:', err);
+            showToast('Export failed', 'error');
+        } finally {
+            if (invPage && invPage.parentNode) document.body.removeChild(invPage);
+            setPortraitExporting(false);
         }
-        pdf.save(`SpinePlan_${patientData.name || 'Patient'}.pdf`);
-        if (incognitoMode) localStorage.removeItem('spine_planner_v2');
-        setPortraitExporting(false);
     };
-    const saveProjectJSON = () => {
-        const data = serialize();
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `SpineProject_${(patientData.name || 'Unnamed').replace(/[^a-zA-Z0-9_\- ]/g, '').trim() || 'Unnamed'}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-        if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+    const saveProjectJSON = async () => {
+        let link: HTMLAnchorElement | null = null;
+        let blobUrl: string | null = null;
+        try {
+            const data = serialize() as Record<string, unknown>;
+            const checksum = await computeChecksum(data);
+            (data.document as Record<string, unknown>).checksum = checksum;
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            link = document.createElement('a');
+            blobUrl = URL.createObjectURL(blob);
+            link.href = blobUrl;
+            link.download = `SpineProject_${(patientData.name || 'Unnamed').replace(/[^a-zA-Z0-9_\- ]/g, '').trim() || 'Unnamed'}.json`;
+            document.body.appendChild(link);
+            link.click();
+            if (incognitoMode) localStorage.removeItem('spine_planner_v2');
+        } catch (err) {
+            console.error('Save failed:', err);
+            showToast('Save failed', 'error');
+        } finally {
+            if (link && link.parentNode) document.body.removeChild(link);
+            if (blobUrl) URL.revokeObjectURL(blobUrl);
+        }
     };
     const loadProjectJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]; if (!file) return;
         const reader = new FileReader();
-        reader.onload = (ev) => {
+        reader.onload = async (ev) => {
             try {
                 const json = JSON.parse(ev.target?.result as string);
                 if (json.schema?.version === 4) {
                     validateV4(json);
+                    const checksumResult = await verifyChecksum(json);
+                    if (checksumResult === 'mismatch') {
+                        showToast(t('alert.checksum_mismatch'), 'error');
+                    }
                     const result = deserializeDocument(json);
                     dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
                     if (result.viewMode) setViewMode(result.viewMode);
@@ -911,9 +1001,9 @@ const App = () => {
         </React.Fragment>
     );
 
-    const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={heightScale} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('planLeftRod', e.target.innerText)} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('planRightRod', e.target.innerText)} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} isActive={activeChart === 'planned'} activeBg={scheme.activeBg} activeText={scheme.activeText} />;
+    const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={heightScale} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('planLeftRod', e.target.innerText)} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('planRightRod', e.target.innerText)} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} isActive={activeChart === 'planned'} activeBg={scheme.activeBg} activeText={scheme.activeText} focusedLevelId={activeChart === 'planned' ? kbFocusLevelId : null} focusedZone={kbFocusZone} />;
 
-    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={heightScale} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('leftRod', e.target.innerText)} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('rightRod', e.target.innerText)} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} isActive={activeChart === 'completed'} activeBg={scheme.activeBg} activeText={scheme.activeText} />;
+    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={heightScale} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('leftRod', e.target.innerText)} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('rightRod', e.target.innerText)} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} isActive={activeChart === 'completed'} activeBg={scheme.activeBg} activeText={scheme.activeText} focusedLevelId={activeChart === 'completed' ? kbFocusLevelId : null} focusedZone={kbFocusZone} />;
 
     const newPatientAction = () => setConfirmNewPatient(true);
     const executeNewPatient = () => {
@@ -1251,15 +1341,7 @@ const App = () => {
                         </div>
                     </div>
                 )}
-            {/* Toast notifications */}
-            {toasts.length > 0 && <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2 pointer-events-none">
-                {toasts.map(toast => (
-                    <div key={toast.id} className={`pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium animate-[fadeIn_0.2s_ease-out] ${toast.type === 'error' ? 'bg-red-800 text-white' : 'bg-slate-800 text-white'}`}>
-                        <span className="flex-1">{toast.message}</span>
-                        <button onClick={() => dismissToast(toast.id)} className="shrink-0 hover:brightness-125 text-xs font-bold">✕</button>
-                    </div>
-                ))}
-            </div>}
+            {/* Toast notifications rendered by ToastProvider in main.tsx */}
             {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerTick(n => n + 1); if (syncChannelRef.current) syncChannelRef.current.postMessage({ type: 'lang_accepted', appVersion: CURRENT_VERSION, lang: currentLang }); }} />}
             </div>
         );
@@ -1418,15 +1500,7 @@ const App = () => {
                     </div>
                 </div>
             </div>
-            {/* Toast notifications */}
-            {toasts.length > 0 && <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2 pointer-events-none">
-                {toasts.map(toast => (
-                    <div key={toast.id} className={`pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium animate-[fadeIn_0.2s_ease-out] ${toast.type === 'error' ? 'bg-red-800 text-white' : 'bg-slate-800 text-white'}`}>
-                        <span className="flex-1">{toast.message}</span>
-                        <button onClick={() => dismissToast(toast.id)} className="shrink-0 hover:brightness-125 text-xs font-bold">✕</button>
-                    </div>
-                ))}
-            </div>}
+            {/* Toast notifications rendered by ToastProvider in main.tsx */}
             {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerTick(n => n + 1); if (syncChannelRef.current) syncChannelRef.current.postMessage({ type: 'lang_accepted', appVersion: CURRENT_VERSION, lang: currentLang }); }} />}
             {disclaimerAccepted && <OnboardingTour activeChart={activeChart} setActiveChart={setActiveChart} />}
         </div>

@@ -6,6 +6,7 @@ import { CURRENT_VERSION } from '../data/changelog';
 import { acceptDisclaimer } from '../components/modals/DisclaimerModal';
 import { validateV4, validateLegacy, ValidationError } from '../state/schema';
 import { migrateStoredData } from '../state/migrations';
+import { t } from '../i18n/i18n';
 import type { DocumentState, DocumentAction } from '../types';
 
 /** Validate sync payload using the same Zod checks as file load */
@@ -117,6 +118,15 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
                     dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
                     if (result.viewMode) setViewMode(result.viewMode);
                     if (result.colourScheme) changeTheme(result.colourScheme);
+                    // Stale data warning — check document.modified timestamp
+                    const modified = parsed.document?.modified;
+                    if (modified && !incognitoMode) {
+                        const ageMs = Date.now() - new Date(modified).getTime();
+                        const ageDays = Math.floor(ageMs / (24 * 60 * 60 * 1000));
+                        if (ageDays >= 7) {
+                            showToast?.(t('alert.stale_data', { days: ageDays }), 'warn');
+                        }
+                    }
                 } else if (parsed.formatVersion >= 2) {
                     validateLegacy(parsed);
                     const result = deserializeDocument(parsed);

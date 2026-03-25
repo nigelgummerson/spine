@@ -46,6 +46,8 @@ export interface ChartPaperProps {
     isActive?: boolean;
     activeBg?: string;
     activeText?: string;
+    focusedLevelId?: string | null;
+    focusedZone?: 'left' | 'right' | 'mid';
 }
 
 // Header area height in SVG units
@@ -54,7 +56,7 @@ const COL_HEADER_H = 20;  // Column headers (LEFT / RIGHT / FORCE)
 const ROD_HEADER_H = 22;  // Rod text row
 const CONTENT_TOP = TITLE_H + COL_HEADER_H + ROD_HEADER_H;
 
-export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements, ghostConnectors, onGhostConnectorClick, ghostCages, onGhostCageClick, reconLabelPositions, onReconLabelUpdate, onPelvisZoneClick, isActive, activeBg, activeText }) => {
+export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements, ghostConnectors, onGhostConnectorClick, ghostCages, onGhostCageClick, reconLabelPositions, onReconLabelUpdate, onPelvisZoneClick, isActive, activeBg, activeText, focusedLevelId, focusedZone }) => {
     const svgRef = useRef<SVGSVGElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [chartWidth, setChartWidth] = useState(500);
@@ -270,7 +272,8 @@ export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placem
                         tools={tools} readOnly={readOnly} showForces={showForces} heightScale={heightScale}
                         cages={cages} onDiscClick={onDiscClick} levels={levels} viewMode={viewMode}
                         forcePlacements={forcePlacements} ghostCages={ghostCages} onGhostCageClick={onGhostCageClick}
-                        chartWidth={chartWidth} rowY={levelYOffsets[lvl.id] || 0} />
+                        chartWidth={chartWidth} rowY={levelYOffsets[lvl.id] || 0}
+                        focusedZone={focusedLevelId === lvl.id ? focusedZone : undefined} />
                 ))}
                 {/* Pelvis ghost targets — rendered ON TOP of level rows */}
                 {levels.some(l => l.type === 'pelvic' || l.id === 'S2') && levelYOffsets['L5'] !== undefined && (
