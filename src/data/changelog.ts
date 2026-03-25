@@ -1,6 +1,6 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION: string = "v2.7.0-beta";
+export const CURRENT_VERSION: string = "v2.7.1-beta";
 
 interface ChangeLogEntry {
     version: string;

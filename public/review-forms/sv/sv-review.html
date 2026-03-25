@@ -190,7 +190,7 @@
         <div class="header-top">
             <div>
                 <h1>Spinal Instrumentation Plan & Record: Translation Review</h1>
-                <span class="lang-badge">Swedish / Svenska (sv) — v2.7.0-beta</span>
+                <span class="lang-badge">Swedish / Svenska (sv) — v2.7.1-beta</span>
             </div>
             <div class="header-actions">
                 <a href="../guide.html" target="_blank" style="color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: none; padding: 6px 10px;" title="How to use this form">Guide</a>
@@ -202,7 +202,7 @@
         </div>
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-            <div class="progress-text" id="progress-text">0 of 296 items reviewed (0%)</div>
+            <div class="progress-text" id="progress-text">0 of 298 items reviewed (0%)</div>
             <div class="save-hint" id="save-hint"></div>
         </div>
     </div>
@@ -237,7 +237,7 @@
             <a href="#section-11" class="nav-link" data-section="11">Export &amp; Column Headers <span class="nav-count" id="nav-count-11">0/4</span></a>
             <a href="#section-12" class="nav-link" data-section="12">Help Modal <span class="nav-count" id="nav-count-12">0/25</span></a>
             <a href="#section-13" class="nav-link" data-section="13">Common Buttons &amp; Shortcuts <span class="nav-count" id="nav-count-13">0/7</span></a>
-            <a href="#section-14" class="nav-link" data-section="14">Alerts &amp; Confirmations <span class="nav-count" id="nav-count-14">0/16</span></a>
+            <a href="#section-14" class="nav-link" data-section="14">Alerts &amp; Confirmations <span class="nav-count" id="nav-count-14">0/18</span></a>
             <a href="#section-15" class="nav-link" data-section="15">Credits &amp; Disclaimer <span class="nav-count" id="nav-count-15">0/12</span></a>
             <a href="#section-16" class="nav-link" data-section="16">Version History Modal <span class="nav-count" id="nav-count-16">0/1</span></a>
             <a href="#section-17" class="nav-link" data-section="17">Other <span class="nav-count" id="nav-count-17">0/12</span></a>
@@ -8869,6 +8869,39 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="alert.checksum_mismatch" data-section="14" id="item-alert.checksum_mismatch">
+            <div class="item-header">
+                <code class="key-label">alert.checksum_mismatch</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">File checksum mismatch — the file may have been modified.</div>
+                </div>
+                <div class="col-translation">
+                    <label>Svenska</label>
+                    <textarea class="translation-field" data-key="alert.checksum_mismatch" data-original="Kontrollsumma stämmer inte — filen kan ha ändrats.">Kontrollsumma stämmer inte — filen kan ha ändrats.</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-alert.checksum_mismatch" value="correct" data-key="alert.checksum_mismatch">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-alert.checksum_mismatch" value="corrected" data-key="alert.checksum_mismatch">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="alert.checksum_mismatch" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="alert.clear_construct" data-section="14" id="item-alert.clear_construct">
             <div class="item-header">
                 <code class="key-label">alert.clear_construct</code>
@@ -9262,6 +9295,39 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="alert.redone" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="alert.stale_data" data-section="14" id="item-alert.stale_data">
+            <div class="item-header">
+                <code class="key-label">alert.stale_data</code>
+                <span class="hint placeholder-hint">Contains {placeholders}: keep braces intact</span>
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Cached data is {days} days old — start New Patient if this is outdated</div>
+                </div>
+                <div class="col-translation">
+                    <label>Svenska</label>
+                    <textarea class="translation-field" data-key="alert.stale_data" data-original="Cachad data är {days} dagar gammal — starta en ny patient om den är inaktuell">Cachad data är {days} dagar gammal — starta en ny patient om den är inaktuell</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-alert.stale_data" value="correct" data-key="alert.stale_data">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-alert.stale_data" value="corrected" data-key="alert.stale_data">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="alert.stale_data" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -10222,7 +10288,7 @@
     (function() {
         const LANG = "sv";
         const STORAGE_KEY = "spine_review_" + LANG;
-        const TOTAL = 296;
+        const TOTAL = 298;
 
         // --- Reviewer details ---
 
