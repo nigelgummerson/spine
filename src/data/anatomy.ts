@@ -83,7 +83,7 @@ export const REGIONS: Record<string, { height: number; color: string }> = {
 // tpW = transverse process projection per side, from Tan TPW: (TPW - EPWl)/2 * 1.143.
 export const VERTEBRA_ANATOMY: Record<string, VertAnatomyEntry> = {
     Oc:  { region: 'occiput', bodyW: 78, bodyH: 12, foramenMagnumW: 35, condyleW: 22 },
-    C1:  { region: 'cervical-upper', bodyW: 22, bodyH: 10, latMassW: 16, latMassH: 12, totalWidth: 80 },
+    C1:  { region: 'cervical-upper', bodyW: 22, bodyH: 10, latMassW: 16, latMassH: 12, totalWidth: 58 },
     C2:  { region: 'cervical-upper', bodyW: 18, bodyH: 20, latMassW: 12, latMassH: 14, totalWidth: 54 },
     C3:  { region: 'cervical-subaxial', bodyW: 18.0, bodyH: 15.1, latMassW: 12.5, latMassH: 12 },
     C4:  { region: 'cervical-subaxial', bodyW: 18.3, bodyH: 15.2, latMassW: 13, latMassH: 12.5 },
