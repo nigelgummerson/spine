@@ -3,6 +3,13 @@ import { t } from '../i18n/i18n';
 import { INVENTORY_CATEGORIES, getDiscLabel } from '../data/clinical';
 import type { Placement, ToolDefinition, Level } from '../types';
 
+/** Format screw size "7x50" → "7.0x50" (always 1dp on diameter) */
+const formatScrewSize = (s: string): string => {
+    const m = s.match(/^(\d+\.?\d*)x(\d+)$/);
+    if (!m) return s;
+    return `${Number(m[1]).toFixed(1)}x${m[2]}`;
+};
+
 interface Rods {
     left?: string;
     right?: string;
@@ -29,7 +36,7 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
             const isFixation = ['band','wire','cable'].includes(p.tool);
             let key = toolLabel;
             if (p.data && !isFixation) {
-                if (typeof p.data === 'string' && tool.needsSize) { key = `${toolLabel} (${p.data}mm)`; }
+                if (typeof p.data === 'string' && tool.needsSize) { key = `${toolLabel} (${formatScrewSize(p.data)}mm)`; }
                 else if (p.tool === 'osteotomy' && typeof p.data === 'object') { const od = p.data as any; key = od.angle != null && od.angle !== '' ? `${od.shortLabel} (${od.angle}°)` : od.shortLabel; }
                 else if (typeof p.data === 'object' && (p.data as any).height) {
                     const cd = p.data as any;

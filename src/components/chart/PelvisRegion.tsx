@@ -3,6 +3,13 @@ import { getLevelHeight, getVertSvgGeometry, VERT_PAD } from '../../data/anatomy
 import { InstrumentIcon } from './InstrumentIcon';
 import type { Placement, ToolDefinition } from '../../types';
 
+/** Format screw size "7x50" → "7.0x50" (always 1dp on diameter) */
+const formatScrewSize = (s: string): string => {
+    const m = s.match(/^(\d+\.?\d*)x(\d+)$/);
+    if (!m) return s;
+    return `${Number(m[1]).toFixed(1)}x${m[2]}`;
+};
+
 interface PelvisRegionProps {
     chartWidth: number;
     scaledWidth: number;
@@ -117,8 +124,8 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                     stroke={boneStroke} strokeWidth={1 * Math.min(1, heightScale)} strokeOpacity={0.4} />
             </g>}
 
-            {/* GHOST TARGETS — rendered as overlay on top of level rows */}
-            {overlay && !readOnly && (() => {
+            {/* Pelvic screws + ghost targets — rendered as overlay on top of level rows */}
+            {overlay && (() => {
                 // Match LevelRow ghost target size: screwPx * 0.4
                 const iconScale = Math.max(0.65, Math.min(1.3, heightScale));
                 const screwPx = Math.round(24 * iconScale);
@@ -165,9 +172,10 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                 };
 
                 // Iliac screw entry: at PSIS (~S2 level), in the iliac wing body
+                // Offset by one screw width laterally so they sit further out on the wing
                 const iliacY = s2Y + s2H * 0.4;
-                const iliacLeftX = cx - wingExtent * 0.5;
-                const iliacRightX = cx + wingExtent * 0.5;
+                const iliacLeftX = cx - wingExtent * 0.5 - screwPx;
+                const iliacRightX = cx + wingExtent * 0.5 + screwPx;
 
                 // SI fusion: clickable zone highlighting the SI joint at S1 and upper S2
                 const siZoneTop = s1Y;
@@ -175,7 +183,7 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                 const siY = (siZoneTop + siZoneBottom) / 2; // midpoint for placed screw rendering
 
                 const hitR = r * 1.8; // larger hit area
-                const ghostTarget = (x: number, y: number, label: string, zone: string) => (
+                const ghostTarget = (x: number, y: number, label: string, zone: string, side?: 'left' | 'right') => (
                     <g key={zone} cursor="crosshair"
                         onClick={(e) => { e.stopPropagation(); onZoneClick?.(zone); }}>
                         {/* Hit area with hover highlight */}
@@ -185,8 +193,14 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                         <g opacity={0.5} pointerEvents="none">
                             <circle cx={x} cy={y} r={r} fill="none" stroke="#94a3b8" strokeWidth={2} strokeDasharray="4 3" />
                             <circle cx={x} cy={y} r={1.5} fill="#94a3b8" />
-                            <text x={x} y={y + r + fontSize + 1} textAnchor="middle" fontSize={fontSize}
-                                fontWeight="bold" fill="#94a3b8" fontFamily="Inter, sans-serif">{label}</text>
+                            {side ? (
+                                <text x={side === 'left' ? x - r - 3 : x + r + 3} y={y + fontSize * 0.35}
+                                    textAnchor={side === 'left' ? 'end' : 'start'} fontSize={fontSize}
+                                    fontWeight="bold" fill="#94a3b8" fontFamily="Inter, sans-serif">{label}</text>
+                            ) : (
+                                <text x={x} y={y + r + fontSize + 1} textAnchor="middle" fontSize={fontSize}
+                                    fontWeight="bold" fill="#94a3b8" fontFamily="Inter, sans-serif">{label}</text>
+                            )}
                         </g>
                     </g>
                 );
@@ -209,7 +223,7 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                 );
 
                 // SI fusion zone — angled zone following the SI joint line
-                const siZone = (topX: number, bottomX: number, zone: string, label: string) => {
+                const siZone = (topX: number, bottomX: number, zone: string) => {
                     const halfW = 10 * heightScale;
                     const pathD = `
                         M${topX - halfW},${siZoneTop}
@@ -226,8 +240,6 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                                 onMouseLeave={(e) => (e.target as SVGPathElement).setAttribute('fill', 'transparent')} />
                             <g opacity={0.5} pointerEvents="none">
                                 <path d={pathD} fill="none" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="4 3" />
-                                <text x={(topX + bottomX) / 2} y={siZoneBottom + fontSize + 2} textAnchor="middle" fontSize={fontSize}
-                                    fontWeight="bold" fill="#94a3b8" fontFamily="Inter, sans-serif">{label}</text>
                             </g>
                         </g>
                     );
@@ -311,6 +323,9 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                 const siLabelPx = Math.round(labelPx * 0.8);
 
                 // Render a placed screw icon with positioned label
+                // Tiny "Iliac" label font size — small but readable
+                const iliacLabelPx = Math.max(6, Math.round(8 * heightScale));
+
                 const placedScrew = (x: number, y: number, p: Placement, side: 'left' | 'right', variant: Variant = 'standard') => {
                     const tool = tools?.find(t => t.id === p.tool);
                     const isSi = variant === 'si';
@@ -324,14 +339,24 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                         <g key={p.id} cursor={readOnly ? 'default' : 'pointer'}
                             onClick={(e) => { e.stopPropagation(); if (!readOnly && onPlacementClick) onPlacementClick(p); }}>
                             <svg x={x - sW / 2} y={y - sH / 2} width={sW} height={sH} overflow="visible">
-                                <InstrumentIcon type={tool?.icon || 'polyaxial'} className="w-full h-full" />
+                                <InstrumentIcon type={tool?.icon || 'polyaxial'} className="w-full h-full" side={side} />
                             </svg>
                             {isS2ai && s2aiArrow(x, y, dirX, '#475569')}
                             {p.data && typeof p.data === 'string' && (
                                 <text x={tp.tx} y={tp.ty} textAnchor={tp.anchor} fontSize={fPx}
                                     fontFamily="Inter, sans-serif" fontWeight="bold" fill="#0f172a">
-                                    {p.data}
+                                    {formatScrewSize(p.data as string)}
                                 </text>
+                            )}
+                            {variant === 'iliac' && (
+                                <text x={side === 'left' ? x - iW / 2 - 3 : x + iW / 2 + 3}
+                                    y={y + iliacLabelPx * 0.35} textAnchor={side === 'left' ? 'end' : 'start'}
+                                    fontSize={iliacLabelPx} fontFamily="Inter, sans-serif" fontWeight="bold" fill="#0f172a">Iliac</text>
+                            )}
+                            {variant === 'si' && (
+                                <text x={side === 'left' ? x + sW / 2 + 3 : x - sW / 2 - 3}
+                                    y={y + iliacLabelPx * 0.35} textAnchor={side === 'left' ? 'start' : 'end'}
+                                    fontSize={iliacLabelPx} fontFamily="Inter, sans-serif" fontWeight="bold" fill="#0f172a">SI-J</text>
                             )}
                         </g>
                     );
@@ -351,25 +376,36 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                         <g key={'ghost-' + p.id} opacity={0.75} cursor="pointer"
                             onClick={(e) => { e.stopPropagation(); if (onGhostClick) onGhostClick(p); }}>
                             <svg x={x - sW / 2} y={y - sH / 2} width={sW} height={sH} overflow="visible">
-                                <InstrumentIcon type={tool?.icon || 'polyaxial'} className="w-full h-full" color="#14b8a6" />
+                                <InstrumentIcon type={tool?.icon || 'polyaxial'} className="w-full h-full" color="#14b8a6" side={side} />
                             </svg>
                             {isS2ai && s2aiArrow(x, y, dirX, '#14b8a6')}
                             {p.data && typeof p.data === 'string' && (
                                 <text x={tp.tx} y={tp.ty} textAnchor={tp.anchor} fontSize={fPx}
                                     fontFamily="Inter, sans-serif" fontWeight="bold" fill="#0f172a">
-                                    {p.data}
+                                    {formatScrewSize(p.data as string)}
                                 </text>
+                            )}
+                            {variant === 'iliac' && (
+                                <text x={side === 'left' ? x - iW / 2 - 3 : x + iW / 2 + 3}
+                                    y={y + iliacLabelPx * 0.35} textAnchor={side === 'left' ? 'end' : 'start'}
+                                    fontSize={iliacLabelPx} fontFamily="Inter, sans-serif" fontWeight="bold" fill="#0f172a">Iliac</text>
+                            )}
+                            {variant === 'si' && (
+                                <text x={side === 'left' ? x + sW / 2 + 3 : x - sW / 2 - 3}
+                                    y={y + iliacLabelPx * 0.35} textAnchor={side === 'left' ? 'start' : 'end'}
+                                    fontSize={iliacLabelPx} fontFamily="Inter, sans-serif" fontWeight="bold" fill="#0f172a">SI-J</text>
                             )}
                         </g>
                     );
                 };
 
-                // Render: placed > ghost > empty ghost target
+                // Render: placed > ghost > empty ghost target (targets only when interactive)
                 const renderZone = (x: number, y: number, levelId: string, zone: string, side: 'left' | 'right', variant: Variant, emptyRenderer: () => React.ReactElement) => {
                     const placed = findPlacement(levelId, zone);
                     if (placed) return placedScrew(x, y, placed, side, variant);
                     const ghost = findGhost(levelId, zone);
                     if (ghost) return ghostScrew(x, y, ghost, side, variant);
+                    if (readOnly) return null;
                     return emptyRenderer();
                 };
 
@@ -385,11 +421,11 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                         {renderZone(s2aiLeftX, s2aiY, 'S1', 's2ai_left', 'left', 's2ai_left', () => s2aiTarget(s2aiLeftX, s2aiY, 's2ai_left', -1))}
                         {renderZone(s2aiRightX, s2aiY, 'S1', 's2ai_right', 'right', 's2ai_right', () => s2aiTarget(s2aiRightX, s2aiY, 's2ai_right', 1))}
                         {/* Iliac */}
-                        {renderZone(iliacLeftX, iliacY, 'S1', 'iliac_left', 'left', 'iliac', () => ghostTarget(iliacLeftX, iliacY, 'Iliac', 'iliac_left'))}
-                        {renderZone(iliacRightX, iliacY, 'S1', 'iliac_right', 'right', 'iliac', () => ghostTarget(iliacRightX, iliacY, 'Iliac', 'iliac_right'))}
+                        {renderZone(iliacLeftX, iliacY, 'S1', 'iliac_left', 'left', 'iliac', () => ghostTarget(iliacLeftX, iliacY, 'Iliac', 'iliac_left', 'left'))}
+                        {renderZone(iliacRightX, iliacY, 'S1', 'iliac_right', 'right', 'iliac', () => ghostTarget(iliacRightX, iliacY, 'Iliac', 'iliac_right', 'right'))}
                         {/* SI fusion — medial to SI joint */}
-                        {renderZone(siLeftTop + r * 2 + r, siZoneTop + (siZoneBottom - siZoneTop) * 0.3 + r, 'S1', 'si_left', 'left', 'si', () => siZone(siLeftTop - siGap, siLeftBottom - siGap, 'si_left', 'SI'))}
-                        {renderZone(siRightTop - r * 2 - r, siZoneTop + (siZoneBottom - siZoneTop) * 0.3 + r, 'S1', 'si_right', 'right', 'si', () => siZone(siRightTop + siGap, siRightBottom + siGap, 'si_right', 'SI'))}
+                        {renderZone(siLeftTop + r * 2 + r, siZoneTop + (siZoneBottom - siZoneTop) * 0.3 + r, 'S1', 'si_left', 'left', 'si', () => siZone(siLeftTop - siGap, siLeftBottom - siGap, 'si_left'))}
+                        {renderZone(siRightTop - r * 2 - r, siZoneTop + (siZoneBottom - siZoneTop) * 0.3 + r, 'S1', 'si_right', 'right', 'si', () => siZone(siRightTop + siGap, siRightBottom + siGap, 'si_right'))}
                     </g>
                 );
             })()}

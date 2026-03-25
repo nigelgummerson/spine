@@ -5,6 +5,7 @@ interface InstrumentIconProps {
     type: string;
     className?: string;
     color?: string;
+    side?: 'left' | 'right';
 }
 
 interface HookBaseProps {
@@ -12,8 +13,25 @@ interface HookBaseProps {
     label: string;
 }
 
-export const InstrumentIcon = ({ type, className = "w-5 h-5", color = "black" }: InstrumentIconProps) => {
-    const strokeWidth = 2.5; const HookBase = ({ direction, label }: HookBaseProps) => (<svg viewBox="0 0 40 24" className={className}>{direction === 'up' ? <path d="M12 18V6m0 0l-4 4m4-4l4 4m-8 12h8" stroke={color} fill="none" strokeWidth={strokeWidth} /> : <path d="M12 6v12m0 0l-4-4m4 4l4-4m-8-12h8" stroke={color} fill="none" strokeWidth={strokeWidth} />}<text x="22" y="17" fontSize="14" fontWeight="bold" fontFamily="serif" fill={color}>{label}</text></svg>);
+export const InstrumentIcon = ({ type, className = "w-5 h-5", color = "black", side }: InstrumentIconProps) => {
+    const strokeWidth = 2.5;
+    // Arrow nearest spine: for right-side placements arrow is on left (default),
+    // for left-side placements arrow is on right (mirrored)
+    const mirrored = side === 'left';
+    const HookBase = ({ direction, label }: HookBaseProps) => {
+        const cx = mirrored ? 28 : 12;
+        const tx = mirrored ? 18 : 22;
+        const anchor = mirrored ? 'end' : 'start';
+        const arrowPath = direction === 'up'
+            ? `M${cx} 18V6m0 0l-4 4m4-4l4 4m-8 12h8`
+            : `M${cx} 6v12m0 0l-4-4m4 4l4-4m-8-12h8`;
+        return (
+            <svg viewBox="0 0 40 24" className={className} overflow="visible">
+                <path d={arrowPath} stroke={color} fill="none" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+                <text x={tx} y="17" fontSize="14" fontWeight="bold" fontFamily="serif" fill={color} textAnchor={anchor}>{label}</text>
+            </svg>
+        );
+    };
     switch (type) {
         // ... Implants ...
         case 'monoaxial': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><circle cx="12" cy="12" r="9" /></svg>;

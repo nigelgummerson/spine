@@ -9,6 +9,13 @@ import { CageVisualization } from './CageVisualization';
 import { measureText } from '../../utils/measureText';
 import type { Placement, Cage, Level, ToolDefinition, OsteotomyData } from '../../types';
 
+/** Format screw size "7x50" → "7.0x50" (always 1dp on diameter) */
+const formatScrewSize = (s: string): string => {
+    const m = s.match(/^(\d+\.?\d*)x(\d+)$/);
+    if (!m) return s;
+    return `${Number(m[1]).toFixed(1)}x${m[2]}`;
+};
+
 export interface LevelRowProps {
     level: Level;
     placements: Placement[];
@@ -83,12 +90,12 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
     const discH = hasDisc && rawDiscH > 0 ? Math.max(DISC_MIN_PX, rawDiscH) : 0;
 
     /** Render an instrument icon as a nested SVG */
-    const renderIcon = (type: string, x: number, y: number, w: number, h: number, colorOrProps?: string | Record<string, any>) => {
+    const renderIcon = (type: string, x: number, y: number, w: number, h: number, colorOrProps?: string | Record<string, any>, side?: 'left' | 'right') => {
         const color = typeof colorOrProps === 'string' ? colorOrProps : undefined;
         const extraProps = typeof colorOrProps === 'object' ? colorOrProps : undefined;
         return (
             <svg x={x} y={y} width={w} height={h} overflow="visible" {...extraProps}>
-                <InstrumentIcon type={type} className="w-full h-full" color={color} />
+                <InstrumentIcon type={type} className="w-full h-full" color={color} side={side} />
             </svg>
         );
     };
@@ -205,7 +212,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
 
             // Label text
             const labelText = showData
-                ? (isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel)) : String(displayLabel))
+                ? (isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel)) : formatScrewSize(String(displayLabel)))
                 : '';
             const annText = showAnn ? ann : '';
             const isInline = heightScale < 0.85 && !!labelText && !!annText;
@@ -225,7 +232,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                             </div>
                         </foreignObject>
                     )}
-                    {renderIcon(tool?.icon || '', iconX, iconY, iW, iH)}
+                    {renderIcon(tool?.icon || '', iconX, iconY, iW, iH, undefined, zone === 'left' ? 'left' : zone === 'right' ? 'right' : undefined)}
                     {align === 'right' && (labelText || annText) && (
                         <foreignObject x={iconX + iW + 2} y={0} width={zoneX + zoneW - iconX - iW - 12} height={rowHeight} overflow="visible" pointerEvents="none">
                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' } as any}>
@@ -278,7 +285,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             }
 
             const labelText = showData
-                ? (isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel)) : String(displayLabel))
+                ? (isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel)) : formatScrewSize(String(displayLabel)))
                 : '';
 
             elements.push(
@@ -294,7 +301,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                         </foreignObject>
                     )}
                     <rect x={iconX} y={iconY} width={iW} height={iH} fill="transparent" pointerEvents="all" />
-                    {renderIcon(tool?.icon || '', iconX, iconY, iW, iH, '#14b8a6')}
+                    {renderIcon(tool?.icon || '', iconX, iconY, iW, iH, '#14b8a6', zone === 'left' ? 'left' : zone === 'right' ? 'right' : undefined)}
                     {align === 'right' && labelText && (
                         <foreignObject x={iconX + iW + 2} y={0} width={zoneX + zoneW - iconX - iW - 12} height={rowHeight} overflow="visible" pointerEvents="none">
                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' } as any}>

@@ -118,7 +118,7 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
         let finalSize = null;
         if (isHookOnly || isFixation) { finalSize = null; }
         else if (mode === 'custom') finalSize = customText || "Custom";
-        else if (mode === 'standard') finalSize = `${diameter}x${length}`;
+        else if (mode === 'standard') finalSize = `${Number(diameter).toFixed(1)}x${length}`;
         onConfirm(
             finalSize,
             (isHookOnly || isFixation) ? null : { diameter, length, mode, customText },
