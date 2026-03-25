@@ -1,7 +1,7 @@
 // src/state/__tests__/schema.test.js
 import { describe, it, expect } from 'vitest';
 import { validateV4, validateLegacy, ValidationError } from '../schema';
-import { createInitialState, serializeState } from '../documentReducer';
+import { createInitialState, serializeState, documentReducer, deserializeDocument } from '../documentReducer';
 import { migrateStoredData, LATEST_SCHEMA_VERSION } from '../migrations';
 
 // Helper: minimal valid v4 JSON
@@ -175,6 +175,30 @@ describe('validateV4', () => {
             expect(err.message).toContain('Invalid file');
             expect(err.message).toContain('error');
         }
+    });
+});
+
+// --- Pelvic zone round-trip ---
+
+describe('pelvic zone round-trip', () => {
+    it('serializes and validates pelvic placements, preserving zones after deserialization', () => {
+        const state = createInitialState();
+        const pS2ai = { id: 'pv1', levelId: 'S1', zone: 's2ai_left', tool: 'polyaxial', data: '7.0x50', annotation: '' };
+        const pIliac = { id: 'pv2', levelId: 'S1', zone: 'iliac_right', tool: 'polyaxial', data: '7.5x80', annotation: '' };
+        const pSI = { id: 'pv3', levelId: 'S1', zone: 'si_left', tool: 'monoaxial', data: '7.0x60', annotation: '' };
+        let s = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: pS2ai });
+        s = documentReducer(s, { type: 'ADD_PLACEMENT', chart: 'plan', placement: pIliac });
+        s = documentReducer(s, { type: 'ADD_PLACEMENT', chart: 'plan', placement: pSI });
+
+        const json = serializeState(s, 'thoracolumbar', 'default', '2.5.20', 'en');
+        expect(() => validateV4(json)).not.toThrow();
+
+        const result = deserializeDocument(json);
+        expect(result.state.plannedPlacements).toHaveLength(3);
+        const zones = result.state.plannedPlacements.map((p: any) => p.zone);
+        expect(zones).toContain('s2ai_left');
+        expect(zones).toContain('iliac_right');
+        expect(zones).toContain('si_left');
     });
 });
 

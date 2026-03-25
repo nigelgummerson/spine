@@ -1,14 +1,8 @@
 import React from 'react';
 import { getLevelHeight, getVertSvgGeometry, VERT_PAD } from '../../data/anatomy';
 import { InstrumentIcon } from './InstrumentIcon';
+import { formatScrewSize } from '../../utils/formatScrewSize';
 import type { Placement, ToolDefinition } from '../../types';
-
-/** Format screw size "7x50" → "7.0x50" (always 1dp on diameter) */
-const formatScrewSize = (s: string): string => {
-    const m = s.match(/^(\d+\.?\d*)x(\d+)$/);
-    if (!m) return s;
-    return `${Number(m[1]).toFixed(1)}x${m[2]}`;
-};
 
 interface PelvisRegionProps {
     chartWidth: number;

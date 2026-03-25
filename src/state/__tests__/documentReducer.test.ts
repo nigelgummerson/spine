@@ -214,6 +214,57 @@ describe('Edge cases', () => {
     });
 });
 
+// --- Pelvic placements ---
+
+describe('pelvic placements', () => {
+    it('adds a pelvic placement at S1 with s2ai_left zone', () => {
+        const state = createInitialState();
+        const p = { id: 'pv1', levelId: 'S1', zone: 's2ai_left', tool: 'polyaxial', data: '7.0x50', annotation: '' } as Placement;
+        const next = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
+        expect(next.plannedPlacements).toHaveLength(1);
+        expect(next.plannedPlacements[0].zone).toBe('s2ai_left');
+        expect(next.plannedPlacements[0].levelId).toBe('S1');
+        expect(next.plannedPlacements[0].data).toBe('7.0x50');
+    });
+
+    it('allows multiple pelvic zones at S1 to coexist', () => {
+        const state = createInitialState();
+        const pLeft = { id: 'pv1', levelId: 'S1', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
+        const pS2ai = { id: 'pv2', levelId: 'S1', zone: 's2ai_left', tool: 'polyaxial', data: '7.0x50', annotation: '' } as Placement;
+        const pIliac = { id: 'pv3', levelId: 'S1', zone: 'iliac_left', tool: 'polyaxial', data: '7.5x80', annotation: '' } as Placement;
+        const pSI = { id: 'pv4', levelId: 'S1', zone: 'si_left', tool: 'polyaxial', data: '7.0x60', annotation: '' } as Placement;
+        let s = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: pLeft });
+        s = documentReducer(s, { type: 'ADD_PLACEMENT', chart: 'plan', placement: pS2ai });
+        s = documentReducer(s, { type: 'ADD_PLACEMENT', chart: 'plan', placement: pIliac });
+        s = documentReducer(s, { type: 'ADD_PLACEMENT', chart: 'plan', placement: pSI });
+        expect(s.plannedPlacements).toHaveLength(4);
+        const zones = s.plannedPlacements.map(p => p.zone);
+        expect(zones).toContain('left');
+        expect(zones).toContain('s2ai_left');
+        expect(zones).toContain('iliac_left');
+        expect(zones).toContain('si_left');
+    });
+
+    it('allows duplicate pelvic zone placements (reducer does not enforce one-per-pelvic-zone)', () => {
+        const state = createInitialState();
+        const p1 = { id: 'pv1', levelId: 'S1', zone: 's2ai_left', tool: 'polyaxial', data: '7.0x50', annotation: '' } as Placement;
+        const p2 = { id: 'pv2', levelId: 'S1', zone: 's2ai_left', tool: 'monoaxial', data: '7.0x55', annotation: '' } as Placement;
+        let s = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p1 });
+        s = documentReducer(s, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p2 });
+        // Pelvic zones are not guarded by the left/right dedup — UI handles this
+        expect(s.plannedPlacements).toHaveLength(2);
+    });
+
+    it('removes a pelvic placement by id', () => {
+        const state = createInitialState();
+        const p = { id: 'pv1', levelId: 'S1', zone: 'iliac_left', tool: 'polyaxial', data: '7.5x80', annotation: '' } as Placement;
+        const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
+        expect(s1.plannedPlacements).toHaveLength(1);
+        const s2 = documentReducer(s1, { type: 'REMOVE_PLACEMENT', chart: 'plan', id: 'pv1' });
+        expect(s2.plannedPlacements).toHaveLength(0);
+    });
+});
+
 // --- Task 12: Bulk operations and serialization round-trip ---
 
 describe('NEW_PATIENT', () => {
