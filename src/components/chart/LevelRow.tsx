@@ -159,12 +159,15 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             : null;
         const isForceZone = zone.startsWith('force');
 
-        // Screws at anatomic entry point (lateral mass for cervical, pedicle for T/L/S); zone edge fallback
+        // Cervical/occiput: position at lateral mass or parasagittal screw zone
+        // Sacral: position at L5 pedicle alignment
+        // Thoracolumbar: position at zone edge (unchanged from original layout)
+        const isCervicalOrOc = isCervical;  // includes Oc and all C levels
         const zoneCx = isForceZone ? zoneX + zoneW / 2
             : isSacral && zone === 'left' && chartScrewLeftCx !== undefined ? chartScrewLeftCx
             : isSacral && zone === 'right' && chartScrewRightCx !== undefined ? chartScrewRightCx
-            : chartScrewLeftCx !== undefined && zone === 'left' ? chartScrewLeftCx
-            : chartScrewRightCx !== undefined && zone === 'right' ? chartScrewRightCx
+            : isCervicalOrOc && chartScrewLeftCx !== undefined && zone === 'left' ? chartScrewLeftCx
+            : isCervicalOrOc && chartScrewRightCx !== undefined && zone === 'right' ? chartScrewRightCx
             : zone === 'left' ? zoneX + zoneW - screwPx / 2 - 4
             : zone === 'right' ? zoneX + screwPx / 2 + 4
             : zoneX + zoneW / 2;
@@ -215,12 +218,12 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const showData = p.data && !isHookItem && !isFixation;
             const showAnn = !!ann;
 
-            // Position icon: anatomy-based when available (lateral mass/pedicle); zone edge fallback
+            // Position icon: cervical/sacral at anatomy-based position; T/L at zone edge
             let iconX: number;
             const iconY = zoneCy - iH / 2;
             if (align === 'center') {
                 iconX = zoneCx - iW / 2;
-            } else if (chartScrewLeftCx !== undefined || chartScrewRightCx !== undefined || isSacral) {
+            } else if (isSacral || isCervicalOrOc) {
                 iconX = zoneCx - iW / 2;
             } else if (align === 'left') {
                 iconX = zoneX + zoneW - iW - 4;
@@ -294,7 +297,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const iconY = zoneCy - iH / 2;
             if (align === 'center') {
                 iconX = zoneCx - iW / 2;
-            } else if (chartScrewLeftCx !== undefined || chartScrewRightCx !== undefined || isSacral) {
+            } else if (isSacral || isCervicalOrOc) {
                 iconX = zoneCx - iW / 2;
             } else if (align === 'left') {
                 iconX = zoneX + zoneW - iW - 4;
