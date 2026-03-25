@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { validateV4, validateLegacy, ValidationError } from '../schema';
 import { createInitialState, serializeState, documentReducer, deserializeDocument } from '../documentReducer';
 import { migrateStoredData, LATEST_SCHEMA_VERSION } from '../migrations';
+import type { Placement } from '../../types';
 
 // Helper: minimal valid v4 JSON
 function validV4(): any {
@@ -183,9 +184,9 @@ describe('validateV4', () => {
 describe('pelvic zone round-trip', () => {
     it('migrates old pelvic zone placements to new level IDs on deserialization', () => {
         const state = createInitialState();
-        const pS2ai = { id: 'pv1', levelId: 'S1', zone: 's2ai_left', tool: 'polyaxial', data: '7.0x50', annotation: '' };
-        const pIliac = { id: 'pv2', levelId: 'S1', zone: 'iliac_right', tool: 'polyaxial', data: '7.5x80', annotation: '' };
-        const pSI = { id: 'pv3', levelId: 'S1', zone: 'si_left', tool: 'monoaxial', data: '7.0x60', annotation: '' };
+        const pS2ai = { id: 'pv1', levelId: 'S1', zone: 's2ai_left' as Placement['zone'], tool: 'polyaxial', data: '7.0x50', annotation: '' };
+        const pIliac = { id: 'pv2', levelId: 'S1', zone: 'iliac_right' as Placement['zone'], tool: 'polyaxial', data: '7.5x80', annotation: '' };
+        const pSI = { id: 'pv3', levelId: 'S1', zone: 'si_left' as Placement['zone'], tool: 'monoaxial', data: '7.0x60', annotation: '' };
         let s = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: pS2ai });
         s = documentReducer(s, { type: 'ADD_PLACEMENT', chart: 'plan', placement: pIliac });
         s = documentReducer(s, { type: 'ADD_PLACEMENT', chart: 'plan', placement: pSI });

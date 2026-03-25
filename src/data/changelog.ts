@@ -1,6 +1,6 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION: string = "v2.5.30-beta";
+export const CURRENT_VERSION: string = "v2.7.0-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -9,7 +9,40 @@ interface ChangeLogEntry {
 }
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
-    { version: "v2.5.30-beta", date: "2026-03-25", changes: [
+    { version: "v2.7.0-beta", date: "2026-03-25", changes: [
+        "Undo/redo — Ctrl+Z / Ctrl+Shift+Z with 20-level history stack. Placement, cage, osteotomy, connector, note, and bulk operations are undoable.",
+        "React Error Boundary — runtime crashes show a recovery screen instead of a blank page.",
+        "BroadcastChannel sync data now Zod-validated — corrupted sync payloads are rejected instead of overwriting valid state.",
+        "Privacy mode sync fix — incognito window no longer leaks patient data to a non-incognito peer's localStorage.",
+        "Force picker and disc picker converted from centred modals to inline popovers positioned at the click point.",
+        "Force popover shows existing force as selected, with replace and remove (Delete key) support.",
+        "Cage modal shows all cage types with non-permitted types greyed out and level ranges displayed (e.g. C2–C7).",
+        "Cervical osteotomy restrictions — C1/C2 blocked, C3-C7 corpectomy only, thoracolumbar unchanged.",
+        "UIV and LIV added as note preset labels.",
+        "ALIF now permitted at L3/4 disc level.",
+        "First-run onboarding tour — 3-step guided walkthrough (landscape only, shown once).",
+        "EDITING badge on active chart column — visible at theatre distance.",
+        "Patient name and ID fields enlarged (text-sm bold) for clinical identification.",
+        "Confirm & Next keyboard shortcuts now consistent — Enter always confirms & advances, Shift+Enter always closes.",
+        "Liability disclaimer added to all 22 languages.",
+        "Report a Problem help section with GitHub Issues link and email, all 22 languages.",
+        "Service worker for web build — offline access after first visit.",
+        "React.memo on 6 chart components + useMemo for auto-scale — reduces unnecessary re-renders.",
+        "TypeScript any types reduced from ~65 to 5 (all at JSON boundaries with comments).",
+        "Hover state opacity increased for better visibility in theatre lighting.",
+        "Focus restored to triggering element on modal close.",
+        "HTML stripped from contentEditable paste events.",
+        "localStorage.setItem wrapped in try/catch for QuotaExceededError.",
+        "Specification synced to v2.7.0 — 19 gaps fixed including cervical anatomy, pelvic fixation, screw defaults.",
+    ]},
+    { version: "v2.6.0-beta", date: "2026-03-25", changes: [
+        "Cervical vertebrae rendered with distinct anatomical shapes — occiput, atlas (C1), axis (C2), subaxial (C3-C6), and C7 each have unique SVG outlines with lateral masses.",
+        "Whole-spine proportions rescaled to Tan 2004 published vertebral body heights — more accurate relative sizing from C2 to L5.",
+        "Transverse processes shown on all thoracolumbar vertebrae with per-level craniocaudal heights from published data.",
+        "Per-level disc heights from Koeller 1986 data — cervical, thoracic, and lumbar disc spaces now proportionally accurate.",
+        "Implant company audit — Zimmer Biomet renamed to Highridge Medical, SpineGuard/Aurora Spine/SI-BONE removed (not pedicle screw systems). Legacy/discontinued systems removed, new systems added (LONGITUDE II, QUARTEX OCT, LineSider, Cortium).",
+        "ACDF cages now visible in whole-spine view (previously replaced by text hint). Smaller label to avoid clashing.",
+        "Preferences (pelvis, region defaults, confirm behaviour) now sync between dual windows.",
         "Pelvic fixation — S2AI, Iliac, and SI-J are now separate levels with anatomical iliac wing rendering.",
         "Level selector in implant modal — see and change the target level when placing or editing screws.",
         "Confirm & Next — place screws sequentially down the spine without closing the modal.",

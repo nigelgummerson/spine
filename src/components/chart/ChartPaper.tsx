@@ -7,7 +7,7 @@ import { PelvisRegion } from './PelvisRegion';
 import { FORCE_TYPES } from '../../data/clinical';
 import { InstrumentIcon } from './InstrumentIcon';
 import { LevelRow } from './LevelRow';
-import type { Placement, Cage, Connector, Note, Level, ToolDefinition } from '../../types';
+import type { Placement, Cage, Connector, Note, Level, ToolDefinition, OsteotomyData } from '../../types';
 import { measureText } from '../../utils/measureText';
 
 export interface ChartPaperProps {
@@ -43,6 +43,9 @@ export interface ChartPaperProps {
     reconLabelPositions?: Record<string, { offsetX: number; offsetY: number }>;
     onReconLabelUpdate?: (id: string, pos: { offsetX: number; offsetY: number }) => void;
     onPelvisZoneClick?: (levelId: string, zone: string) => void;
+    isActive?: boolean;
+    activeBg?: string;
+    activeText?: string;
 }
 
 // Header area height in SVG units
@@ -51,7 +54,7 @@ const COL_HEADER_H = 20;  // Column headers (LEFT / RIGHT / FORCE)
 const ROD_HEADER_H = 22;  // Rod text row
 const CONTENT_TOP = TITLE_H + COL_HEADER_H + ROD_HEADER_H;
 
-export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements, ghostConnectors, onGhostConnectorClick, ghostCages, onGhostCageClick, reconLabelPositions, onReconLabelUpdate, onPelvisZoneClick }) => {
+export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements, ghostConnectors, onGhostConnectorClick, ghostCages, onGhostCageClick, reconLabelPositions, onReconLabelUpdate, onPelvisZoneClick, isActive, activeBg, activeText }) => {
     const svgRef = useRef<SVGSVGElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [chartWidth, setChartWidth] = useState(500);
@@ -90,8 +93,8 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
     // Reconstruction cage labels
     const reconCageLabels = useMemo(() => {
         return (placements || [])
-            .filter(p => p.tool === 'osteotomy' && typeof p.data === 'object' && p.data !== null && (p.data as any).reconstructionCage)
-            .map(p => ({ id: `recon-${p.levelId}`, levelId: p.levelId, text: (p.data as any).reconstructionCage as string, offsetX: undefined as number | undefined, offsetY: undefined as number | undefined }));
+            .filter(p => p.tool === 'osteotomy' && typeof p.data === 'object' && p.data !== null && (p.data as OsteotomyData).reconstructionCage)
+            .map(p => ({ id: `recon-${p.levelId}`, levelId: p.levelId, text: (p.data as OsteotomyData).reconstructionCage as string, offsetX: undefined as number | undefined, offsetY: undefined as number | undefined }));
     }, [placements]);
 
     // Convert screen coords to SVG coords
@@ -207,7 +210,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
     <div ref={containerRef} className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative overflow-hidden">
         {/* Title bar — HTML, fixed at top */}
         <div className={`${forcePlacements ? 'px-2 py-1' : 'p-2'} bg-slate-50 border-b border-slate-200 text-center shrink-0`}>
-            <div className="font-bold text-sm text-slate-800 uppercase tracking-wider">{title}</div>
+            <div className="font-bold text-sm text-slate-800 uppercase tracking-wider flex items-center justify-center gap-2">{title}{isActive && <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide" data-export-hide="true" style={{ backgroundColor: activeBg || '#005EB8', color: activeText || '#fff', lineHeight: '1.1' }}>{t('sidebar.editing')}</span>}</div>
             {forcePlacements && <div className="flex items-center justify-center gap-3 -mt-0.5">
                 <span className="text-[10px] font-normal text-blue-400 italic">{t('chart.force_plan_only')}</span>
                 {ghostPlacements && <span className="flex items-center gap-1 text-[10px] font-bold" style={{ color: '#14b8a6' }}><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" strokeWidth="3"><circle cx="12" cy="12" r="9" /><path d="M7 7l10 10M17 7l-10 10" /></svg>= {t('export.plan')}</span>}
@@ -228,18 +231,18 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
             <div className="flex w-full px-2 shrink-0 -mt-1">
                 {showForces && <div style={{ width: 56 }}></div>}
                 <div className="flex-1 flex justify-end pr-1">
-                    {React.Children.toArray((rodHeader.props as any).children)[0]}
+                    {React.Children.toArray((rodHeader.props as { children: React.ReactNode }).children)[0]}
                 </div>
                 <div style={{ width: `${scaledWidth * 0.5}px` }}></div>
                 <div className="flex-1 flex justify-start pl-0">
-                    {React.Children.toArray((rodHeader.props as any).children)[1]}
+                    {React.Children.toArray((rodHeader.props as { children: React.ReactNode }).children)[1]}
                 </div>
                 {showForces && <div style={{ width: 56 }}></div>}
             </div>
         )}
 
         {/* SVG chart content — scales with spine view */}
-        <svg ref={svgRef} data-chart-svg="true" viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} preserveAspectRatio="xMidYMid meet" className="flex-1 w-full" style={{ overflow: 'visible' }}>
+        <svg ref={svgRef} data-chart-svg="true" data-chart="true" viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} preserveAspectRatio="xMidYMid meet" className="flex-1 w-full" style={{ overflow: 'visible' }}>
             {/* 0. Pelvis background — iliac wings behind S1/S2, drawn first so levels paint on top */}
             {levels.some(l => l.type === 'pelvic' || l.id === 'S2') && levelYOffsets['L5'] !== undefined && (
                 <PelvisRegion
@@ -302,7 +305,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                         else { onDiscClick(lvl.id); }
                     };
                     return (
-                        <rect key={`disc-click-${lvl.id}`} x={vertX} y={discY} width={scaledWidth} height={discH}
+                        <rect key={`disc-click-${lvl.id}`} data-zone="disc" data-level={lvl.id} x={vertX} y={discY} width={scaledWidth} height={discH}
                             fill="transparent" cursor={!readOnly ? 'pointer' : 'default'}
                             pointerEvents="all"
                             onMouseEnter={!readOnly ? (e) => { (e.target as SVGRectElement).setAttribute('fill', 'rgba(186, 230, 253, 0.4)'); } : undefined}
@@ -333,7 +336,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                                 </svg>
                                 {!readOnly && (
                                     <g className="connector-remove-btn" opacity={0}
-                                        style={{ pointerEvents: 'all' } as any}
+                                        style={{ pointerEvents: 'all' }}
                                         onClick={(e) => { e.stopPropagation(); onConnectorRemove(conn.id); }}
                                         onMouseDown={(e) => e.stopPropagation()}>
                                         <circle cx={vertX + scaledWidth + 4} cy={y} r={7} fill="#ef4444" />
@@ -509,6 +512,6 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
         </svg>
     </div>
     );
-};
+});
 
 // ==========================================

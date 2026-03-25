@@ -1,18 +1,31 @@
 import type { Level } from '../types';
 
+/**
+ * Returns the osteotomy type IDs permitted at a given spinal level.
+ * - Oc, C1, C2: no osteotomies (complex anatomy, out of scope)
+ * - C3-C7: Corpectomy only (anterior). No posterior osteotomies.
+ * - T1 and below: all types permitted.
+ */
+export const getPermittedOsteotomyTypes = (levelId: string): string[] | null => {
+    if (levelId === 'Oc' || levelId === 'C1' || levelId === 'C2') return [];
+    if (/^C[3-7]$/.test(levelId)) return ['Corpectomy'];
+    return null; // null = no restriction (all types permitted)
+};
+
 export const CAGE_PERMISSIBILITY: Record<string, string[]> = {
   acdf: ['C2','C3','C4','C5','C6','C7'],
   plif: ['T11','T12','L1','L2','L3','L4','L5'],
   tlif: ['T11','T12','L1','L2','L3','L4','L5'],
   xlif: ['T5','T6','T7','T8','T9','T10','T11','T12','L1','L2','L3','L4'],
   olif: ['T12','L1','L2','L3','L4'],
-  alif: ['L4','L5'],
+  alif: ['L3','L4','L5'],
 };
 
 export const HOOK_TYPES: string[] = ['pedicle_hook','tp_hook','tp_hook_up','sl_hook','il_hook'];
 export const NO_SIZE_TYPES: string[] = [...HOOK_TYPES, 'band', 'wire', 'cable'];
 
 export const NOTE_PRESET_KEYS: string[] = [
+    'clinical.note.uiv', 'clinical.note.liv',
     'clinical.note.last_visible_rib', 'clinical.note.end_vertebra', 'clinical.note.apex',
     'clinical.note.transitional_level', 'clinical.note.stable_vertebra', 'clinical.note.neutral_vertebra'
 ];

@@ -1,5 +1,13 @@
 import TRANSLATIONS from './translations.json';
-import SUPPORTED_LANGUAGES from './languages.json';
+import _SUPPORTED_LANGUAGES from './languages.json';
+
+export interface LanguageEntry {
+    code: string;
+    name: string;
+    hidden?: boolean;
+}
+
+const SUPPORTED_LANGUAGES: LanguageEntry[] = _SUPPORTED_LANGUAGES;
 
 export { SUPPORTED_LANGUAGES };
 

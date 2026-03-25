@@ -69,7 +69,7 @@ export const modalKeyHandler = ({ onSubmit, onClose, onDelete, isEditing }: Moda
 interface ScrewModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onConfirm: (size: string | null, details: any, type: string, annotation: string, levelId: string, zone: Zone) => void;
+    onConfirm: (size: string | null, details: { diameter: string; length: string; mode: string; customText: string } | null, type: string, annotation: string, levelId: string, zone: Zone) => void;
     onConfirmAndNext?: (confirmedLevelId: string, confirmedZone: Zone) => void;
     onDelete?: () => void;
     initialData?: string | null;
@@ -190,11 +190,10 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     if (!isEditing && onConfirmAndNext) {
-                        // When confirmAndNextDefault: Enter = next, Shift+Enter = close
-                        // Otherwise: Enter = close, Shift+Enter = next
-                        const useNext = confirmAndNextDefault ? !e.shiftKey : e.shiftKey;
-                        if (useNext) handleSubmitAndNext();
-                        else handleSubmit();
+                        // Enter = always Confirm & Next (fast path)
+                        // Shift+Enter = always plain Confirm (close modal)
+                        if (e.shiftKey) handleSubmit();
+                        else handleSubmitAndNext();
                     } else {
                         handleSubmit();
                     }
@@ -274,12 +273,21 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
                     <div className="flex gap-2">
                         <button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title={t('shortcut.escape')}>{t('button.cancel')}</button>
                         {!isEditing && onConfirmAndNext ? (<>
-                            <button onClick={confirmAndNextDefault ? handleSubmit : handleSubmitAndNext}
-                                className="px-4 py-2 rounded bg-slate-600 text-white hover:bg-slate-500 text-sm font-bold shadow"
-                                title={confirmAndNextDefault ? 'Shift+Enter' : 'Shift+Enter'}>{confirmAndNextDefault ? t('button.confirm') : t('modal.screw.confirm_and_next')}</button>
-                            <button onClick={confirmAndNextDefault ? handleSubmitAndNext : handleSubmit}
-                                className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg"
-                                title="Enter">{confirmAndNextDefault ? t('modal.screw.confirm_and_next') : t('button.confirm')}</button>
+                            {confirmAndNextDefault ? (<>
+                                <button onClick={handleSubmit}
+                                    className="px-4 py-2 rounded bg-slate-600 text-white hover:bg-slate-500 text-sm font-bold shadow"
+                                    title="Shift+Enter">{t('button.confirm')}</button>
+                                <button onClick={handleSubmitAndNext}
+                                    className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg"
+                                    title="Enter">{t('modal.screw.confirm_and_next')}</button>
+                            </>) : (<>
+                                <button onClick={handleSubmitAndNext}
+                                    className="px-4 py-2 rounded bg-slate-600 text-white hover:bg-slate-500 text-sm font-bold shadow"
+                                    title="Enter">{t('modal.screw.confirm_and_next')}</button>
+                                <button onClick={handleSubmit}
+                                    className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg"
+                                    title="Shift+Enter">{t('button.confirm')}</button>
+                            </>)}
                         </>) : (
                             <button onClick={handleSubmit} className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg" title={t('shortcut.enter')}>{t('button.confirm')}</button>
                         )}

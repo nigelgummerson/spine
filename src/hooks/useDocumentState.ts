@@ -1,11 +1,24 @@
 // src/hooks/useDocumentState.ts
 import { useReducer, useState, useRef, useEffect, useCallback } from 'react';
-import { documentReducer, createInitialState, serializeState, deserializeDocument } from '../state/documentReducer';
+import { createInitialState, serializeState, deserializeDocument } from '../state/documentReducer';
+import { undoReducer, createInitialUndoState } from '../state/undoReducer';
 import { CURRENT_VERSION } from '../data/changelog';
 import { acceptDisclaimer } from '../components/modals/DisclaimerModal';
 import { validateV4, validateLegacy, ValidationError } from '../state/schema';
 import { migrateStoredData } from '../state/migrations';
 import type { DocumentState, DocumentAction } from '../types';
+
+/** Validate sync payload using the same Zod checks as file load */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- JSON boundary: untrusted data from BroadcastChannel
+function validateSyncPayload(payload: Record<string, any>): void {
+    if (payload?.schema?.version === 4) {
+        validateV4(payload);
+    } else if (payload?.formatVersion >= 2) {
+        validateLegacy(payload);
+    } else {
+        throw new Error('Unrecognised sync payload format');
+    }
+}
 
 interface UseDocumentStateParams {
     viewMode: string;
@@ -16,19 +29,34 @@ interface UseDocumentStateParams {
     currentLang: string;
     setViewMode: (mode: string) => void;
     showToast?: (message: string, level?: string) => void;
+    showPelvis: boolean;
+    useRegionDefaults: boolean;
+    confirmAndNext: boolean;
+    setShowPelvis: (v: boolean) => void;
+    setUseRegionDefaults: (v: boolean) => void;
+    setConfirmAndNext: (v: boolean) => void;
 }
 
 interface UseDocumentStateReturn {
     state: DocumentState;
     dispatch: React.Dispatch<DocumentAction>;
-    serialize: () => any;
+    serialize: () => ReturnType<typeof serializeState>;
     syncChannelRef: React.MutableRefObject<BroadcastChannel | null>;
     syncConnected: boolean;
     hasLoaded: boolean;
+    canUndo: boolean;
+    canRedo: boolean;
+    undo: () => void;
+    redo: () => void;
 }
 
-export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLang, incognitoMode, currentLang, setViewMode, showToast }: UseDocumentStateParams): UseDocumentStateReturn {
-    const [state, dispatch] = useReducer(documentReducer, undefined, createInitialState);
+export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLang, incognitoMode, currentLang, setViewMode, showToast, showPelvis, useRegionDefaults, confirmAndNext, setShowPelvis, setUseRegionDefaults, setConfirmAndNext }: UseDocumentStateParams): UseDocumentStateReturn {
+    const [undoState, dispatch] = useReducer(undoReducer, undefined, createInitialUndoState);
+    const state = undoState.present;
+    const canUndo = undoState.past.length > 0;
+    const canRedo = undoState.future.length > 0;
+    const undo = useCallback(() => dispatch({ type: 'UNDO' }), []);
+    const redo = useCallback(() => dispatch({ type: 'REDO' }), []);
     const [hasLoaded, setHasLoaded] = useState(false);
     const [syncConnected, setSyncConnected] = useState(false);
 
@@ -42,6 +70,8 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
     // 2. localChangeRef: suppress incoming sync while local changes are pending render
     const lastSyncReceiveRef = useRef(0);
     const localChangePendingRef = useRef(false);
+    // When true, suppress localStorage persist for current state (peer is in incognito)
+    const peerIncognitoRef = useRef(false);
 
     // Stable refs for values needed in sync callbacks
     const stateRef = useRef(state);
@@ -54,9 +84,25 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
     currentLangRef.current = currentLang;
     const changeLangRef = useRef(changeLang);
     changeLangRef.current = changeLang;
+    const showPelvisRef = useRef(showPelvis);
+    showPelvisRef.current = showPelvis;
+    const useRegionDefaultsRef = useRef(useRegionDefaults);
+    useRegionDefaultsRef.current = useRegionDefaults;
+    const confirmAndNextRef = useRef(confirmAndNext);
+    confirmAndNextRef.current = confirmAndNext;
+    const setShowPelvisRef = useRef(setShowPelvis);
+    setShowPelvisRef.current = setShowPelvis;
+    const setUseRegionDefaultsRef = useRef(setUseRegionDefaults);
+    setUseRegionDefaultsRef.current = setUseRegionDefaults;
+    const setConfirmAndNextRef = useRef(setConfirmAndNext);
+    setConfirmAndNextRef.current = setConfirmAndNext;
+    const incognitoRef = useRef(incognitoMode);
+    incognitoRef.current = incognitoMode;
 
     const serialize = useCallback(() => {
-        return serializeState(stateRef.current, viewModeRef.current, colourSchemeRef.current, CURRENT_VERSION, currentLangRef.current);
+        return serializeState(stateRef.current, viewModeRef.current, colourSchemeRef.current, CURRENT_VERSION, currentLangRef.current, {
+            showPelvis: showPelvisRef.current, useRegionDefaults: useRegionDefaultsRef.current, confirmAndNext: confirmAndNextRef.current,
+        });
     }, []);
 
     // AUTO-LOAD from localStorage on mount
@@ -91,10 +137,17 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
 
     // AUTO-SAVE to localStorage when state changes
     useEffect(() => {
-        if (hasLoaded && !incognitoMode) {
-            localStorage.setItem('spine_planner_v2', JSON.stringify(
-                serializeState(state, viewMode, colourScheme, CURRENT_VERSION, currentLang)
-            ));
+        if (hasLoaded && !incognitoMode && !peerIncognitoRef.current) {
+            try {
+                localStorage.setItem('spine_planner_v2', JSON.stringify(
+                    serializeState(state, viewMode, colourScheme, CURRENT_VERSION, currentLang, {
+                        showPelvis, useRegionDefaults, confirmAndNext,
+                    })
+                ));
+            } catch (e) {
+                // QuotaExceededError on locked-down hospital machines — data still in memory
+                console.warn('localStorage save failed:', e);
+            }
         }
         if (incognitoMode) localStorage.removeItem('spine_planner_v2');
 
@@ -107,6 +160,7 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
         }
         // Local change — mark as authoritative until broadcast completes
         if (hasLoaded) localChangePendingRef.current = true;
+        peerIncognitoRef.current = false;
         if (hasLoaded && syncChannelRef.current) {
             syncVersionRef.current++;
             clearTimeout(syncTimerRef.current!);
@@ -114,14 +168,33 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
                 if (syncChannelRef.current) {
                     syncChannelRef.current.postMessage({
                         type: 'state', appVersion: CURRENT_VERSION,
-                        payload: serializeState(stateRef.current, viewModeRef.current, colourSchemeRef.current, CURRENT_VERSION, currentLangRef.current),
+                        payload: serializeState(stateRef.current, viewModeRef.current, colourSchemeRef.current, CURRENT_VERSION, currentLangRef.current, {
+                            showPelvis: showPelvisRef.current, useRegionDefaults: useRegionDefaultsRef.current, confirmAndNext: confirmAndNextRef.current,
+                        }),
                         version: syncVersionRef.current,
+                        incognito: incognitoRef.current,
                     });
                     localChangePendingRef.current = false;
                 }
             }, 200);
         }
-    }, [state, viewMode, colourScheme, hasLoaded, incognitoMode]);
+    }, [state, viewMode, colourScheme, hasLoaded, incognitoMode, showPelvis, useRegionDefaults, confirmAndNext]);
+
+    const applyPrefs = (prefs?: { showPelvis?: boolean; useRegionDefaults?: boolean; confirmAndNext?: boolean }) => {
+        if (!prefs) return;
+        if (prefs.showPelvis !== undefined && prefs.showPelvis !== showPelvisRef.current) {
+            setShowPelvisRef.current(prefs.showPelvis);
+            localStorage.setItem('spine_planner_pelvis', String(prefs.showPelvis));
+        }
+        if (prefs.useRegionDefaults !== undefined && prefs.useRegionDefaults !== useRegionDefaultsRef.current) {
+            setUseRegionDefaultsRef.current(prefs.useRegionDefaults);
+            localStorage.setItem('spine_planner_region_defaults', String(prefs.useRegionDefaults));
+        }
+        if (prefs.confirmAndNext !== undefined && prefs.confirmAndNext !== confirmAndNextRef.current) {
+            setConfirmAndNextRef.current(prefs.confirmAndNext);
+            localStorage.setItem('spine_planner_confirm_next_default', String(prefs.confirmAndNext));
+        }
+    };
 
     // BROADCAST CHANNEL SYNC
     useEffect(() => {
@@ -140,28 +213,42 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
                 return;
             }
             if (msg.type === 'ping') {
-                ch.postMessage({ type: 'pong', appVersion: CURRENT_VERSION, payload: serialize() });
+                ch.postMessage({ type: 'pong', appVersion: CURRENT_VERSION, payload: serialize(), incognito: incognitoRef.current });
             } else if (msg.type === 'pong') {
                 lastPongRef.current = Date.now();
                 setSyncConnected(true);
                 if (msg.payload) {
-                    clearTimeout(syncTimerRef.current!);
-                    lastSyncReceiveRef.current = Date.now();
-                    const result = deserializeDocument(msg.payload);
-                    dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
-                    if (result.viewMode) setViewMode(result.viewMode);
-                    if (result.colourScheme) changeTheme(result.colourScheme);
+                    try {
+                        validateSyncPayload(msg.payload);
+                        clearTimeout(syncTimerRef.current!);
+                        lastSyncReceiveRef.current = Date.now();
+                        if (msg.incognito) peerIncognitoRef.current = true;
+                        const result = deserializeDocument(msg.payload);
+                        dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
+                        if (result.viewMode) setViewMode(result.viewMode);
+                        if (result.colourScheme) changeTheme(result.colourScheme);
+                        applyPrefs(result.preferences);
+                    } catch (e) {
+                        console.warn('Sync pong data failed validation — ignoring:', e);
+                    }
                 }
             } else if (msg.type === 'state') {
                 if (msg.payload) {
                     // Reject incoming sync if we have local changes pending broadcast
                     if (localChangePendingRef.current) return;
-                    clearTimeout(syncTimerRef.current!);
-                    lastSyncReceiveRef.current = Date.now();
-                    const result = deserializeDocument(msg.payload);
-                    dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
-                    if (result.viewMode) setViewMode(result.viewMode);
-                    if (result.colourScheme) changeTheme(result.colourScheme);
+                    try {
+                        validateSyncPayload(msg.payload);
+                        clearTimeout(syncTimerRef.current!);
+                        lastSyncReceiveRef.current = Date.now();
+                        if (msg.incognito) peerIncognitoRef.current = true;
+                        const result = deserializeDocument(msg.payload);
+                        dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
+                        if (result.viewMode) setViewMode(result.viewMode);
+                        if (result.colourScheme) changeTheme(result.colourScheme);
+                        applyPrefs(result.preferences);
+                    } catch (e) {
+                        console.warn('Sync state data failed validation — ignoring:', e);
+                    }
                 }
             } else if (msg.type === 'lang_accepted') {
                 if (msg.lang) {
@@ -193,5 +280,5 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
         };
     }, [hasLoaded]);
 
-    return { state, dispatch, serialize, syncChannelRef, syncConnected, hasLoaded };
+    return { state, dispatch, serialize, syncChannelRef, syncConnected, hasLoaded, canUndo, canRedo, undo, redo };
 }

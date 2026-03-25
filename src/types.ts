@@ -108,7 +108,9 @@ export type DocumentAction =
     | { type: 'NEW_PATIENT' }
     | { type: 'COPY_PLAN_TO_CONSTRUCT'; genId: () => string }
     | { type: 'CLEAR_CONSTRUCT' }
-    | { type: 'LOAD_DOCUMENT'; document: DocumentState };
+    | { type: 'LOAD_DOCUMENT'; document: DocumentState }
+    | { type: 'UNDO' }
+    | { type: 'REDO' };
 
 export interface ColourScheme {
     id: string;

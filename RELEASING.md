@@ -12,8 +12,7 @@ Every version bump requires updating these files:
 - **`README.md`** — update version badge (line 5)
 
 ### 3. Static pages
-- **`public/quick-reference.html`** — find/replace all version strings (16 `version:` entries, one per translated language block). Also check that `SUPPORTED_LANGUAGES` array matches current language count.
-  - **Known gap:** quick-reference only has 16 translated language blocks (missing he, hi, ar, ja, ko, zh-Hans). Adding these is a separate task.
+- **`public/quick-reference.html`** — find/replace all version strings (22 `version:` entries, one per translated language block). Also check that `SUPPORTED_LANGUAGES` array matches current language count.
 - **Language count** — check `credits.quick_reference` in `src/i18n/translations.json` matches the actual language count
 
 ### 4. Generated files
@@ -61,7 +60,7 @@ After a version bump, update the landing page if the version number, feature lis
 1. Edit src/data/changelog.ts          # CURRENT_VERSION + CHANGE_LOG
 2. Edit CLAUDE.md                       # version header + history entry
 3. Edit README.md                       # version badge
-4. Edit public/quick-reference.html     # find/replace version (16 entries)
+4. Edit public/quick-reference.html     # find/replace version (22 entries)
 5. python3 tools/generate-review-forms.py  # regenerate review forms
 6. npm test                             # verify tests pass
 7. npm run dev                          # visual check

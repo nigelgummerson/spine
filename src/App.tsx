@@ -9,7 +9,7 @@ import { BONE_GRAFT_OPTIONS, BONE_GRAFT_LABEL_KEYS, IMPLANT_COMPANIES, SCREW_SYS
          DIAMETER_OPTIONS, LENGTH_OPTIONS } from './data/implants';
 import { _light, _dark, COLOUR_SCHEMES, AUTO_THEME_FROM_COMPANY, COMPANY_THEME_MAP } from './data/themes';
 import { CAGE_PERMISSIBILITY, HOOK_TYPES, NO_SIZE_TYPES, NOTE_PRESET_KEYS, CAGE_TYPES,
-         APPROACH_GROUPS, getDiscLabel, FORCE_TYPES, INVENTORY_CATEGORIES } from './data/clinical';
+         APPROACH_GROUPS, getDiscLabel, FORCE_TYPES, INVENTORY_CATEGORIES, getPermittedOsteotomyTypes } from './data/clinical';
 import { REGIONS, getLevelHeight,
          ALL_LEVELS, DISC_MIN_PX, getDiscHeight, buildHeightMap,
          levelToYNorm, yNormToRenderedY, renderedYToYNorm, CHART_CONTENT_HEIGHT,
@@ -32,10 +32,47 @@ import { ChartPaper } from './components/chart/ChartPaper';
 import { InstrumentIcon } from './components/chart/InstrumentIcon';
 import { Portal } from './components/Portal';
 import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, resetDisclaimer, getDisclaimerTimestamp } from './components/modals/DisclaimerModal';
+import { OnboardingTour } from './components/OnboardingTour';
 import { useDocumentState } from './hooks/useDocumentState';
 import { deserializeDocument } from './state/documentReducer';
 import { validateV4, validateLegacy, ValidationError } from './state/schema';
-import type { ColourScheme, ToolDefinition, Placement, Level, Zone, OsteotomyData, Cage, Note } from './types';
+import type { ColourScheme, ToolDefinition, Placement, Level, Zone, OsteotomyData, CageData, Cage, Note } from './types';
+
+/** Data shape returned by CageModal.onConfirm */
+interface CageConfirmData {
+    type: string;
+    height: string;
+    width: string;
+    length: string;
+    lordosis: string;
+    side: string;
+}
+
+/** Data shape returned by OsteotomyModal.onConfirm */
+interface OsteotomyConfirmData {
+    type: string;
+    angle: string | null;
+    shortLabel: string;
+    reconstructionCage: string;
+}
+
+/** Detail components returned by ScrewModal's computeDetails() */
+interface ScrewDetails {
+    diameter: string;
+    length: string;
+    mode: string;
+    customText: string;
+}
+
+/** Editing data can be placement data, cage data for ghost cages, or undefined for new entries */
+type EditingData = string | OsteotomyData | CageData | Cage | null | undefined;
+
+/** Paste handler for contentEditable fields — strips HTML, inserts plain text only. */
+const handlePastePlainText = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
+};
 
 const App = () => {
     const [selectedTool, setSelectedTool] = useState('implant');
@@ -87,6 +124,12 @@ const App = () => {
     // TOAST NOTIFICATIONS (defined before useDocumentState so showToast can be passed as parameter)
     const [toasts, setToasts] = useState<Array<{id: number; message: string; type: string}>>([]);
     const toastIdRef = useRef(0);
+    const lastClickRef = useRef({ x: 0, y: 0 });
+    useEffect(() => {
+        const capture = (e: MouseEvent) => { lastClickRef.current = { x: e.clientX, y: e.clientY }; };
+        window.addEventListener('click', capture, true);
+        return () => window.removeEventListener('click', capture, true);
+    }, []);
     const showToast = useCallback((message: string, type: string = 'info') => {
         const id = ++toastIdRef.current;
         setToasts(prev => [...prev, { id, message, type }]);
@@ -101,8 +144,10 @@ const App = () => {
     }, [toasts.length, dismissAllToasts]);
 
     // DOCUMENT STATE (clinical data, sync, auto-save)
-    const { state, dispatch, serialize, syncChannelRef, syncConnected, hasLoaded } = useDocumentState({
+    const { state, dispatch, serialize, syncChannelRef, syncConnected, hasLoaded, canUndo, canRedo, undo, redo } = useDocumentState({
         viewMode, colourScheme, changeTheme, changeLang, incognitoMode, currentLang, setViewMode, showToast,
+        showPelvis, useRegionDefaults, confirmAndNext: confirmAndNextDefault,
+        setShowPelvis, setUseRegionDefaults, setConfirmAndNext: setConfirmAndNextDefault,
     });
     const {
         patientData, plannedPlacements, completedPlacements,
@@ -116,6 +161,7 @@ const App = () => {
     const [osteoModalOpen, setOsteoModalOpen] = useState(false);
     const [cageModalOpen, setCageModalOpen] = useState(false);
     const [forceModalOpen, setForceModalOpen] = useState(false);
+    const [forcePopover, setForcePopover] = useState<{ x: number; y: number; existingTool: string | null; existingId: string | null } | null>(null);
     const [helpModalOpen, setHelpModalOpen] = useState(false);
     const [changeLogOpen, setChangeLogOpen] = useState(false);
     const [noteModalOpen, setNoteModalOpen] = useState(false);
@@ -134,10 +180,10 @@ const App = () => {
     const recentPlacementsRef = useRef<{ levelId: string; zone: string }[]>([]);
     const [pendingPlacement, setPendingPlacement] = useState<{ levelId: string; zone: string; tool: string } | null>(null);
     const [editingPlacementId, setEditingPlacementId] = useState<string | null>(null);
-    const [editingData, setEditingData] = useState<any>(undefined);
+    const [editingData, setEditingData] = useState<EditingData>(undefined);
     const [editingTool, setEditingTool] = useState<string | null>(null);
     const [editingCageLevel, setEditingCageLevel] = useState<string | null>(null);
-    const [discPickerLevel, setDiscPickerLevel] = useState<string | null>(null);
+    const [discPickerLevel, setDiscPickerLevel] = useState<{ levelId: string; x: number; y: number } | null>(null);
     const [editingAnnotation, setEditingAnnotation] = useState('');
 
     const [defaultDiameter, setDefaultDiameter] = useState('6.5');
@@ -198,6 +244,45 @@ const App = () => {
         }
     }, [isPortrait, portraitTab]);
 
+    // KEYBOARD SHORTCUTS — only when no modal is open and no editable field is focused
+    useEffect(() => {
+        const handleShortcut = (e: KeyboardEvent) => {
+            // Skip if any modal is open
+            if (screwModalOpen || osteoModalOpen || cageModalOpen || forceModalOpen || forcePopover || helpModalOpen || noteModalOpen || changeLogOpen || preferencesModalOpen || !disclaimerAccepted) return;
+
+            // Undo/Redo — Ctrl+Z, Ctrl+Shift+Z, Ctrl+Y (works even when editable fields are focused)
+            const mod = e.ctrlKey || e.metaKey;
+            if (mod && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                if (canUndo) { undo(); showToast(t('alert.undone'), 'info'); }
+                return;
+            }
+            if (mod && ((e.key.toLowerCase() === 'z' && e.shiftKey) || e.key.toLowerCase() === 'y')) {
+                e.preventDefault();
+                if (canRedo) { redo(); showToast(t('alert.redone'), 'info'); }
+                return;
+            }
+
+            // Skip remaining shortcuts if focus is in an editable field
+            const tag = (e.target as HTMLElement)?.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target as HTMLElement)?.isContentEditable) return;
+
+            switch (e.key.toLowerCase()) {
+                case 'c': setViewMode('cervical'); break;
+                case 'l': setViewMode('t10_pelvis'); break;
+                case 't': setViewMode('thoracolumbar'); break;
+                case 'w': setViewMode('whole'); break;
+                case 'p': if (viewMode !== 'cervical') togglePelvis(); break;
+                case 'i': setSelectedTool('implant'); break;
+                case 'n': setSelectedTool('note'); break;
+                default: return;
+            }
+            e.preventDefault();
+        };
+        window.addEventListener('keydown', handleShortcut);
+        return () => window.removeEventListener('keydown', handleShortcut);
+    }, [screwModalOpen, osteoModalOpen, cageModalOpen, forceModalOpen, forcePopover, helpModalOpen, noteModalOpen, changeLogOpen, preferencesModalOpen, disclaimerAccepted, viewMode, canUndo, canRedo]);
+
     const levels = useMemo(() => {
         const lvls = [];
         // VIEW LOGIC
@@ -219,6 +304,8 @@ const App = () => {
         }
         return lvls;
     }, [viewMode, showPelvis]);
+
+    const heightScale = useMemo(() => calculateAutoScale(levels), [levels]);
 
     const scheme: ColourScheme = COLOUR_SCHEMES.find(s => s.id === colourScheme) || COLOUR_SCHEMES[0];
 
@@ -297,18 +384,20 @@ const App = () => {
     const handleZoneClick = (levelId: string, zone: string) => {
         const isForceZone = zone.startsWith('force');
 
-        // Force zones → always open ForceModal, regardless of selected tool
+        // Force zones → popover to pick force type, regardless of selected tool
         if (isForceZone) {
+            // If force already placed here, find it for edit/replace
+            const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
+            const existingForce = currentPlacements.find(p => p.levelId === levelId && p.zone === zone);
             setPendingForceZone({ levelId, zone });
-            setForceModalOpen(true);
+            setForcePopover({ x: lastClickRef.current.x, y: lastClickRef.current.y, existingTool: existingForce?.tool || null, existingId: existingForce?.id || null });
             return;
         }
 
         // ANNOTATION MODE: when note/pin selected, non-force clicks place notes
         if (selectedTool === 'note') {
-            const hs = calculateAutoScale(levels);
             const levelObj = levels.find(l => l.id === levelId);
-            const vertH = levelObj ? getLevelHeight(levelObj) * hs : 30;
+            const vertH = levelObj ? getLevelHeight(levelObj) * heightScale : 30;
             setPendingNoteTool({ tool: selectedTool, levelId, offsetX: -140, offsetY: Math.round(vertH / 2) });
             setEditingNote(null);
             setNoteModalOpen(true);
@@ -348,6 +437,11 @@ const App = () => {
             addPlacement(levelId, zone, selectedTool, null);
         } else if (!levelId.startsWith('S')) {
             // Default: open osteotomy modal (Schwab 3+) — not for sacral levels
+            const permitted = getPermittedOsteotomyTypes(levelId);
+            if (permitted !== null && permitted.length === 0) {
+                showToast(t('alert.no_osteotomy_at_level'), 'error');
+                return;
+            }
             setPendingPlacement({ levelId, zone, tool: 'osteotomy' });
             setEditingPlacementId(null);
             setEditingData(undefined);
@@ -377,10 +471,22 @@ const App = () => {
         if (existingCage) { setEditingCageLevel(levelId); setEditingData(existingCage); setCageModalOpen(true); return; }
 
         // Nothing exists - show picker (cage vs osteotomy)
-        setDiscPickerLevel(levelId);
+        // Cervical disc levels: no disc-level osteotomies permitted (Facet/Ponte blocked, Corpectomy is vertebral-body only)
+        const permitted = getPermittedOsteotomyTypes(levelId);
+        const hasDiscOsteo = permitted === null || permitted.some(id => id === 'Facet' || id === 'Ponte');
+        if (!hasDiscOsteo) {
+            // Skip picker — go straight to cage modal
+            const anyPermitted = Object.values(CAGE_PERMISSIBILITY).some(arr => arr.includes(levelId));
+            if (!anyPermitted) return showToast(t('alert.no_cage_types', { level: getDiscLabel(levelId, levels) }), 'error');
+            setEditingCageLevel(levelId);
+            setEditingData(undefined);
+            setCageModalOpen(true);
+            return;
+        }
+        setDiscPickerLevel({ levelId, x: lastClickRef.current.x, y: lastClickRef.current.y });
     };
     const handleDiscPickCage = () => {
-        const levelId = discPickerLevel!;
+        const levelId = discPickerLevel!.levelId;
         setDiscPickerLevel(null);
         const anyPermitted = Object.values(CAGE_PERMISSIBILITY).some(arr => arr.includes(levelId));
         if (!anyPermitted) return showToast(t('alert.no_cage_types', { level: getDiscLabel(levelId, levels) }), 'error');
@@ -389,7 +495,7 @@ const App = () => {
         setCageModalOpen(true);
     };
     const handleDiscPickOsteo = () => {
-        const levelId = discPickerLevel!;
+        const levelId = discPickerLevel!.levelId;
         setDiscPickerLevel(null);
         setPendingPlacement({ levelId, zone: 'disc', tool: 'osteotomy' });
         setEditingPlacementId(null);
@@ -398,7 +504,7 @@ const App = () => {
         setOsteoModalOpen(true);
     };
 
-    const handleCageConfirm = (data: any) => {
+    const handleCageConfirm = (data: CageConfirmData) => {
         const lvl = editingCageLevel!;
         const permitted = CAGE_PERMISSIBILITY[data.type] || [];
         if (!permitted.includes(lvl)) {
@@ -451,7 +557,7 @@ const App = () => {
         }
     };
 
-    const handleScrewConfirm = (sizeData: any, components: any, finalType: string, annotation: string, finalLevelId: string, finalZone: Zone) => {
+    const handleScrewConfirm = (sizeData: string | null, components: ScrewDetails | null, finalType: string, annotation: string, finalLevelId: string, finalZone: Zone) => {
         if (components) { setDefaultDiameter(components.diameter); setDefaultLength(components.length); setDefaultScrewMode(components.mode); setDefaultCustomText(components.customText || ''); }
         setLastUsedScrewType(finalType);
         if (editingPlacementId) {
@@ -495,10 +601,11 @@ const App = () => {
         }
     };
 
-    const handleOsteoConfirm = (data: any) => {
+    const handleOsteoConfirm = (data: OsteotomyConfirmData) => {
         setDefaultOsteoType(data.type);
-        if (editingPlacementId) { updatePlacement(editingPlacementId, 'osteotomy', data); setEditingPlacementId(null); } 
-        else if (pendingPlacement) { addPlacement(pendingPlacement.levelId, pendingPlacement.zone, 'osteotomy', data); setPendingPlacement(null); }
+        const osteoData: OsteotomyData = { ...data, angle: data.angle != null ? Number(data.angle) : null };
+        if (editingPlacementId) { updatePlacement(editingPlacementId, 'osteotomy', osteoData); setEditingPlacementId(null); }
+        else if (pendingPlacement) { addPlacement(pendingPlacement.levelId, pendingPlacement.zone, 'osteotomy', osteoData); setPendingPlacement(null); }
     };
 
     const addPlacement = (levelId: string, zone: string, tool: string, data: string | OsteotomyData | null, annotation?: string) => {
@@ -572,23 +679,23 @@ const App = () => {
             setNoteModalOpen(false);
         }
     };
-    const handleNoteClick = (note: any) => {
+    const handleNoteClick = (note: Note) => {
         setEditingNote(note);
         setPendingNoteTool(null);
         setNoteModalOpen(true);
     };
-    const handleGhostNoteClick = (ghostNote: any) => {
+    const handleGhostNoteClick = (ghostNote: Note) => {
         setActiveChart('completed');
         setEditingNote({ ...ghostNote });
         setPendingNoteTool(null);
         setNoteModalOpen(true);
     };
 
-    const handleGhostConnectorClick = (ghostConn: any) => {
+    const handleGhostConnectorClick = (ghostConn: { levelId: string; fraction: number }) => {
         dispatch({ type: 'ADD_CONNECTOR', chart: 'construct', connector: { id: genId(), levelId: ghostConn.levelId, fraction: ghostConn.fraction, tool: 'connector' } });
     };
 
-    const handleGhostCageClick = (ghostCage: any) => {
+    const handleGhostCageClick = (ghostCage: Cage) => {
         setActiveChart('completed');
         setEditingCageLevel(ghostCage.levelId);
         setEditingData(ghostCage);
@@ -621,14 +728,15 @@ const App = () => {
         // Chart columns are SVG-native and don't need this
         const demoCol = element.querySelector('.w-\\[370px\\]');
         if (demoCol) {
-            demoCol.querySelectorAll('input[type="checkbox"]').forEach((cb: any) => {
-                if (cb.checked) cb.setAttribute('checked', 'checked');
+            demoCol.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+                if ((cb as HTMLInputElement).checked) cb.setAttribute('checked', 'checked');
                 else cb.removeAttribute('checked');
             });
-            demoCol.querySelectorAll('select').forEach((sel: any) => {
-                Array.from(sel.options).forEach((opt: any, i: number) => {
-                    if (i === sel.selectedIndex) (opt as HTMLOptionElement).setAttribute('selected', 'selected');
-                    else (opt as HTMLOptionElement).removeAttribute('selected');
+            demoCol.querySelectorAll('select').forEach((sel) => {
+                const selectEl = sel as HTMLSelectElement;
+                Array.from(selectEl.options).forEach((opt: HTMLOptionElement, i: number) => {
+                    if (i === selectEl.selectedIndex) opt.setAttribute('selected', 'selected');
+                    else opt.removeAttribute('selected');
                 });
             });
         }
@@ -638,7 +746,7 @@ const App = () => {
             backgroundColor: '#ffffff',
             width: 1485,
             height: 1050,
-            filter: (node: any) => !node.dataset?.exportHide
+            filter: (node: HTMLElement) => !node.dataset?.exportHide
         });
         return canvas;
     };
@@ -772,14 +880,14 @@ const App = () => {
             <h2 className="font-bold text-2xl text-slate-900 mb-4 border-b-4 border-slate-900 pb-2">{t('export.title')}</h2>
             <div className="flex-1 flex flex-col overflow-y-auto min-h-0">
                 <div className="space-y-1 shrink-0">
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.name')}</label><div className="editable-field w-full text-xs font-semibold" contentEditable suppressContentEditableWarning onBlur={e => setPatientField('name', e.target.innerText)} placeholder={t('patient.click_to_enter')}>{patientData.name}</div></div>
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.id')}</label><div className="editable-field w-full text-xs font-mono" contentEditable suppressContentEditableWarning onBlur={e => setPatientField('id', e.target.innerText)} placeholder={t('patient.click_to_enter')}>{patientData.id}</div></div>
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.surgeon')}</label><div className="editable-field w-full text-xs" contentEditable suppressContentEditableWarning onBlur={e => setPatientField('surgeon', e.target.innerText)} placeholder={t('patient.click_to_enter')}>{patientData.surgeon}</div></div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.name')}</label><div className="editable-field w-full text-sm font-bold" contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('name', e.target.innerText)} placeholder={t('patient.click_to_enter')}>{patientData.name}</div></div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.id')}</label><div className="editable-field w-full text-sm font-mono font-bold" contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('id', e.target.innerText)} placeholder={t('patient.click_to_enter')}>{patientData.id}</div></div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.surgeon')}</label><div className="editable-field w-full text-xs" contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('surgeon', e.target.innerText)} placeholder={t('patient.click_to_enter')}>{patientData.surgeon}</div></div>
                     <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.date')}</label><div className="editable-field w-full text-xs cursor-pointer" onClick={() => setIsEditingDate(true)}>{isEditingDate ? <input type="date" className="w-full text-xs border-b border-slate-800 bg-transparent outline-none py-0" value={patientData.date} autoFocus onBlur={()=>setIsEditingDate(false)} onChange={e=>setPatientField('date', e.target.value)} /> : formatDate(patientData.date)}</div></div>
                 </div>
                 <div className="border-t border-slate-200 my-3"></div>
                 <div className="space-y-1 shrink-0">
-                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.supplier')}</label><select className="editable-field w-full text-xs bg-white cursor-pointer" value={patientData.company} onChange={e => { const v = e.target.value; setPatientField('company', v); if (AUTO_THEME_FROM_COMPANY && COMPANY_THEME_MAP[v]) { changeTheme(COMPANY_THEME_MAP[v]); } }}><option value="">{t('patient.select_supplier')}</option>{IMPLANT_COMPANIES.map(c => <option key={c} value={c}>{c}</option>)}<option value="__other">{t('patient.other')}</option></select>{patientData.company === '__other' && <div className="editable-field w-full text-xs mt-0.5" contentEditable suppressContentEditableWarning onBlur={e => setPatientField('company', e.target.innerText)} placeholder={t('patient.enter_company')}></div>}</div>
+                    <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.supplier')}</label><select className="editable-field w-full text-xs bg-white cursor-pointer" value={patientData.company} onChange={e => { const v = e.target.value; setPatientField('company', v); if (AUTO_THEME_FROM_COMPANY && COMPANY_THEME_MAP[v]) { changeTheme(COMPANY_THEME_MAP[v]); } }}><option value="">{t('patient.select_supplier')}</option>{IMPLANT_COMPANIES.map(c => <option key={c} value={c}>{c}</option>)}<option value="__other">{t('patient.other')}</option></select>{patientData.company === '__other' && <div className="editable-field w-full text-xs mt-0.5" contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('company', e.target.innerText)} placeholder={t('patient.enter_company')}></div>}</div>
                     <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-0">{t('patient.screw_system')}</label><ScrewSystemCombo value={patientData.screwSystem} onChange={v => setPatientField('screwSystem', v)} company={patientData.company} placeholder={t('patient.screw_system_placeholder')} /></div>
                 </div>
                 <div className="border-t border-slate-200 my-2"></div>
@@ -793,7 +901,7 @@ const App = () => {
                             </label>
                         ))}
                     </div>
-                    <div className="editable-field w-full text-[10px] mt-1" contentEditable suppressContentEditableWarning onBlur={e => dispatch({ type: 'SET_BONE_GRAFT', types: patientData.boneGraft?.types || [], notes: e.target.innerText })} placeholder={t('patient.bone_graft_notes_placeholder')}>{patientData.boneGraft?.notes || ''}</div>
+                    <div className="editable-field w-full text-[10px] mt-1" contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => dispatch({ type: 'SET_BONE_GRAFT', types: patientData.boneGraft?.types || [], notes: e.target.innerText })} placeholder={t('patient.bone_graft_notes_placeholder')}>{patientData.boneGraft?.notes || ''}</div>
                 </div>
                 <ImplantInventory placements={[...(showFinalInventory ? completedPlacements : plannedPlacements), ...(showFinalInventory ? completedCages : plannedCages).map(c => ({...c, zone: 'mid' as Zone, annotation: '', tool: c.tool, data: null})), ...(showFinalInventory ? completedConnectors : plannedConnectors).map(c => ({...c, levelId: levels[0]?.id || 'T1', zone: 'mid' as Zone, annotation: '', data: null}))] as Placement[]} tools={[...allTools, {id: 'tlif', labelKey: 'inventory.cage.tlif', icon: 'cage', type: 'cage'}, {id: 'plif', labelKey: 'inventory.cage.plif', icon: 'cage', type: 'cage'}, {id: 'acdf', labelKey: 'inventory.cage.acdf', icon: 'cage', type: 'cage'}, {id: 'xlif', labelKey: 'inventory.cage.xlif', icon: 'cage', type: 'cage'}, {id: 'olif', labelKey: 'inventory.cage.olif', icon: 'cage', type: 'cage'}, {id: 'alif', labelKey: 'inventory.cage.alif', icon: 'cage', type: 'cage'}]} title={showFinalInventory ? t('inventory.title_construct') : t('inventory.title_plan')} visibleLevelIds={levels.map(l => l.id)} levels={levels} rods={showFinalInventory ? { left: patientData.leftRod, right: patientData.rightRod } : { left: patientData.planLeftRod, right: patientData.planRightRod }} />
                 <button onClick={() => setShowFinalInventory(!showFinalInventory)} className="mt-1 w-full text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase tracking-wider py-1 border border-slate-200 rounded hover:bg-slate-50 transition-colors">{showFinalInventory ? t('inventory.view_plan') : t('inventory.view_final')}</button>
@@ -802,9 +910,9 @@ const App = () => {
         </React.Fragment>
     );
 
-    const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('planLeftRod', e.target.innerText)} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('planRightRod', e.target.innerText)} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} />;
+    const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={heightScale} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('planLeftRod', e.target.innerText)} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('planRightRod', e.target.innerText)} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} isActive={activeChart === 'planned'} activeBg={scheme.activeBg} activeText={scheme.activeText} />;
 
-    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('leftRod', e.target.innerText)} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onBlur={e => setPatientField('rightRod', e.target.innerText)} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} />;
+    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={heightScale} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('leftRod', e.target.innerText)} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('rightRod', e.target.innerText)} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} isActive={activeChart === 'completed'} activeBg={scheme.activeBg} activeText={scheme.activeText} />;
 
     const newPatientAction = () => setConfirmNewPatient(true);
     const executeNewPatient = () => {
@@ -823,7 +931,7 @@ const App = () => {
                 onConfirm={handleScrewConfirm}
                 onConfirmAndNext={handleScrewConfirmAndNext}
                 onDelete={() => removePlacement(editingPlacementId!)}
-                initialData={editingData} initialTool={editingTool ?? undefined}
+                initialData={editingData as string | null | undefined} initialTool={editingTool ?? undefined}
                 defaultDiameter={defaultDiameter} defaultLength={defaultLength}
                 defaultMode={defaultScrewMode} defaultCustomText={defaultCustomText}
                 initialAnnotation={editingAnnotation}
@@ -833,9 +941,73 @@ const App = () => {
                 placements={activeChart === 'planned' ? plannedPlacements : completedPlacements}
                 useRegionDefaults={useRegionDefaults}
                 confirmAndNextDefault={confirmAndNextDefault} />
-            <OsteotomyModal isOpen={osteoModalOpen} onClose={() => { setOsteoModalOpen(false); setOsteoDiscLevel(undefined); }} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId!)} initialData={editingData} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} discLevelOnly={osteoDiscLevel} />
-            <CageModal isOpen={cageModalOpen} onClose={() => setCageModalOpen(false)} onConfirm={handleCageConfirm} onDelete={handleDeleteCage} initialData={editingData} levelId={editingCageLevel ?? ''} levels={levels} />
+            <OsteotomyModal isOpen={osteoModalOpen} onClose={() => { setOsteoModalOpen(false); setOsteoDiscLevel(undefined); }} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId!)} initialData={editingData as OsteotomyData | null | undefined} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} discLevelOnly={osteoDiscLevel}
+                levelId={pendingPlacement?.levelId || (editingPlacementId ? [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId)?.levelId : undefined)} />
+            <CageModal isOpen={cageModalOpen} onClose={() => setCageModalOpen(false)} onConfirm={handleCageConfirm} onDelete={handleDeleteCage} initialData={editingData as { tool: string; data: CageData } | null | undefined} levelId={editingCageLevel ?? ''} levels={levels} />
             <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
+            {forcePopover && (() => {
+                const popW = 200, popH = forcePopover.existingTool ? 300 : 260;
+                const px = Math.min(forcePopover.x, window.innerWidth - popW - 8);
+                const py = Math.min(forcePopover.y - popH / 2, window.innerHeight - popH - 8);
+                const handleForceSelect = (forceId: string) => {
+                    if (forcePopover.existingId) {
+                        // Replace: remove old, place new
+                        const chart = activeChart === 'planned' ? 'plan' : 'construct';
+                        dispatch({ type: 'REMOVE_PLACEMENT', chart, id: forcePopover.existingId });
+                    }
+                    handleForceConfirm(forceId);
+                    setForcePopover(null);
+                };
+                const handleForceRemove = () => {
+                    if (forcePopover.existingId) {
+                        const chart = activeChart === 'planned' ? 'plan' : 'construct';
+                        dispatch({ type: 'REMOVE_PLACEMENT', chart, id: forcePopover.existingId });
+                    }
+                    setPendingForceZone(null);
+                    setForcePopover(null);
+                };
+                return (<Portal>
+                    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true"
+                        onKeyDown={e => {
+                            if (e.key === 'Escape') { e.preventDefault(); setForcePopover(null); }
+                            else if ((e.key === 'Delete' || e.key === 'Backspace') && forcePopover.existingId) { e.preventDefault(); handleForceRemove(); }
+                            else if (e.key === 'Tab') {
+                                e.preventDefault();
+                                const btns = Array.from(document.querySelectorAll('.force-picker-btn')) as HTMLElement[];
+                                const idx = btns.indexOf(document.activeElement as HTMLElement);
+                                const next = e.shiftKey ? (idx <= 0 ? btns.length - 1 : idx - 1) : (idx >= btns.length - 1 ? 0 : idx + 1);
+                                btns[next]?.focus();
+                            }
+                        }}
+                        onClick={() => setForcePopover(null)}>
+                        <div className="absolute bg-white rounded-lg shadow-2xl overflow-hidden animate-[fadeIn_0.1s_ease-out]"
+                            style={{ left: Math.max(8, px), top: Math.max(8, py), width: popW }}
+                            onClick={e => e.stopPropagation()}>
+                            <div className="bg-blue-700 text-white px-3 py-1.5 text-center text-xs font-bold">{t('modal.force.title')}</div>
+                            <div className="p-2 grid grid-cols-2 gap-1.5">
+                                {FORCE_TYPES.map((f, i) => (
+                                    <button key={f.id} onClick={() => handleForceSelect(f.id)}
+                                        autoFocus={i === 0}
+                                        className={`force-picker-btn flex flex-col items-center gap-1 p-2 rounded border transition-all outline-none focus:ring-2 focus:ring-blue-400 ${
+                                            forcePopover.existingTool === f.id
+                                                ? 'bg-blue-600 border-blue-700 text-white'
+                                                : 'border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300'
+                                        }`}>
+                                        <InstrumentIcon type={f.icon} className="w-7 h-7" color={forcePopover.existingTool === f.id ? '#ffffff' : '#2563eb'} />
+                                        <span className={`text-[9px] font-bold leading-tight text-center ${forcePopover.existingTool === f.id ? 'text-blue-100' : 'text-slate-700'}`}>{t(f.labelKey)}</span>
+                                    </button>
+                                ))}
+                            </div>
+                            {forcePopover.existingTool && (
+                                <div className="px-2 pb-2">
+                                    <button onClick={handleForceRemove}
+                                        className="w-full px-2 py-1.5 rounded text-xs font-bold text-red-600 hover:bg-red-50 border border-red-200 transition-colors">{t('button.remove')}</button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </Portal>);
+            })()}
             <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
             <PreferencesModal isOpen={preferencesModalOpen} onClose={() => setPreferencesModalOpen(false)} useRegionDefaults={useRegionDefaults} onToggleRegionDefaults={toggleRegionDefaults} confirmAndNextDefault={confirmAndNextDefault} onToggleConfirmAndNextDefault={toggleConfirmAndNextDefault} />
             <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
@@ -873,8 +1045,12 @@ const App = () => {
                     { action: handleDiscPickCage, label: t('help.cages.title'), cls: 'text-sky-800 bg-sky-50 border-sky-200 hover:bg-sky-100 focus:ring-2 focus:ring-sky-400' },
                     { action: handleDiscPickOsteo, label: t('help.osteotomies.title'), cls: 'text-amber-800 bg-amber-50 border-amber-200 hover:bg-amber-100 focus:ring-2 focus:ring-amber-400' },
                 ];
+                // Position popover near click, clamped to viewport
+                const popW = 180, popH = 120;
+                const px = Math.min(discPickerLevel.x, window.innerWidth - popW - 8);
+                const py = Math.min(discPickerLevel.y - popH / 2, window.innerHeight - popH - 8);
                 return (<Portal>
-                    <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true"
+                    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true"
                         onKeyDown={e => {
                             if (e.key === 'Escape') { e.preventDefault(); setDiscPickerLevel(null); }
                             else if (e.key === 'Enter') {
@@ -892,9 +1068,11 @@ const App = () => {
                             }
                         }}
                         onClick={() => setDiscPickerLevel(null)}>
-                        <div className="bg-white rounded-lg shadow-2xl w-full max-w-[200px] overflow-hidden" onClick={e => e.stopPropagation()}>
-                            <div className="bg-slate-700 text-white px-3 py-2 text-center text-xs font-bold uppercase tracking-wider">{getDiscLabel(discPickerLevel, levels)}</div>
-                            <div className="p-2 flex flex-col gap-1">
+                        <div className="absolute bg-white rounded-lg shadow-2xl overflow-hidden animate-[fadeIn_0.1s_ease-out]"
+                            style={{ left: Math.max(8, px), top: Math.max(8, py), width: popW }}
+                            onClick={e => e.stopPropagation()}>
+                            <div className="bg-slate-700 text-white px-3 py-1.5 text-center text-xs font-bold uppercase tracking-wider">{getDiscLabel(discPickerLevel.levelId, levels)}</div>
+                            <div className="p-1.5 flex flex-col gap-1">
                                 {pickerButtons.map((btn, i) => (
                                     <button key={i} onClick={btn.action}
                                         className={`disc-picker-btn w-full px-3 py-2 rounded text-sm font-bold border transition-colors outline-none ${btn.cls}`}
@@ -951,7 +1129,7 @@ const App = () => {
                         {themeDropdown}
                         <select value={currentLang} onChange={e => changeLang(e.target.value)}
                             className="bg-transparent text-[10px] border-none outline-none cursor-pointer w-14" style={{ color: scheme.textSecondary }}>
-                            {SUPPORTED_LANGUAGES.filter(l => !(l as any).hidden || l.code === currentLang).map(l => (
+                            {SUPPORTED_LANGUAGES.filter(l => !l.hidden || l.code === currentLang).map(l => (
                                 <option key={l.code} value={l.code} style={{color: '#1e293b'}}>{l.code.toUpperCase()}</option>
                             ))}
                         </select>
@@ -977,7 +1155,7 @@ const App = () => {
                                     const active = viewMode === vm;
                                     return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{shortLabels[vm]}</button>;
                                 })}
-                                {viewMode !== 'cervical' && <button onClick={togglePelvis} title={showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')} className={`px-2 py-2 text-[10px] rounded border font-bold ${showPelvis ? '' : 'hover:brightness-125'}`} style={showPelvis ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>P</button>}
+                                {viewMode !== 'cervical' && <button onClick={togglePelvis} title={showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')} className={`px-2 py-2 text-[10px] rounded border font-bold ${showPelvis ? '' : 'hover:brightness-125'}`} style={showPelvis ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')}</button>}
                             </div>
                         </div>
                     ) : (
@@ -997,7 +1175,7 @@ const App = () => {
                                     const active = viewMode === vm;
                                     return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{shortLabels[vm]}</button>;
                                 })}
-                                {viewMode !== 'cervical' && <button onClick={togglePelvis} title={showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')} className={`px-2 py-2 text-[10px] rounded border font-bold ${showPelvis ? '' : 'hover:brightness-125'}`} style={showPelvis ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>P</button>}
+                                {viewMode !== 'cervical' && <button onClick={togglePelvis} title={showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')} className={`px-2 py-2 text-[10px] rounded border font-bold ${showPelvis ? '' : 'hover:brightness-125'}`} style={showPelvis ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')}</button>}
                             </div>
                             <div className="w-px h-5 bg-white/20 mx-1"></div>
                             <button onClick={() => { copyPlanToCompleted(); switchPortraitTab(2); }} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold hover:bg-white/10 hover:brightness-125 shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)' }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
@@ -1063,10 +1241,10 @@ const App = () => {
                                 <CreditsFooter lang={currentLang} />
                             </div>
                             <div dir="ltr" className="flex-[4] flex flex-col h-full min-w-0 overflow-hidden">
-                                <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={true} heightScale={calculateAutoScale(levels)} cages={plannedCages} onDiscClick={() => {}} connectors={plannedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.planLeftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.planRightRod}</span></div></React.Fragment>} reconLabelPositions={reconLabelPositions} />
+                                <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={true} heightScale={heightScale} cages={plannedCages} onDiscClick={() => {}} connectors={plannedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.planLeftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.planRightRod}</span></div></React.Fragment>} reconLabelPositions={reconLabelPositions} />
                             </div>
                             <div dir="ltr" className="flex-[3] flex flex-col h-full min-w-0 overflow-hidden">
-                                <ChartPaper title={t('export.construct')} placements={completedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={false} heightScale={calculateAutoScale(levels)} cages={completedCages} onDiscClick={() => {}} connectors={completedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={completedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.leftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.rightRod}</span></div></React.Fragment>} reconLabelPositions={reconLabelPositions} />
+                                <ChartPaper title={t('export.construct')} placements={completedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={false} heightScale={heightScale} cages={completedCages} onDiscClick={() => {}} connectors={completedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={completedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.leftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.rightRod}</span></div></React.Fragment>} reconLabelPositions={reconLabelPositions} />
                             </div>
                             <div className="absolute bottom-1 end-2 text-[8px] text-slate-300 font-mono">{getDisclaimerTimestamp() ? `${t('disclaimer.accepted_label')} ${getDisclaimerTimestamp()}` : ''} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
                         </div>
@@ -1191,7 +1369,7 @@ const App = () => {
                                 <span className="font-bold text-[10px] uppercase tracking-widest shrink-0" style={{ color: scheme.textMuted }}>{t('sidebar.language')}</span>
                                 <select value={currentLang} onChange={e => changeLang(e.target.value)}
                                     className="flex-1 min-w-0 bg-transparent text-[10px] border-none outline-none cursor-pointer" style={{ color: scheme.textSecondary }}>
-                                    {SUPPORTED_LANGUAGES.filter(l => !(l as any).hidden || l.code === currentLang).map(l => (
+                                    {SUPPORTED_LANGUAGES.filter(l => !l.hidden || l.code === currentLang).map(l => (
                                         <option key={l.code} value={l.code} style={{color: '#1e293b'}}>{l.name}</option>
                                     ))}
                                 </select>
@@ -1249,6 +1427,7 @@ const App = () => {
                 ))}
             </div>}
             {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerTick(n => n + 1); if (syncChannelRef.current) syncChannelRef.current.postMessage({ type: 'lang_accepted', appVersion: CURRENT_VERSION, lang: currentLang }); }} />}
+            {disclaimerAccepted && <OnboardingTour activeChart={activeChart} setActiveChart={setActiveChart} />}
         </div>
     );
 };

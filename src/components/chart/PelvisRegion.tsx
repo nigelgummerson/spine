@@ -31,7 +31,7 @@ interface PelvisRegionProps {
  * SI joint shown as a distinct gap between sacral ala and iliac wing.
  * No bottom cut line on wings — the fill fades naturally.
  */
-export const PelvisRegion: React.FC<PelvisRegionProps> = ({
+export const PelvisRegion: React.FC<PelvisRegionProps> = React.memo(({
     chartWidth, scaledWidth, vertX, heightScale,
     l5Y, s1Y, s2Y, clipLeft, clipRight, readOnly, overlay, placements, ghostPlacements, tools, onZoneClick, onPlacementClick, onGhostClick,
 }) => {
@@ -419,4 +419,4 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
             })()}
         </g>
     );
-};
+});

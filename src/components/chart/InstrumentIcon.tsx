@@ -13,7 +13,7 @@ interface HookBaseProps {
     label: string;
 }
 
-export const InstrumentIcon = ({ type, className = "w-5 h-5", color = "black", side }: InstrumentIconProps) => {
+export const InstrumentIcon = React.memo(({ type, className = "w-5 h-5", color = "black", side }: InstrumentIconProps) => {
     const strokeWidth = 2.5;
     // Arrow nearest spine: for right-side placements arrow is on left (default),
     // for left-side placements arrow is on right (mirrored)
@@ -73,4 +73,4 @@ export const InstrumentIcon = ({ type, className = "w-5 h-5", color = "black", s
         case 'note': return <svg viewBox="0 0 24 24" className={className} stroke={color} fill="none" strokeWidth={strokeWidth}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>;
         default: return null;
     }
-};
+});

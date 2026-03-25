@@ -2,6 +2,44 @@
 
 Detailed technical changes by version. For user-facing changes see the in-app changelog (`src/data/changelog.ts`).
 
+## v2.6.0-beta (2026-03-25)
+
+### Cervical Anatomy Redesign
+- `7d4ab54` Discriminated union for VertAnatomyEntry — `ThoracolumbarAnatomyEntry` and `CervicalAnatomyEntry` with region tags, enables type-safe geometry access
+- `609e345` Cervical anatomy data (Oc-C7): lateral mass width/depth, articular pillar, dens dimensions, C1 anterior/posterior arch widths (sources: Panjabi 1991, Tan 2004, Yao 2015, Berry 1987)
+- `8933934` Type narrowing for VertSvgGeometry union in all consumers (LevelRow, PelvisRegion, SpineVertebra)
+- `ce292b8` Anatomically distinct cervical SVG shapes: occiput (foramen magnum + condyles), C1 atlas (anterior/posterior arches + lateral masses), C2 axis (dens + body), C3-C6 subaxial (body + articular pillars), C7 transitional (wider body + pillars)
+- `1b5aa29` Lateral mass click zones for cervical screw placement — zones positioned over articular pillars
+- `39a1126` Restrict anatomy-based icon positioning to cervical/occiput only (thoracolumbar unchanged)
+- `8fdb4d2` Correct cervical bodyW to Yao EPWl White male values, zone-edge icons aligned to pillar edges
+- `756bb22` C1 totalWidth 80→58mm to align lateral masses with C2 articular pillar width
+
+### Whole-Spine Rescale (Tan 2004)
+- `9f271a9` Rescale whole-spine vertebral body heights to Tan 2004 published proportions (Panjabi 1991 for cervical). Transverse processes added as constant-height rectangles at pedicle level, width from anatomy data.
+- `115603f` TP shape fix: constant-height rectangles at pedicle centreline (not full vertebral height)
+- `446e82b` Per-level disc heights from Koeller 1986 data — cervical (2.8-3.3mm), thoracic (3.5-5.2mm), lumbar (8.5-11.3mm)
+- `2cf17a8` DISC_MIN_PX reduced from 8 to 6 for better disc height variation
+- `fbcb3cc` Per-level TP craniocaudal heights from Berry 1987 data
+
+### Implant Data Audit (web-searched 2026-03-25)
+- Renamed "Zimmer Biomet" → "Highridge Medical" (spine business sold to H.I.G. Capital April 2024)
+- Removed SpineGuard (instruments only, not implants), Aurora Spine (no pedicle screws), SI-BONE (SI joint fixation only)
+- Removed legacy/discontinued systems: TSRH, VERTEX SELECT (Medtronic); EXPEDIUM, VIPER 2 MIS, ALTALYNE (DePuy); Armada (Globus, doesn't exist); DENALI MI (VB Spine, unverifiable); Sequoia (Highridge); Firebird (Orthofix); Zodiac (ATEC); Karma (Spinal Elements)
+- Added new systems: LONGITUDE II (Medtronic MIS), QUARTEX OCT (Globus cervical), LineSider (Highridge TL), Cortium (ulrich OCT)
+- Stryker retained — divestiture to VB Spine still incomplete in many territories
+
+### ACDF Cage Visibility
+- ACDF cages now render with cage graphic and label in whole-spine cervical view (previously replaced by italic text hint)
+- Cervical cage label font scaled to 60% of normal (min 8px) to prevent text clashing in compressed disc spaces
+
+### Preferences Sync (BroadcastChannel)
+- Preferences (showPelvis, useRegionDefaults, confirmAndNext) added to serialized `ui` object in `serializeState()`
+- `deserializeDocument()` returns `preferences` alongside viewMode/colourScheme
+- `applyPrefs()` helper in useDocumentState applies incoming preferences and updates localStorage
+- Preference changes trigger sync broadcast (added to effect dependency array)
+
+---
+
 ## v2.5.30-beta (2026-03-25)
 
 ### Pelvic Region Redesign

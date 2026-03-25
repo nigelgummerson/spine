@@ -8,7 +8,15 @@ import '@fontsource/noto-sans-sc/400.css';
 import '@fontsource/noto-sans-jp/400.css';
 import '@fontsource/noto-sans-kr/400.css';
 import App from './App';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import './styles.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root')!);
-root.render(<App />);
+root.render(<ErrorBoundary><App /></ErrorBoundary>);
+
+// Register service worker for offline caching (web build only, not file://)
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  navigator.serviceWorker.register(
+    import.meta.env.BASE_URL + 'sw.js'
+  ).catch(() => { /* SW registration failed — app works fine without it */ });
+}

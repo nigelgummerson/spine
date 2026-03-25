@@ -3,6 +3,7 @@ import { t } from '../../i18n/i18n';
 import { modalKeyHandler, selectWheelHandler, numberWheelHandler } from './ScrewModal';
 import { IconTrash, IconX } from '../icons';
 import { Portal } from '../Portal';
+import { getPermittedOsteotomyTypes } from '../../data/clinical';
 
 interface OsteotomyConfirmData {
     type: string;
@@ -20,9 +21,10 @@ interface OsteotomyModalProps {
     defaultType?: string;
     defaultAngle?: string;
     discLevelOnly?: boolean | null;
+    levelId?: string;
 }
 
-export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, defaultType, defaultAngle, discLevelOnly }: OsteotomyModalProps) => {
+export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, defaultType, defaultAngle, discLevelOnly, levelId }: OsteotomyModalProps) => {
     if (!isOpen) return null;
 
     const OSTEOTOMY_TYPES = [
@@ -35,11 +37,18 @@ export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialDa
         { id: 'Corpectomy', labelKey: 'clinical.osteotomy.corpectomy.label', shortLabel: 'Corpectomy', schwabKey: 'clinical.osteotomy.corpectomy.schwab', descKey: 'clinical.osteotomy.corpectomy.desc', defaultAngle: '0', group: 'anterior' }
     ];
 
-    const filteredTypes = discLevelOnly === true
+    // Filter by disc-level vs vertebral-body placement
+    const discFiltered = discLevelOnly === true
         ? OSTEOTOMY_TYPES.filter(ot => ot.discLevel)
         : discLevelOnly === false
             ? OSTEOTOMY_TYPES.filter(ot => !ot.discLevel)
             : OSTEOTOMY_TYPES;
+
+    // Further filter by cervical permissibility
+    const permitted = levelId ? getPermittedOsteotomyTypes(levelId) : null;
+    const filteredTypes = permitted !== null
+        ? discFiltered.filter(ot => permitted.includes(ot.id))
+        : discFiltered;
 
     // Resolve initial type: use defaultType only if it's in the filtered list
     const resolvedDefault = filteredTypes.find(ot => ot.id === defaultType) ? defaultType! : filteredTypes[0]?.id || 'PSO';

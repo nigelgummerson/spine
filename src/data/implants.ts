@@ -12,25 +12,23 @@ export const BONE_GRAFT_LABEL_KEYS: Record<string, string> = {
 
 export const IMPLANT_COMPANIES: string[] = [
     'Medtronic', 'DePuy Synthes', 'Globus Medical', 'Stryker', 'VB Spine',
-    'Zimmer Biomet', 'Orthofix', 'ATEC Spine', 'SI-BONE', 'Aesculap (B. Braun)',
-    'ulrich medical', 'SpineGuard', 'Spinal Elements', 'Life Spine', 'Aurora Spine', 'Precision Spine'
+    'Highridge Medical', 'Orthofix', 'ATEC Spine', 'Aesculap (B. Braun)',
+    'ulrich medical', 'Spinal Elements', 'Life Spine', 'Precision Spine'
 ];
 
 export const SCREW_SYSTEMS: Record<string, string[]> = {
-    'Medtronic': ['ModuLeX', 'Solera', 'Solera Voyager', 'Infinity OCT', 'VERTEX SELECT', 'TSRH'],
-    'DePuy Synthes': ['TriALTIS', 'EXPEDIUM VERSE', 'EXPEDIUM', 'VIPER PRIME', 'VIPER 2 MIS', 'ALTALYNE', 'MATRIX', 'SYMPHONY OCT'],
-    'Globus Medical': ['CREO', 'CREO MIS', 'REVERE', 'REVOLVE', 'Reline', 'Reline 3D', 'Armada', 'Precept'],
+    'Medtronic': ['ModuLeX', 'Solera', 'Solera Voyager', 'LONGITUDE II', 'Infinity OCT'],
+    'DePuy Synthes': ['TriALTIS', 'EXPEDIUM VERSE', 'VIPER PRIME', 'MATRIX', 'SYMPHONY OCT'],
+    'Globus Medical': ['CREO', 'CREO MIS', 'REVERE', 'REVOLVE', 'Reline', 'Reline 3D', 'Precept', 'QUARTEX OCT'],
     'Stryker': ['Serrato', 'MESA 2', 'MESA Rail', 'Xia 3', 'DENALI', 'ES2', 'Everest', 'CASPIAN OCT'],
-    'VB Spine': ['Serrato', 'MESA 2', 'MESA Rail', 'Xia 3', 'DENALI', 'DENALI MI', 'ES2', 'Everest', 'OASYS', 'CASPIAN OCT', 'YUKON OCT'],
-    'Zimmer Biomet': ['Vital', 'Vitality', 'Polaris', 'Sequoia', 'PathFinder NXT', 'Cypher MIS', 'Virage OCT'],
-    'Orthofix': ['Firebird', 'Firebird NXG', 'Phoenix MIS', 'Mariner', 'NorthStar OCT'],
-    'ATEC Spine': ['InVictus', 'InVictus OCT', 'Arsenal', 'Zodiac'],
-    'SI-BONE': ['iFuse', 'iFuse-TORQ', 'iFuse Bedrock'],
+    'VB Spine': ['Serrato', 'MESA 2', 'MESA Rail', 'Xia 3', 'DENALI', 'ES2', 'Everest', 'OASYS', 'CASPIAN OCT', 'YUKON OCT'],
+    'Highridge Medical': ['Vital', 'Vitality', 'Polaris', 'PathFinder NXT', 'Cypher MIS', 'LineSider', 'Virage OCT'],
+    'Orthofix': ['Firebird NXG', 'Phoenix MIS', 'Mariner', 'NorthStar OCT'],
+    'ATEC Spine': ['InVictus', 'InVictus OCT', 'Arsenal'],
     'Aesculap (B. Braun)': ['S4', 'Ennovate'],
-    'ulrich medical': ['neon3', 'tango RS', 'uCentum', 'Momentum', 'flamenco'],
-    'Spinal Elements': ['Overwatch', 'Mercury', 'Lotus', 'Karma'],
+    'ulrich medical': ['neon3', 'tango RS', 'uCentum', 'Momentum', 'flamenco', 'Cortium'],
+    'Spinal Elements': ['Overwatch', 'Mercury', 'Lotus'],
     'Life Spine': ['CENTERLINE', 'Solstice OCT'],
-    'Aurora Spine': ['ZIP', 'DEXA-C'],
     'Precision Spine': ['SureLOK', 'Reform'],
 };
 

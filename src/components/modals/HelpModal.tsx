@@ -91,6 +91,10 @@ export const HelpModal = ({ isOpen, onClose }: HelpModalProps) => {
                         <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.offline_use.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.offline_use.body')}} /></div>
                     </div>
                     <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
+                        <div className="min-w-[40px] pt-1"><span className="text-lg">&#x26A0;</span></div>
+                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.report_problem.title')}</h4><p className="text-xs text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: t('help.report_problem.body')}} /></div>
+                    </div>
+                    <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
                         <div className="min-w-[40px] pt-1"><span className="text-lg">&#x2696;</span></div>
                         <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.disclaimer.title')}</h4><p className="text-xs text-slate-600 leading-relaxed">{t('disclaimer.clinical_short')}</p></div>
                     </div>
@@ -104,7 +108,7 @@ export const HelpModal = ({ isOpen, onClose }: HelpModalProps) => {
                             <div className="mt-0.5 shrink-0"><IconCC /></div>
                             <span dangerouslySetInnerHTML={{__html: t('credits.license')}} />
                         </div>
-                        <p className="text-[10px] text-slate-400 mt-2"><a href="https://plan.skeletalsurgery.com/spine/quick-reference.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600">{t('credits.quick_reference', { count: SUPPORTED_LANGUAGES.filter(l => !(l as any).hidden).length })}</a></p>
+                        <p className="text-[10px] text-slate-400 mt-2"><a href="https://plan.skeletalsurgery.com/spine/quick-reference.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600">{t('credits.quick_reference', { count: SUPPORTED_LANGUAGES.filter(l => !l.hidden).length })}</a></p>
                     </div>
                 </div>
                 <div className="bg-slate-50 px-4 py-3 text-end border-t border-slate-200">

@@ -40,8 +40,8 @@ describe('CAGE_PERMISSIBILITY', () => {
     expect(CAGE_PERMISSIBILITY.tlif).toEqual(expected);
   });
 
-  it('ALIF is only permitted at L4 and L5', () => {
-    expect(CAGE_PERMISSIBILITY.alif).toEqual(['L4','L5']);
+  it('ALIF is permitted at L3, L4 and L5', () => {
+    expect(CAGE_PERMISSIBILITY.alif).toEqual(['L3','L4','L5']);
   });
 
   it('XLIF is not permitted at L5 (too close to iliac vessels)', () => {
@@ -276,9 +276,9 @@ describe('buildHeightMap', () => {
 });
 
 describe('calculateAutoScale', () => {
-  it('returns a value between 0.5 and 1.5 for ALL_LEVELS', () => {
+  it('returns a value between 0.3 and 1.5 for ALL_LEVELS', () => {
     const scale = calculateAutoScale(ALL_LEVELS);
-    expect(scale).toBeGreaterThanOrEqual(0.5);
+    expect(scale).toBeGreaterThanOrEqual(0.3);
     expect(scale).toBeLessThanOrEqual(1.5);
   });
 

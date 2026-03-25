@@ -10,7 +10,7 @@ interface SpineVertebraProps {
     heightScale?: number;
 }
 
-export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale = 1 }: SpineVertebraProps) => {
+export const SpineVertebra = React.memo(({ label, type, height, isCorpectomy, heightScale = 1 }: SpineVertebraProps) => {
     const common = { fill: REGIONS[type].color, stroke: "#94a3b8", strokeWidth: "1" };
     const geom = getVertSvgGeometry(label);
 
@@ -160,16 +160,23 @@ export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale =
                     const pedCy = geom.pedCy;
                     const pedStroke = isT ? "#94a3b8" : "#64748b";
                     const pedWidth = isT ? "1" : "1.5";
-                    // Transverse processes — fill only, constant-height rectangles at pedicle level
+                    // Transverse processes — rectangles rotated by tpAngle (caudal angulation)
+                    // Pivot at bottom-inner corner so base stays flush with body
+                    const tpH = geom.tpHalfH * 2;
+                    const tpLeftW = l - geom.tpLeftX;
+                    const tpRightW = geom.tpRightX - r;
+                    const ang = geom.tpAngle;
                     const tpTop = pedCy - geom.tpHalfH;
                     const tpBot = pedCy + geom.tpHalfH;
                     return (
                         <g>
                             {/* Transverse processes (behind body, at pedicle level) */}
-                            <rect x={geom.tpLeftX} y={tpTop} width={l - geom.tpLeftX} height={tpBot - tpTop} rx={2}
-                                fill={common.fill} />
-                            <rect x={r} y={tpTop} width={geom.tpRightX - r} height={tpBot - tpTop} rx={2}
-                                fill={common.fill} />
+                            <rect x={geom.tpLeftX} y={tpTop} width={tpLeftW} height={tpH} rx={2}
+                                fill={common.fill}
+                                transform={ang ? `rotate(${ang}, ${l}, ${tpBot})` : undefined} />
+                            <rect x={r} y={tpTop} width={tpRightW} height={tpH} rx={2}
+                                fill={common.fill}
+                                transform={ang ? `rotate(${-ang}, ${r}, ${tpBot})` : undefined} />
                             <path d={bodyPath} {...common} />
                             <ellipse cx={geom.pedLeftCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth}/>
                             <ellipse cx={geom.pedRightCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth}/>
@@ -204,4 +211,4 @@ export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale =
             <text x="80" y={height/2} dominantBaseline="middle" textAnchor="middle" fontSize={Math.min(18, Math.max(12, 12 / Math.max(0.5, heightScale)))} fontWeight="bold" fill="#1e293b" className="font-sans pointer-events-none select-none">{label}</text>
         </svg>
     );
-};
+});

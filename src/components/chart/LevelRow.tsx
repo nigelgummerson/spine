@@ -34,7 +34,7 @@ export interface LevelRowProps {
 }
 
 /** SVG-native level row — renders as a <g> group at a given Y offset */
-export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlacements, onZoneClick, tools, onPlacementClick, onGhostClick, readOnly, showForces, heightScale, onDiscClick, cages, levels, viewMode, forcePlacements, ghostCages, onGhostCageClick, chartWidth, rowY }) => {
+export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements, ghostPlacements, onZoneClick, tools, onPlacementClick, onGhostClick, readOnly, showForces, heightScale, onDiscClick, cages, levels, viewMode, forcePlacements, ghostCages, onGhostCageClick, chartWidth, rowY }) => {
     const getItems = (z: string) => {
         const src = (forcePlacements && z.startsWith('force')) ? forcePlacements : placements;
         return src.filter(p => p.levelId === level.id && p.zone === z);
@@ -45,8 +45,10 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
     // Scaled instrument sizes — cervical levels get 25% smaller (clinically appropriate)
     const isCervical = level.type === 'C' || level.type === 'Oc';
     const cervicalFactor = isCervical ? 0.75 : 1;
-    const iconScale = Math.max(0.65, Math.min(1.3, heightScale)) * cervicalFactor;
+    const baseIconScale = Math.max(0.65, Math.min(1.3, heightScale));
+    const iconScale = baseIconScale * cervicalFactor;
     const screwPx = Math.round(24 * iconScale);
+    const baseScrewPx = Math.round(24 * baseIconScale); // for consistent zone centre alignment
     const hookW = Math.round(34 * iconScale);
     const hookH = Math.round(22 * iconScale);
     const fixW = Math.round(40 * iconScale);
@@ -84,7 +86,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
     const discH = hasDisc && rawDiscH > 0 ? Math.max(DISC_MIN_PX, rawDiscH) : 0;
 
     /** Render an instrument icon as a nested SVG */
-    const renderIcon = (type: string, x: number, y: number, w: number, h: number, colorOrProps?: string | Record<string, any>, side?: 'left' | 'right') => {
+    const renderIcon = (type: string, x: number, y: number, w: number, h: number, colorOrProps?: string | React.SVGAttributes<SVGSVGElement>, side?: 'left' | 'right') => {
         const color = typeof colorOrProps === 'string' ? colorOrProps : undefined;
         const extraProps = typeof colorOrProps === 'object' ? colorOrProps : undefined;
         return (
@@ -95,7 +97,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
     };
 
     /** Render a ghost target (empty zone indicator) */
-    const renderGhostTarget = (cx: number, cy: number, isForce: boolean) => {
+    const renderGhostTarget = (cx: number, cy: number, isForce: boolean, zoneName?: string) => {
         if (isForce) {
             // Cardinal icon for force zones
             return (
@@ -106,7 +108,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
         }
         const r = screwPx * 0.4;
         return (
-            <g opacity={0.6}>
+            <g opacity={0.6} data-ghost-zone={zoneName} data-ghost-level={level.id}>
                 <circle cx={cx} cy={cy} r={r} fill="none" stroke="#94a3b8" strokeWidth={2} strokeDasharray="4 3" />
                 <circle cx={cx} cy={cy} r={1.5} fill="#94a3b8" />
             </g>
@@ -160,12 +162,12 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
         const isForceZone = zone.startsWith('force');
 
         // Sacral: position at L5 pedicle alignment
-        // All others (cervical, thoracolumbar, occiput): position at zone edge
+        // All others: zone centre based on baseScrewPx so cervical/thoracolumbar centres align
         const zoneCx = isForceZone ? zoneX + zoneW / 2
             : isSacral && zone === 'left' && chartScrewLeftCx !== undefined ? chartScrewLeftCx
             : isSacral && zone === 'right' && chartScrewRightCx !== undefined ? chartScrewRightCx
-            : zone === 'left' ? zoneX + zoneW - screwPx / 2 - 4
-            : zone === 'right' ? zoneX + screwPx / 2 + 4
+            : zone === 'left' ? zoneX + zoneW - baseScrewPx / 2 - 4
+            : zone === 'right' ? zoneX + baseScrewPx / 2 + 4
             : zoneX + zoneW / 2;
         const zoneCy = isForceZone ? rowHeight / 2 : chartScrewCy;
 
@@ -174,9 +176,9 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
         const elements: React.ReactElement[] = [];
 
         // Clickable background rect — hover via parent <g> onMouseEnter/Leave
-        const hoverFill = isForceZone ? 'rgba(191, 219, 254, 0.3)' : 'rgba(148, 163, 184, 0.15)';
+        const hoverFill = isForceZone ? 'rgba(191, 219, 254, 0.5)' : 'rgba(148, 163, 184, 0.25)';
         elements.push(
-            <rect key={`zone-bg-${zone}`} className="zone-bg" x={zoneX} y={0} width={zoneW} height={rowHeight}
+            <rect key={`zone-bg-${zone}`} className="zone-bg" data-zone={zone} data-level={level.id} x={zoneX} y={0} width={zoneW} height={rowHeight}
                 fill="transparent" cursor={clickable ? 'crosshair' : 'default'}
                 onClick={() => clickable && onZoneClick(level.id, zone)} />
         );
@@ -193,7 +195,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
 
         // Ghost target when empty
         if (!items.length && !ghostItem && !readOnly && (zone === 'left' || zone === 'right' || isForceZone)) {
-            elements.push(<g key={`ghost-target-${zone}`}>{renderGhostTarget(zoneCx, zoneCy, isForceZone)}</g>);
+            elements.push(<g key={`ghost-target-${zone}`}>{renderGhostTarget(zoneCx, zoneCy, isForceZone, zone)}</g>);
         }
 
         // Render placed items
@@ -201,8 +203,8 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const tool = tools.find(item => item.id === p.tool);
             const isHookItem = HOOK_TYPES.includes(p.tool);
             const isOsteo = p.tool === 'osteotomy';
-            let displayLabel: any = p.data;
-            let angle: any = null;
+            let displayLabel: string | OsteotomyData | null = p.data;
+            let angle: number | null = null;
             if (isOsteo && typeof p.data === 'object' && p.data !== null) {
                 displayLabel = (p.data as OsteotomyData).shortLabel || (p.data as OsteotomyData).type;
                 angle = (p.data as OsteotomyData).angle;
@@ -229,7 +231,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
 
             // Label text
             const labelText = showData
-                ? (isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel)) : formatScrewSize(String(displayLabel)))
+                ? (isOsteo ? (angle != null ? `${displayLabel} ${angle}\u00B0` : String(displayLabel)) : formatScrewSize(String(displayLabel)))
                 : '';
             const annText = showAnn ? ann : '';
             const isInline = heightScale < 0.85 && !!labelText && !!annText;
@@ -239,11 +241,11 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}>
                     {align === 'left' && (labelText || annText) && (
                         <foreignObject x={zoneX + 4} y={0} width={iconX - zoneX - 6} height={rowHeight} overflow="visible" pointerEvents="none">
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' } as any}>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' }}>
                                 <div style={{ width: '100%', display: 'flex', flexDirection: isInline ? 'row-reverse' : 'column', alignItems: isInline ? 'center' : 'flex-end', gap: isInline ? 3 : 0, lineHeight: 1 }}>
                                     {labelText && <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>}
                                     {annText && <div style={{ alignSelf: 'stretch', textAlign: 'left', width: '100%' }}>
-                                        <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', paddingLeft: 1, paddingRight: 1, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as any}>{annText}</span>
+                                        <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', paddingLeft: 1, paddingRight: 1, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.1 } as React.CSSProperties}>{annText}</span>
                                     </div>}
                                 </div>
                             </div>
@@ -252,11 +254,11 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     {renderIcon(tool?.icon || '', iconX, iconY, iW, iH, undefined, zone === 'left' ? 'left' : zone === 'right' ? 'right' : undefined)}
                     {align === 'right' && (labelText || annText) && (
                         <foreignObject x={iconX + iW + 2} y={0} width={zoneX + zoneW - iconX - iW - 12} height={rowHeight} overflow="visible" pointerEvents="none">
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' } as any}>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' }}>
                                 <div style={{ width: '100%', display: 'flex', flexDirection: isInline ? 'row' : 'column', alignItems: isInline ? 'center' : 'flex-start', gap: isInline ? 3 : 0, lineHeight: 1 }}>
                                     {labelText && <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>}
                                     {annText && <div style={{ width: '100%', textAlign: 'right', lineHeight: 1.1 }}>
-                                        <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', paddingLeft: 1, paddingRight: 1, lineHeight: 1.1, display: 'inline-block' } as any}>{annText}</span>
+                                        <span style={{ fontSize: 9, fontStyle: 'italic', color: '#94a3b8', paddingLeft: 1, paddingRight: 1, lineHeight: 1.1, display: 'inline-block' }}>{annText}</span>
                                     </div>}
                                 </div>
                             </div>
@@ -278,8 +280,8 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const tool = tools.find(item => item.id === ghostItem.tool);
             const isHookItem = HOOK_TYPES.includes(ghostItem.tool);
             const isOsteo = ghostItem.tool === 'osteotomy';
-            let displayLabel: any = ghostItem.data;
-            let angle: any = null;
+            let displayLabel: string | OsteotomyData | null = ghostItem.data;
+            let angle: number | null = null;
             if (isOsteo && typeof ghostItem.data === 'object' && ghostItem.data !== null) {
                 displayLabel = (ghostItem.data as OsteotomyData).shortLabel || (ghostItem.data as OsteotomyData).type;
                 angle = (ghostItem.data as OsteotomyData).angle;
@@ -302,7 +304,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             }
 
             const labelText = showData
-                ? (isOsteo ? (angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel)) : formatScrewSize(String(displayLabel)))
+                ? (isOsteo ? (angle != null ? `${displayLabel} ${angle}\u00B0` : String(displayLabel)) : formatScrewSize(String(displayLabel)))
                 : '';
 
             elements.push(
@@ -310,7 +312,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostItem); }}>
                     {align === 'left' && labelText && (
                         <foreignObject x={zoneX + 4} y={0} width={iconX - zoneX - 6} height={rowHeight} overflow="visible" pointerEvents="none">
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' } as any}>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' }}>
                                 <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: 1 }}>
                                     <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 'bold', fontSize: labelPx, color: '#0f172a', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>
                                 </div>
@@ -321,7 +323,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     {renderIcon(tool?.icon || '', iconX, iconY, iW, iH, '#14b8a6', zone === 'left' ? 'left' : zone === 'right' ? 'right' : undefined)}
                     {align === 'right' && labelText && (
                         <foreignObject x={iconX + iW + 2} y={0} width={zoneX + zoneW - iconX - iW - 12} height={rowHeight} overflow="visible" pointerEvents="none">
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' } as any}>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' }}>
                                 <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
                                     <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 'bold', fontSize: labelPx, color: '#0f172a', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>
                                 </div>
@@ -352,8 +354,8 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
 
         midItems.forEach(p => {
             const tool = tools.find(item => item.id === p.tool);
-            let displayLabel: any = '';
-            let angle: any = '';
+            let displayLabel: string = '';
+            let angle: number | null = null;
             if (p.tool === 'osteotomy' && typeof p.data === 'object' && p.data !== null) {
                 displayLabel = (p.data as OsteotomyData).shortLabel || (p.data as OsteotomyData).type;
                 angle = (p.data as OsteotomyData).angle;
@@ -367,7 +369,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                         <InstrumentIcon type={tool?.icon || ''} className="w-full h-full" />
                     </svg>
                     {p.tool === 'osteotomy' && p.data && (() => {
-                        const osteoText = angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel);
+                        const osteoText = angle != null ? `${displayLabel} ${angle}\u00B0` : String(displayLabel);
                         const osteoRectW = Math.max(measureText(osteoText, `bold ${osteoLabelPx}px Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, sans-serif`) + 16, 60);
                         return (
                         <g>
@@ -377,7 +379,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                             <text x={vertX + scaledWidth / 2} y={rowHeight / 2}
                                 textAnchor="middle" dominantBaseline="middle"
                                 fontSize={osteoLabelPx} fontWeight="bold" fill="#92400e">
-                                {displayLabel}{angle != null && angle !== '' ? ` ${angle}\u00B0` : ''}
+                                {displayLabel}{angle != null ? ` ${angle}\u00B0` : ''}
                             </text>
                         </g>
                         );
@@ -391,8 +393,8 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const gp = ghostPlacements.find(p => p.levelId === level.id && p.zone === 'mid');
             if (gp) {
                 const tool = tools.find(item => item.id === gp.tool);
-                let displayLabel: any = '';
-                let angle: any = '';
+                let displayLabel: string = '';
+                let angle: number | null = null;
                 if (gp.tool === 'osteotomy' && typeof gp.data === 'object' && gp.data !== null) {
                     displayLabel = (gp.data as OsteotomyData).shortLabel || (gp.data as OsteotomyData).type;
                     angle = (gp.data as OsteotomyData).angle;
@@ -404,7 +406,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                             <InstrumentIcon type={tool?.icon || ''} className="w-full h-full" color="#14b8a6" />
                         </svg>
                         {gp.tool === 'osteotomy' && gp.data && (() => {
-                            const ghostOsteoText = angle != null && angle !== '' ? `${displayLabel} ${angle}\u00B0` : String(displayLabel);
+                            const ghostOsteoText = angle != null ? `${displayLabel} ${angle}\u00B0` : String(displayLabel);
                             const ghostOsteoRectW = Math.max(measureText(ghostOsteoText, `bold ${osteoLabelPx}px Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, sans-serif`) + 16, 60);
                             return (
                             <g>
@@ -414,7 +416,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                                 <text x={vertX + scaledWidth / 2} y={rowHeight / 2}
                                     textAnchor="middle" dominantBaseline="middle"
                                     fontSize={osteoLabelPx} fontWeight="bold" fill="#0d9488">
-                                    {displayLabel}{angle != null && angle !== '' ? ` ${angle}\u00B0` : ''}
+                                    {displayLabel}{angle != null ? ` ${angle}\u00B0` : ''}
                                 </text>
                             </g>
                             );
@@ -433,24 +435,15 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
         const discY = rowHeight;
 
         const renderCageInfo = (cage: Cage, opacity?: number, isGhost?: boolean) => {
-            if (viewMode === 'whole' && level.type === 'C') {
-                return (
-                    <g opacity={opacity}>
-                        <text x={vertX + scaledWidth / 2} y={discY + discH / 2}
-                            textAnchor="middle" dominantBaseline="middle"
-                            fontSize={8} fontStyle="italic" fill="#d97706">
-                            {t('chart.cervical_cage_hint')}
-                        </text>
-                    </g>
-                );
-            }
             const sideChar = cage.data.side && cage.data.side !== 'bilateral' && cage.data.side !== 'midline'
                 ? ` (${cage.data.side.charAt(0).toUpperCase()})` : '';
             const hasDims = cage.data.height || cage.data.lordosis;
+            const isCervicalWhole = viewMode === 'whole' && level.type === 'C';
             const cageLabel = hasDims
                 ? `${cage.tool.toUpperCase()} ${cage.data.height}H ${cage.data.lordosis || '0'}\u00B0${sideChar}`
                 : `${cage.tool.toUpperCase()}${sideChar}`;
             const labelColor = isGhost ? '#14b8a6' : '#0369a1';
+            const fontSize = isCervicalWhole ? Math.max(8, cageLabelPx * 0.6) : cageLabelPx;
             return (
                 <g opacity={opacity}>
                     <svg x={vertX} y={discY} width={scaledWidth} height={discH} viewBox="0 0 160 20" preserveAspectRatio="none" overflow="visible">
@@ -458,7 +451,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
                     </svg>
                     <text x={rightZoneX + 8} y={discY + discH / 2}
                         textAnchor="start" dominantBaseline="middle"
-                        fontSize={cageLabelPx} fontWeight="bold" fill={labelColor}>
+                        fontSize={fontSize} fontWeight="bold" fill={labelColor}>
                         {cageLabel}
                     </text>
                 </g>
@@ -466,9 +459,9 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
         };
 
         const renderOsteoLabel = (osteo: Placement, opacity?: number, isGhost?: boolean) => {
-            const data = osteo.data as any;
+            const data = osteo.data as OsteotomyData;
             const label = data?.shortLabel || t('clinical.osteotomy.fallback');
-            const angleStr = data?.angle != null && data?.angle !== '' ? ` ${data.angle}\u00B0` : '';
+            const angleStr = data?.angle != null ? ` ${data.angle}\u00B0` : '';
             const discOsteoText = `${label}${angleStr}`;
             const discOsteoRectW = Math.max(measureText(discOsteoText, `bold ${cageLabelPx}px Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, sans-serif`) + 16, 60);
             return (
@@ -525,7 +518,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             {(() => {
                 const midClickable = !readOnly && !isSacral;
                 return (
-                <g onMouseEnter={midClickable ? (e) => { (e.currentTarget.querySelector('.mid-bg') as SVGRectElement)?.setAttribute('fill', 'rgba(253, 230, 138, 0.3)'); } : undefined}
+                <g onMouseEnter={midClickable ? (e) => { (e.currentTarget.querySelector('.mid-bg') as SVGRectElement)?.setAttribute('fill', 'rgba(253, 230, 138, 0.45)'); } : undefined}
                    onMouseLeave={midClickable ? (e) => { (e.currentTarget.querySelector('.mid-bg') as SVGRectElement)?.setAttribute('fill', 'transparent'); } : undefined}>
                 <rect className="mid-bg" x={vertX} y={0} width={scaledWidth} height={rowHeight}
                     fill="transparent" cursor={midClickable ? 'pointer' : 'default'}
@@ -556,4 +549,4 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             {renderDiscZone()}
         </g>
     );
-};
+});

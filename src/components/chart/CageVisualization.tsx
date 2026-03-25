@@ -9,7 +9,7 @@ interface CageVisualizationProps {
     color?: string;
 }
 
-export const CageVisualization = ({ cageType, heightScale, levelId, color: colorProp }: CageVisualizationProps) => {
+export const CageVisualization = React.memo(({ cageType, heightScale, levelId, color: colorProp }: CageVisualizationProps) => {
     const h = 12 * heightScale;
     const color = colorProp || "#0ea5e9";
     const geom = getVertSvgGeometry(levelId);
@@ -34,4 +34,4 @@ export const CageVisualization = ({ cageType, heightScale, levelId, color: color
         case 'alif': return <rect x={l + ann} y="2" width={bw - ann*2} height={h} rx="2" fill={color} opacity="0.7" />;
         default: return <rect x={80 - acdfW/2} y="2" width={acdfW} height={h} fill={color} />;
     }
-};
+});

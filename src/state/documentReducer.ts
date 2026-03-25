@@ -1,6 +1,6 @@
 // src/state/documentReducer.ts
 import { WHOLE_SPINE_MAP } from '../data/anatomy';
-import type { DocumentState, DocumentAction, Placement, Cage, Connector, Note, Chart, PatientData, OsteotomyData } from '../types';
+import type { DocumentState, DocumentAction, Placement, Cage, Connector, Note, Chart, PatientData, OsteotomyData, Zone } from '../types';
 
 // --- V4 mapping tables ---
 
@@ -256,17 +256,61 @@ interface RodText {
     right?: string;
 }
 
+interface V4Element {
+    id: string;
+    type: string;
+    level: string;
+    side: string;
+    zone?: string;
+    markerType?: string;
+    screw?: { headType: string; diameter?: number; length?: number };
+    hook?: { hookType: string };
+    fixation?: { fixationType: string; description?: string };
+    osteotomy?: { osteotomyType: string; schwabGrade?: number; correctionAngle?: number; reconstructionCage?: string };
+    cage?: { approach: string; height?: number; width?: number; length?: number; lordosis?: number };
+    connector?: { connectorType: string; fraction: number };
+    annotation?: string;
+}
+
+interface V4Force {
+    id: string;
+    type: string;
+    direction?: string;
+    level: string;
+    side: string;
+}
+
+interface V4Rod {
+    id: string;
+    side: string;
+    freeText: string;
+}
+
+interface V4Note {
+    id: string;
+    level: string;
+    text: string;
+    showArrow: boolean;
+}
+
 interface V4ChartResult {
-    elements: any[];
-    forces: any[];
-    rods: any[];
-    notes: any[];
+    elements: V4Element[];
+    forces: V4Force[];
+    rods: V4Rod[];
+    notes: V4Note[];
     notePositions: Record<string, { offsetX: number; offsetY: number }>;
 }
 
+interface V4ChartData {
+    elements?: V4Element[];
+    forces?: V4Force[];
+    rods?: V4Rod[];
+    notes?: V4Note[];
+}
+
 export function internalToV4Chart(placements: Placement[], cages: Cage[], connectors: Connector[], notes: Note[], rodText: RodText): V4ChartResult {
-    const elements: any[] = [];
-    const forces: any[] = [];
+    const elements: V4Element[] = [];
+    const forces: V4Force[] = [];
     (placements || []).forEach(p => {
         const fv4 = FORCE_TO_V4[p.tool];
         if (fv4) {
@@ -281,51 +325,50 @@ export function internalToV4Chart(placements: Placement[], cages: Cage[], connec
         const hookTypes = Object.keys(TOOL_TO_V4_HOOK);
         const fixTypes = Object.keys(TOOL_TO_V4_FIXATION);
         if (screwTypes.includes(p.tool)) {
-            const el: any = { id: p.id, type: 'screw', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', zone: p.zone };
-            const screw: any = { headType: p.tool };
+            const screw: V4Element['screw'] = { headType: p.tool };
             if (typeof p.data === 'string' && p.data.includes('x')) {
                 const parts = p.data.split('x').map(Number);
                 if (!isNaN(parts[0])) screw.diameter = parts[0];
                 if (!isNaN(parts[1])) screw.length = parts[1];
             }
-            el.screw = screw;
+            const el: V4Element = { id: p.id, type: 'screw', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', zone: p.zone, screw };
             if (p.annotation) el.annotation = p.annotation;
             elements.push(el);
         } else if (hookTypes.includes(p.tool)) {
-            const el: any = { id: p.id, type: 'hook', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', zone: p.zone, hook: { hookType: TOOL_TO_V4_HOOK[p.tool] } };
-            if (p.annotation) el.annotation = p.annotation;
-            elements.push(el);
+            const hookEl: V4Element = { id: p.id, type: 'hook', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', zone: p.zone, hook: { hookType: TOOL_TO_V4_HOOK[p.tool] } };
+            if (p.annotation) hookEl.annotation = p.annotation;
+            elements.push(hookEl);
         } else if (fixTypes.includes(p.tool)) {
-            const el: any = { id: p.id, type: 'fixation', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', zone: p.zone, fixation: { fixationType: TOOL_TO_V4_FIXATION[p.tool] } };
-            if (p.data) el.fixation.description = p.data;
-            if (p.annotation) el.annotation = p.annotation;
-            elements.push(el);
+            const fixation: NonNullable<V4Element['fixation']> = { fixationType: TOOL_TO_V4_FIXATION[p.tool] };
+            if (p.data && typeof p.data === 'string') fixation.description = p.data;
+            const fixEl: V4Element = { id: p.id, type: 'fixation', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', zone: p.zone, fixation };
+            if (p.annotation) fixEl.annotation = p.annotation;
+            elements.push(fixEl);
         } else if (p.tool === 'osteotomy' && typeof p.data === 'object' && p.data !== null) {
             const oData = p.data as OsteotomyData;
             const ov4 = OSTEO_TO_V4[oData.type] || { t: oData.type, g: null };
-            const el: any = { id: p.id, type: 'osteotomy', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'midline', zone: p.zone };
-            el.osteotomy = { osteotomyType: ov4.t };
-            if (ov4.g) el.osteotomy.schwabGrade = ov4.g;
-            if (oData.angle != null && oData.angle !== ('' as any)) el.osteotomy.correctionAngle = Number(oData.angle);
-            if (oData.reconstructionCage) el.osteotomy.reconstructionCage = oData.reconstructionCage;
-            elements.push(el);
+            const osteotomy: NonNullable<V4Element['osteotomy']> = { osteotomyType: ov4.t };
+            if (ov4.g) osteotomy.schwabGrade = ov4.g;
+            if (oData.angle != null && String(oData.angle) !== '') osteotomy.correctionAngle = Number(oData.angle);
+            if (oData.reconstructionCage) osteotomy.reconstructionCage = oData.reconstructionCage;
+            const osteoEl: V4Element = { id: p.id, type: 'osteotomy', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'midline', zone: p.zone, osteotomy };
+            elements.push(osteoEl);
         }
     });
     (cages || []).forEach(c => {
-        const el: any = { id: c.id, type: 'cage', level: c.levelId, side: c.data?.side || 'bilateral' };
-        el.cage = { approach: c.tool.toUpperCase() };
+        const cage: NonNullable<V4Element['cage']> = { approach: c.tool.toUpperCase() };
         if (c.data) {
-            if (c.data.height) el.cage.height = Number(c.data.height);
-            if (c.data.width) el.cage.width = Number(c.data.width);
-            if (c.data.length) el.cage.length = Number(c.data.length);
-            if (c.data.lordosis) el.cage.lordosis = Number(c.data.lordosis);
+            if (c.data.height) cage.height = Number(c.data.height);
+            if (c.data.width) cage.width = Number(c.data.width);
+            if (c.data.length) cage.length = Number(c.data.length);
+            if (c.data.lordosis) cage.lordosis = Number(c.data.lordosis);
         }
-        elements.push(el);
+        elements.push({ id: c.id, type: 'cage', level: c.levelId, side: c.data?.side || 'bilateral', cage });
     });
     (connectors || []).forEach(cn => {
         elements.push({ id: cn.id, type: 'connector', level: cn.levelId, side: 'midline', connector: { connectorType: 'crosslink', fraction: cn.fraction } });
     });
-    const rods: any[] = [];
+    const rods: V4Rod[] = [];
     if (rodText?.left) rods.push({ id: 'rod-left', side: 'left', freeText: rodText.left });
     if (rodText?.right) rods.push({ id: 'rod-right', side: 'right', freeText: rodText.right });
     const v4Notes = (notes || []).map(n => ({ id: n.id, level: n.levelId, text: n.text, showArrow: n.showArrow || false }));
@@ -343,52 +386,55 @@ interface InternalChartResult {
     rodRight: string;
 }
 
-export function v4ChartToInternal(chartData: any, notePositions: Record<string, any>): InternalChartResult {
+export function v4ChartToInternal(chartData: V4ChartData, notePositions: Record<string, { offsetX: number; offsetY: number }>): InternalChartResult {
     const placements: Placement[] = [], cages: Cage[] = [], connectors: Connector[] = [], notes: Note[] = [];
-    (chartData.elements || []).forEach((el: any) => {
+    (chartData.elements || []).forEach((el: V4Element) => {
         // zone field (v4.1+) carries the full zone type; fall back to side for older v4 files
-        const resolveZone = (el: any) => el.zone || (el.side === 'right' ? 'right' : 'left');
+        const resolveZone = (el: V4Element): Zone => (el.zone as Zone) || (el.side === 'right' ? 'right' : 'left');
 
         if (el.type === 'screw') {
             const sizeStr = (el.screw?.diameter && el.screw?.length) ? `${el.screw.diameter}x${el.screw.length}` : null;
             placements.push({ id: el.id, levelId: el.level, zone: resolveZone(el), tool: el.screw?.headType || 'polyaxial', data: sizeStr, annotation: el.annotation || '' });
         } else if (el.type === 'hook') {
-            const tool = V4_HOOK_TO_TOOL[el.hook?.hookType] || 'pedicle_hook';
+            const hookType = el.hook?.hookType || '';
+            const tool = V4_HOOK_TO_TOOL[hookType] || 'pedicle_hook';
             placements.push({ id: el.id, levelId: el.level, zone: resolveZone(el), tool, data: null, annotation: el.annotation || '' });
         } else if (el.type === 'fixation') {
-            const tool = V4_FIXATION_TO_TOOL[el.fixation?.fixationType] || 'band';
+            const fixType = el.fixation?.fixationType || '';
+            const tool = V4_FIXATION_TO_TOOL[fixType] || 'band';
             placements.push({ id: el.id, levelId: el.level, zone: resolveZone(el), tool, data: el.fixation?.description || null, annotation: el.annotation || '' });
         } else if (el.type === 'osteotomy') {
-            const v3Type = V4_OSTEO_TO_TOOL[el.osteotomy?.osteotomyType] || el.osteotomy?.osteotomyType || 'PSO';
-            const isDisc = ['facetectomy', 'ponte'].includes(el.osteotomy?.osteotomyType);
-            const osteoZone = el.zone || (isDisc ? 'disc' : 'mid');
-            placements.push({ id: el.id, levelId: el.level, zone: osteoZone, tool: 'osteotomy', data: { type: v3Type, shortLabel: el.osteotomy?.osteotomyType === 'facetectomy' ? 'Facet' : (v3Type.length <= 6 ? v3Type : v3Type.substring(0, 3).toUpperCase()), angle: el.osteotomy?.correctionAngle ?? null, reconstructionCage: el.osteotomy?.reconstructionCage || '' }, annotation: '' });
+            const osteoType = el.osteotomy?.osteotomyType || '';
+            const v3Type = V4_OSTEO_TO_TOOL[osteoType] || osteoType || 'PSO';
+            const isDisc = ['facetectomy', 'ponte'].includes(osteoType);
+            const osteoZone: Zone = (el.zone as Zone) || (isDisc ? 'disc' : 'mid');
+            placements.push({ id: el.id, levelId: el.level, zone: osteoZone, tool: 'osteotomy', data: { type: v3Type, shortLabel: osteoType === 'facetectomy' ? 'Facet' : (v3Type.length <= 6 ? v3Type : v3Type.substring(0, 3).toUpperCase()), angle: el.osteotomy?.correctionAngle ?? null, reconstructionCage: el.osteotomy?.reconstructionCage || '' }, annotation: '' });
         } else if (el.type === 'cage') {
-            cages.push({ id: el.id, levelId: el.level, tool: (el.cage?.approach || 'TLIF').toLowerCase(), data: { height: String(el.cage?.height || ''), lordosis: String(el.cage?.lordosis || ''), side: el.side || 'bilateral', width: el.cage?.width ? String(el.cage.width) : undefined, length: el.cage?.length ? String(el.cage.length) : undefined } as any });
+            cages.push({ id: el.id, levelId: el.level, tool: (el.cage?.approach || 'TLIF').toLowerCase(), data: { height: String(el.cage?.height || ''), lordosis: String(el.cage?.lordosis || ''), side: el.side || 'bilateral', width: el.cage?.width ? String(el.cage.width) : undefined, length: el.cage?.length ? String(el.cage.length) : undefined } });
         } else if (el.type === 'connector') {
             connectors.push({ id: el.id, levelId: el.level, fraction: el.connector?.fraction || 0.5, tool: 'connector' });
         } else if (el.type === 'marker' && el.markerType === 'unstable') {
             placements.push({ id: el.id, levelId: el.level, zone: resolveZone(el), tool: 'unstable', data: null, annotation: '' });
         }
     });
-    (chartData.forces || []).forEach((f: any) => {
+    (chartData.forces || []).forEach((f: V4Force) => {
         const key = f.direction ? `${f.type}-${f.direction}` : f.type;
         const tool = V4_FORCE_TO_TOOL[key] || 'compression';
         const zone = f.side === 'right' ? 'force_right' : 'force_left';
         placements.push({ id: f.id, levelId: f.level, zone, tool, data: null, annotation: '' });
     });
-    (chartData.notes || []).forEach((n: any) => {
+    (chartData.notes || []).forEach((n: V4Note) => {
         const pos = notePositions?.[n.id] || { offsetX: -140, offsetY: 0 };
         notes.push({ id: n.id, tool: 'note', levelId: n.level, text: n.text, offsetX: pos.offsetX, offsetY: pos.offsetY, showArrow: n.showArrow || false });
     });
-    const rodLeft = (chartData.rods || []).find((r: any) => r.side === 'left');
-    const rodRight = (chartData.rods || []).find((r: any) => r.side === 'right');
+    const rodLeft = (chartData.rods || []).find((r: V4Rod) => r.side === 'left');
+    const rodRight = (chartData.rods || []).find((r: V4Rod) => r.side === 'right');
     return { placements, cages, connectors, notes, rodLeft: rodLeft?.freeText || '', rodRight: rodRight?.freeText || '' };
 }
 
 // --- Serialize ---
 
-export function serializeState(state: DocumentState, viewMode: string, colourScheme: string, currentVersion: string, currentLang: string) {
+export function serializeState(state: DocumentState, viewMode: string, colourScheme: string, currentVersion: string, currentLang: string, prefs?: { showPelvis?: boolean; useRegionDefaults?: boolean; confirmAndNext?: boolean }) {
     const planChart = internalToV4Chart(
         state.plannedPlacements, state.plannedCages, state.plannedConnectors, state.plannedNotes,
         { left: state.patientData.planLeftRod, right: state.patientData.planRightRod }
@@ -417,13 +463,13 @@ export function serializeState(state: DocumentState, viewMode: string, colourSch
             boneGraft: { types: [] as string[], notes: '' },
             notes: constChart.notes,
         },
-        ui: { colourScheme, viewMode, notePositions: { ...planChart.notePositions, ...constChart.notePositions, ...state.reconLabelPositions } },
+        ui: { colourScheme, viewMode, notePositions: { ...planChart.notePositions, ...constChart.notePositions, ...state.reconLabelPositions }, ...(prefs && { preferences: prefs }) },
     };
 }
 
 // --- Deserialize ---
 
-export function migrateConnectors(conns: any[]): any[] {
+export function migrateConnectors(conns: Array<Connector & { yNorm?: number }>): Connector[] {
     if (!conns) return conns;
     return conns.map(c => {
         if (c.levelId) return c;
@@ -453,7 +499,8 @@ function migratePelvicPlacements(placements: Placement[]): Placement[] {
     });
 }
 
-export function deserializeDocument(json: any): { state: DocumentState; viewMode?: string; colourScheme?: string } {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- JSON boundary: shape validated by Zod before reaching here
+export function deserializeDocument(json: Record<string, any>): { state: DocumentState; viewMode?: string; colourScheme?: string; preferences?: { showPelvis?: boolean; useRegionDefaults?: boolean; confirmAndNext?: boolean } } {
     const state = createInitialState();
 
     // v4 format
@@ -493,12 +540,12 @@ export function deserializeDocument(json: any): { state: DocumentState; viewMode
         state.patientData = pd;
 
         // Restore recon label positions
-        const reconPos: Record<string, any> = {};
-        Object.entries(notePos).forEach(([k, v]) => { if (k.startsWith('recon-')) reconPos[k] = v; });
+        const reconPos: Record<string, { offsetX: number; offsetY: number }> = {};
+        Object.entries(notePos).forEach(([k, v]) => { if (k.startsWith('recon-')) reconPos[k] = v as { offsetX: number; offsetY: number }; });
         if (Object.keys(reconPos).length > 0) state.reconLabelPositions = reconPos;
 
         // Return state + UI preferences (caller applies these separately)
-        return { state, viewMode: json.ui?.viewMode, colourScheme: json.ui?.colourScheme };
+        return { state, viewMode: json.ui?.viewMode, colourScheme: json.ui?.colourScheme, preferences: json.ui?.preferences };
     }
 
     // v3 / v2 legacy format

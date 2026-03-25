@@ -63,8 +63,8 @@ The single most impactful addition. Transforms the planner from a screw map into
 
 ## Backlog (not SPEC-related)
 
-- [ ] Cervical spine proportions — extend VERTEBRA_ANATOMY to cervical levels
-- [ ] Specification sync — SPECIFICATION.md is outdated (last synced v0.9.0)
+- [x] Cervical spine proportions — extend VERTEBRA_ANATOMY to cervical levels (DONE v2.6.0)
+- [x] Specification sync — SPECIFICATION.md synced to v2.6.0 (2026-03-25)
 
 ## Done (recent)
 

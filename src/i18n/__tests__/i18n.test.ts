@@ -12,15 +12,16 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import TRANSLATIONS from '../translations.json';
 import LANGUAGES from '../languages.json';
 
 // ---------------------------------------------------------------------------
 // Load glossary via fs — file lives outside src/ so JSON import path may vary
 // ---------------------------------------------------------------------------
-const glossaryPath = resolve(__dirname, '../../../tests/translation-glossary.json');
+const glossaryPath = resolve(dirname(fileURLToPath(import.meta.url)), '../../../tests/translation-glossary.json');
 const GLOSSARY = JSON.parse(readFileSync(glossaryPath, 'utf-8')) as {
   allowlist: string[];
   terms: Array<{
@@ -125,6 +126,8 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   'Allograft',
   'Standard PSO',
   // Very short labels / abbreviations where English form is universal
+  'UIV',
+  'LIV',
   'L:',
   'R:',
   'Text',

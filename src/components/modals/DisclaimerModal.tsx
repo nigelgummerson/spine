@@ -41,7 +41,7 @@ export const DisclaimerModal = ({ lang, onLangChange, onAccept }: DisclaimerModa
                     onChange={e => onLangChange(e.target.value)}
                     className="bg-slate-700 text-white text-xs border-none rounded px-2 py-1 outline-none cursor-pointer"
                 >
-                    {SUPPORTED_LANGUAGES.filter(l => !(l as any).hidden || l.code === lang).map(l => (
+                    {SUPPORTED_LANGUAGES.filter(l => !l.hidden || l.code === lang).map(l => (
                         <option key={l.code} value={l.code}>{l.name}</option>
                     ))}
                 </select>

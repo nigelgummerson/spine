@@ -120,24 +120,35 @@ export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, l
                 <div className="p-5 space-y-4">
                     {/* Approach groups */}
                     {APPROACH_GROUPS.map(group => {
-                        const permittedInGroup = group.types
+                        const typesInGroup = group.types
                             .map(id => CAGE_TYPES.find(ct => ct.id === id))
-                            .filter((ct): ct is NonNullable<typeof ct> => !!ct && (CAGE_PERMISSIBILITY[ct.id] || []).includes(levelId));
-                        if (permittedInGroup.length === 0) return null;
+                            .filter((ct): ct is NonNullable<typeof ct> => !!ct);
+                        if (typesInGroup.length === 0) return null;
                         return (
                             <div key={group.labelKey}>
                                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{t(group.labelKey)} <span className="font-normal normal-case">- {t(group.descKey)}</span></div>
                                 <div className="flex gap-1.5">
-                                    {permittedInGroup.map(ct => (
-                                        <button key={ct.id} onClick={() => handleTypeChange(ct.id)}
-                                            className={`flex-1 py-2 px-2 rounded border text-xs font-bold transition-all ${
-                                                type === ct.id ? 'bg-sky-700 text-white border-sky-800 shadow' :
-                                                'bg-slate-50 text-slate-700 border-slate-200 hover:bg-sky-50 hover:border-sky-300'
-                                            }`}>
-                                            <div>{ct.label}</div>
-                                            <div className={`text-[10px] font-normal mt-0.5 ${type === ct.id ? 'text-sky-200' : 'text-slate-400'}`}>{t(ct.descKey).split(' ').slice(0,2).join(' ')}</div>
-                                        </button>
-                                    ))}
+                                    {typesInGroup.map(ct => {
+                                        const permitted = (CAGE_PERMISSIBILITY[ct.id] || []).includes(levelId);
+                                        const levels = CAGE_PERMISSIBILITY[ct.id] || [];
+                                        const rangeLabel = levels.length > 0 ? `${levels[0]}\u2013${levels[levels.length - 1]}` : '';
+                                        return (
+                                            <button key={ct.id} onClick={() => permitted && handleTypeChange(ct.id)}
+                                                disabled={!permitted}
+                                                className={`flex-1 py-2 px-2 rounded border text-xs font-bold transition-all ${
+                                                    !permitted ? 'bg-slate-100 text-slate-300 border-slate-200 cursor-not-allowed' :
+                                                    type === ct.id ? 'bg-sky-700 text-white border-sky-800 shadow' :
+                                                    'bg-slate-50 text-slate-700 border-slate-200 hover:bg-sky-50 hover:border-sky-300'
+                                                }`}>
+                                                <div>{ct.label}</div>
+                                                {!permitted ? (
+                                                    <div className="text-[9px] font-normal mt-0.5 text-slate-300">{rangeLabel}</div>
+                                                ) : (
+                                                    <div className={`text-[10px] font-normal mt-0.5 ${type === ct.id ? 'text-sky-200' : 'text-slate-400'}`}>{t(ct.descKey).split(' ').slice(0,2).join(' ')}</div>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         );

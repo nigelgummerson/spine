@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { t } from '../i18n/i18n';
 import { INVENTORY_CATEGORIES, getDiscLabel } from '../data/clinical';
 import { formatScrewSize } from '../utils/formatScrewSize';
-import type { Placement, ToolDefinition, Level } from '../types';
+import type { Placement, ToolDefinition, Level, OsteotomyData, CageData } from '../types';
 
 interface Rods {
     left?: string;
@@ -26,14 +26,14 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
             if (!visibleLevelIds.includes(p.levelId)) return;
             const tool = tools.find(item => item.id === p.tool);
             if (!tool || tool.type === 'force' || p.tool === 'osteotomy') return;
-            const toolLabel = tool.labelKey ? t(tool.labelKey) : (tool as any).label;
+            const toolLabel = tool.labelKey ? t(tool.labelKey) : tool.id;
             const isFixation = ['band','wire','cable'].includes(p.tool);
             let key = toolLabel;
             if (p.data && !isFixation) {
                 if (typeof p.data === 'string' && tool.needsSize) { key = `${toolLabel} (${formatScrewSize(p.data)}mm)`; }
-                else if (p.tool === 'osteotomy' && typeof p.data === 'object') { const od = p.data as any; key = od.angle != null && od.angle !== '' ? `${od.shortLabel} (${od.angle}°)` : od.shortLabel; }
-                else if (typeof p.data === 'object' && (p.data as any).height) {
-                    const cd = p.data as any;
+                else if (p.tool === 'osteotomy' && typeof p.data === 'object') { const od = p.data as OsteotomyData; key = od.angle != null && String(od.angle) !== '' ? `${od.shortLabel} (${od.angle}°)` : od.shortLabel; }
+                else if (typeof p.data === 'object' && p.data !== null && 'height' in p.data) {
+                    const cd = p.data as unknown as CageData; // legacy: cage data in placement
                     const sideStr = p.tool !== 'acdf' && cd.side && cd.side !== 'bilateral' && cd.side !== 'midline' ? ` (${cd.side.charAt(0).toUpperCase()})` : '';
                     key = `${toolLabel} ${cd.height}mm ${cd.lordosis || '0'}°${sideStr}`;
                 }
