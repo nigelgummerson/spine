@@ -1,5 +1,5 @@
 import React from 'react';
-import { getLevelHeight, getVertSvgGeometry, VERT_PAD } from '../../data/anatomy';
+import { getLevelHeight, getVertSvgGeometry } from '../../data/anatomy';
 import { InstrumentIcon } from './InstrumentIcon';
 import { formatScrewSize } from '../../utils/formatScrewSize';
 import type { Placement, ToolDefinition } from '../../types';
@@ -240,20 +240,23 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                 };
 
                 // S1 pedicle screw positions — same medial shift as LevelRow
-                const s1Geom = getVertSvgGeometry('S1');
-                const s2Geom = getVertSvgGeometry('S2');
-                const l5Geom = getVertSvgGeometry('L5');
+                const s1GeomRaw = getVertSvgGeometry('S1');
+                const s1Geom = s1GeomRaw && s1GeomRaw.region === 'sacral' ? s1GeomRaw : null;
+                const s2GeomRaw = getVertSvgGeometry('S2');
+                const s2Geom = s2GeomRaw && s2GeomRaw.region === 'sacral' ? s2GeomRaw : null;
+                const l5GeomRaw = getVertSvgGeometry('L5');
+                const l5Geom = l5GeomRaw && l5GeomRaw.region === 'lumbar' ? l5GeomRaw : null;
                 // S1/S2 pedicle screws aligned under L5 pedicles (visually consistent column)
                 const s1PedLeftX = l5Geom ? vertX + (l5Geom.pedLeftCx / 160) * scaledWidth : cx - 20;
                 const s1PedRightX = l5Geom ? vertX + (l5Geom.pedRightCx / 160) * scaledWidth : cx + 20;
                 const s1ViewH = getLevelHeight({ id: 'S1', type: 'S' });
-                const s1PedViewY = s1Geom ? VERT_PAD + s1Geom.pedRy + 5 : s1ViewH / 2;
+                const s1PedViewY = s1Geom ? s1Geom.pedCy : s1ViewH / 2;
                 const s1PedY = s1Y + (s1PedViewY / s1ViewH) * s1H;
 
                 const s2PedLeftX = s1PedLeftX; // aligned below S1
                 const s2PedRightX = s1PedRightX;
                 const s2ViewH = getLevelHeight({ id: 'S2', type: 'S' });
-                const s2PedViewY = s2Geom ? VERT_PAD + s2Geom.pedRy + 5 : s2ViewH / 2;
+                const s2PedViewY = s2Geom ? s2Geom.pedCy : s2ViewH / 2;
                 const s2PedY = s2Y + (s2PedViewY / s2ViewH) * s2H;
 
                 const findPlacement = (levelId: string, zone: string) =>

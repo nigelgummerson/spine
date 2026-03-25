@@ -10,7 +10,7 @@ import { BONE_GRAFT_OPTIONS, BONE_GRAFT_LABEL_KEYS, IMPLANT_COMPANIES, SCREW_SYS
 import { _light, _dark, COLOUR_SCHEMES, AUTO_THEME_FROM_COMPANY, COMPANY_THEME_MAP } from './data/themes';
 import { CAGE_PERMISSIBILITY, HOOK_TYPES, NO_SIZE_TYPES, NOTE_PRESET_KEYS, CAGE_TYPES,
          APPROACH_GROUPS, getDiscLabel, FORCE_TYPES, INVENTORY_CATEGORIES } from './data/clinical';
-import { REGIONS, VERTEBRA_ANATOMY, VERT_SVG_SCALE, VERT_PAD, getLevelHeight, getVertSvgGeometry,
+import { REGIONS, getLevelHeight,
          ALL_LEVELS, DISC_MIN_PX, getDiscHeight, buildHeightMap,
          levelToYNorm, yNormToRenderedY, renderedYToYNorm, CHART_CONTENT_HEIGHT,
          calculateAutoScale } from './data/anatomy';

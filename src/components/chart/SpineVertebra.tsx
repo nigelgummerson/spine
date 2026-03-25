@@ -1,5 +1,5 @@
 import React from 'react';
-import { getVertSvgGeometry, VERT_SVG_SCALE, VERT_PAD, getLevelHeight , REGIONS} from '../../data/anatomy';
+import { getVertSvgGeometry, VERT_PAD, REGIONS } from '../../data/anatomy';
 import { t } from '../../i18n/i18n';
 
 interface SpineVertebraProps {
@@ -38,7 +38,7 @@ export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale =
                     </g>
                 )}
 
-                {(type === 'T' || type === 'L') && geom && (() => {
+                {(type === 'T' || type === 'L') && geom && (geom.region === 'thoracic' || geom.region === 'lumbar') && (() => {
                     const l = geom.left, r = geom.right;
                     const isT = type === 'T';
                     const c = isT ? 3 : 4; // corner radius
@@ -51,7 +51,7 @@ export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale =
                     const bodyPath = `M${l},${t+c} Q${l},${t} ${l+c},${t} Q80,${t+endCurve} ${r-c},${t} Q${r},${t} ${r},${t+c} Q${r-w},${m} ${r},${b-c} Q${r},${b} ${r-c},${b} Q80,${b-endCurve} ${l+c},${b} Q${l},${b} ${l},${b-c} Q${l+w},${m} ${l},${t+c} Z`;
                     // Pedicle vertical position: centre offset from top of body
                     // Uses pedicle sagittal height (pedRy) to scale position, matching medial-lateral convention
-                    const pedCy = t + geom.pedRy + 5;
+                    const pedCy = geom.pedCy;
                     const pedStroke = isT ? "#94a3b8" : "#64748b";
                     const pedWidth = isT ? "1" : "1.5";
                     return (
@@ -63,7 +63,7 @@ export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale =
                     );
                 })()}
 
-                {type === 'S' && geom && (() => {
+                {type === 'S' && geom && geom.region === 'sacral' && (() => {
                     const t = VERT_PAD;
                     const b = height - VERT_PAD;
                     // S1 narrows to ~85% at bottom (S1/S2 junction), S2 narrows to ~80%

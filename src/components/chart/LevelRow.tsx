@@ -1,6 +1,6 @@
 import React from 'react';
 import { t } from '../../i18n/i18n';
-import { getDiscHeight, getLevelHeight, getVertSvgGeometry, DISC_MIN_PX, VERT_PAD } from '../../data/anatomy';
+import { getDiscHeight, getLevelHeight, getVertSvgGeometry, DISC_MIN_PX } from '../../data/anatomy';
 import { HOOK_TYPES, FORCE_TYPES } from '../../data/clinical';
 const FIXATION_TYPES = ['band', 'wire', 'cable'];
 import { InstrumentIcon } from './InstrumentIcon';
@@ -113,18 +113,43 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
         );
     };
 
-    // Compute pedicle position in chart coordinates from anatomy data
+    // Compute screw zone position in chart coordinates from anatomy data
     const geom = getVertSvgGeometry(level.id);
     const viewBoxHeight = getLevelHeight(level);
-    const viewBoxPedCy = geom ? VERT_PAD + geom.pedRy + 5 : viewBoxHeight / 2;
-    const chartPedCy = (viewBoxPedCy / viewBoxHeight) * rowHeight;
-    // Pedicle X in chart coords — sacral screws aligned under L5 pedicles (not S1 anatomical position)
+
+    // Determine screw zone vertical centre based on region
+    let viewBoxScrewCy: number;
+    if (geom && (geom.region === 'thoracic' || geom.region === 'lumbar' || geom.region === 'sacral')) {
+        viewBoxScrewCy = geom.pedCy;
+    } else if (geom && (geom.region === 'cervical-upper' || geom.region === 'cervical-subaxial')) {
+        viewBoxScrewCy = geom.latMassCy;
+    } else {
+        viewBoxScrewCy = viewBoxHeight / 2;
+    }
+    const chartScrewCy = (viewBoxScrewCy / viewBoxHeight) * rowHeight;
+
+    // Screw zone X positions — sacral screws aligned under L5 pedicles (not S1 anatomical position)
     const isSacral = level.type === 'S';
-    const l5Geom = getVertSvgGeometry('L5');
+    const l5GeomRaw = getVertSvgGeometry('L5');
+    const l5Geom = l5GeomRaw && l5GeomRaw.region === 'lumbar' ? l5GeomRaw : null;
     const l5LeftX = l5Geom ? vertX + (l5Geom.pedLeftCx / 160) * scaledWidth : undefined;
     const l5RightX = l5Geom ? vertX + (l5Geom.pedRightCx / 160) * scaledWidth : undefined;
-    const chartPedLeftCx = isSacral ? l5LeftX : (geom ? vertX + (geom.pedLeftCx / 160) * scaledWidth : undefined);
-    const chartPedRightCx = isSacral ? l5RightX : (geom ? vertX + (geom.pedRightCx / 160) * scaledWidth : undefined);
+
+    let chartScrewLeftCx: number | undefined;
+    let chartScrewRightCx: number | undefined;
+    if (isSacral) {
+        chartScrewLeftCx = l5LeftX;
+        chartScrewRightCx = l5RightX;
+    } else if (geom && (geom.region === 'thoracic' || geom.region === 'lumbar')) {
+        chartScrewLeftCx = vertX + (geom.pedLeftCx / 160) * scaledWidth;
+        chartScrewRightCx = vertX + (geom.pedRightCx / 160) * scaledWidth;
+    } else if (geom && geom.region === 'occiput') {
+        chartScrewLeftCx = vertX + (geom.screwLeftCx / 160) * scaledWidth;
+        chartScrewRightCx = vertX + (geom.screwRightCx / 160) * scaledWidth;
+    } else if (geom && (geom.region === 'cervical-upper' || geom.region === 'cervical-subaxial')) {
+        chartScrewLeftCx = vertX + (geom.latMassLeftCx / 160) * scaledWidth;
+        chartScrewRightCx = vertX + (geom.latMassRightCx / 160) * scaledWidth;
+    }
 
     /** Render items for a zone (left, right, force_left, force_right) */
     const renderZoneContent = (zone: string, zoneX: number, zoneW: number, align: 'left' | 'right' | 'center') => {
@@ -136,12 +161,12 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
 
         // Sacral screws at pedicle X (anatomic entry point); others at zone edge
         const zoneCx = isForceZone ? zoneX + zoneW / 2
-            : isSacral && zone === 'left' && chartPedLeftCx !== undefined ? chartPedLeftCx
-            : isSacral && zone === 'right' && chartPedRightCx !== undefined ? chartPedRightCx
+            : isSacral && zone === 'left' && chartScrewLeftCx !== undefined ? chartScrewLeftCx
+            : isSacral && zone === 'right' && chartScrewRightCx !== undefined ? chartScrewRightCx
             : zone === 'left' ? zoneX + zoneW - screwPx / 2 - 4
             : zone === 'right' ? zoneX + screwPx / 2 + 4
             : zoneX + zoneW / 2;
-        const zoneCy = isForceZone ? rowHeight / 2 : chartPedCy;
+        const zoneCy = isForceZone ? rowHeight / 2 : chartScrewCy;
 
         // Click zone background
         const clickable = !readOnly && (!isForceZone || !forcePlacements);
