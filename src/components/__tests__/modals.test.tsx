@@ -9,6 +9,16 @@ afterEach(() => {
     document.body.innerHTML = '';
 });
 import { HelpModal } from '../modals/HelpModal';
+import type { Zone } from '../../types';
+
+const defaultScrewProps = {
+    levelId: 'L4',
+    zone: 'left' as Zone,
+    levels: [{ id: 'L3', type: 'L' }, { id: 'L4', type: 'L' }, { id: 'L5', type: 'L' }],
+    placements: [] as any[],
+    showPelvis: false,
+    useRegionDefaults: false,
+};
 import { ChangeLogModal } from '../modals/ChangeLogModal';
 import { ForceModal } from '../modals/ForceModal';
 import { NoteModal } from '../modals/NoteModal';
@@ -60,12 +70,12 @@ describe('Modal rendering', () => {
     });
 
     it('ScrewModal renders nothing when closed', () => {
-        const { container } = render(<ScrewModal isOpen={false} onClose={() => {}} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" />);
+        const { container } = render(<ScrewModal isOpen={false} onClose={() => {}} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" {...defaultScrewProps} />);
         expect(container.innerHTML).toBe('');
     });
 
     it('ScrewModal renders dialog when open', () => {
-        render(<ScrewModal isOpen={true} onClose={() => {}} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" />);
+        render(<ScrewModal isOpen={true} onClose={() => {}} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" {...defaultScrewProps} />);
         expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
@@ -113,7 +123,7 @@ describe('Modal keyboard: Escape closes', () => {
 
     it('ScrewModal calls onClose on Escape', () => {
         const onClose = vi.fn();
-        render(<ScrewModal isOpen={true} onClose={onClose} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" />);
+        render(<ScrewModal isOpen={true} onClose={onClose} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" {...defaultScrewProps} />);
         fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
         expect(onClose).toHaveBeenCalled();
     });
@@ -140,7 +150,7 @@ describe('Modal keyboard: Enter submits', () => {
     it('ScrewModal calls onConfirm on Enter', () => {
         const onConfirm = vi.fn();
         const onClose = vi.fn();
-        render(<ScrewModal isOpen={true} onClose={onClose} onConfirm={onConfirm} defaultDiameter="6.5" defaultLength="45" />);
+        render(<ScrewModal isOpen={true} onClose={onClose} onConfirm={onConfirm} defaultDiameter="6.5" defaultLength="45" {...defaultScrewProps} />);
         fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Enter' });
         expect(onConfirm).toHaveBeenCalled();
     });
@@ -165,22 +175,22 @@ describe('Modal keyboard: Enter submits', () => {
 describe('Modal focus trap', () => {
 
     it('ScrewModal traps Tab within modal', () => {
-        render(<ScrewModal isOpen={true} onClose={() => {}} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" />);
+        render(<ScrewModal isOpen={true} onClose={() => {}} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" {...defaultScrewProps} />);
         const dialog = screen.getByRole('dialog');
-        const buttons = dialog.querySelectorAll('button:not([disabled])');
-        expect(buttons.length).toBeGreaterThan(1);
+        const focusable = Array.from(dialog.querySelectorAll('button:not([disabled]), select:not([disabled]), input:not([disabled])')) as HTMLElement[];
+        expect(focusable.length).toBeGreaterThan(1);
 
-        // Focus the first button
-        (buttons[0] as HTMLElement).focus();
-        expect(document.activeElement).toBe(buttons[0]);
+        // Focus the first focusable element
+        focusable[0].focus();
+        expect(document.activeElement).toBe(focusable[0]);
 
         // Tab should move to next
         fireEvent.keyDown(dialog, { key: 'Tab' });
-        expect(document.activeElement).toBe(buttons[1]);
+        expect(document.activeElement).toBe(focusable[1]);
     });
 
     it('ScrewModal wraps Tab from last to first', () => {
-        render(<ScrewModal isOpen={true} onClose={() => {}} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" />);
+        render(<ScrewModal isOpen={true} onClose={() => {}} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" {...defaultScrewProps} />);
         const dialog = screen.getByRole('dialog');
         const focusable = Array.from(dialog.querySelectorAll('button:not([disabled]), select:not([disabled]), input:not([disabled])')) as HTMLElement[];
         expect(focusable.length).toBeGreaterThan(1);
@@ -196,7 +206,7 @@ describe('Modal focus trap', () => {
     });
 
     it('ScrewModal wraps Shift+Tab from first to last', () => {
-        render(<ScrewModal isOpen={true} onClose={() => {}} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" />);
+        render(<ScrewModal isOpen={true} onClose={() => {}} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" {...defaultScrewProps} />);
         const dialog = screen.getByRole('dialog');
         const focusable = Array.from(dialog.querySelectorAll('button:not([disabled]), select:not([disabled]), input:not([disabled])')) as HTMLElement[];
 
@@ -239,7 +249,7 @@ describe('Modal overlay click', () => {
 describe('Modal accessibility', () => {
 
     it('modals have aria-modal="true"', () => {
-        render(<ScrewModal isOpen={true} onClose={() => {}} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" />);
+        render(<ScrewModal isOpen={true} onClose={() => {}} onConfirm={() => {}} defaultDiameter="6.5" defaultLength="45" {...defaultScrewProps} />);
         expect(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true');
     });
 
