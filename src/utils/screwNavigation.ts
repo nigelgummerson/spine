@@ -1,7 +1,6 @@
 import type { Level, Placement, Zone } from '../types';
 
-/** Find the next empty level below `currentLevelId` on the given side.
- * Only considers standard left/right zones (not pelvic).
+/** Finds the next empty level below currentLevelId on the given side.
  * Returns null if no more empty levels. */
 export function getNextEmptyLevel(
     currentLevelId: string,

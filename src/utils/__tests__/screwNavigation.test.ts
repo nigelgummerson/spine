@@ -35,4 +35,11 @@ describe('getNextEmptyLevel', () => {
         const placements = [mkPlacement('S1', 's2ai_left' as Zone)];
         expect(getNextEmptyLevel('L3', 'left', levels, placements)).toEqual({ levelId: 'S1', zone: 'left' });
     });
+    it('traverses into pelvic levels when present', () => {
+        const withPelvic: Level[] = [
+            ...levels,
+            { id: 'S2AI', type: 'pelvic' }, { id: 'Iliac', type: 'pelvic' }, { id: 'SI-J', type: 'pelvic' },
+        ];
+        expect(getNextEmptyLevel('S1', 'left', withPelvic, [])).toEqual({ levelId: 'S2AI', zone: 'left' });
+    });
 });
