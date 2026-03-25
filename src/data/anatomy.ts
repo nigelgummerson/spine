@@ -23,34 +23,38 @@ export const REGIONS: Record<string, { height: number; color: string }> = {
     Pelvis: { height: 56, color: '#f1f5f9' }
 };
 
-// Anatomical dimensions (mm): bodyW/bodyH from X-ray measurements interpolated
-// between anchors T2(36x20), T12(48x30), L4(60x36).
-// Pedicle data from Lien et al. 2007 (Eur Spine J, PMC2200778) - averaged L/R.
-// Lumbar pedH cross-checked against Zindrick 1987 (Spine 12:160-166).
+// Anatomical dimensions (mm) from published CT morphometric data.
+// Thoracic: PMC4857161 (CT-based, Indian population, n=120).
+// Lumbar body heights: PMC11624215 (meta-analysis, n=1481).
+// Lumbar body widths: PMC3207343 endplate data + PMC9252235 mid-body transverse.
+// Lumbar pedicles: PMC11624215 meta-analysis.
+// Sacral: PMC6286901 (systematic review).
+// Pedicle data cross-checked against Lien 2007 (Eur Spine J) and Zindrick 1987.
 export const VERTEBRA_ANATOMY: Record<string, VertAnatomyEntry> = {
-    T1:  { bodyW: 34.8, bodyH: 19.0, pedW: 7.7, pedH:  8.7 },
-    T2:  { bodyW: 36.0, bodyH: 20.0, pedW: 5.5, pedH: 10.3 },
-    T3:  { bodyW: 37.2, bodyH: 21.0, pedW: 4.0, pedH: 10.4 },
-    T4:  { bodyW: 38.4, bodyH: 22.0, pedW: 3.5, pedH: 10.3 },
-    T5:  { bodyW: 39.6, bodyH: 23.0, pedW: 3.8, pedH: 10.6 },
-    T6:  { bodyW: 40.8, bodyH: 24.0, pedW: 4.0, pedH: 10.2 },
-    T7:  { bodyW: 42.0, bodyH: 25.0, pedW: 4.4, pedH: 10.4 },
-    T8:  { bodyW: 43.2, bodyH: 26.0, pedW: 4.8, pedH: 10.9 },
-    T9:  { bodyW: 44.4, bodyH: 27.0, pedW: 5.3, pedH: 12.4 },
-    T10: { bodyW: 45.6, bodyH: 28.0, pedW: 5.7, pedH: 13.7 },
-    T11: { bodyW: 46.8, bodyH: 29.0, pedW: 7.2, pedH: 15.1 },
-    T12: { bodyW: 48.0, bodyH: 30.0, pedW: 7.6, pedH: 15.1 },
-    L1:  { bodyW: 51.0, bodyH: 31.5, pedW: 6.5, pedH: 13.7 },
-    L2:  { bodyW: 54.0, bodyH: 33.0, pedW: 7.2, pedH: 14.1 },
-    L3:  { bodyW: 57.0, bodyH: 34.5, pedW: 9.2, pedH: 13.9 },
-    L4:  { bodyW: 60.0, bodyH: 36.0, pedW: 11.9, pedH: 12.8 },
-    L5:  { bodyW: 63.0, bodyH: 35.0, pedW: 17.6, pedH: 12.5 },
-    S1:  { bodyW: 66.0, bodyH: 34.0, pedW: 20.0, pedH: 14.0 },
+    T1:  { bodyW: 33.1, bodyH: 18.9, pedW: 9.3, pedH:  9.0 },
+    T2:  { bodyW: 32.0, bodyH: 19.0, pedW: 7.5, pedH: 10.3 },
+    T3:  { bodyW: 32.8, bodyH: 20.2, pedW: 6.0, pedH: 10.4 },
+    T4:  { bodyW: 34.2, bodyH: 21.0, pedW: 4.5, pedH: 10.3 },
+    T5:  { bodyW: 36.1, bodyH: 22.7, pedW: 5.0, pedH: 10.6 },
+    T6:  { bodyW: 37.5, bodyH: 22.9, pedW: 5.5, pedH: 10.2 },
+    T7:  { bodyW: 38.1, bodyH: 24.2, pedW: 6.0, pedH: 10.4 },
+    T8:  { bodyW: 38.2, bodyH: 24.8, pedW: 6.3, pedH: 10.9 },
+    T9:  { bodyW: 39.6, bodyH: 25.8, pedW: 6.3, pedH: 12.0 },
+    T10: { bodyW: 43.1, bodyH: 27.7, pedW: 6.5, pedH: 13.7 },
+    T11: { bodyW: 42.8, bodyH: 28.1, pedW: 7.8, pedH: 15.0 },
+    T12: { bodyW: 44.2, bodyH: 28.9, pedW: 8.3, pedH: 15.0 },
+    L1:  { bodyW: 45.0, bodyH: 24.5, pedW: 7.5, pedH: 15.4 },
+    L2:  { bodyW: 47.5, bodyH: 25.8, pedW: 8.2, pedH: 14.9 },
+    L3:  { bodyW: 49.0, bodyH: 26.8, pedW: 9.7, pedH: 14.5 },
+    L4:  { bodyW: 51.5, bodyH: 26.9, pedW: 11.5, pedH: 14.2 },
+    L5:  { bodyW: 54.0, bodyH: 27.4, pedW: 14.6, pedH: 14.7 },
+    S1:  { bodyW: 100.0, bodyH: 28.0, pedW: 20.0, pedH: 14.0 }, // includes sacral ala (~49mm body + ~21mm ala each side)
+    S2:  { bodyW: 83.0, bodyH: 22.0, pedW: 18.0, pedH: 11.0 },  // total S2 breadth (PMC6286901)
 };
 
-// Per-level SVG height: use same mm-to-SVG scale as width (130/66 ≈ 1.97) for correct aspect ratio
-// Add padding (6 SVG units) so body path doesn't touch viewBox edges
-export const VERT_SVG_SCALE = 130 / 66.0; // same scale for width and height
+// Per-level SVG height: use same mm-to-SVG scale as width.
+// Scale anchor: L5 (54mm) maps to 130 SVG units. S1/S2 extend beyond 160-unit viewBox (overflow visible).
+export const VERT_SVG_SCALE = 130 / 54.0; // ~2.41; 130 SVG units = L5 body width
 export const VERT_PAD = 3; // top/bottom padding in SVG units
 export const getLevelHeight = (level: Level): number => {
     const a = VERTEBRA_ANATOMY[level.id];
@@ -63,7 +67,7 @@ export const getVertSvgGeometry = (levelId: string) => {
     const a = VERTEBRA_ANATOMY[levelId];
     if (!a) return null;
     const maxBodySvg = 130;
-    const maxBodyMm = 66.0;
+    const maxBodyMm = 54.0; // L5 body width — S1/S2 overflow beyond viewBox
     const scale = maxBodySvg / maxBodyMm;
     const bw = a.bodyW * scale;
     const cx = 80;
@@ -78,7 +82,7 @@ export const getVertSvgGeometry = (levelId: string) => {
     const pedScale = 1.0;
     const pedRx = Math.max(1.5, (a.pedW * scale / 2) * pedScale);
     const pedRy = Math.max(2, (a.pedH * scale / 2) * pedScale);
-    const isLumbar = levelId.startsWith('L') || levelId === 'S1';
+    const isLumbar = levelId.startsWith('L') || levelId === 'S1' || levelId === 'S2';
     return { left, right, cx, bw, pedLeftCx, pedRightCx, pedRx, pedRy, isLumbar };
 };
 
@@ -88,6 +92,7 @@ export const ALL_LEVELS: Level[] = [
     ...['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'].map(id => ({ id, type: 'T' })),
     ...['L1','L2','L3','L4','L5'].map(id => ({ id, type: 'L' })),
     { id: 'S1', type: 'S' },
+    { id: 'S2', type: 'S' },
     { id: 'Pelvis', type: 'Pelvis' },
 ];
 
@@ -175,8 +180,10 @@ export const calculateAutoScale = (levels: Level[]): number => {
     });
     if (totalUnscaled <= 0) return 0.5;
     // Account for fixed per-level costs: 1px border per level, min disc zone height
+    // Add top/bottom padding for breathing room (iliac crests extend above L5)
+    const padding = levels.length > 20 ? 60 : 30; // more padding for whole-spine view
     const borderCost = levels.length; // 1px border-b per level
-    const available = CHART_CONTENT_HEIGHT - borderCost;
+    const available = CHART_CONTENT_HEIGHT - borderCost - padding;
     // Iterative: disc zones have min DISC_MIN_PX, so solve for scale
     // where scaled disc heights below DISC_MIN_PX get clamped
     let scale = available / totalUnscaled;

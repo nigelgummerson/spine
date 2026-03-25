@@ -1,6 +1,6 @@
 import React from 'react';
 import { t } from '../../i18n/i18n';
-import { getDiscHeight, getLevelHeight, DISC_MIN_PX } from '../../data/anatomy';
+import { getDiscHeight, getLevelHeight, getVertSvgGeometry, DISC_MIN_PX, VERT_PAD } from '../../data/anatomy';
 import { HOOK_TYPES, FORCE_TYPES } from '../../data/clinical';
 const FIXATION_TYPES = ['band', 'wire', 'cable'];
 import { InstrumentIcon } from './InstrumentIcon';
@@ -112,6 +112,22 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
         );
     };
 
+    // Compute pedicle position in chart coordinates from anatomy data
+    const geom = getVertSvgGeometry(level.id);
+    const viewBoxHeight = getLevelHeight(level);
+    const viewBoxPedCy = geom ? VERT_PAD + geom.pedRy + 5 : viewBoxHeight / 2;
+    const chartPedCy = (viewBoxPedCy / viewBoxHeight) * rowHeight;
+    // Pedicle X in chart coords — sacral screws shifted medially to create space for pelvic targets
+    // S2 screws aligned directly below S1 screws (same X position)
+    const isSacral = level.type === 'S';
+    const s1Geom = getVertSvgGeometry('S1');
+    const s1MedialShift = screwPx * 1.75;
+    const s1LeftX = s1Geom ? vertX + (s1Geom.pedLeftCx / 160) * scaledWidth + s1MedialShift : undefined;
+    const s1RightX = s1Geom ? vertX + (s1Geom.pedRightCx / 160) * scaledWidth - s1MedialShift : undefined;
+    // S1 uses its own shifted position; S2 uses S1's X to align vertically
+    const chartPedLeftCx = isSacral ? s1LeftX : (geom ? vertX + (geom.pedLeftCx / 160) * scaledWidth : undefined);
+    const chartPedRightCx = isSacral ? s1RightX : (geom ? vertX + (geom.pedRightCx / 160) * scaledWidth : undefined);
+
     /** Render items for a zone (left, right, force_left, force_right) */
     const renderZoneContent = (zone: string, zoneX: number, zoneW: number, align: 'left' | 'right' | 'center') => {
         const items = getItems(zone);
@@ -120,21 +136,23 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             : null;
         const isForceZone = zone.startsWith('force');
 
-        // Ghost targets align with where placed screw icons would be centred
-        const zoneCx = zone === 'left' ? zoneX + zoneW - screwPx / 2 - 4
+        // Sacral screws at pedicle X (anatomic entry point); others at zone edge
+        const zoneCx = isForceZone ? zoneX + zoneW / 2
+            : isSacral && zone === 'left' && chartPedLeftCx !== undefined ? chartPedLeftCx
+            : isSacral && zone === 'right' && chartPedRightCx !== undefined ? chartPedRightCx
+            : zone === 'left' ? zoneX + zoneW - screwPx / 2 - 4
             : zone === 'right' ? zoneX + screwPx / 2 + 4
             : zoneX + zoneW / 2;
-        const zoneCy = rowHeight / 2;
+        const zoneCy = isForceZone ? rowHeight / 2 : chartPedCy;
 
         // Click zone background
         const clickable = !readOnly && (!isForceZone || !forcePlacements);
         const elements: React.ReactElement[] = [];
 
-        // Clickable background rect
+        // Clickable background rect — hover via parent <g> onMouseEnter/Leave
         const hoverFill = isForceZone ? 'rgba(191, 219, 254, 0.3)' : 'rgba(148, 163, 184, 0.15)';
-        const bgId = `zone-bg-${level.id}-${zone}`;
         elements.push(
-            <rect key={`zone-bg-${zone}`} id={bgId} x={zoneX} y={0} width={zoneW} height={rowHeight}
+            <rect key={`zone-bg-${zone}`} className="zone-bg" x={zoneX} y={0} width={zoneW} height={rowHeight}
                 fill="transparent" cursor={clickable ? 'crosshair' : 'default'}
                 onClick={() => clickable && onZoneClick(level.id, zone)} />
         );
@@ -172,10 +190,12 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const showData = p.data && !isHookItem && !isFixation;
             const showAnn = !!ann;
 
-            // Position icon: for left align icon is on the right side of zone, for right on left side
+            // Position icon: sacral uses zoneCx (pedicle position); others at zone edge
             let iconX: number;
-            const iconY = 2; // slight top offset like pt-[2px]
+            const iconY = zoneCy - iH / 2;
             if (align === 'center') {
+                iconX = zoneCx - iW / 2;
+            } else if (isSacral) {
                 iconX = zoneCx - iW / 2;
             } else if (align === 'left') {
                 iconX = zoneX + zoneW - iW - 4;
@@ -246,8 +266,10 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const showData = ghostItem.data && !isHookItem && !isFixation;
 
             let iconX: number;
-            const iconY = 2;
+            const iconY = zoneCy - iH / 2;
             if (align === 'center') {
+                iconX = zoneCx - iW / 2;
+            } else if (isSacral) {
                 iconX = zoneCx - iW / 2;
             } else if (align === 'left') {
                 iconX = zoneX + zoneW - iW - 4;
@@ -294,8 +316,8 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
         }
 
         return <g key={`zone-${zone}`}
-            onMouseEnter={clickable ? () => { document.getElementById(bgId)?.setAttribute('fill', hoverFill); } : undefined}
-            onMouseLeave={clickable ? () => { document.getElementById(bgId)?.setAttribute('fill', 'transparent'); } : undefined}
+            onMouseEnter={clickable ? (e) => { (e.currentTarget.querySelector('.zone-bg') as SVGRectElement)?.setAttribute('fill', hoverFill); } : undefined}
+            onMouseLeave={clickable ? (e) => { (e.currentTarget.querySelector('.zone-bg') as SVGRectElement)?.setAttribute('fill', 'transparent'); } : undefined}
         >{elements}</g>;
     };
 
@@ -475,22 +497,35 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             {/* Level border bottom */}
             <line x1={0} y1={rowHeight} x2={chartWidth} y2={rowHeight} stroke="#f1f5f9" strokeWidth={1} />
 
-            {/* Vertebral body + mid zone */}
-            <g onMouseEnter={!readOnly ? () => { document.getElementById(`mid-bg-${level.id}`)?.setAttribute('fill', 'rgba(253, 230, 138, 0.3)'); } : undefined}
-               onMouseLeave={!readOnly ? () => { document.getElementById(`mid-bg-${level.id}`)?.setAttribute('fill', 'transparent'); } : undefined}>
-                <rect id={`mid-bg-${level.id}`} x={vertX} y={0} width={scaledWidth} height={rowHeight}
-                    fill="transparent" cursor={!readOnly ? 'pointer' : 'default'}
-                    onClick={() => !readOnly && onZoneClick(level.id, 'mid')} />
+            {/* Vertebral body + mid zone — sacral mid zone disabled when pelvis expanded */}
+            {(() => {
+                const midClickable = !readOnly && !isSacral;
+                return (
+                <g onMouseEnter={midClickable ? (e) => { (e.currentTarget.querySelector('.mid-bg') as SVGRectElement)?.setAttribute('fill', 'rgba(253, 230, 138, 0.3)'); } : undefined}
+                   onMouseLeave={midClickable ? (e) => { (e.currentTarget.querySelector('.mid-bg') as SVGRectElement)?.setAttribute('fill', 'transparent'); } : undefined}>
+                <rect className="mid-bg" x={vertX} y={0} width={scaledWidth} height={rowHeight}
+                    fill="transparent" cursor={midClickable ? 'pointer' : 'default'}
+                    onClick={() => midClickable && onZoneClick(level.id, 'mid')} />
                 <svg x={vertX} y={0} width={scaledWidth} height={rowHeight} overflow="visible" style={{ pointerEvents: 'none' }}>
                     <SpineVertebra label={level.id} type={level.type} height={getLevelHeight(level)} isCorpectomy={isCorpectomy} heightScale={heightScale} />
                 </svg>
                 {renderMidContent()}
-            </g>
+            </g>);
+            })()}
 
             {/* Left/right zones */}
             {showForces && renderZoneContent('force_left', forceLeftX, forceW, 'center')}
-            {renderZoneContent('left', leftZoneX, sideZoneW, 'left')}
-            {renderZoneContent('right', rightZoneX, sideZoneW, 'right')}
+            {/* Sacral levels: pelvis hidden = extended left/right zones; pelvis shown = no zones (PelvisRegion handles all targets) */}
+            {isSacral && !levels.some(l => l.id === 'S2')
+                ? <>
+                    {renderZoneContent('left', leftZoneX, sideZoneW + scaledWidth / 2, 'left')}
+                    {renderZoneContent('right', vertX + scaledWidth / 2, sideZoneW + scaledWidth / 2, 'right')}
+                </>
+                : !isSacral && <>
+                    {renderZoneContent('left', leftZoneX, sideZoneW, 'left')}
+                    {renderZoneContent('right', rightZoneX, sideZoneW, 'right')}
+                </>
+            }
             {showForces && renderZoneContent('force_right', forceRightX, forceW, 'center')}
 
             {/* Disc zone */}

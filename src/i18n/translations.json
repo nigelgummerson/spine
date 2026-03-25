@@ -276,7 +276,9 @@
     "disclaimer.modal_body": "This tool is a <strong>documentation and communication aid</strong> for surgical planning. It is not a medical device and has not been approved by any regulatory body (MHRA, EU MDR, FDA).<br/><br/>It does not provide clinical decision support or treatment recommendations. The <strong>operating surgeon is responsible</strong> for all clinical decisions, implant verification (WHO Surgical Safety Checklist), and ensuring the record accurately reflects the procedure performed.<br/><br/>All data remains on this device. Nothing is transmitted to any server.",
     "disclaimer.modal_accept": "I understand",
     "disclaimer.accepted_label": "Notice accepted",
-    "portrait.tab.inventory": "Inventory"
+    "portrait.tab.inventory": "Inventory",
+    "sidebar.show_pelvis": "Show Pelvis",
+    "sidebar.hide_pelvis": "Hide Pelvis"
   },
   "de": {
     "sidebar.title": "Spinale Instrumentierung",
@@ -555,7 +557,9 @@
     "disclaimer.modal_accept": "Ich verstehe",
     "disclaimer.accepted_label": "Hinweis akzeptiert",
     "modal.cage.clear_dimensions": "Maße löschen",
-    "portrait.tab.inventory": "Inventar"
+    "portrait.tab.inventory": "Inventar",
+    "sidebar.show_pelvis": "Becken anzeigen",
+    "sidebar.hide_pelvis": "Becken ausblenden"
   },
   "fr": {
     "sidebar.title": "Instrumentation rachidienne",
@@ -834,7 +838,9 @@
     "disclaimer.modal_accept": "Je comprends",
     "disclaimer.accepted_label": "Avis accepté",
     "modal.cage.clear_dimensions": "Effacer dimensions",
-    "portrait.tab.inventory": "Inventaire"
+    "portrait.tab.inventory": "Inventaire",
+    "sidebar.show_pelvis": "Afficher bassin",
+    "sidebar.hide_pelvis": "Masquer bassin"
   },
   "es": {
     "sidebar.title": "Instrumentación espinal",
@@ -1113,7 +1119,9 @@
     "disclaimer.modal_accept": "Entiendo",
     "disclaimer.accepted_label": "Aviso aceptado",
     "modal.cage.clear_dimensions": "Borrar dimensiones",
-    "portrait.tab.inventory": "Inventario"
+    "portrait.tab.inventory": "Inventario",
+    "sidebar.show_pelvis": "Mostrar pelvis",
+    "sidebar.hide_pelvis": "Ocultar pelvis"
   },
   "it": {
     "sidebar.title": "Strumentazione vertebrale",
@@ -1392,7 +1400,9 @@
     "disclaimer.modal_accept": "Ho capito",
     "disclaimer.accepted_label": "Avviso accettato",
     "modal.cage.clear_dimensions": "Cancella dimensioni",
-    "portrait.tab.inventory": "Inventario"
+    "portrait.tab.inventory": "Inventario",
+    "sidebar.show_pelvis": "Mostra bacino",
+    "sidebar.hide_pelvis": "Nascondi bacino"
   },
   "pt": {
     "sidebar.title": "Instrumentação vertebral",
@@ -1671,7 +1681,9 @@
     "disclaimer.modal_accept": "Compreendo",
     "disclaimer.accepted_label": "Aviso aceite",
     "modal.cage.clear_dimensions": "Limpar dimensões",
-    "portrait.tab.inventory": "Inventário"
+    "portrait.tab.inventory": "Inventário",
+    "sidebar.show_pelvis": "Mostrar pelve",
+    "sidebar.hide_pelvis": "Ocultar pelve"
   },
   "sv": {
     "sidebar.title": "Spinal instrumentering",
@@ -1950,7 +1962,9 @@
     "disclaimer.modal_accept": "Jag förstår",
     "disclaimer.accepted_label": "Information bekräftad",
     "modal.cage.clear_dimensions": "Rensa mått",
-    "portrait.tab.inventory": "Inventarium"
+    "portrait.tab.inventory": "Inventarium",
+    "sidebar.show_pelvis": "Visa bäcken",
+    "sidebar.hide_pelvis": "Dölj bäcken"
   },
   "nb": {
     "sidebar.title": "Spinal instrumentering",
@@ -2229,7 +2243,9 @@
     "disclaimer.modal_accept": "Jeg forstår",
     "disclaimer.accepted_label": "Informasjon bekreftet",
     "modal.cage.clear_dimensions": "Fjern mål",
-    "portrait.tab.inventory": "Inventar"
+    "portrait.tab.inventory": "Inventar",
+    "sidebar.show_pelvis": "Vis bekken",
+    "sidebar.hide_pelvis": "Skjul bekken"
   },
   "da": {
     "sidebar.title": "Spinal instrumentering",
@@ -2508,7 +2524,9 @@
     "disclaimer.modal_accept": "Jeg forstår",
     "disclaimer.accepted_label": "Information bekræftet",
     "modal.cage.clear_dimensions": "Ryd mål",
-    "portrait.tab.inventory": "Inventar"
+    "portrait.tab.inventory": "Inventar",
+    "sidebar.show_pelvis": "Vis bækken",
+    "sidebar.hide_pelvis": "Skjul bækken"
   },
   "fi": {
     "sidebar.title": "Spinaalinen instrumentointi",
@@ -2787,7 +2805,9 @@
     "disclaimer.modal_accept": "Ymmärrän",
     "disclaimer.accepted_label": "Ilmoitus hyväksytty",
     "modal.cage.clear_dimensions": "Tyhjennä mitat",
-    "portrait.tab.inventory": "Inventaario"
+    "portrait.tab.inventory": "Inventaario",
+    "sidebar.show_pelvis": "Näytä lantio",
+    "sidebar.hide_pelvis": "Piilota lantio"
   },
   "nl": {
     "sidebar.title": "Spinale instrumentatie",
@@ -3066,7 +3086,9 @@
     "disclaimer.modal_accept": "Ik begrijp het",
     "disclaimer.accepted_label": "Mededeling aanvaard",
     "modal.cage.clear_dimensions": "Wis afmetingen",
-    "portrait.tab.inventory": "Inventaris"
+    "portrait.tab.inventory": "Inventaris",
+    "sidebar.show_pelvis": "Toon bekken",
+    "sidebar.hide_pelvis": "Verberg bekken"
   },
   "pl": {
     "sidebar.title": "Instrumentacja kręgosłupa",
@@ -3345,7 +3367,9 @@
     "disclaimer.modal_accept": "Rozumiem",
     "disclaimer.accepted_label": "Informacja zaakceptowana",
     "modal.cage.clear_dimensions": "Wyczyść wymiary",
-    "portrait.tab.inventory": "Inwentarz"
+    "portrait.tab.inventory": "Inwentarz",
+    "sidebar.show_pelvis": "Pokaż miednicę",
+    "sidebar.hide_pelvis": "Ukryj miednicę"
   },
   "el": {
     "sidebar.title": "Σπονδυλική οργανοληψία",
@@ -3624,7 +3648,9 @@
     "disclaimer.modal_accept": "Καταλαβαίνω",
     "disclaimer.accepted_label": "Ειδοποίηση αποδεκτή",
     "modal.cage.clear_dimensions": "Εκκαθάριση διαστάσεων",
-    "portrait.tab.inventory": "Απόθεμα"
+    "portrait.tab.inventory": "Απόθεμα",
+    "sidebar.show_pelvis": "Εμφάνιση λεκάνης",
+    "sidebar.hide_pelvis": "Απόκρυψη λεκάνης"
   },
   "tr": {
     "sidebar.title": "Spinal enstrümantasyon",
@@ -3903,7 +3929,9 @@
     "disclaimer.modal_accept": "Anlıyorum",
     "disclaimer.accepted_label": "Bilgilendirme kabul edildi",
     "modal.cage.clear_dimensions": "Ölçüleri temizle",
-    "portrait.tab.inventory": "Envanter"
+    "portrait.tab.inventory": "Envanter",
+    "sidebar.show_pelvis": "Pelvisi göster",
+    "sidebar.hide_pelvis": "Pelvisi gizle"
   },
   "uk": {
     "sidebar.title": "Спінальна інструментація",
@@ -4182,7 +4210,9 @@
     "disclaimer.modal_accept": "Зрозуміло",
     "disclaimer.accepted_label": "Повідомлення прийнято",
     "modal.cage.clear_dimensions": "Очистити розміри",
-    "portrait.tab.inventory": "Інвентар"
+    "portrait.tab.inventory": "Інвентар",
+    "sidebar.show_pelvis": "Показати таз",
+    "sidebar.hide_pelvis": "Сховати таз"
   },
   "ru": {
     "sidebar.title": "Спинальная инструментация",
@@ -4461,7 +4491,9 @@
     "disclaimer.modal_accept": "Понятно",
     "disclaimer.accepted_label": "Уведомление принято",
     "modal.cage.clear_dimensions": "Очистить размеры",
-    "portrait.tab.inventory": "Инвентарь"
+    "portrait.tab.inventory": "Инвентарь",
+    "sidebar.show_pelvis": "Показать таз",
+    "sidebar.hide_pelvis": "Скрыть таз"
   },
   "hi": {
     "sidebar.title": "स्पाइनल इंस्ट्रूमेंटेशन",
@@ -4740,7 +4772,9 @@
     "disclaimer.modal_accept": "मैं समझता/समझती हूँ",
     "disclaimer.accepted_label": "सूचना स्वीकृत",
     "modal.cage.clear_dimensions": "माप हटाएं",
-    "portrait.tab.inventory": "इन्वेंटरी"
+    "portrait.tab.inventory": "इन्वेंटरी",
+    "sidebar.show_pelvis": "पेल्विस दिखाएं",
+    "sidebar.hide_pelvis": "पेल्विस छुपाएं"
   },
   "ar": {
     "sidebar.title": "الأجهزة الشوكية",
@@ -5019,7 +5053,9 @@
     "disclaimer.modal_accept": "أفهم",
     "disclaimer.accepted_label": "تم قبول الإشعار",
     "modal.cage.clear_dimensions": "مسح الأبعاد",
-    "portrait.tab.inventory": "المخزون"
+    "portrait.tab.inventory": "المخزون",
+    "sidebar.show_pelvis": "إظهار الحوض",
+    "sidebar.hide_pelvis": "إخفاء الحوض"
   },
   "he": {
     "sidebar.title": "אינסטרומנטציה שדרתית",
@@ -5298,7 +5334,9 @@
     "disclaimer.modal_accept": "הבנתי",
     "disclaimer.accepted_label": "ההודעה התקבלה",
     "modal.cage.clear_dimensions": "נקה מידות",
-    "portrait.tab.inventory": "מלאי"
+    "portrait.tab.inventory": "מלאי",
+    "sidebar.show_pelvis": "הצג אגן",
+    "sidebar.hide_pelvis": "הסתר אגן"
   },
   "zh-Hans": {
     "sidebar.title": "脊柱内固定",
@@ -5577,7 +5615,9 @@
     "disclaimer.modal_accept": "我已了解",
     "disclaimer.accepted_label": "已接受提示",
     "modal.cage.clear_dimensions": "清除尺寸",
-    "portrait.tab.inventory": "库存"
+    "portrait.tab.inventory": "库存",
+    "sidebar.show_pelvis": "显示骨盆",
+    "sidebar.hide_pelvis": "隐藏骨盆"
   },
   "ja": {
     "sidebar.title": "脊椎インストゥルメンテーション",
@@ -5856,7 +5896,9 @@
     "disclaimer.modal_accept": "理解しました",
     "disclaimer.accepted_label": "お知らせ確認済み",
     "modal.cage.clear_dimensions": "寸法をクリア",
-    "portrait.tab.inventory": "在庫"
+    "portrait.tab.inventory": "在庫",
+    "sidebar.show_pelvis": "骨盤を表示",
+    "sidebar.hide_pelvis": "骨盤を非表示"
   },
   "ko": {
     "sidebar.title": "척추 기기 삽입술",
@@ -6135,7 +6177,9 @@
     "disclaimer.modal_accept": "이해했습니다",
     "disclaimer.accepted_label": "공지 확인 완료",
     "modal.cage.clear_dimensions": "치수 지우기",
-    "portrait.tab.inventory": "재고"
+    "portrait.tab.inventory": "재고",
+    "sidebar.show_pelvis": "골반 표시",
+    "sidebar.hide_pelvis": "골반 숨기기"
   },
   "en-YK": {
     "sidebar.title": "Spinal Instrumentation",

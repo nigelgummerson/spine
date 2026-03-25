@@ -110,10 +110,9 @@ describe('INVENTORY_CATEGORIES', () => {
 // ---------------------------------------------------------------------------
 
 describe('ALL_LEVELS', () => {
-  it('has exactly 21 levels (Oc + C1–C7 + T1–T12 + L1–L5 + S1 + Pelvis)', () => {
-    // Oc=1, C1-C7=7, T1-T12=12, L1-L5=5, S1=1, Pelvis=1 → 27 total
-    // Re-count from the source: 1 + 7 + 12 + 5 + 1 + 1 = 27
-    expect(ALL_LEVELS).toHaveLength(27);
+  it('has exactly 28 levels (Oc + C1–C7 + T1–T12 + L1–L5 + S1 + S2 + Pelvis)', () => {
+    // Oc=1, C1-C7=7, T1-T12=12, L1-L5=5, S1=1, S2=1, Pelvis=1 → 28 total
+    expect(ALL_LEVELS).toHaveLength(28);
   });
 
   it('starts with Oc and ends with Pelvis', () => {

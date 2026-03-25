@@ -11,7 +11,7 @@ interface SpineVertebraProps {
 }
 
 export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale = 1 }: SpineVertebraProps) => {
-    const common = { fill: REGIONS[type].color, stroke: "#475569", strokeWidth: "1.5" };
+    const common = { fill: REGIONS[type].color, stroke: "#94a3b8", strokeWidth: "1" };
     const geom = getVertSvgGeometry(label);
 
     if (isCorpectomy) {
@@ -66,12 +66,28 @@ export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale =
                 {type === 'S' && geom && (() => {
                     const t = VERT_PAD;
                     const b = height - VERT_PAD;
-                    const narrowFrac = 0.6; // sacrum narrows to 60% at bottom
-                    return <path d={`M${geom.left},${t} Q80,${t-4} ${geom.right},${t} L${80 + (geom.right-80)*narrowFrac},${b} Q80,${b+4} ${80 - (80-geom.left)*narrowFrac},${b} Z`} {...common} />;
+                    // S1 narrows to ~85% at bottom (S1/S2 junction), S2 narrows to ~80%
+                    const narrowFrac = label === 'S1' ? 0.85 : 0.80;
+                    const bLeft = 80 - (80 - geom.left) * narrowFrac;
+                    const bRight = 80 + (geom.right - 80) * narrowFrac;
+                    // Dorsal sacral foramina — ~38mm apart for S1, ~27mm for S2 (scaled)
+                    const foramenSpacingMm = label === 'S1' ? 38 : 27;
+                    const foramenSpacing = foramenSpacingMm * (130 / 54.0) / 2;
+                    const foramenY = t + (b - t) * 0.7;
+                    const foramenRx = label === 'S1' ? 5 : 4.5;
+                    const foramenRy = label === 'S1' ? 3.5 : 3;
+                    return (
+                        <g>
+                            <path d={`M${geom.left},${t} Q80,${t-4} ${geom.right},${t} L${bRight},${b} Q80,${b+4} ${bLeft},${b} Z`} {...common} />
+                            {/* Dorsal sacral foramina */}
+                            <ellipse cx={80 - foramenSpacing} cy={foramenY} rx={foramenRx} ry={foramenRy} fill="none" stroke="#94a3b8" strokeWidth={1} />
+                            <ellipse cx={80 + foramenSpacing} cy={foramenY} rx={foramenRx} ry={foramenRy} fill="none" stroke="#94a3b8" strokeWidth={1} />
+                        </g>
+                    );
                 })()}
                 {type === 'Pelvis' && <rect x="25" y={VERT_PAD} width="110" height={height - VERT_PAD * 2} rx="3" {...common} opacity="0.6" />}
             </g>
-            <text x="80" y={height/2} dominantBaseline="middle" textAnchor="middle" fontSize={Math.min(14, Math.max(10, 10 / Math.max(0.6, heightScale)))} fontWeight="bold" fill="#334155" className="font-sans pointer-events-none select-none">{label}</text>
+            <text x="80" y={height/2} dominantBaseline="middle" textAnchor="middle" fontSize={Math.min(18, Math.max(12, 12 / Math.max(0.5, heightScale)))} fontWeight="bold" fill="#1e293b" className="font-sans pointer-events-none select-none">{label}</text>
         </svg>
     );
 };

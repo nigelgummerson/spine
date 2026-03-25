@@ -3,6 +3,7 @@ import { t } from '../../i18n/i18n';
 import { ALL_LEVELS, VERT_SVG_SCALE, VERT_PAD, getLevelHeight, getDiscHeight,
          calculateAutoScale, yNormToRenderedY, renderedYToYNorm,
          CHART_CONTENT_HEIGHT, buildHeightMap, DISC_MIN_PX } from '../../data/anatomy';
+import { PelvisRegion } from './PelvisRegion';
 import { FORCE_TYPES } from '../../data/clinical';
 import { InstrumentIcon } from './InstrumentIcon';
 import { LevelRow } from './LevelRow';
@@ -41,6 +42,7 @@ export interface ChartPaperProps {
     onGhostCageClick?: (cage: Cage) => void;
     reconLabelPositions?: Record<string, { offsetX: number; offsetY: number }>;
     onReconLabelUpdate?: (id: string, pos: { offsetX: number; offsetY: number }) => void;
+    onPelvisZoneClick?: (zone: string) => void;
 }
 
 // Header area height in SVG units
@@ -49,7 +51,7 @@ const COL_HEADER_H = 20;  // Column headers (LEFT / RIGHT / FORCE)
 const ROD_HEADER_H = 22;  // Rod text row
 const CONTENT_TOP = TITLE_H + COL_HEADER_H + ROD_HEADER_H;
 
-export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements, ghostConnectors, onGhostConnectorClick, ghostCages, onGhostCageClick, reconLabelPositions, onReconLabelUpdate }) => {
+export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements, ghostConnectors, onGhostConnectorClick, ghostCages, onGhostCageClick, reconLabelPositions, onReconLabelUpdate, onPelvisZoneClick }) => {
     const svgRef = useRef<SVGSVGElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [chartWidth, setChartWidth] = useState(500);
@@ -238,9 +240,21 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
 
         {/* SVG chart content — scales with spine view */}
         <svg ref={svgRef} data-chart-svg="true" viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} preserveAspectRatio="xMidYMid meet" className="flex-1 w-full" style={{ overflow: 'visible' }}>
+            {/* 0. Pelvis background — iliac wings behind S1/S2, drawn first so levels paint on top */}
+            {levels.some(l => l.id === 'S2') && levelYOffsets['L5'] !== undefined && (
+                <PelvisRegion
+                    chartWidth={chartWidth} scaledWidth={scaledWidth} vertX={vertX}
+                    heightScale={heightScale}
+                    l5Y={levelYOffsets['L5'] || 0}
+                    s1Y={levelYOffsets['S1'] || 0}
+                    s2Y={levelYOffsets['S2'] || 0}
+                    clipLeft={forceW} clipRight={chartWidth - forceW}
+                    readOnly={readOnly} />
+            )}
+
             {/* 1. Level rows — vertebral bodies, zones, cages, osteotomies, implant icons */}
             <g>
-                {levels.map(lvl => (
+                {levels.filter(lvl => lvl.type !== 'Pelvis').map(lvl => (
                     <LevelRow key={lvl.id} level={lvl} placements={placements} ghostPlacements={ghostPlacements}
                         onZoneClick={onZoneClick} onPlacementClick={onPlacementClick} onGhostClick={onGhostClick}
                         tools={tools} readOnly={readOnly} showForces={showForces} heightScale={heightScale}
@@ -248,6 +262,21 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                         forcePlacements={forcePlacements} ghostCages={ghostCages} onGhostCageClick={onGhostCageClick}
                         chartWidth={chartWidth} rowY={levelYOffsets[lvl.id] || 0} />
                 ))}
+                {/* Pelvis ghost targets — rendered ON TOP of level rows */}
+                {levels.some(l => l.id === 'S2') && levelYOffsets['L5'] !== undefined && (
+                    <PelvisRegion overlay
+                        chartWidth={chartWidth} scaledWidth={scaledWidth} vertX={vertX}
+                        heightScale={heightScale}
+                        l5Y={levelYOffsets['L5'] || 0}
+                        s1Y={levelYOffsets['S1'] || 0}
+                        s2Y={levelYOffsets['S2'] || 0}
+                        clipLeft={forceW} clipRight={chartWidth - forceW}
+                        readOnly={readOnly}
+                        placements={placements} ghostPlacements={ghostPlacements} tools={tools}
+                        onZoneClick={onPelvisZoneClick}
+                        onPlacementClick={onPlacementClick}
+                        onGhostClick={onGhostClick} />
+                )}
             </g>
 
             {/* 1b. Disc zones — separate pass so they paint on top of next level's zone rects */}

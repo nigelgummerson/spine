@@ -174,7 +174,8 @@ export function validateV4(json: unknown): V4Document {
 
 // --- Legacy v2/v3 schema (loose — validates basic shape only) ---
 
-const legacyZone = z.enum(['left', 'right', 'mid', 'disc', 'force_left', 'force_right']);
+const legacyZone = z.enum(['left', 'right', 'mid', 'disc', 'force_left', 'force_right',
+    's2ai_left', 's2ai_right', 'iliac_left', 'iliac_right', 'si_left', 'si_right']);
 
 const legacyPlacement = z.object({
     id: z.string(),

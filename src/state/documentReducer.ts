@@ -16,7 +16,10 @@ export const V4_OSTEO_TO_TOOL: Record<string, string> = Object.fromEntries(Objec
 export const FORCE_TO_V4: Record<string, { type: string; direction?: string }> = { translate_left: { type: 'translation', direction: 'left' }, translate_right: { type: 'translation', direction: 'right' }, compression: { type: 'compression' }, distraction: { type: 'distraction' }, derotate_cw: { type: 'derotation', direction: 'clockwise' }, derotate_ccw: { type: 'derotation', direction: 'anticlockwise' } };
 export const V4_FORCE_TO_TOOL: Record<string, string> = { 'translation-left': 'translate_left', 'translation-right': 'translate_right', compression: 'compression', distraction: 'distraction', 'derotation-clockwise': 'derotate_cw', 'derotation-anticlockwise': 'derotate_ccw' };
 
-export const ZONE_TO_SIDE: Record<string, string> = { left: 'left', right: 'right', mid: 'midline', disc: 'midline', force_left: 'left', force_right: 'right' };
+export const ZONE_TO_SIDE: Record<string, string> = {
+    left: 'left', right: 'right', mid: 'midline', disc: 'midline', force_left: 'left', force_right: 'right',
+    s2ai_left: 'left', s2ai_right: 'right', iliac_left: 'left', iliac_right: 'right', si_left: 'left', si_right: 'right',
+};
 
 export const BONEGRAFT_TO_V4: Record<string, string> = { 'Local Bone': 'local-bone', 'Autograft': 'iliac-crest-autograft', 'Allograft': 'allograft', 'Synthetics': 'synthetic', 'DBM': 'DBM', 'BMP': 'BMP' };
 export const V4_BONEGRAFT_TO_TOOL: Record<string, string> = Object.fromEntries(Object.entries(BONEGRAFT_TO_V4).map(([k, v]) => [v, k]));
@@ -276,7 +279,7 @@ export function internalToV4Chart(placements: Placement[], cages: Cage[], connec
         const hookTypes = Object.keys(TOOL_TO_V4_HOOK);
         const fixTypes = Object.keys(TOOL_TO_V4_FIXATION);
         if (screwTypes.includes(p.tool)) {
-            const el: any = { id: p.id, type: 'screw', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left' };
+            const el: any = { id: p.id, type: 'screw', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', zone: p.zone };
             const screw: any = { headType: p.tool };
             if (typeof p.data === 'string' && p.data.includes('x')) {
                 const parts = p.data.split('x').map(Number);
@@ -287,18 +290,18 @@ export function internalToV4Chart(placements: Placement[], cages: Cage[], connec
             if (p.annotation) el.annotation = p.annotation;
             elements.push(el);
         } else if (hookTypes.includes(p.tool)) {
-            const el: any = { id: p.id, type: 'hook', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', hook: { hookType: TOOL_TO_V4_HOOK[p.tool] } };
+            const el: any = { id: p.id, type: 'hook', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', zone: p.zone, hook: { hookType: TOOL_TO_V4_HOOK[p.tool] } };
             if (p.annotation) el.annotation = p.annotation;
             elements.push(el);
         } else if (fixTypes.includes(p.tool)) {
-            const el: any = { id: p.id, type: 'fixation', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', fixation: { fixationType: TOOL_TO_V4_FIXATION[p.tool] } };
+            const el: any = { id: p.id, type: 'fixation', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', zone: p.zone, fixation: { fixationType: TOOL_TO_V4_FIXATION[p.tool] } };
             if (p.data) el.fixation.description = p.data;
             if (p.annotation) el.annotation = p.annotation;
             elements.push(el);
         } else if (p.tool === 'osteotomy' && typeof p.data === 'object' && p.data !== null) {
             const oData = p.data as OsteotomyData;
             const ov4 = OSTEO_TO_V4[oData.type] || { t: oData.type, g: null };
-            const el: any = { id: p.id, type: 'osteotomy', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'midline' };
+            const el: any = { id: p.id, type: 'osteotomy', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'midline', zone: p.zone };
             el.osteotomy = { osteotomyType: ov4.t };
             if (ov4.g) el.osteotomy.schwabGrade = ov4.g;
             if (oData.angle != null && oData.angle !== ('' as any)) el.osteotomy.correctionAngle = Number(oData.angle);
@@ -341,22 +344,23 @@ interface InternalChartResult {
 export function v4ChartToInternal(chartData: any, notePositions: Record<string, any>): InternalChartResult {
     const placements: Placement[] = [], cages: Cage[] = [], connectors: Connector[] = [], notes: Note[] = [];
     (chartData.elements || []).forEach((el: any) => {
+        // zone field (v4.1+) carries the full zone type; fall back to side for older v4 files
+        const resolveZone = (el: any) => el.zone || (el.side === 'right' ? 'right' : 'left');
+
         if (el.type === 'screw') {
             const sizeStr = (el.screw?.diameter && el.screw?.length) ? `${el.screw.diameter}x${el.screw.length}` : null;
-            const zone = el.side === 'right' ? 'right' : 'left';
-            placements.push({ id: el.id, levelId: el.level, zone, tool: el.screw?.headType || 'polyaxial', data: sizeStr, annotation: el.annotation || '' });
+            placements.push({ id: el.id, levelId: el.level, zone: resolveZone(el), tool: el.screw?.headType || 'polyaxial', data: sizeStr, annotation: el.annotation || '' });
         } else if (el.type === 'hook') {
             const tool = V4_HOOK_TO_TOOL[el.hook?.hookType] || 'pedicle_hook';
-            const zone = el.side === 'right' ? 'right' : 'left';
-            placements.push({ id: el.id, levelId: el.level, zone, tool, data: null, annotation: el.annotation || '' });
+            placements.push({ id: el.id, levelId: el.level, zone: resolveZone(el), tool, data: null, annotation: el.annotation || '' });
         } else if (el.type === 'fixation') {
             const tool = V4_FIXATION_TO_TOOL[el.fixation?.fixationType] || 'band';
-            const zone = el.side === 'right' ? 'right' : 'left';
-            placements.push({ id: el.id, levelId: el.level, zone, tool, data: el.fixation?.description || null, annotation: el.annotation || '' });
+            placements.push({ id: el.id, levelId: el.level, zone: resolveZone(el), tool, data: el.fixation?.description || null, annotation: el.annotation || '' });
         } else if (el.type === 'osteotomy') {
             const v3Type = V4_OSTEO_TO_TOOL[el.osteotomy?.osteotomyType] || el.osteotomy?.osteotomyType || 'PSO';
             const isDisc = ['facetectomy', 'ponte'].includes(el.osteotomy?.osteotomyType);
-            placements.push({ id: el.id, levelId: el.level, zone: isDisc ? 'disc' : 'mid', tool: 'osteotomy', data: { type: v3Type, shortLabel: el.osteotomy?.osteotomyType === 'facetectomy' ? 'Facet' : (v3Type.length <= 6 ? v3Type : v3Type.substring(0, 3).toUpperCase()), angle: el.osteotomy?.correctionAngle ?? null, reconstructionCage: el.osteotomy?.reconstructionCage || '' }, annotation: '' });
+            const osteoZone = el.zone || (isDisc ? 'disc' : 'mid');
+            placements.push({ id: el.id, levelId: el.level, zone: osteoZone, tool: 'osteotomy', data: { type: v3Type, shortLabel: el.osteotomy?.osteotomyType === 'facetectomy' ? 'Facet' : (v3Type.length <= 6 ? v3Type : v3Type.substring(0, 3).toUpperCase()), angle: el.osteotomy?.correctionAngle ?? null, reconstructionCage: el.osteotomy?.reconstructionCage || '' }, annotation: '' });
         } else if (el.type === 'cage') {
             cages.push({ id: el.id, levelId: el.level, tool: (el.cage?.approach || 'TLIF').toLowerCase(), data: { height: String(el.cage?.height || ''), lordosis: String(el.cage?.lordosis || ''), side: el.side || 'bilateral', width: el.cage?.width ? String(el.cage.width) : undefined, length: el.cage?.length ? String(el.cage.length) : undefined } as any });
         } else if (el.type === 'connector') {
