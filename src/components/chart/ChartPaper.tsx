@@ -134,18 +134,22 @@ export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placem
         return { levelId: entry.levelId, fraction };
     };
 
-    // Connector drag handler
+    // Connector drag handler (mouse + touch)
     useEffect(() => {
         if (!draggingId || readOnly) return;
-        const handleMouseMove = (e: MouseEvent) => {
-            const { y } = screenToSvg(e.clientX, e.clientY);
+        const handleMove = (clientX: number, clientY: number) => {
+            const { y } = screenToSvg(clientX, clientY);
             const { levelId, fraction } = contentYToConnector(y);
             onConnectorUpdate(draggingId, { levelId, fraction });
         };
-        const handleMouseUp = () => setDraggingId(null);
+        const handleMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY);
+        const handleTouchMove = (e: TouchEvent) => { e.preventDefault(); handleMove(e.touches[0].clientX, e.touches[0].clientY); };
+        const handleEnd = () => setDraggingId(null);
         document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
-        return () => { document.removeEventListener('mousemove', handleMouseMove); document.removeEventListener('mouseup', handleMouseUp); };
+        document.addEventListener('mouseup', handleEnd);
+        document.addEventListener('touchmove', handleTouchMove, { passive: false });
+        document.addEventListener('touchend', handleEnd);
+        return () => { document.removeEventListener('mousemove', handleMouseMove); document.removeEventListener('mouseup', handleEnd); document.removeEventListener('touchmove', handleTouchMove); document.removeEventListener('touchend', handleEnd); };
     }, [draggingId, levels, heightScale, readOnly, onConnectorUpdate, screenToSvg]);
 
     // Note pixel position within SVG
@@ -158,16 +162,15 @@ export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placem
         return { x, y, anchorY };
     };
 
-    // Note + recon label drag handler
+    // Note + recon label drag handler (mouse + touch)
     useEffect(() => {
         if (!draggingNoteId || readOnly) return;
         const isRecon = typeof draggingNoteId === 'string' && draggingNoteId.startsWith('recon-');
-        const handleMouseMove = (e: MouseEvent) => {
+        const handleMove = (clientX: number, clientY: number) => {
             if (!noteDragStartRef.current) return;
-            const dx = e.clientX - noteDragStartRef.current.clientX;
-            const dy = e.clientY - noteDragStartRef.current.clientY;
+            const dx = clientX - noteDragStartRef.current.clientX;
+            const dy = clientY - noteDragStartRef.current.clientY;
             if (Math.abs(dx) > 3 || Math.abs(dy) > 3) didDragRef.current = true;
-            // Convert pixel delta to SVG coordinate delta
             const svg = svgRef.current;
             let scaleX = 1, scaleY = 1;
             if (svg) {
@@ -182,10 +185,14 @@ export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placem
                 onNoteUpdate(draggingNoteId, { offsetX: startOX + dx * scaleX, offsetY: startOY + dy * scaleY });
             }
         };
-        const handleMouseUp = () => setDraggingNoteId(null);
+        const handleMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY);
+        const handleTouchMove = (e: TouchEvent) => { e.preventDefault(); handleMove(e.touches[0].clientX, e.touches[0].clientY); };
+        const handleEnd = () => setDraggingNoteId(null);
         document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
-        return () => { document.removeEventListener('mousemove', handleMouseMove); document.removeEventListener('mouseup', handleMouseUp); };
+        document.addEventListener('mouseup', handleEnd);
+        document.addEventListener('touchmove', handleTouchMove, { passive: false });
+        document.addEventListener('touchend', handleEnd);
+        return () => { document.removeEventListener('mousemove', handleMouseMove); document.removeEventListener('mouseup', handleEnd); document.removeEventListener('touchmove', handleTouchMove); document.removeEventListener('touchend', handleEnd); };
     }, [draggingNoteId, readOnly, onNoteUpdate, screenToSvg]);
 
     // Calculate row Y offsets for each level
@@ -330,6 +337,13 @@ export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placem
                                         dragStartRef.current = { y: e.clientY };
                                         setDraggingId(conn.id);
                                     }
+                                }}
+                                onTouchStart={(e) => {
+                                    if (!readOnly) {
+                                        e.preventDefault();
+                                        dragStartRef.current = { y: e.touches[0].clientY };
+                                        setDraggingId(conn.id);
+                                    }
                                 }}>
                                 <svg x={vertX} y={y - connH / 2} width={scaledWidth} height={connH} overflow="visible">
                                     <InstrumentIcon type="connector" className="w-full h-full" color="#1e293b" />
@@ -419,7 +433,8 @@ export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placem
 
                 const renderNoteLabel = (n: { id: string; levelId: string; text: string; offsetX?: number; offsetY?: number }, opts: {
                     opacity?: number; draggable?: boolean; onClick?: (e: React.MouseEvent) => void;
-                    onMouseDown?: (e: React.MouseEvent) => void; bgFill?: string; borderColor?: string; textColor?: string;
+                    onMouseDown?: (e: React.MouseEvent) => void; onTouchStart?: (e: React.TouchEvent) => void;
+                    bgFill?: string; borderColor?: string; textColor?: string;
                 }) => {
                     const pos = getNotePixelPos(n);
                     if (!pos) return null;
@@ -437,6 +452,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placem
                         <g key={n.id} opacity={opts.opacity || 1}
                             cursor={opts.draggable && !readOnly ? 'grab' : (opts.onClick ? 'pointer' : 'default')}
                             onMouseDown={opts.onMouseDown}
+                            onTouchStart={opts.onTouchStart}
                             onClick={opts.onClick}>
                             <rect x={x - rectW / 2} y={rectTop} width={rectW} height={rectH}
                                 rx={3} fill={opts.bgFill || 'rgba(255,255,255,0.9)'}
@@ -474,6 +490,15 @@ export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placem
                                 noteDragStartRef.current = { clientX: e.clientX, clientY: e.clientY, offsetX: n.offsetX || 80, offsetY: n.offsetY || 0 };
                                 setDraggingNoteId(n.id);
                             },
+                            onTouchStart: (e) => {
+                                if (readOnly) return;
+                                e.preventDefault();
+                                e.stopPropagation();
+                                didDragRef.current = false;
+                                const t = e.touches[0];
+                                noteDragStartRef.current = { clientX: t.clientX, clientY: t.clientY, offsetX: n.offsetX || 80, offsetY: n.offsetY || 0 };
+                                setDraggingNoteId(n.id);
+                            },
                             onClick: (e) => { e.stopPropagation(); if (!readOnly && !didDragRef.current) { setDraggingNoteId(null); onNoteClick(n); } },
                         }))}
                         {hasGhosts && activeGhostNotes.map(gn => renderNoteLabel(gn, {
@@ -496,6 +521,15 @@ export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placem
                                     e.stopPropagation();
                                     didDragRef.current = false;
                                     noteDragStartRef.current = { clientX: e.clientX, clientY: e.clientY, offsetX: rPos.offsetX !== undefined ? rPos.offsetX : -160, offsetY: rPos.offsetY || 0 };
+                                    setDraggingNoteId(rc.id);
+                                },
+                                onTouchStart: (e) => {
+                                    if (readOnly) return;
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    didDragRef.current = false;
+                                    const t = e.touches[0];
+                                    noteDragStartRef.current = { clientX: t.clientX, clientY: t.clientY, offsetX: rPos.offsetX !== undefined ? rPos.offsetX : -160, offsetY: rPos.offsetY || 0 };
                                     setDraggingNoteId(rc.id);
                                 },
                                 onClick: (e) => {
