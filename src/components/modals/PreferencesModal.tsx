@@ -15,7 +15,7 @@ interface PreferencesModalProps {
 export const PreferencesModal = ({ isOpen, onClose, useRegionDefaults, onToggleRegionDefaults, confirmAndNextDefault, onToggleConfirmAndNextDefault }: PreferencesModalProps) => {
     if (!isOpen) return null;
     return (<Portal>
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={e => e.key === 'Escape' && onClose()} ref={el => { el?.focus(); }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={e => (e.key === 'Escape' || e.key === 'Enter') && onClose()} ref={el => { el?.focus(); }}>
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden" onClick={e => e.stopPropagation()}>
                 <div className="bg-slate-800 text-white px-4 py-3 flex justify-between items-center">
                     <h3 className="font-bold text-sm flex items-center gap-2"><IconGear /> {t('modal.preferences.title')}</h3>

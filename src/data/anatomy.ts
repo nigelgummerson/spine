@@ -20,7 +20,8 @@ export const REGIONS: Record<string, { height: number; color: string }> = {
     T: { height: 36, color: '#f1f5f9' },
     L: { height: 46, color: '#f1f5f9' },
     S: { height: 52, color: '#f1f5f9' },
-    Pelvis: { height: 56, color: '#f1f5f9' }
+    Pelvis: { height: 56, color: '#f1f5f9' },
+    pelvic: { height: 0, color: '#f1f5f9' }
 };
 
 // Anatomical dimensions (mm) from published CT morphometric data.
