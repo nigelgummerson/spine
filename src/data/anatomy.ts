@@ -302,14 +302,22 @@ export const ALL_LEVELS: Level[] = [
     { id: 'Pelvis', type: 'Pelvis' },
 ];
 
-// Disc height varies by region: lumbar ~30% body height, thoracic ~18%, cervical ~5mm
+// Per-level disc heights (mm) — disc below the named level.
+// Cervical: Yu et al. 2017 (PMC5444210) posterior disc height.
+// Thoracic: Back et al. 2019 ADH, interpolated between reported values.
+// Lumbar: Back et al. 2019 male disc height.
+const DISC_HEIGHT_MM: Record<string, number> = {
+    C2: 4.5, C3: 4.6, C4: 4.6, C5: 4.2, C6: 3.8, C7: 4.5,
+    T1: 4.0, T2: 3.5, T3: 3.2, T4: 3.0, T5: 3.5, T6: 4.0,
+    T7: 4.5, T8: 5.2, T9: 6.0, T10: 7.2, T11: 6.0, T12: 5.6,
+    L1: 6.9, L2: 8.1, L3: 8.7, L4: 9.2, L5: 8.8,
+};
 export const DISC_MIN_PX = 8; // minimum rendered disc zone height in pixels
 export const getDiscHeight = (level: Level): number => {
     if (level.type === 'Pelvis' || level.type === 'pelvic' || level.type === 'S' || level.id === 'Oc' || level.id === 'C1') return 0;
-    const h = getLevelHeight(level);
-    if (level.type === 'L') return Math.round(h * 0.30);
-    if (level.type === 'T') return Math.round(h * 0.18);
-    return Math.round(5 * VERT_SVG_SCALE); // cervical ~5mm
+    const mm = DISC_HEIGHT_MM[level.id];
+    if (mm) return Math.round(mm * VERT_SVG_SCALE);
+    return 0;
 };
 
 export const buildHeightMap = (lvls: Level[], hScale: number): { map: HeightMapEntry[]; totalHeight: number } => {
