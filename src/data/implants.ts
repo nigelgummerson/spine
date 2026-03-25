@@ -59,7 +59,7 @@ export const SCREW_DEFAULTS: Record<string, { diameter: string; length: string }
     T7: { diameter: '4.5', length: '32' },
     T8: { diameter: '5.0', length: '35' },
     T9: { diameter: '5.0', length: '35' },
-    T10: { diameter: '5.5', length: '38' },
+    T10: { diameter: '5.5', length: '35' },
     T11: { diameter: '5.5', length: '40' },
     T12: { diameter: '6.0', length: '40' },
     L1: { diameter: '6.0', length: '45' },
