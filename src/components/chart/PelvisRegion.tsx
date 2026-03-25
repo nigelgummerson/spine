@@ -19,7 +19,7 @@ interface PelvisRegionProps {
     placements?: Placement[];
     ghostPlacements?: Placement[];
     tools?: ToolDefinition[];
-    onZoneClick?: (zone: string) => void;
+    onZoneClick?: (levelId: string, zone: string) => void;
     onPlacementClick?: (placement: Placement) => void;
     onGhostClick?: (placement: Placement) => void;
 }
@@ -177,9 +177,9 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                 const siY = (siZoneTop + siZoneBottom) / 2; // midpoint for placed screw rendering
 
                 const hitR = r * 1.8; // larger hit area
-                const ghostTarget = (x: number, y: number, label: string, zone: string, side?: 'left' | 'right') => (
-                    <g key={zone} cursor="crosshair"
-                        onClick={(e) => { e.stopPropagation(); onZoneClick?.(zone); }}>
+                const ghostTarget = (x: number, y: number, label: string, levelId: string, zone: string, side?: 'left' | 'right') => (
+                    <g key={`${levelId}-${zone}`} cursor="crosshair"
+                        onClick={(e) => { e.stopPropagation(); onZoneClick?.(levelId, zone); }}>
                         {/* Hit area with hover highlight */}
                         <circle cx={x} cy={y} r={hitR} fill="transparent"
                             onMouseEnter={(e) => (e.target as SVGCircleElement).setAttribute('fill', 'rgba(148, 163, 184, 0.15)')}
@@ -200,9 +200,9 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                 );
 
                 // S2AI ghost with trajectory arrow
-                const s2aiTarget = (x: number, y: number, zone: string, dirX: number) => (
-                    <g key={zone} cursor="crosshair"
-                        onClick={(e) => { e.stopPropagation(); onZoneClick?.(zone); }}>
+                const s2aiTarget = (x: number, y: number, levelId: string, zone: string, dirX: number) => (
+                    <g key={`${levelId}-${zone}`} cursor="crosshair"
+                        onClick={(e) => { e.stopPropagation(); onZoneClick?.(levelId, zone); }}>
                         <circle cx={x} cy={y} r={hitR} fill="transparent"
                             onMouseEnter={(e) => (e.target as SVGCircleElement).setAttribute('fill', 'rgba(245, 158, 11, 0.15)')}
                             onMouseLeave={(e) => (e.target as SVGCircleElement).setAttribute('fill', 'transparent')} />
@@ -217,7 +217,7 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                 );
 
                 // SI fusion zone — angled zone following the SI joint line
-                const siZone = (topX: number, bottomX: number, zone: string) => {
+                const siZone = (topX: number, bottomX: number, levelId: string, zone: string) => {
                     const halfW = 10 * heightScale;
                     const pathD = `
                         M${topX - halfW},${siZoneTop}
@@ -226,8 +226,8 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                         L${bottomX - halfW},${siZoneBottom}
                         Z`;
                     return (
-                        <g key={zone} cursor="crosshair"
-                            onClick={(e) => { e.stopPropagation(); onZoneClick?.(zone); }}>
+                        <g key={`${levelId}-${zone}`} cursor="crosshair"
+                            onClick={(e) => { e.stopPropagation(); onZoneClick?.(levelId, zone); }}>
                             {/* Hit area with hover */}
                             <path d={pathD} fill="transparent"
                                 onMouseEnter={(e) => (e.target as SVGPathElement).setAttribute('fill', 'rgba(225, 29, 72, 0.12)')}
@@ -254,25 +254,6 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                 const s2ViewH = getLevelHeight({ id: 'S2', type: 'S' });
                 const s2PedViewY = s2Geom ? VERT_PAD + s2Geom.pedRy + 5 : s2ViewH / 2;
                 const s2PedY = s2Y + (s2PedViewY / s2ViewH) * s2H;
-
-                // Map zone names to positions
-                const zonePositions: Record<string, { x: number; y: number; levelId: string }> = {
-                    s1_left: { x: s1PedLeftX, y: s1PedY, levelId: 'S1' },
-                    s1_right: { x: s1PedRightX, y: s1PedY, levelId: 'S1' },
-                    s2_left: { x: s2PedLeftX, y: s2PedY, levelId: 'S2' },
-                    s2_right: { x: s2PedRightX, y: s2PedY, levelId: 'S2' },
-                    s2ai_left: { x: s2aiLeftX, y: s2aiY, levelId: 'S1' },
-                    s2ai_right: { x: s2aiRightX, y: s2aiY, levelId: 'S1' },
-                    iliac_left: { x: iliacLeftX, y: iliacY, levelId: 'S1' },
-                    iliac_right: { x: iliacRightX, y: iliacY, levelId: 'S1' },
-                    si_left: { x: siLeftTop - siGap, y: siY, levelId: 'S1' },
-                    si_right: { x: siRightTop + siGap, y: siY, levelId: 'S1' },
-                };
-
-                // Check which zones have placed screws
-                const pelvicZones = ['s2ai_left', 's2ai_right', 'iliac_left', 'iliac_right', 'si_left', 'si_right'];
-                const s1Zones = ['s1_left', 's1_right'];
-                const s2Zones = ['s2_left', 's2_right'];
 
                 const findPlacement = (levelId: string, zone: string) =>
                     placements?.find(p => p.levelId === levelId && p.zone === zone);
@@ -415,20 +396,20 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                 return (
                     <g>
                         {/* S1 pedicle screws */}
-                        {renderZone(s1PedLeftX, s1PedY, 'S1', 'left', 'left', 'standard', () => ghostTarget(s1PedLeftX, s1PedY, 'S1', 's1_left'))}
-                        {renderZone(s1PedRightX, s1PedY, 'S1', 'right', 'right', 'standard', () => ghostTarget(s1PedRightX, s1PedY, 'S1', 's1_right'))}
+                        {renderZone(s1PedLeftX, s1PedY, 'S1', 'left', 'left', 'standard', () => ghostTarget(s1PedLeftX, s1PedY, 'S1', 'S1', 'left'))}
+                        {renderZone(s1PedRightX, s1PedY, 'S1', 'right', 'right', 'standard', () => ghostTarget(s1PedRightX, s1PedY, 'S1', 'S1', 'right'))}
                         {/* S2 pedicle screws */}
-                        {renderZone(s2PedLeftX, s2PedY, 'S2', 'left', 'left', 's2', () => ghostTarget(s2PedLeftX, s2PedY, 'S2', 's2_left'))}
-                        {renderZone(s2PedRightX, s2PedY, 'S2', 'right', 'right', 's2', () => ghostTarget(s2PedRightX, s2PedY, 'S2', 's2_right'))}
+                        {renderZone(s2PedLeftX, s2PedY, 'S2', 'left', 'left', 's2', () => ghostTarget(s2PedLeftX, s2PedY, 'S2', 'S2', 'left'))}
+                        {renderZone(s2PedRightX, s2PedY, 'S2', 'right', 'right', 's2', () => ghostTarget(s2PedRightX, s2PedY, 'S2', 'S2', 'right'))}
                         {/* S2AI */}
-                        {renderZone(s2aiLeftX, s2aiY, 'S1', 's2ai_left', 'left', 's2ai_left', () => s2aiTarget(s2aiLeftX, s2aiY, 's2ai_left', -1))}
-                        {renderZone(s2aiRightX, s2aiY, 'S1', 's2ai_right', 'right', 's2ai_right', () => s2aiTarget(s2aiRightX, s2aiY, 's2ai_right', 1))}
+                        {renderZone(s2aiLeftX, s2aiY, 'S2AI', 'left', 'left', 's2ai_left', () => s2aiTarget(s2aiLeftX, s2aiY, 'S2AI', 'left', -1))}
+                        {renderZone(s2aiRightX, s2aiY, 'S2AI', 'right', 'right', 's2ai_right', () => s2aiTarget(s2aiRightX, s2aiY, 'S2AI', 'right', 1))}
                         {/* Iliac */}
-                        {renderZone(iliacLeftX, iliacY, 'S1', 'iliac_left', 'left', 'iliac', () => ghostTarget(iliacLeftX, iliacY, 'Iliac', 'iliac_left', 'left'))}
-                        {renderZone(iliacRightX, iliacY, 'S1', 'iliac_right', 'right', 'iliac', () => ghostTarget(iliacRightX, iliacY, 'Iliac', 'iliac_right', 'right'))}
+                        {renderZone(iliacLeftX, iliacY, 'Iliac', 'left', 'left', 'iliac', () => ghostTarget(iliacLeftX, iliacY, 'Iliac', 'Iliac', 'left', 'left'))}
+                        {renderZone(iliacRightX, iliacY, 'Iliac', 'right', 'right', 'iliac', () => ghostTarget(iliacRightX, iliacY, 'Iliac', 'Iliac', 'right', 'right'))}
                         {/* SI fusion — medial to SI joint */}
-                        {renderZone(siLeftTop + r * 2 + r, siZoneTop + (siZoneBottom - siZoneTop) * 0.3 + r, 'S1', 'si_left', 'left', 'si', () => siZone(siLeftTop - siGap, siLeftBottom - siGap, 'si_left'))}
-                        {renderZone(siRightTop - r * 2 - r, siZoneTop + (siZoneBottom - siZoneTop) * 0.3 + r, 'S1', 'si_right', 'right', 'si', () => siZone(siRightTop + siGap, siRightBottom + siGap, 'si_right'))}
+                        {renderZone(siLeftTop + r * 2 + r, siZoneTop + (siZoneBottom - siZoneTop) * 0.3 + r, 'SI-J', 'left', 'left', 'si', () => siZone(siLeftTop - siGap, siLeftBottom - siGap, 'SI-J', 'left'))}
+                        {renderZone(siRightTop - r * 2 - r, siZoneTop + (siZoneBottom - siZoneTop) * 0.3 + r, 'SI-J', 'right', 'right', 'si', () => siZone(siRightTop + siGap, siRightBottom + siGap, 'SI-J', 'right'))}
                     </g>
                 );
             })()}

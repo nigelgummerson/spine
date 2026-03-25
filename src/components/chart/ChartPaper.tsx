@@ -42,7 +42,7 @@ export interface ChartPaperProps {
     onGhostCageClick?: (cage: Cage) => void;
     reconLabelPositions?: Record<string, { offsetX: number; offsetY: number }>;
     onReconLabelUpdate?: (id: string, pos: { offsetX: number; offsetY: number }) => void;
-    onPelvisZoneClick?: (zone: string) => void;
+    onPelvisZoneClick?: (levelId: string, zone: string) => void;
 }
 
 // Header area height in SVG units
@@ -241,7 +241,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
         {/* SVG chart content — scales with spine view */}
         <svg ref={svgRef} data-chart-svg="true" viewBox={`0 0 ${chartWidth} ${totalSvgHeight}`} preserveAspectRatio="xMidYMid meet" className="flex-1 w-full" style={{ overflow: 'visible' }}>
             {/* 0. Pelvis background — iliac wings behind S1/S2, drawn first so levels paint on top */}
-            {levels.some(l => l.id === 'S2') && levelYOffsets['L5'] !== undefined && (
+            {levels.some(l => l.type === 'pelvic' || l.id === 'S2') && levelYOffsets['L5'] !== undefined && (
                 <PelvisRegion
                     chartWidth={chartWidth} scaledWidth={scaledWidth} vertX={vertX}
                     heightScale={heightScale}
@@ -254,7 +254,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
 
             {/* 1. Level rows — vertebral bodies, zones, cages, osteotomies, implant icons */}
             <g>
-                {levels.filter(lvl => lvl.type !== 'Pelvis').map(lvl => (
+                {levels.filter(lvl => lvl.type !== 'Pelvis' && lvl.type !== 'pelvic').map(lvl => (
                     <LevelRow key={lvl.id} level={lvl} placements={placements} ghostPlacements={ghostPlacements}
                         onZoneClick={onZoneClick} onPlacementClick={onPlacementClick} onGhostClick={onGhostClick}
                         tools={tools} readOnly={readOnly} showForces={showForces} heightScale={heightScale}
@@ -263,7 +263,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = ({ title, placements, ghost
                         chartWidth={chartWidth} rowY={levelYOffsets[lvl.id] || 0} />
                 ))}
                 {/* Pelvis ghost targets — rendered ON TOP of level rows */}
-                {levels.some(l => l.id === 'S2') && levelYOffsets['L5'] !== undefined && (
+                {levels.some(l => l.type === 'pelvic' || l.id === 'S2') && levelYOffsets['L5'] !== undefined && (
                     <PelvisRegion overlay
                         chartWidth={chartWidth} scaledWidth={scaledWidth} vertX={vertX}
                         heightScale={heightScale}
