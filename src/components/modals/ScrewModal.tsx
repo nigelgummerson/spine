@@ -83,12 +83,11 @@ interface ScrewModalProps {
     zone: Zone;
     levels: Level[];
     placements: Placement[];
-    showPelvis: boolean;
     useRegionDefaults: boolean;
     confirmAndNextDefault?: boolean;
 }
 
-export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, levelId, zone, levels, placements, showPelvis, useRegionDefaults, confirmAndNextDefault }: ScrewModalProps) => {
+export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, levelId, zone, levels, placements, useRegionDefaults, confirmAndNextDefault }: ScrewModalProps) => {
     if (!isOpen) return null;
     // Compute initial values from props (runs on mount since component unmounts when closed)
     const computeInitial = () => {
@@ -102,7 +101,7 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
         } else if (initialData === null) { mode = 'none'; }
         else if (useRegionDefaults && initialData === undefined) {
             // New placement with region defaults on — use per-level defaults
-            const def = getScrewDefault(levelId, zone);
+            const def = getScrewDefault(levelId);
             if (def) { dia = def.diameter; len = def.length; mode = 'standard'; }
             else { mode = 'none'; }
         }
@@ -121,23 +120,12 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
     const [selectedLevel, setSelectedLevel] = useState(levelId);
     const [selectedZone, setSelectedZone] = useState<Zone>(zone);
 
-    const isPelvic = /^(s2ai|iliac|si)_/.test(selectedZone);
+    const isPelvic = levels.find(l => l.id === selectedLevel)?.type === 'pelvic';
 
-    // Build side options based on current level and pelvis visibility
     const sideOptions: { value: Zone; label: string }[] = [
         { value: 'left', label: t('modal.screw.zone.left') },
         { value: 'right', label: t('modal.screw.zone.right') },
     ];
-    if (showPelvis && selectedLevel === 'S1') {
-        sideOptions.push(
-            { value: 's2ai_left', label: t('modal.screw.zone.s2ai_left') },
-            { value: 's2ai_right', label: t('modal.screw.zone.s2ai_right') },
-            { value: 'iliac_left', label: t('modal.screw.zone.iliac_left') },
-            { value: 'iliac_right', label: t('modal.screw.zone.iliac_right') },
-            { value: 'si_left', label: t('modal.screw.zone.si_left') },
-            { value: 'si_right', label: t('modal.screw.zone.si_right') },
-        );
-    }
 
     const isHookOnly = HOOK_TYPES.includes(selectedType);
     const isFixation = ['band','wire','cable'].includes(selectedType);
@@ -146,13 +134,8 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
 
     const handleLevelChange = (newLevel: string) => {
         setSelectedLevel(newLevel);
-        let effectiveZone = selectedZone;
-        if (newLevel !== 'S1' && /^(s2ai|iliac|si)_/.test(selectedZone)) {
-            effectiveZone = (selectedZone.endsWith('_right') ? 'right' : 'left') as Zone;
-            setSelectedZone(effectiveZone);
-        }
         if (useRegionDefaults && isScrew) {
-            const def = getScrewDefault(newLevel, effectiveZone);
+            const def = getScrewDefault(newLevel);
             if (def) { setDiameter(def.diameter); setLength(def.length); setMode('standard'); }
             else { setMode('none'); }
         }
@@ -161,7 +144,7 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
     const handleZoneChange = (newZone: Zone) => {
         setSelectedZone(newZone);
         if (useRegionDefaults && isScrew) {
-            const def = getScrewDefault(selectedLevel, newZone);
+            const def = getScrewDefault(selectedLevel);
             if (def) { setDiameter(def.diameter); setLength(def.length); setMode('standard'); }
         }
     };
@@ -274,7 +257,7 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
                         {mode === 'custom' && <input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} placeholder={t('modal.screw.custom_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg focus:border-amber-500 outline-none" autoFocus />}
                         {mode === 'none' && <div className="text-center py-6 text-slate-400 text-sm italic">{t('modal.screw.icon_only')}</div>}
                         {useRegionDefaults && mode === 'standard' && (() => {
-                            const def = getScrewDefault(selectedLevel, selectedZone);
+                            const def = getScrewDefault(selectedLevel);
                             return def
                                 ? <div className="mt-2 text-[10px] text-slate-400 italic">{t('modal.screw.suggested_size', { level: selectedLevel })}</div>
                                 : <div className="mt-2 text-[10px] text-amber-500 italic">{t('modal.screw.no_default_size', { level: selectedLevel })}</div>;

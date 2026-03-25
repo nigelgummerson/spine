@@ -16,7 +16,6 @@ const defaultScrewProps = {
     zone: 'left' as Zone,
     levels: [{ id: 'L3', type: 'L' }, { id: 'L4', type: 'L' }, { id: 'L5', type: 'L' }],
     placements: [] as any[],
-    showPelvis: false,
     useRegionDefaults: false,
 };
 import { ChangeLogModal } from '../modals/ChangeLogModal';
