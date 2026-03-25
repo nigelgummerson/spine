@@ -127,14 +127,16 @@ interface GeomBase {
 
 interface OccipitGeom extends GeomBase {
   region: 'occiput';
-  condyleLeftCx: number;
+  condyleLeftCx: number;   // SVG x, for rendering condyle shapes
   condyleRightCx: number;
   condyleRx: number;
   condyleRy: number;
   foramenRx: number;
   foramenRy: number;
-  plateZoneCx: number;    // always 80 (midline)
-  plateZoneW: number;     // width of clickable plate zone
+  // Screw click zones: parasagittal, close to midline (not on condyles)
+  // Positioned ~8-10mm either side of midline keel, matching occipital plate hole rows
+  screwLeftCx: number;     // SVG x, left parasagittal click zone
+  screwRightCx: number;    // SVG x, right parasagittal click zone
 }
 
 interface CervicalUpperGeom extends GeomBase {
@@ -197,7 +199,7 @@ type VertSvgGeometry =
 
 **Coordinate system:** Same 160-unit viewBox, same `VERT_SVG_SCALE` (anchored to L5 = 130 SVG units). Cervical lateral masses are positioned lateral to the body edges. C1 (~80mm) is wider than subaxial cervical but fits within the viewBox.
 
-The function signature changes from `(levelId: string) => {...} | null` to `(levelId: string) => VertSvgGeometry | null` where null is only returned for Pelvis.
+The function signature changes from `(levelId: string) => {...} | null` to `(levelId: string) => VertSvgGeometry | null` where null is only returned for Pelvis. The current return object has no `region` discriminant and includes an `isLumbar` field with no external consumers -- both are replaced by the discriminated union. Every existing call site will need type narrowing via `geom.region`.
 
 ### 3. SVG Rendering (SpineVertebra)
 
@@ -242,7 +244,7 @@ Five distinct shape groups replace the current two cervical paths. All use the s
 
 LevelRow checks `geom.region` to determine click zone positioning:
 
-**Occiput:** Left/right zones positioned parasagittally (close together, either side of midline). This matches clinical reality where occipital plate screws are placed in paramedian rows. Keeps the existing left/right data model paradigm -- no special-casing needed.
+**Occiput:** Left/right zones positioned at `screwLeftCx`/`screwRightCx` -- parasagittal, close together either side of midline (~8-10mm offset, matching occipital plate hole rows). These are distinct from the condyle positions which are more lateral. Keeps the existing left/right data model paradigm -- no special-casing needed.
 
 **C1-C6 (cervical-upper, cervical-subaxial):** Left/right zones positioned on `latMassLeftCx`/`latMassRightCx` from the geometry. Vertical position from `latMassCy`.
 
@@ -290,6 +292,7 @@ LevelRow checks `geom.region` to determine click zone positioning:
 - `getLevelHeight()` returns per-level heights (not flat 24 for all cervical)
 - Height progression: C1 body is shortest (~10mm), C7 is tallest (~17mm)
 - `calculateAutoScale()` still produces reasonable scale factors for whole-spine and cervical-only views
+- `getDiscHeight()` returns 0 for Oc and C1 (non-clickable spacer behaviour preserved)
 
 ### 7. Risks
 
