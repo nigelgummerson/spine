@@ -159,10 +159,12 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             : null;
         const isForceZone = zone.startsWith('force');
 
-        // Sacral screws at pedicle X (anatomic entry point); others at zone edge
+        // Screws at anatomic entry point (lateral mass for cervical, pedicle for T/L/S); zone edge fallback
         const zoneCx = isForceZone ? zoneX + zoneW / 2
             : isSacral && zone === 'left' && chartScrewLeftCx !== undefined ? chartScrewLeftCx
             : isSacral && zone === 'right' && chartScrewRightCx !== undefined ? chartScrewRightCx
+            : chartScrewLeftCx !== undefined && zone === 'left' ? chartScrewLeftCx
+            : chartScrewRightCx !== undefined && zone === 'right' ? chartScrewRightCx
             : zone === 'left' ? zoneX + zoneW - screwPx / 2 - 4
             : zone === 'right' ? zoneX + screwPx / 2 + 4
             : zoneX + zoneW / 2;
@@ -213,12 +215,12 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const showData = p.data && !isHookItem && !isFixation;
             const showAnn = !!ann;
 
-            // Position icon: sacral uses zoneCx (pedicle position); others at zone edge
+            // Position icon: anatomy-based when available (lateral mass/pedicle); zone edge fallback
             let iconX: number;
             const iconY = zoneCy - iH / 2;
             if (align === 'center') {
                 iconX = zoneCx - iW / 2;
-            } else if (isSacral) {
+            } else if (chartScrewLeftCx !== undefined || chartScrewRightCx !== undefined || isSacral) {
                 iconX = zoneCx - iW / 2;
             } else if (align === 'left') {
                 iconX = zoneX + zoneW - iW - 4;
@@ -292,7 +294,7 @@ export const LevelRow: React.FC<LevelRowProps> = ({ level, placements, ghostPlac
             const iconY = zoneCy - iH / 2;
             if (align === 'center') {
                 iconX = zoneCx - iW / 2;
-            } else if (isSacral) {
+            } else if (chartScrewLeftCx !== undefined || chartScrewRightCx !== undefined || isSacral) {
                 iconX = zoneCx - iW / 2;
             } else if (align === 'left') {
                 iconX = zoneX + zoneW - iW - 4;
