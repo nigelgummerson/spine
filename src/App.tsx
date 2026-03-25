@@ -33,7 +33,7 @@ import { InstrumentIcon } from './components/chart/InstrumentIcon';
 import { Portal } from './components/Portal';
 import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, resetDisclaimer, getDisclaimerTimestamp } from './components/modals/DisclaimerModal';
 import { useDocumentState } from './hooks/useDocumentState';
-import { serializeState as serializeDocState, deserializeDocument } from './state/documentReducer';
+import { deserializeDocument } from './state/documentReducer';
 import { validateV4, validateLegacy, ValidationError } from './state/schema';
 import type { ColourScheme, ToolDefinition, Placement, Level, Zone, OsteotomyData, Cage, Note } from './types';
 
@@ -840,11 +840,8 @@ const App = () => {
         setActiveChart('planned');
         resetDisclaimer();
         setDisclaimerTick(n => n + 1);
-        // Broadcast empty state to synced windows
-        if (syncChannelRef.current) {
-            const emptyState = serializeDocState(state, viewMode, colourScheme, CURRENT_VERSION, currentLang);
-            syncChannelRef.current.postMessage({ type: 'state', appVersion: CURRENT_VERSION, payload: emptyState });
-        }
+        // Sync handled by auto-save effect — no manual broadcast needed
+        // (manual broadcast used stale pre-dispatch state, causing bounce)
     };
 
     const modals = (
