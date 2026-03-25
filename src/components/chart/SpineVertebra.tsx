@@ -35,18 +35,26 @@ export const SpineVertebra = React.memo(({ label, type, height, isCorpectomy, he
                     const t = VERT_PAD;
                     const b = height - VERT_PAD;
                     const m = (t + b) / 2;
+                    // Shift Oc upward to separate from C1
+                    const ocShift = -7;
+                    const ot = t + ocShift;
+                    const ob = b + ocShift;
+                    const om = (ot + ob) / 2;
+                    // Inset lateral tips to soften the sharp spikes
+                    const tipInset = 6;
+                    const tipLift = 4;
                     return (
                         <g>
-                            {/* Skull base — wide convex arc */}
-                            <path d={`M${g.left},${b} Q${g.cx},${t - 8} ${g.right},${b} L${g.right},${b} Q${g.cx},${m + 4} ${g.left},${b} Z`}
+                            {/* Skull base — smooth convex arc with rounded lateral tips */}
+                            <path d={`M${g.left + tipInset},${ob - tipLift} Q${g.cx},${ot - 8} ${g.right - tipInset},${ob - tipLift} Q${g.right},${ob} ${g.right - tipInset},${ob} Q${g.cx},${om + 4} ${g.left + tipInset},${ob} Q${g.left},${ob} ${g.left + tipInset},${ob - tipLift} Z`}
                                 {...common} />
                             {/* Occipital condyles */}
-                            <ellipse cx={g.condyleLeftCx} cy={b - g.condyleRy} rx={g.condyleRx} ry={g.condyleRy}
+                            <ellipse cx={g.condyleLeftCx} cy={ob - g.condyleRy} rx={g.condyleRx} ry={g.condyleRy}
                                 fill="#e8ecf0" stroke="#94a3b8" strokeWidth="1" />
-                            <ellipse cx={g.condyleRightCx} cy={b - g.condyleRy} rx={g.condyleRx} ry={g.condyleRy}
+                            <ellipse cx={g.condyleRightCx} cy={ob - g.condyleRy} rx={g.condyleRx} ry={g.condyleRy}
                                 fill="#e8ecf0" stroke="#94a3b8" strokeWidth="1" />
                             {/* Foramen magnum */}
-                            <ellipse cx={g.cx} cy={m} rx={g.foramenRx} ry={g.foramenRy}
+                            <ellipse cx={g.cx} cy={om} rx={g.foramenRx} ry={g.foramenRy}
                                 fill="white" stroke="#94a3b8" strokeWidth="0.8" strokeDasharray="3 2" />
                         </g>
                     );
@@ -171,12 +179,20 @@ export const SpineVertebra = React.memo(({ label, type, height, isCorpectomy, he
                     return (
                         <g>
                             {/* Transverse processes (behind body, at pedicle level) */}
-                            <rect x={geom.tpLeftX} y={tpTop} width={tpLeftW} height={tpH} rx={2}
-                                fill={common.fill}
-                                transform={ang ? `rotate(${ang}, ${l}, ${tpBot})` : undefined} />
-                            <rect x={r} y={tpTop} width={tpRightW} height={tpH} rx={2}
-                                fill={common.fill}
-                                transform={ang ? `rotate(${-ang}, ${r}, ${tpBot})` : undefined} />
+                            {/* Left TP: medial corners sharp (right side), lateral corners rounded (left side) */}
+                            {(() => {
+                                const lx = geom.tpLeftX, ly = tpTop, lw = tpLeftW, lh = tpH, cr = Math.min(5, lh / 2);
+                                const tpPath = `M${lx + cr},${ly} L${lx + lw},${ly} L${lx + lw},${ly + lh} L${lx + cr},${ly + lh} Q${lx},${ly + lh} ${lx},${ly + lh - cr} L${lx},${ly + cr} Q${lx},${ly} ${lx + cr},${ly} Z`;
+                                return <path d={tpPath} fill={common.fill}
+                                    transform={ang ? `rotate(${ang}, ${l}, ${tpBot})` : undefined} />;
+                            })()}
+                            {/* Right TP: medial corners sharp (left side), lateral corners rounded (right side) */}
+                            {(() => {
+                                const rx2 = r, ry2 = tpTop, rw = tpRightW, rh = tpH, cr = Math.min(5, rh / 2);
+                                const tpPath = `M${rx2},${ry2} L${rx2 + rw - cr},${ry2} Q${rx2 + rw},${ry2} ${rx2 + rw},${ry2 + cr} L${rx2 + rw},${ry2 + rh - cr} Q${rx2 + rw},${ry2 + rh} ${rx2 + rw - cr},${ry2 + rh} L${rx2},${ry2 + rh} Z`;
+                                return <path d={tpPath} fill={common.fill}
+                                    transform={ang ? `rotate(${-ang}, ${r}, ${tpBot})` : undefined} />;
+                            })()}
                             <path d={bodyPath} {...common} />
                             <ellipse cx={geom.pedLeftCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth}/>
                             <ellipse cx={geom.pedRightCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth}/>

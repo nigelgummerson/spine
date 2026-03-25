@@ -812,6 +812,7 @@ const App = () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
         if (incognitoMode) localStorage.removeItem('spine_planner_v2');
     };
     const loadProjectJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
