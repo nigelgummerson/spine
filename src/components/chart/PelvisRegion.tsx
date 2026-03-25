@@ -137,12 +137,12 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
 
                 // S2AI entry: midpoint between S1 and S2 foramen, just LATERAL to foramen
                 // but MEDIAL to SI joint. Moved up slightly from S1/S2 junction.
-                const s2aiY = s1Y + s1H * 0.85;
-                const s2aiLeftX = cx - foramenHalfSpacing - r * 2.5;
-                const s2aiRightX = cx + foramenHalfSpacing + r * 2.5;
+                const s2aiY = s1Y + s1H * 0.85 + r * 0.5;
+                const s2aiLeftX = cx - foramenHalfSpacing - r * 3.0;
+                const s2aiRightX = cx + foramenHalfSpacing + r * 3.0;
 
                 // S2AI trajectory: lateral and caudal, line starts at circle edge
-                const arrowLen = r * 8;
+                const arrowLen = r * 5.3;
                 const s2aiArrow = (x: number, y: number, dirX: number, color: string) => {
                     // Direction vector: lateral (dirX) and caudal (0.4 ratio)
                     const dx = dirX * arrowLen;
@@ -296,10 +296,9 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
 
                 const iW = screwPx;
                 const iH = screwPx;
-                // Match lumbar spine text size for all pelvic screws
-                const isCervical = false; // pelvic region is never cervical
+                // Pelvic screw size text — smaller than lumbar to avoid clashing at small scales
                 const labelScale = Math.max(0.9, Math.min(1.2, Math.pow(heightScale, 0.3)));
-                const labelPx = Math.max(19, Math.min(22, Math.round(20 * labelScale)));
+                const labelPx = Math.max(13, Math.min(16, Math.round(15 * labelScale)));
 
                 // Text positioning per zone type:
                 // 'right-of' = text to the right of icon (for left-side screws)
@@ -309,7 +308,17 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                 type TextPos = { tx: number; ty: number; anchor: 'start' | 'middle' | 'end' };
                 const textPos = (x: number, y: number, side: 'left' | 'right', variant: Variant): TextPos => {
                     if (variant === 'iliac') {
-                        return { tx: x, ty: y + iH / 2 + labelPx * 0.8, anchor: 'middle' }; // below
+                        const lateralOffset = iW / 2 + 3;
+                        return side === 'left'
+                            ? { tx: x - lateralOffset, ty: y + iH / 2 + labelPx * 0.5, anchor: 'end' }
+                            : { tx: x + lateralOffset, ty: y + iH / 2 + labelPx * 0.5, anchor: 'start' };
+                    }
+                    // S2: lower outer quadrant — below and lateral
+                    if (variant === 's2') {
+                        const lateralOffset = iW / 2 + 3;
+                        return side === 'left'
+                            ? { tx: x - lateralOffset, ty: y + iH / 2 + labelPx * 0.5, anchor: 'end' }
+                            : { tx: x + lateralOffset, ty: y + iH / 2 + labelPx * 0.5, anchor: 'start' };
                     }
                     // Text on the LATERAL side (away from midline), in line with icon
                     if (side === 'left') {
@@ -318,7 +327,7 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                     return { tx: x + iW / 2 + 3, ty: y + labelPx * 0.35, anchor: 'start' };
                 };
 
-                type Variant = 'standard' | 'si' | 'iliac' | 's2ai_left' | 's2ai_right';
+                type Variant = 'standard' | 's2' | 'si' | 'iliac' | 's2ai_left' | 's2ai_right';
                 const siIconScale = 0.75; // SI screws slightly smaller
                 const siLabelPx = Math.round(labelPx * 0.8);
 
@@ -415,8 +424,8 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = ({
                         {renderZone(s1PedLeftX, s1PedY, 'S1', 'left', 'left', 'standard', () => ghostTarget(s1PedLeftX, s1PedY, 'S1', 's1_left'))}
                         {renderZone(s1PedRightX, s1PedY, 'S1', 'right', 'right', 'standard', () => ghostTarget(s1PedRightX, s1PedY, 'S1', 's1_right'))}
                         {/* S2 pedicle screws */}
-                        {renderZone(s2PedLeftX, s2PedY, 'S2', 'left', 'left', 'standard', () => ghostTarget(s2PedLeftX, s2PedY, 'S2', 's2_left'))}
-                        {renderZone(s2PedRightX, s2PedY, 'S2', 'right', 'right', 'standard', () => ghostTarget(s2PedRightX, s2PedY, 'S2', 's2_right'))}
+                        {renderZone(s2PedLeftX, s2PedY, 'S2', 'left', 'left', 's2', () => ghostTarget(s2PedLeftX, s2PedY, 'S2', 's2_left'))}
+                        {renderZone(s2PedRightX, s2PedY, 'S2', 'right', 'right', 's2', () => ghostTarget(s2PedRightX, s2PedY, 'S2', 's2_right'))}
                         {/* S2AI */}
                         {renderZone(s2aiLeftX, s2aiY, 'S1', 's2ai_left', 'left', 's2ai_left', () => s2aiTarget(s2aiLeftX, s2aiY, 's2ai_left', -1))}
                         {renderZone(s2aiRightX, s2aiY, 'S1', 's2ai_right', 'right', 's2ai_right', () => s2aiTarget(s2aiRightX, s2aiY, 's2ai_right', 1))}

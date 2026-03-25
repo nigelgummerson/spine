@@ -77,9 +77,10 @@ interface ScrewModalProps {
     defaultMode?: string;
     defaultCustomText?: string;
     initialAnnotation?: string;
+    isPelvicZone?: boolean;
 }
 
-export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation }: ScrewModalProps) => {
+export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, isPelvicZone }: ScrewModalProps) => {
     if (!isOpen) return null;
     // Compute initial values from props (runs on mount since component unmounts when closed)
     const computeInitial = () => {
@@ -156,7 +157,11 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
                         {mode === 'custom' && <input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} placeholder={t('modal.screw.custom_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg focus:border-amber-500 outline-none" autoFocus />}
                         {mode === 'none' && <div className="text-center py-6 text-slate-400 text-sm italic">{t('modal.screw.icon_only')}</div>}
                     </>)}
-                    <div className="mt-3"><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.screw.annotation')}</label><input type="text" value={annotation} onChange={(e) => setAnnotation(e.target.value)} placeholder={t('modal.screw.annotation_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-amber-500 outline-none" /></div>
+                    {isPelvicZone ? (
+                        <div className="mt-3 text-[10px] text-slate-400 italic">{t('modal.screw.pelvic_note_hint')}</div>
+                    ) : (
+                        <div className="mt-3"><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.screw.annotation')}</label><input type="text" value={annotation} onChange={(e) => setAnnotation(e.target.value)} placeholder={t('modal.screw.annotation_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-amber-500 outline-none" /></div>
+                    )}
                 </div>
                 <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center" title={t('shortcut.delete')}><IconTrash/> {t('button.remove')}</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title={t('shortcut.escape')}>{t('button.cancel')}</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg" title={t('shortcut.enter')}>{t('button.confirm')}</button></div></div>
             </div>
