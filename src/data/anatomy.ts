@@ -1,11 +1,56 @@
 import type { Level } from '../types';
 
-interface VertAnatomyEntry {
+interface AnatomyBase {
     bodyW: number;
     bodyH: number;
+}
+
+interface OccipitAnatomy extends AnatomyBase {
+    region: 'occiput';
+    foramenMagnumW: number;
+    condyleW: number;
+}
+
+interface CervicalUpperAnatomy extends AnatomyBase {
+    region: 'cervical-upper';
+    latMassW: number;
+    latMassH: number;
+    totalWidth: number;
+}
+
+interface CervicalSubaxialAnatomy extends AnatomyBase {
+    region: 'cervical-subaxial';
+    latMassW: number;
+    latMassH: number;
+    pedW?: number;
+    pedH?: number;
+}
+
+interface ThoracicAnatomy extends AnatomyBase {
+    region: 'thoracic';
     pedW: number;
     pedH: number;
 }
+
+interface LumbarAnatomy extends AnatomyBase {
+    region: 'lumbar';
+    pedW: number;
+    pedH: number;
+}
+
+interface SacralAnatomy extends AnatomyBase {
+    region: 'sacral';
+    pedW: number;
+    pedH: number;
+}
+
+type VertAnatomyEntry =
+    | OccipitAnatomy
+    | CervicalUpperAnatomy
+    | CervicalSubaxialAnatomy
+    | ThoracicAnatomy
+    | LumbarAnatomy
+    | SacralAnatomy;
 
 interface HeightMapEntry {
     levelId: string;
@@ -32,25 +77,25 @@ export const REGIONS: Record<string, { height: number; color: string }> = {
 // Sacral: PMC6286901 (systematic review).
 // Pedicle data cross-checked against Lien 2007 (Eur Spine J) and Zindrick 1987.
 export const VERTEBRA_ANATOMY: Record<string, VertAnatomyEntry> = {
-    T1:  { bodyW: 33.1, bodyH: 18.9, pedW: 9.3, pedH:  9.0 },
-    T2:  { bodyW: 32.0, bodyH: 19.0, pedW: 7.5, pedH: 10.3 },
-    T3:  { bodyW: 32.8, bodyH: 20.2, pedW: 6.0, pedH: 10.4 },
-    T4:  { bodyW: 34.2, bodyH: 21.0, pedW: 4.5, pedH: 10.3 },
-    T5:  { bodyW: 36.1, bodyH: 22.7, pedW: 5.0, pedH: 10.6 },
-    T6:  { bodyW: 37.5, bodyH: 22.9, pedW: 5.5, pedH: 10.2 },
-    T7:  { bodyW: 38.1, bodyH: 24.2, pedW: 6.0, pedH: 10.4 },
-    T8:  { bodyW: 38.2, bodyH: 24.8, pedW: 6.3, pedH: 10.9 },
-    T9:  { bodyW: 39.6, bodyH: 25.8, pedW: 6.3, pedH: 12.0 },
-    T10: { bodyW: 43.1, bodyH: 27.7, pedW: 6.5, pedH: 13.7 },
-    T11: { bodyW: 42.8, bodyH: 28.1, pedW: 7.8, pedH: 15.0 },
-    T12: { bodyW: 44.2, bodyH: 28.9, pedW: 8.3, pedH: 15.0 },
-    L1:  { bodyW: 45.0, bodyH: 24.5, pedW: 7.5, pedH: 15.4 },
-    L2:  { bodyW: 47.5, bodyH: 25.8, pedW: 8.2, pedH: 14.9 },
-    L3:  { bodyW: 49.0, bodyH: 26.8, pedW: 9.7, pedH: 14.5 },
-    L4:  { bodyW: 51.5, bodyH: 26.9, pedW: 11.5, pedH: 14.2 },
-    L5:  { bodyW: 54.0, bodyH: 27.4, pedW: 14.6, pedH: 14.7 },
-    S1:  { bodyW: 100.0, bodyH: 28.0, pedW: 20.0, pedH: 14.0 }, // includes sacral ala (~49mm body + ~21mm ala each side)
-    S2:  { bodyW: 83.0, bodyH: 22.0, pedW: 18.0, pedH: 11.0 },  // total S2 breadth (PMC6286901)
+    T1:  { region: 'thoracic', bodyW: 33.1, bodyH: 18.9, pedW: 9.3, pedH:  9.0 },
+    T2:  { region: 'thoracic', bodyW: 32.0, bodyH: 19.0, pedW: 7.5, pedH: 10.3 },
+    T3:  { region: 'thoracic', bodyW: 32.8, bodyH: 20.2, pedW: 6.0, pedH: 10.4 },
+    T4:  { region: 'thoracic', bodyW: 34.2, bodyH: 21.0, pedW: 4.5, pedH: 10.3 },
+    T5:  { region: 'thoracic', bodyW: 36.1, bodyH: 22.7, pedW: 5.0, pedH: 10.6 },
+    T6:  { region: 'thoracic', bodyW: 37.5, bodyH: 22.9, pedW: 5.5, pedH: 10.2 },
+    T7:  { region: 'thoracic', bodyW: 38.1, bodyH: 24.2, pedW: 6.0, pedH: 10.4 },
+    T8:  { region: 'thoracic', bodyW: 38.2, bodyH: 24.8, pedW: 6.3, pedH: 10.9 },
+    T9:  { region: 'thoracic', bodyW: 39.6, bodyH: 25.8, pedW: 6.3, pedH: 12.0 },
+    T10: { region: 'thoracic', bodyW: 43.1, bodyH: 27.7, pedW: 6.5, pedH: 13.7 },
+    T11: { region: 'thoracic', bodyW: 42.8, bodyH: 28.1, pedW: 7.8, pedH: 15.0 },
+    T12: { region: 'thoracic', bodyW: 44.2, bodyH: 28.9, pedW: 8.3, pedH: 15.0 },
+    L1:  { region: 'lumbar', bodyW: 45.0, bodyH: 24.5, pedW: 7.5, pedH: 15.4 },
+    L2:  { region: 'lumbar', bodyW: 47.5, bodyH: 25.8, pedW: 8.2, pedH: 14.9 },
+    L3:  { region: 'lumbar', bodyW: 49.0, bodyH: 26.8, pedW: 9.7, pedH: 14.5 },
+    L4:  { region: 'lumbar', bodyW: 51.5, bodyH: 26.9, pedW: 11.5, pedH: 14.2 },
+    L5:  { region: 'lumbar', bodyW: 54.0, bodyH: 27.4, pedW: 14.6, pedH: 14.7 },
+    S1:  { region: 'sacral', bodyW: 100.0, bodyH: 28.0, pedW: 20.0, pedH: 14.0 }, // includes sacral ala (~49mm body + ~21mm ala each side)
+    S2:  { region: 'sacral', bodyW: 83.0, bodyH: 22.0, pedW: 18.0, pedH: 11.0 },  // total S2 breadth (PMC6286901)
 };
 
 // Per-level SVG height: use same mm-to-SVG scale as width.
@@ -63,28 +108,107 @@ export const getLevelHeight = (level: Level): number => {
     return REGIONS[level.type].height;
 };
 
+// Geometry return types — discriminated union matching anatomy regions
+interface GeomBase {
+    region: string;
+    left: number;
+    right: number;
+    cx: number;
+    bw: number;
+}
+
+interface OccipitGeom extends GeomBase {
+    region: 'occiput';
+    condyleLeftCx: number;
+    condyleRightCx: number;
+    condyleRx: number;
+    condyleRy: number;
+    foramenRx: number;
+    foramenRy: number;
+    screwLeftCx: number;
+    screwRightCx: number;
+}
+
+interface CervicalUpperGeom extends GeomBase {
+    region: 'cervical-upper';
+    latMassLeftCx: number;
+    latMassRightCx: number;
+    latMassRx: number;
+    latMassRy: number;
+    latMassCy: number;
+}
+
+interface CervicalSubaxialGeom extends GeomBase {
+    region: 'cervical-subaxial';
+    latMassLeftCx: number;
+    latMassRightCx: number;
+    latMassRx: number;
+    latMassRy: number;
+    latMassCy: number;
+    pedLeftCx?: number;
+    pedRightCx?: number;
+    pedRx?: number;
+    pedRy?: number;
+}
+
+interface ThoracicGeom extends GeomBase {
+    region: 'thoracic';
+    pedLeftCx: number;
+    pedRightCx: number;
+    pedRx: number;
+    pedRy: number;
+    pedCy: number;
+}
+
+interface LumbarGeom extends GeomBase {
+    region: 'lumbar';
+    pedLeftCx: number;
+    pedRightCx: number;
+    pedRx: number;
+    pedRy: number;
+    pedCy: number;
+}
+
+interface SacralGeom extends GeomBase {
+    region: 'sacral';
+    pedLeftCx: number;
+    pedRightCx: number;
+    pedRx: number;
+    pedRy: number;
+    pedCy: number;
+}
+
+export type VertSvgGeometry =
+    | OccipitGeom
+    | CervicalUpperGeom
+    | CervicalSubaxialGeom
+    | ThoracicGeom
+    | LumbarGeom
+    | SacralGeom;
+
 // Convert mm anatomy data to SVG coordinates within the 160-unit viewBox
-export const getVertSvgGeometry = (levelId: string) => {
+export const getVertSvgGeometry = (levelId: string): VertSvgGeometry | null => {
     const a = VERTEBRA_ANATOMY[levelId];
     if (!a) return null;
-    const maxBodySvg = 130;
-    const maxBodyMm = 54.0; // L5 body width — S1/S2 overflow beyond viewBox
-    const scale = maxBodySvg / maxBodyMm;
+    const scale = 130 / 54.0;
     const bw = a.bodyW * scale;
     const cx = 80;
     const left = cx - bw / 2;
     const right = cx + bw / 2;
-    // Pedicle positions: inset from body edge
-    const pedInset = (a.pedW * scale) * 0.5;
-    const pedLeftCx = left + pedInset + 5;
-    const pedRightCx = right - pedInset - 5;
-    // Pedicle radii: scaled down for schematic (not anatomically literal)
-    // pedRx = transverse (width), pedRy = sagittal (height)
-    const pedScale = 1.0;
-    const pedRx = Math.max(1.5, (a.pedW * scale / 2) * pedScale);
-    const pedRy = Math.max(2, (a.pedH * scale / 2) * pedScale);
-    const isLumbar = levelId.startsWith('L') || levelId === 'S1' || levelId === 'S2';
-    return { left, right, cx, bw, pedLeftCx, pedRightCx, pedRx, pedRy, isLumbar };
+
+    if (a.region === 'thoracic' || a.region === 'lumbar' || a.region === 'sacral') {
+        const pedInset = (a.pedW * scale) * 0.5;
+        const pedLeftCx = left + pedInset + 5;
+        const pedRightCx = right - pedInset - 5;
+        const pedScale = 1.0;
+        const pedRx = Math.max(1.5, (a.pedW * scale / 2) * pedScale);
+        const pedRy = Math.max(2, (a.pedH * scale / 2) * pedScale);
+        const pedCy = VERT_PAD + pedRy + 5;
+        return { region: a.region, left, right, cx, bw, pedLeftCx, pedRightCx, pedRx, pedRy, pedCy };
+    }
+
+    // Cervical branches added in Task 2
+    return null;
 };
 
 export const ALL_LEVELS: Level[] = [

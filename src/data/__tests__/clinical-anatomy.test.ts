@@ -215,6 +215,24 @@ describe('getVertSvgGeometry', () => {
       expect(geom).not.toBeNull();
     }
   });
+
+  it('returns geometry with region "thoracic" for T5', () => {
+    const geom = getVertSvgGeometry('T5');
+    expect(geom).not.toBeNull();
+    expect(geom!.region).toBe('thoracic');
+  });
+
+  it('returns geometry with region "lumbar" for L3', () => {
+    const geom = getVertSvgGeometry('L3');
+    expect(geom).not.toBeNull();
+    expect(geom!.region).toBe('lumbar');
+  });
+
+  it('returns geometry with region "sacral" for S1', () => {
+    const geom = getVertSvgGeometry('S1');
+    expect(geom).not.toBeNull();
+    expect(geom!.region).toBe('sacral');
+  });
 });
 
 describe('buildHeightMap', () => {
