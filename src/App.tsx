@@ -130,6 +130,8 @@ const App = () => {
     const disclaimerAccepted = isDisclaimerAccepted(currentLang);
 
     // EDITING STATE
+    // Track recently confirmed placements (not yet in rendered state) for Confirm & Next skip logic
+    const recentPlacementsRef = useRef<{ levelId: string; zone: string }[]>([]);
     const [pendingPlacement, setPendingPlacement] = useState<{ levelId: string; zone: string; tool: string } | null>(null);
     const [editingPlacementId, setEditingPlacementId] = useState<string | null>(null);
     const [editingData, setEditingData] = useState<any>(undefined);
@@ -461,16 +463,24 @@ const App = () => {
             setEditingPlacementId(null);
         } else {
             addPlacement(finalLevelId, finalZone, finalType, sizeData, annotation);
+            // Track for rapid Confirm & Next — cleared on next render
+            recentPlacementsRef.current.push({ levelId: finalLevelId, zone: finalZone });
             setPendingPlacement(null);
         }
     };
 
+    // Clear recent placements ref after React renders with updated state
+    useEffect(() => {
+        recentPlacementsRef.current = [];
+    }, [plannedPlacements, completedPlacements]);
+
     const handleScrewConfirmAndNext = (confirmedLevelId: string, confirmedZone: Zone) => {
         const side = confirmedZone as 'left' | 'right';
         if (side !== 'left' && side !== 'right') { setScrewModalOpen(false); return; }
+        // Include both rendered placements AND recently confirmed (not yet rendered) ones
         const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
-        const withJustPlaced = [...currentPlacements, { levelId: confirmedLevelId, zone: confirmedZone } as Placement];
-        const next = getNextEmptyLevel(confirmedLevelId, side, levels, withJustPlaced);
+        const allPlaced = [...currentPlacements, ...recentPlacementsRef.current.map(r => ({ ...r } as Placement))];
+        const next = getNextEmptyLevel(confirmedLevelId, side, levels, allPlaced);
         if (next) {
             setPendingPlacement({ levelId: next.levelId, zone: next.zone, tool: lastUsedScrewType });
             setEditingPlacementId(null);
