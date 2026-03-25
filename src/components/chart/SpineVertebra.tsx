@@ -160,15 +160,16 @@ export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale =
                     const pedCy = geom.pedCy;
                     const pedStroke = isT ? "#94a3b8" : "#64748b";
                     const pedWidth = isT ? "1" : "1.5";
-                    // Transverse processes — fill only, no stroke, tapered shape
-                    const tpHalf = (b - t) * 0.3; // TP craniocaudal half-height at base
-                    const tpTipHalf = (b - t) * 0.1; // tapers to narrow tip
+                    // Transverse processes — fill only, constant-height rectangles at pedicle level
+                    const tpH = geom.pedRy * 1.6; // TP craniocaudal height ~= pedicle height
+                    const tpTop = pedCy - tpH;
+                    const tpBot = pedCy + tpH;
                     return (
                         <g>
-                            {/* Transverse processes (behind body) */}
-                            <path d={`M${l},${m - tpHalf} L${geom.tpLeftX},${m - tpTipHalf} L${geom.tpLeftX},${m + tpTipHalf} L${l},${m + tpHalf} Z`}
+                            {/* Transverse processes (behind body, at pedicle level) */}
+                            <rect x={geom.tpLeftX} y={tpTop} width={l - geom.tpLeftX} height={tpBot - tpTop} rx={2}
                                 fill={common.fill} />
-                            <path d={`M${r},${m - tpHalf} L${geom.tpRightX},${m - tpTipHalf} L${geom.tpRightX},${m + tpTipHalf} L${r},${m + tpHalf} Z`}
+                            <rect x={r} y={tpTop} width={geom.tpRightX - r} height={tpBot - tpTop} rx={2}
                                 fill={common.fill} />
                             <path d={bodyPath} {...common} />
                             <ellipse cx={geom.pedLeftCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth}/>
