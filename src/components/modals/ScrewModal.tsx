@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { t } from '../../i18n/i18n';
-import { DIAMETER_OPTIONS, LENGTH_OPTIONS } from '../../data/implants';
+import { DIAMETER_OPTIONS, LENGTH_OPTIONS, getScrewDefault } from '../../data/implants';
 import { HOOK_TYPES, NO_SIZE_TYPES } from '../../data/clinical';
 import { InstrumentIcon } from '../chart/InstrumentIcon';
 import { IconTrash, IconX } from '../icons';
 import { Portal } from '../Portal';
+import type { Zone, Level, Placement } from '../../types';
 
 /** Scroll wheel increments/decrements a number input on hover. */
 export const numberWheelHandler = (
@@ -68,7 +69,7 @@ export const modalKeyHandler = ({ onSubmit, onClose, onDelete, isEditing }: Moda
 interface ScrewModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onConfirm: (size: string | null, details: any, type: string, annotation: string) => void;
+    onConfirm: (size: string | null, details: any, type: string, annotation: string, levelId: string, zone: Zone) => void;
     onDelete?: () => void;
     initialData?: string | null;
     initialTool?: string;
@@ -77,10 +78,15 @@ interface ScrewModalProps {
     defaultMode?: string;
     defaultCustomText?: string;
     initialAnnotation?: string;
-    isPelvicZone?: boolean;
+    levelId: string;
+    zone: Zone;
+    levels: Level[];
+    placements: Placement[];
+    showPelvis: boolean;
+    useRegionDefaults: boolean;
 }
 
-export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, isPelvicZone }: ScrewModalProps) => {
+export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, levelId, zone, levels, placements, showPelvis, useRegionDefaults }: ScrewModalProps) => {
     if (!isOpen) return null;
     // Compute initial values from props (runs on mount since component unmounts when closed)
     const computeInitial = () => {
@@ -103,9 +109,54 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
     const [selectedType, setSelectedType] = useState(initialTool || 'polyaxial');
     const [annotation, setAnnotation] = useState(init.ann);
     const [fixationText, setFixationText] = useState('');
+
+    const [selectedLevel, setSelectedLevel] = useState(levelId);
+    const [selectedZone, setSelectedZone] = useState<Zone>(zone);
+
+    const isPelvic = /^(s2ai|iliac|si)_/.test(selectedZone);
+
+    // Build side options based on current level and pelvis visibility
+    const sideOptions: { value: Zone; label: string }[] = [
+        { value: 'left', label: t('modal.screw.zone.left') },
+        { value: 'right', label: t('modal.screw.zone.right') },
+    ];
+    if (showPelvis && selectedLevel === 'S1') {
+        sideOptions.push(
+            { value: 's2ai_left', label: t('modal.screw.zone.s2ai_left') },
+            { value: 's2ai_right', label: t('modal.screw.zone.s2ai_right') },
+            { value: 'iliac_left', label: t('modal.screw.zone.iliac_left') },
+            { value: 'iliac_right', label: t('modal.screw.zone.iliac_right') },
+            { value: 'si_left', label: t('modal.screw.zone.si_left') },
+            { value: 'si_right', label: t('modal.screw.zone.si_right') },
+        );
+    }
+
     const isHookOnly = HOOK_TYPES.includes(selectedType);
     const isFixation = ['band','wire','cable'].includes(selectedType);
     const isHook = isHookOnly || isFixation;
+    const isScrew = ['monoaxial','polyaxial','uniplanar'].includes(selectedType);
+
+    const handleLevelChange = (newLevel: string) => {
+        setSelectedLevel(newLevel);
+        let effectiveZone = selectedZone;
+        if (newLevel !== 'S1' && /^(s2ai|iliac|si)_/.test(selectedZone)) {
+            effectiveZone = (selectedZone.endsWith('_right') ? 'right' : 'left') as Zone;
+            setSelectedZone(effectiveZone);
+        }
+        if (useRegionDefaults && isScrew) {
+            const def = getScrewDefault(newLevel, effectiveZone);
+            if (def) { setDiameter(def.diameter); setLength(def.length); setMode('standard'); }
+            else { setMode('none'); }
+        }
+    };
+
+    const handleZoneChange = (newZone: Zone) => {
+        setSelectedZone(newZone);
+        if (useRegionDefaults && isScrew) {
+            const def = getScrewDefault(selectedLevel, newZone);
+            if (def) { setDiameter(def.diameter); setLength(def.length); setMode('standard'); }
+        }
+    };
 
     useEffect(() => {
         if (isOpen) {
@@ -120,15 +171,9 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
         if (isHookOnly || isFixation) { finalSize = null; }
         else if (mode === 'custom') finalSize = customText || "Custom";
         else if (mode === 'standard') finalSize = `${Number(diameter).toFixed(1)}x${length}`;
-        onConfirm(
-            finalSize,
-            (isHookOnly || isFixation) ? null : { diameter, length, mode, customText },
-            selectedType,
-            annotation
-        );
+        onConfirm(finalSize, (isHookOnly || isFixation) ? null : { diameter, length, mode, customText }, selectedType, isPelvic ? '' : annotation, selectedLevel, selectedZone);
         onClose();
     };
-    const isScrew = ['monoaxial','polyaxial','uniplanar'].includes(selectedType);
     const isEditing = initialData !== undefined;
     const hookLabels: Record<string, string> = { pedicle_hook: t('clinical.hook.pedicle_hook'), tp_hook: t('clinical.hook.tp_hook'), tp_hook_up: t('clinical.hook.tp_hook_up'), sl_hook: t('clinical.hook.sl_hook'), il_hook: t('clinical.hook.il_hook') };
     const modalRef = useRef<HTMLDivElement>(null);
@@ -138,6 +183,24 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
         <div ref={modalRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden">
                 <div className="bg-slate-900 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{isEditing ? t('modal.screw.title_edit') : t('modal.screw.title_new')}</h3><button onClick={onClose} className="hover:text-red-400"><IconX /></button></div>
+                <div className="flex gap-2 px-6 pt-4 pb-2">
+                    <select value={selectedLevel} onChange={e => handleLevelChange(e.target.value)}
+                        onWheel={selectWheelHandler} title={t('hint.scroll_to_change')}
+                        className="flex-1 p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold focus:border-amber-500 outline-none">
+                        {levels.map(l => {
+                            const occ = placements.some(p => p.levelId === l.id && p.zone === selectedZone);
+                            return <option key={l.id} value={l.id} disabled={occ && l.id !== levelId}>{l.id}{occ && l.id !== levelId ? ' \u2022' : ''}</option>;
+                        })}
+                    </select>
+                    <select value={selectedZone} onChange={e => handleZoneChange(e.target.value as Zone)}
+                        onWheel={selectWheelHandler} title={t('hint.scroll_to_change')}
+                        className="flex-1 p-2 border border-slate-300 rounded bg-slate-50 text-sm font-bold focus:border-amber-500 outline-none">
+                        {sideOptions.map(o => {
+                            const occ = placements.some(p => p.levelId === selectedLevel && p.zone === o.value);
+                            return <option key={o.value} value={o.value} disabled={occ && o.value !== zone}>{o.label}{occ && o.value !== zone ? ' \u2022' : ''}</option>;
+                        })}
+                    </select>
+                </div>
                 <div className="p-6">
                     <div className="bg-slate-100 p-1 rounded mb-2">
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1 mb-0.5">{t('modal.screw.section_screws')}</div>
@@ -156,8 +219,14 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
                         {mode === 'standard' && (<div className="space-y-4"><div className="grid grid-cols-4 gap-2"><select value={diameter} onChange={(e) => setDiameter(e.target.value)} onWheel={selectWheelHandler} title={t('hint.scroll_to_change')} className="col-span-4 w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{DIAMETER_OPTIONS.map(d => <option key={d} value={d}>{d} mm</option>)}</select></div><select value={length} onChange={(e) => setLength(e.target.value)} onWheel={selectWheelHandler} title={t('hint.scroll_to_change')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{LENGTH_OPTIONS.map(l => <option key={l} value={l}>{l} mm</option>)}</select></div>)}
                         {mode === 'custom' && <input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} placeholder={t('modal.screw.custom_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg focus:border-amber-500 outline-none" autoFocus />}
                         {mode === 'none' && <div className="text-center py-6 text-slate-400 text-sm italic">{t('modal.screw.icon_only')}</div>}
+                        {useRegionDefaults && mode === 'standard' && (() => {
+                            const def = getScrewDefault(selectedLevel, selectedZone);
+                            return def
+                                ? <div className="mt-2 text-[10px] text-slate-400 italic">{t('modal.screw.suggested_size', { level: selectedLevel })}</div>
+                                : <div className="mt-2 text-[10px] text-amber-500 italic">{t('modal.screw.no_default_size', { level: selectedLevel })}</div>;
+                        })()}
                     </>)}
-                    {isPelvicZone ? (
+                    {isPelvic ? (
                         <div className="mt-3 text-[10px] text-slate-400 italic">{t('modal.screw.pelvic_note_hint')}</div>
                     ) : (
                         <div className="mt-3"><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.screw.annotation')}</label><input type="text" value={annotation} onChange={(e) => setAnnotation(e.target.value)} placeholder={t('modal.screw.annotation_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-amber-500 outline-none" /></div>
