@@ -8,6 +8,7 @@ import {
 } from '../clinical';
 import {
   ALL_LEVELS,
+  VERTEBRA_ANATOMY,
   getLevelHeight,
   getDiscHeight,
   getVertSvgGeometry,
@@ -189,16 +190,20 @@ describe('getDiscHeight', () => {
 });
 
 describe('getVertSvgGeometry', () => {
-  it('returns null for Oc (no anatomy entry)', () => {
-    expect(getVertSvgGeometry('Oc')).toBeNull();
+  it('returns geometry with region "occiput" for Oc', () => {
+    const geom = getVertSvgGeometry('Oc');
+    expect(geom).not.toBeNull();
+    expect(geom!.region).toBe('occiput');
   });
 
   it('returns null for Pelvis (no anatomy entry)', () => {
     expect(getVertSvgGeometry('Pelvis')).toBeNull();
   });
 
-  it('returns null for C1 (no anatomy entry)', () => {
-    expect(getVertSvgGeometry('C1')).toBeNull();
+  it('returns geometry with region "cervical-upper" for C1', () => {
+    const geom = getVertSvgGeometry('C1');
+    expect(geom).not.toBeNull();
+    expect(geom!.region).toBe('cervical-upper');
   });
 
   it('returns geometry with left < cx < right for T5', () => {
@@ -342,4 +347,98 @@ describe('WHOLE_SPINE_MAP', () => {
       expect(mapIds.has(level.id)).toBe(true);
     }
   });
+});
+
+describe('cervical anatomy data', () => {
+    it('every level Oc-C7 has an entry in VERTEBRA_ANATOMY', () => {
+        for (const id of ['Oc','C1','C2','C3','C4','C5','C6','C7']) {
+            expect(VERTEBRA_ANATOMY[id]).toBeDefined();
+        }
+    });
+
+    it('getVertSvgGeometry returns occiput region for Oc', () => {
+        const geom = getVertSvgGeometry('Oc');
+        expect(geom).not.toBeNull();
+        expect(geom!.region).toBe('occiput');
+    });
+
+    it('getVertSvgGeometry returns cervical-upper region for C1 and C2', () => {
+        for (const id of ['C1', 'C2']) {
+            const geom = getVertSvgGeometry(id);
+            expect(geom).not.toBeNull();
+            expect(geom!.region).toBe('cervical-upper');
+        }
+    });
+
+    it('getVertSvgGeometry returns cervical-subaxial region for C3-C7', () => {
+        for (const id of ['C3','C4','C5','C6','C7']) {
+            const geom = getVertSvgGeometry(id);
+            expect(geom).not.toBeNull();
+            expect(geom!.region).toBe('cervical-subaxial');
+        }
+    });
+
+    it('C1 is wider than C3 (widest cervical level)', () => {
+        const c1 = getVertSvgGeometry('C1')!;
+        const c3 = getVertSvgGeometry('C3')!;
+        expect(c1.bw).toBeGreaterThan(c3.bw);
+    });
+
+    it('lateral mass coordinates are lateral to body edges for C1-C6', () => {
+        for (const id of ['C1','C2']) {
+            const geom = getVertSvgGeometry(id);
+            expect(geom).not.toBeNull();
+            if (geom && geom.region === 'cervical-upper') {
+                expect(geom.latMassLeftCx).toBeLessThan(geom.left);
+                expect(geom.latMassRightCx).toBeGreaterThan(geom.right);
+            }
+        }
+        for (const id of ['C3','C4','C5','C6']) {
+            const geom = getVertSvgGeometry(id);
+            expect(geom).not.toBeNull();
+            if (geom && geom.region === 'cervical-subaxial') {
+                expect(geom.latMassLeftCx).toBeLessThan(geom.left);
+                expect(geom.latMassRightCx).toBeGreaterThan(geom.right);
+            }
+        }
+    });
+
+    it('C7 geometry includes pedicle coordinates', () => {
+        const geom = getVertSvgGeometry('C7');
+        expect(geom).not.toBeNull();
+        if (geom && geom.region === 'cervical-subaxial') {
+            expect(geom.pedRx).toBeDefined();
+            expect(geom.pedRy).toBeDefined();
+            expect(geom.pedLeftCx).toBeDefined();
+            expect(geom.pedRightCx).toBeDefined();
+        }
+    });
+
+    it('occiput screw zones are parasagittal (close to midline)', () => {
+        const geom = getVertSvgGeometry('Oc');
+        if (geom && geom.region === 'occiput') {
+            expect(geom.screwLeftCx).toBeGreaterThan(50);
+            expect(geom.screwLeftCx).toBeLessThan(80);
+            expect(geom.screwRightCx).toBeGreaterThan(80);
+            expect(geom.screwRightCx).toBeLessThan(110);
+        }
+    });
+
+    it('getLevelHeight returns per-level heights for cervical (not flat 24)', () => {
+        const c1H = getLevelHeight({ id: 'C1', type: 'C' });
+        const c7H = getLevelHeight({ id: 'C7', type: 'C' });
+        expect(c7H).toBeGreaterThan(c1H);
+    });
+
+    it('getDiscHeight returns 0 for Oc and C1', () => {
+        expect(getDiscHeight({ id: 'Oc', type: 'Oc' })).toBe(0);
+        expect(getDiscHeight({ id: 'C1', type: 'C' })).toBe(0);
+    });
+
+    it('calculateAutoScale returns valid range for cervical-only subset', () => {
+        const cervical = ALL_LEVELS.filter(l => l.type === 'C' || l.type === 'Oc');
+        const scale = calculateAutoScale(cervical);
+        expect(scale).toBeGreaterThanOrEqual(0.5);
+        expect(scale).toBeLessThanOrEqual(1.5);
+    });
 });

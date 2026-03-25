@@ -77,6 +77,17 @@ export const REGIONS: Record<string, { height: number; color: string }> = {
 // Sacral: PMC6286901 (systematic review).
 // Pedicle data cross-checked against Lien 2007 (Eur Spine J) and Zindrick 1987.
 export const VERTEBRA_ANATOMY: Record<string, VertAnatomyEntry> = {
+    // Cervical: Panjabi et al. (1991), An et al. (1991), Tan et al. (2004),
+    // Gupta & Goel (2000), Xu et al. (1999), Ebraheim et al. (1996, 1997),
+    // Naderi et al. (2005)
+    Oc:  { region: 'occiput', bodyW: 78, bodyH: 12, foramenMagnumW: 35, condyleW: 22 },
+    C1:  { region: 'cervical-upper', bodyW: 22, bodyH: 10, latMassW: 16, latMassH: 12, totalWidth: 80 },
+    C2:  { region: 'cervical-upper', bodyW: 18, bodyH: 20, latMassW: 12, latMassH: 14, totalWidth: 54 },
+    C3:  { region: 'cervical-subaxial', bodyW: 16.5, bodyH: 14.5, latMassW: 12.5, latMassH: 12 },
+    C4:  { region: 'cervical-subaxial', bodyW: 17, bodyH: 14.5, latMassW: 13, latMassH: 12.5 },
+    C5:  { region: 'cervical-subaxial', bodyW: 18, bodyH: 14.5, latMassW: 14, latMassH: 13 },
+    C6:  { region: 'cervical-subaxial', bodyW: 19, bodyH: 15.5, latMassW: 14, latMassH: 13 },
+    C7:  { region: 'cervical-subaxial', bodyW: 21.5, bodyH: 16.5, latMassW: 12, latMassH: 11, pedW: 5.5, pedH: 7 },
     T1:  { region: 'thoracic', bodyW: 33.1, bodyH: 18.9, pedW: 9.3, pedH:  9.0 },
     T2:  { region: 'thoracic', bodyW: 32.0, bodyH: 19.0, pedW: 7.5, pedH: 10.3 },
     T3:  { region: 'thoracic', bodyW: 32.8, bodyH: 20.2, pedW: 6.0, pedH: 10.4 },
@@ -207,7 +218,59 @@ export const getVertSvgGeometry = (levelId: string): VertSvgGeometry | null => {
         return { region: a.region, left, right, cx, bw, pedLeftCx, pedRightCx, pedRx, pedRy, pedCy };
     }
 
-    // Cervical branches added in Task 2
+    if (a.region === 'occiput') {
+        const condyleOffset = a.condyleW * scale;
+        const fmRx = (a.foramenMagnumW * scale) / 2;
+        const screwOffset = 9 * scale;
+        return {
+            region: 'occiput', left, right, cx, bw,
+            condyleLeftCx: cx - condyleOffset, condyleRightCx: cx + condyleOffset,
+            condyleRx: (a.condyleW * scale) / 2, condyleRy: fmRx * 0.4,
+            foramenRx: fmRx, foramenRy: fmRx * 0.7,
+            screwLeftCx: cx - screwOffset, screwRightCx: cx + screwOffset,
+        };
+    }
+
+    if (a.region === 'cervical-upper') {
+        const lmRx = (a.latMassW * scale) / 2;
+        const lmRy = (a.latMassH * scale) / 2;
+        const halfTotal = (a.totalWidth * scale) / 2;
+        const lmLeftCx = cx - halfTotal + lmRx;
+        const lmRightCx = cx + halfTotal - lmRx;
+        const height = Math.round(a.bodyH * scale) + VERT_PAD * 2;
+        return {
+            region: 'cervical-upper', left, right, cx, bw,
+            latMassLeftCx: lmLeftCx, latMassRightCx: lmRightCx,
+            latMassRx: lmRx, latMassRy: lmRy,
+            latMassCy: height / 2,
+        };
+    }
+
+    if (a.region === 'cervical-subaxial') {
+        const lmRx = (a.latMassW * scale) / 2;
+        const lmRy = (a.latMassH * scale) / 2;
+        const lmLeftCx = left - lmRx - 2;
+        const lmRightCx = right + lmRx + 2;
+        const height = Math.round(a.bodyH * scale) + VERT_PAD * 2;
+        const latMassCy = height / 2;
+        const base: CervicalSubaxialGeom = {
+            region: 'cervical-subaxial', left, right, cx, bw,
+            latMassLeftCx: lmLeftCx, latMassRightCx: lmRightCx,
+            latMassRx: lmRx, latMassRy: lmRy,
+            latMassCy,
+        };
+        if (a.pedW && a.pedH) {
+            const pedRx = Math.max(1.5, (a.pedW * scale / 2));
+            const pedRy = Math.max(2, (a.pedH * scale / 2));
+            const pedInset = (a.pedW * scale) * 0.5;
+            base.pedLeftCx = left + pedInset + 3;
+            base.pedRightCx = right - pedInset - 3;
+            base.pedRx = pedRx;
+            base.pedRy = pedRy;
+        }
+        return base;
+    }
+
     return null;
 };
 
