@@ -318,16 +318,7 @@ const App = () => {
             setEditingPlacementId(null);
             setEditingTool(lastUsedScrewType);
             setEditingAnnotation('');
-            // Level-aware screw defaults: cervical lateral mass screws are smaller
-            const upperCervical = ['Oc', 'C1', 'C2'].includes(levelId);
-            const cervical = levelId.startsWith('C') && !upperCervical;
-            if (upperCervical) {
-                setEditingData(null); // no default size — highly variable anatomy
-            } else if (cervical) {
-                setEditingData('3.5x14'); // lateral mass screw default
-            } else {
-                setEditingData(undefined); // use last-used defaults
-            }
+            setEditingData(undefined); // ScrewModal handles region defaults internally
             setScrewModalOpen(true);
             return;
         }
@@ -450,11 +441,23 @@ const App = () => {
         }
     };
 
-    const handleScrewConfirm = (sizeData: any, components: any, finalType: string, annotation: string) => {
+    const handleScrewConfirm = (sizeData: any, components: any, finalType: string, annotation: string, finalLevelId: string, finalZone: Zone) => {
         if (components) { setDefaultDiameter(components.diameter); setDefaultLength(components.length); setDefaultScrewMode(components.mode); setDefaultCustomText(components.customText || ''); }
         setLastUsedScrewType(finalType);
-        if (editingPlacementId) { updatePlacement(editingPlacementId, finalType, sizeData, annotation); setEditingPlacementId(null); }
-        else if (pendingPlacement) { addPlacement(pendingPlacement.levelId, pendingPlacement.zone, finalType, sizeData, annotation); setPendingPlacement(null); }
+        if (editingPlacementId) {
+            // Check if level/zone changed — need remove + add (reducer can't change levelId/zone)
+            const existing = [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId);
+            if (existing && (existing.levelId !== finalLevelId || existing.zone !== finalZone)) {
+                removePlacement(editingPlacementId);
+                addPlacement(finalLevelId, finalZone, finalType, sizeData, annotation);
+            } else {
+                updatePlacement(editingPlacementId, finalType, sizeData, annotation);
+            }
+            setEditingPlacementId(null);
+        } else {
+            addPlacement(finalLevelId, finalZone, finalType, sizeData, annotation);
+            setPendingPlacement(null);
+        }
     };
 
     const handleOsteoConfirm = (data: any) => {
@@ -814,7 +817,19 @@ const App = () => {
 
     const modals = (
         <React.Fragment>
-            <ScrewModal isOpen={screwModalOpen} onClose={() => setScrewModalOpen(false)} onConfirm={handleScrewConfirm} onDelete={() => removePlacement(editingPlacementId!)} initialData={editingData} initialTool={editingTool ?? undefined} defaultDiameter={defaultDiameter} defaultLength={defaultLength} defaultMode={defaultScrewMode} defaultCustomText={defaultCustomText} initialAnnotation={editingAnnotation} isPelvicZone={(() => { const z = pendingPlacement?.zone || (editingPlacementId ? [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId)?.zone : '') || ''; return /^(s2ai|iliac|si)_/.test(z); })()} />
+            <ScrewModal isOpen={screwModalOpen} onClose={() => setScrewModalOpen(false)}
+                onConfirm={handleScrewConfirm}
+                onDelete={() => removePlacement(editingPlacementId!)}
+                initialData={editingData} initialTool={editingTool ?? undefined}
+                defaultDiameter={defaultDiameter} defaultLength={defaultLength}
+                defaultMode={defaultScrewMode} defaultCustomText={defaultCustomText}
+                initialAnnotation={editingAnnotation}
+                levelId={pendingPlacement?.levelId || (editingPlacementId ? [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId)?.levelId : '') || ''}
+                zone={(pendingPlacement?.zone || (editingPlacementId ? [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId)?.zone : 'left') || 'left') as Zone}
+                levels={levels}
+                placements={activeChart === 'planned' ? plannedPlacements : completedPlacements}
+                showPelvis={showPelvis}
+                useRegionDefaults={useRegionDefaults} />
             <OsteotomyModal isOpen={osteoModalOpen} onClose={() => { setOsteoModalOpen(false); setOsteoDiscLevel(undefined); }} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId!)} initialData={editingData} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} discLevelOnly={osteoDiscLevel} />
             <CageModal isOpen={cageModalOpen} onClose={() => setCageModalOpen(false)} onConfirm={handleCageConfirm} onDelete={handleDeleteCage} initialData={editingData} levelId={editingCageLevel ?? ''} levels={levels} />
             <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
