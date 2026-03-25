@@ -155,6 +155,16 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   'ALIF Cage',
   // Clinical measurement terms used in English internationally
   'Lordosis (°)',
+  // Zone labels: Left/Right kept in English for Hindi (transliterated language uses English anatomical terms)
+  'Left',
+  'Right',
+  'S2AI Left',
+  'S2AI Right',
+  'Iliac Left',
+  'Iliac Right',
+  'SI-J Left',
+  'SI-J Right',
+  'Size Defaults',
   // Sidebar category labels that coincidentally match English in some languages
   'Implants',
   'Annotations',
