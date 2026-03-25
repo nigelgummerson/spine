@@ -1,5 +1,5 @@
 import React from 'react';
-import { getVertSvgGeometry, VERT_PAD, REGIONS } from '../../data/anatomy';
+import { getVertSvgGeometry, VERT_SVG_SCALE, VERT_PAD, REGIONS } from '../../data/anatomy';
 import { t } from '../../i18n/i18n';
 
 interface SpineVertebraProps {
@@ -156,15 +156,20 @@ export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale =
                     const b = height - VERT_PAD; // bottom of body
                     const m = (t + b) / 2; // midpoint for waist
                     const endCurve = isT ? 2 : 2; // endplate concavity
-                    // Rounded corners, biconcave endplates & waisted sidewalls
                     const bodyPath = `M${l},${t+c} Q${l},${t} ${l+c},${t} Q80,${t+endCurve} ${r-c},${t} Q${r},${t} ${r},${t+c} Q${r-w},${m} ${r},${b-c} Q${r},${b} ${r-c},${b} Q80,${b-endCurve} ${l+c},${b} Q${l},${b} ${l},${b-c} Q${l+w},${m} ${l},${t+c} Z`;
-                    // Pedicle vertical position: centre offset from top of body
-                    // Uses pedicle sagittal height (pedRy) to scale position, matching medial-lateral convention
                     const pedCy = geom.pedCy;
                     const pedStroke = isT ? "#94a3b8" : "#64748b";
                     const pedWidth = isT ? "1" : "1.5";
+                    // Transverse processes — fill only, no stroke, tapered shape
+                    const tpHalf = (b - t) * 0.3; // TP craniocaudal half-height at base
+                    const tpTipHalf = (b - t) * 0.1; // tapers to narrow tip
                     return (
                         <g>
+                            {/* Transverse processes (behind body) */}
+                            <path d={`M${l},${m - tpHalf} L${geom.tpLeftX},${m - tpTipHalf} L${geom.tpLeftX},${m + tpTipHalf} L${l},${m + tpHalf} Z`}
+                                fill={common.fill} />
+                            <path d={`M${r},${m - tpHalf} L${geom.tpRightX},${m - tpTipHalf} L${geom.tpRightX},${m + tpTipHalf} L${r},${m + tpHalf} Z`}
+                                fill={common.fill} />
                             <path d={bodyPath} {...common} />
                             <ellipse cx={geom.pedLeftCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth}/>
                             <ellipse cx={geom.pedRightCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth}/>
@@ -181,7 +186,7 @@ export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale =
                     const bRight = 80 + (geom.right - 80) * narrowFrac;
                     // Dorsal sacral foramina — ~38mm apart for S1, ~27mm for S2 (scaled)
                     const foramenSpacingMm = label === 'S1' ? 38 : 27;
-                    const foramenSpacing = foramenSpacingMm * (130 / 54.0) / 2;
+                    const foramenSpacing = foramenSpacingMm * VERT_SVG_SCALE / 2;
                     const foramenY = t + (b - t) * 0.7;
                     const foramenRx = label === 'S1' ? 5 : 4.5;
                     const foramenRy = label === 'S1' ? 3.5 : 3;

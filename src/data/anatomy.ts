@@ -30,12 +30,14 @@ interface ThoracicAnatomy extends AnatomyBase {
     region: 'thoracic';
     pedW: number;
     pedH: number;
+    tpW: number;  // transverse process projection per side (mm), Tan et al. 2004
 }
 
 interface LumbarAnatomy extends AnatomyBase {
     region: 'lumbar';
     pedW: number;
     pedH: number;
+    tpW: number;  // transverse process projection per side (mm), Tan et al. 2004
 }
 
 interface SacralAnatomy extends AnatomyBase {
@@ -69,49 +71,49 @@ export const REGIONS: Record<string, { height: number; color: string }> = {
     pelvic: { height: 0, color: '#f1f5f9' }
 };
 
-// Anatomical dimensions (mm) from published CT morphometric data.
-// Thoracic: PMC4857161 (CT-based, Indian population, n=120).
-// Lumbar body heights: PMC11624215 (meta-analysis, n=1481).
-// Lumbar body widths: PMC3207343 endplate data + PMC9252235 mid-body transverse.
-// Lumbar pedicles: PMC11624215 meta-analysis.
+// Anatomical dimensions (mm). Proportions from Tan et al. 2004 (PMC3476578,
+// Chinese Singaporean, n=10, 3D CT), scaled to Caucasian using two anchors:
+//   Width: Yao et al. 2018 EPWl White male C7=23.2mm (scale=1.143)
+//   Height: Bostrom et al. 2010 VBHp Western C7=15.9mm (scale=1.348)
+// Cervical bodyW: Yao et al. (2018) EPWl White male directly (PMC5838464).
+// Cervical lateral masses: An et al. (1991), Gupta & Goel (2000), Xu et al. (1999).
+// Oc: Naderi et al. (2005), Ebraheim et al. (1996).
+// Pedicles: PMC4857161, Lien 2007, Zindrick 1987 (retained from prior calibration).
 // Sacral: PMC6286901 (systematic review).
-// Pedicle data cross-checked against Lien 2007 (Eur Spine J) and Zindrick 1987.
+// tpW = transverse process projection per side, from Tan TPW: (TPW - EPWl)/2 * 1.143.
 export const VERTEBRA_ANATOMY: Record<string, VertAnatomyEntry> = {
-    // Cervical bodyW: Yao et al. (2018) EPWl White male, PMC5838464.
-    // Lateral masses: An et al. (1991), Gupta & Goel (2000), Xu et al. (1999).
-    // Oc: Naderi et al. (2005), Ebraheim et al. (1996).
     Oc:  { region: 'occiput', bodyW: 78, bodyH: 12, foramenMagnumW: 35, condyleW: 22 },
     C1:  { region: 'cervical-upper', bodyW: 22, bodyH: 10, latMassW: 16, latMassH: 12, totalWidth: 80 },
     C2:  { region: 'cervical-upper', bodyW: 18, bodyH: 20, latMassW: 12, latMassH: 14, totalWidth: 54 },
-    C3:  { region: 'cervical-subaxial', bodyW: 18.0, bodyH: 14.5, latMassW: 12.5, latMassH: 12 },
-    C4:  { region: 'cervical-subaxial', bodyW: 18.3, bodyH: 14.5, latMassW: 13, latMassH: 12.5 },
-    C5:  { region: 'cervical-subaxial', bodyW: 20.1, bodyH: 14.5, latMassW: 14, latMassH: 13 },
-    C6:  { region: 'cervical-subaxial', bodyW: 21.6, bodyH: 15.5, latMassW: 14, latMassH: 13 },
-    C7:  { region: 'cervical-subaxial', bodyW: 23.2, bodyH: 16.5, latMassW: 12, latMassH: 11, pedW: 5.5, pedH: 7 },
-    T1:  { region: 'thoracic', bodyW: 33.1, bodyH: 18.9, pedW: 9.3, pedH:  9.0 },
-    T2:  { region: 'thoracic', bodyW: 32.0, bodyH: 19.0, pedW: 7.5, pedH: 10.3 },
-    T3:  { region: 'thoracic', bodyW: 32.8, bodyH: 20.2, pedW: 6.0, pedH: 10.4 },
-    T4:  { region: 'thoracic', bodyW: 34.2, bodyH: 21.0, pedW: 4.5, pedH: 10.3 },
-    T5:  { region: 'thoracic', bodyW: 36.1, bodyH: 22.7, pedW: 5.0, pedH: 10.6 },
-    T6:  { region: 'thoracic', bodyW: 37.5, bodyH: 22.9, pedW: 5.5, pedH: 10.2 },
-    T7:  { region: 'thoracic', bodyW: 38.1, bodyH: 24.2, pedW: 6.0, pedH: 10.4 },
-    T8:  { region: 'thoracic', bodyW: 38.2, bodyH: 24.8, pedW: 6.3, pedH: 10.9 },
-    T9:  { region: 'thoracic', bodyW: 39.6, bodyH: 25.8, pedW: 6.3, pedH: 12.0 },
-    T10: { region: 'thoracic', bodyW: 43.1, bodyH: 27.7, pedW: 6.5, pedH: 13.7 },
-    T11: { region: 'thoracic', bodyW: 42.8, bodyH: 28.1, pedW: 7.8, pedH: 15.0 },
-    T12: { region: 'thoracic', bodyW: 44.2, bodyH: 28.9, pedW: 8.3, pedH: 15.0 },
-    L1:  { region: 'lumbar', bodyW: 45.0, bodyH: 24.5, pedW: 7.5, pedH: 15.4 },
-    L2:  { region: 'lumbar', bodyW: 47.5, bodyH: 25.8, pedW: 8.2, pedH: 14.9 },
-    L3:  { region: 'lumbar', bodyW: 49.0, bodyH: 26.8, pedW: 9.7, pedH: 14.5 },
-    L4:  { region: 'lumbar', bodyW: 51.5, bodyH: 26.9, pedW: 11.5, pedH: 14.2 },
-    L5:  { region: 'lumbar', bodyW: 54.0, bodyH: 27.4, pedW: 14.6, pedH: 14.7 },
-    S1:  { region: 'sacral', bodyW: 100.0, bodyH: 28.0, pedW: 20.0, pedH: 14.0 }, // includes sacral ala (~49mm body + ~21mm ala each side)
-    S2:  { region: 'sacral', bodyW: 83.0, bodyH: 22.0, pedW: 18.0, pedH: 11.0 },  // total S2 breadth (PMC6286901)
+    C3:  { region: 'cervical-subaxial', bodyW: 18.0, bodyH: 15.1, latMassW: 12.5, latMassH: 12 },
+    C4:  { region: 'cervical-subaxial', bodyW: 18.3, bodyH: 15.2, latMassW: 13, latMassH: 12.5 },
+    C5:  { region: 'cervical-subaxial', bodyW: 20.1, bodyH: 15.2, latMassW: 14, latMassH: 13 },
+    C6:  { region: 'cervical-subaxial', bodyW: 21.6, bodyH: 15.2, latMassW: 14, latMassH: 13 },
+    C7:  { region: 'cervical-subaxial', bodyW: 23.2, bodyH: 15.9, latMassW: 12, latMassH: 11, pedW: 5.5, pedH: 7 },
+    T1:  { region: 'thoracic', bodyW: 31.0, bodyH: 18.9, pedW: 9.3, pedH:  9.0, tpW: 21.0 },
+    T2:  { region: 'thoracic', bodyW: 28.9, bodyH: 20.5, pedW: 7.5, pedH: 10.3, tpW: 18.4 },
+    T3:  { region: 'thoracic', bodyW: 27.9, bodyH: 20.6, pedW: 6.0, pedH: 10.4, tpW: 15.4 },
+    T4:  { region: 'thoracic', bodyW: 28.6, bodyH: 21.3, pedW: 4.5, pedH: 10.3, tpW: 14.2 },
+    T5:  { region: 'thoracic', bodyW: 27.2, bodyH: 22.1, pedW: 5.0, pedH: 10.6, tpW: 14.8 },
+    T6:  { region: 'thoracic', bodyW: 28.3, bodyH: 22.9, pedW: 5.5, pedH: 10.2, tpW: 14.5 },
+    T7:  { region: 'thoracic', bodyW: 30.6, bodyH: 23.4, pedW: 6.0, pedH: 10.4, tpW: 13.1 },
+    T8:  { region: 'thoracic', bodyW: 31.9, bodyH: 24.0, pedW: 6.3, pedH: 10.9, tpW: 11.4 },
+    T9:  { region: 'thoracic', bodyW: 33.4, bodyH: 24.3, pedW: 6.3, pedH: 12.0, tpW: 10.7 },
+    T10: { region: 'thoracic', bodyW: 36.5, bodyH: 25.7, pedW: 6.5, pedH: 13.7, tpW: 7.7 },
+    T11: { region: 'thoracic', bodyW: 40.3, bodyH: 27.5, pedW: 7.8, pedH: 15.0, tpW: 4.4 },
+    T12: { region: 'thoracic', bodyW: 41.6, bodyH: 29.0, pedW: 8.3, pedH: 15.0, tpW: 2.6 },
+    L1:  { region: 'lumbar', bodyW: 44.8, bodyH: 30.2, pedW: 7.5, pedH: 15.4, tpW: 8.2 },
+    L2:  { region: 'lumbar', bodyW: 47.3, bodyH: 31.1, pedW: 8.2, pedH: 14.9, tpW: 13.1 },
+    L3:  { region: 'lumbar', bodyW: 49.7, bodyH: 29.8, pedW: 9.7, pedH: 14.5, tpW: 16.0 },
+    L4:  { region: 'lumbar', bodyW: 51.8, bodyH: 29.1, pedW: 11.5, pedH: 14.2, tpW: 12.8 },
+    L5:  { region: 'lumbar', bodyW: 49.9, bodyH: 27.0, pedW: 14.6, pedH: 14.7, tpW: 15.8 },
+    S1:  { region: 'sacral', bodyW: 100.0, bodyH: 28.0, pedW: 20.0, pedH: 14.0 }, // includes sacral ala
+    S2:  { region: 'sacral', bodyW: 83.0, bodyH: 22.0, pedW: 18.0, pedH: 11.0 },
 };
 
 // Per-level SVG height: use same mm-to-SVG scale as width.
-// Scale anchor: L5 (54mm) maps to 130 SVG units. S1/S2 extend beyond 160-unit viewBox (overflow visible).
-export const VERT_SVG_SCALE = 130 / 54.0; // ~2.41; 130 SVG units = L5 body width
+// Scale anchor: L4 (51.8mm) maps to 130 SVG units. S1/S2 extend beyond 160-unit viewBox (overflow visible).
+export const VERT_SVG_SCALE = 130 / 51.8; // ~2.51; 130 SVG units = L4 body width
 export const VERT_PAD = 3; // top/bottom padding in SVG units
 export const getLevelHeight = (level: Level): number => {
     const a = VERTEBRA_ANATOMY[level.id];
@@ -169,6 +171,8 @@ interface ThoracicGeom extends GeomBase {
     pedRx: number;
     pedRy: number;
     pedCy: number;
+    tpLeftX: number;   // SVG x of left TP tip
+    tpRightX: number;  // SVG x of right TP tip
 }
 
 interface LumbarGeom extends GeomBase {
@@ -178,6 +182,8 @@ interface LumbarGeom extends GeomBase {
     pedRx: number;
     pedRy: number;
     pedCy: number;
+    tpLeftX: number;
+    tpRightX: number;
 }
 
 interface SacralGeom extends GeomBase {
@@ -201,19 +207,31 @@ export type VertSvgGeometry =
 export const getVertSvgGeometry = (levelId: string): VertSvgGeometry | null => {
     const a = VERTEBRA_ANATOMY[levelId];
     if (!a) return null;
-    const scale = 130 / 54.0;
+    const scale = VERT_SVG_SCALE;
     const bw = a.bodyW * scale;
     const cx = 80;
     const left = cx - bw / 2;
     const right = cx + bw / 2;
 
-    if (a.region === 'thoracic' || a.region === 'lumbar' || a.region === 'sacral') {
+    if (a.region === 'thoracic' || a.region === 'lumbar') {
         const pedInset = (a.pedW * scale) * 0.5;
         const pedLeftCx = left + pedInset + 5;
         const pedRightCx = right - pedInset - 5;
-        const pedScale = 1.0;
-        const pedRx = Math.max(1.5, (a.pedW * scale / 2) * pedScale);
-        const pedRy = Math.max(2, (a.pedH * scale / 2) * pedScale);
+        const pedRx = Math.max(1.5, (a.pedW * scale / 2));
+        const pedRy = Math.max(2, (a.pedH * scale / 2));
+        const pedCy = VERT_PAD + pedRy + 5;
+        const tpSvg = a.tpW * scale;
+        const tpLeftX = left - tpSvg;
+        const tpRightX = right + tpSvg;
+        return { region: a.region, left, right, cx, bw, pedLeftCx, pedRightCx, pedRx, pedRy, pedCy, tpLeftX, tpRightX };
+    }
+
+    if (a.region === 'sacral') {
+        const pedInset = (a.pedW * scale) * 0.5;
+        const pedLeftCx = left + pedInset + 5;
+        const pedRightCx = right - pedInset - 5;
+        const pedRx = Math.max(1.5, (a.pedW * scale / 2));
+        const pedRy = Math.max(2, (a.pedH * scale / 2));
         const pedCy = VERT_PAD + pedRy + 5;
         return { region: a.region, left, right, cx, bw, pedLeftCx, pedRightCx, pedRx, pedRy, pedCy };
     }
