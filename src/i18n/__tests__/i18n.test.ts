@@ -165,6 +165,8 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   'SI-J Left',
   'SI-J Right',
   'Size Defaults',
+  'Preferences',
+  'Region Size Defaults',
   // Sidebar category labels that coincidentally match English in some languages
   'Implants',
   'Annotations',

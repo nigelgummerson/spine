@@ -15,9 +15,10 @@ import { REGIONS, VERTEBRA_ANATOMY, VERT_SVG_SCALE, VERT_PAD, getLevelHeight, ge
          levelToYNorm, yNormToRenderedY, renderedYToYNorm, CHART_CONTENT_HEIGHT,
          calculateAutoScale } from './data/anatomy';
 import { IconTrash, IconDownload, IconImage, IconCopy, IconUpload, IconSave,
-         IconCC, IconX, IconPDF, IconHelp, IconLink, IconHistory, IconCardinal } from './components/icons';
+         IconCC, IconX, IconPDF, IconHelp, IconLink, IconHistory, IconCardinal, IconGear } from './components/icons';
 import { ChangeLogModal } from './components/modals/ChangeLogModal';
 import { HelpModal } from './components/modals/HelpModal';
+import { PreferencesModal } from './components/modals/PreferencesModal';
 import { ScrewModal, modalKeyHandler } from './components/modals/ScrewModal';
 import { getNextEmptyLevel } from './utils/screwNavigation';
 import { CageModal } from './components/modals/CageModal';
@@ -76,6 +77,9 @@ const App = () => {
     const togglePelvis = () => { setShowPelvis(v => { const next = !v; localStorage.setItem('spine_planner_pelvis', String(next)); return next; }); };
     const [useRegionDefaults, setUseRegionDefaults] = useState(() => localStorage.getItem('spine_planner_region_defaults') === 'true');
     const toggleRegionDefaults = () => { setUseRegionDefaults(v => { const next = !v; localStorage.setItem('spine_planner_region_defaults', String(next)); return next; }); };
+    const [confirmAndNextDefault, setConfirmAndNextDefault] = useState(() => localStorage.getItem('spine_planner_confirm_next_default') === 'true');
+    const toggleConfirmAndNextDefault = () => { setConfirmAndNextDefault(v => { const next = !v; localStorage.setItem('spine_planner_confirm_next_default', String(next)); return next; }); };
+    const [preferencesModalOpen, setPreferencesModalOpen] = useState(false);
     const [scale, setScale] = useState(1);
     const [incognitoMode, setIncognitoMode] = useState(false);
     const [isEditingDate, setIsEditingDate] = useState(false);
@@ -848,11 +852,13 @@ const App = () => {
                 levels={levels}
                 placements={activeChart === 'planned' ? plannedPlacements : completedPlacements}
                 showPelvis={showPelvis}
-                useRegionDefaults={useRegionDefaults} />
+                useRegionDefaults={useRegionDefaults}
+                confirmAndNextDefault={confirmAndNextDefault} />
             <OsteotomyModal isOpen={osteoModalOpen} onClose={() => { setOsteoModalOpen(false); setOsteoDiscLevel(undefined); }} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId!)} initialData={editingData} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} discLevelOnly={osteoDiscLevel} />
             <CageModal isOpen={cageModalOpen} onClose={() => setCageModalOpen(false)} onConfirm={handleCageConfirm} onDelete={handleDeleteCage} initialData={editingData} levelId={editingCageLevel ?? ''} levels={levels} />
             <ForceModal isOpen={forceModalOpen} onClose={() => setForceModalOpen(false)} onConfirm={handleForceConfirm} />
             <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
+            <PreferencesModal isOpen={preferencesModalOpen} onClose={() => setPreferencesModalOpen(false)} useRegionDefaults={useRegionDefaults} onToggleRegionDefaults={toggleRegionDefaults} confirmAndNextDefault={confirmAndNextDefault} onToggleConfirmAndNextDefault={toggleConfirmAndNextDefault} />
             <ChangeLogModal isOpen={changeLogOpen} onClose={() => setChangeLogOpen(false)} />
             {exportPicker && <Portal><div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: () => runExportWithChoice(exportPicker, false), onClose: () => setExportPicker(null), onDelete: undefined, isEditing: false })} onClick={() => setExportPicker(null)} ref={el => el?.focus()}>
                 <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
@@ -975,6 +981,7 @@ const App = () => {
                             <button onClick={saveProjectJSON} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.save')}><IconSave /></button>
                             <button onClick={promptExportJPG} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.jpg')}><IconImage /></button>
                             <button onClick={promptExportPDF} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.pdf')}><IconPDF /></button>
+                            <button onClick={() => setPreferencesModalOpen(true)} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.preferences')}><IconGear /></button>
                             <button onClick={() => setHelpModalOpen(true)} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title={t('sidebar.help')}><IconHelp /></button>
                             <button onClick={() => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }} className="p-2 rounded hover:bg-white/10 hover:brightness-125" title="Fullscreen"><svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
                             <div className="p-2 rounded flex items-center" style={{ color: syncConnected ? '#34d399' : scheme.textMuted }} title={syncConnected ? t('sync.linked') : t('sync.no_peer')}><IconLink />{syncConnected && <span className="inline-block ms-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>}</div>
@@ -992,7 +999,6 @@ const App = () => {
                                     return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{shortLabels[vm]}</button>;
                                 })}
                                 {viewMode !== 'cervical' && <button onClick={togglePelvis} title={showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')} className={`px-2 py-2 text-[10px] rounded border font-bold ${showPelvis ? '' : 'hover:brightness-125'}`} style={showPelvis ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>P</button>}
-                                <button onClick={toggleRegionDefaults} title={t('sidebar.region_defaults')} className={`px-2 py-2 text-[10px] rounded border font-bold ${useRegionDefaults ? '' : 'hover:brightness-125'}`} style={useRegionDefaults ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>D</button>
                             </div>
                         </div>
                     ) : (
@@ -1013,7 +1019,6 @@ const App = () => {
                                     return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{shortLabels[vm]}</button>;
                                 })}
                                 {viewMode !== 'cervical' && <button onClick={togglePelvis} title={showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')} className={`px-2 py-2 text-[10px] rounded border font-bold ${showPelvis ? '' : 'hover:brightness-125'}`} style={showPelvis ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>P</button>}
-                                <button onClick={toggleRegionDefaults} title={t('sidebar.region_defaults')} className={`px-2 py-2 text-[10px] rounded border font-bold ${useRegionDefaults ? '' : 'hover:brightness-125'}`} style={useRegionDefaults ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>D</button>
                             </div>
                             <div className="w-px h-5 bg-white/20 mx-1"></div>
                             <button onClick={() => { copyPlanToCompleted(); switchPortraitTab(2); }} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold hover:bg-white/10 hover:brightness-125 shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)' }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
@@ -1155,7 +1160,6 @@ const App = () => {
                         {viewMode !== 'cervical' && (
                             <button onClick={togglePelvis} className={`mt-1.5 w-full py-1.5 px-1 text-[10px] rounded border font-bold transition-all ${showPelvis ? 'border-transparent' : 'hover:brightness-125'}`} style={showPelvis ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')}</button>
                         )}
-                        <button onClick={toggleRegionDefaults} title={t('sidebar.region_defaults')} className={`mt-1.5 w-full py-1.5 px-1 text-[10px] rounded border font-bold transition-all ${useRegionDefaults ? 'border-transparent' : 'hover:brightness-125'}`} style={useRegionDefaults ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{t('sidebar.region_defaults')}</button>
                     </div>
 
                     {/* 4. File Operations */}
@@ -1221,6 +1225,7 @@ const App = () => {
 
                     {/* 7. Help + Fullscreen - prominent, bottom */}
                     <div className="p-3 flex gap-2" style={{ borderTop: `1px solid ${scheme.sidebarBorder}` }}>
+                        <button onClick={() => setPreferencesModalOpen(true)} className="flex items-center justify-center hover:brightness-125 px-3 py-2 rounded text-xs font-bold border transition-colors" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconGear /></button>
                         <button onClick={() => setHelpModalOpen(true)} className="flex-1 flex items-center justify-center gap-2 hover:brightness-125 px-3 py-2 rounded text-xs font-bold border transition-colors" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}><IconHelp /> {t('sidebar.help')}</button>
                         <button onClick={() => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }} className="flex items-center justify-center px-3 py-2 rounded text-xs font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }} title="Fullscreen"><svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
                     </div>

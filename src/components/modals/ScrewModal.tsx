@@ -85,9 +85,10 @@ interface ScrewModalProps {
     placements: Placement[];
     showPelvis: boolean;
     useRegionDefaults: boolean;
+    confirmAndNextDefault?: boolean;
 }
 
-export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, levelId, zone, levels, placements, showPelvis, useRegionDefaults }: ScrewModalProps) => {
+export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, levelId, zone, levels, placements, showPelvis, useRegionDefaults, confirmAndNextDefault }: ScrewModalProps) => {
     if (!isOpen) return null;
     // Compute initial values from props (runs on mount since component unmounts when closed)
     const computeInitial = () => {
@@ -99,6 +100,12 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
             if (initialData === "Custom") { mode = 'custom'; custom = defaultCustomText || ''; }
             else if (initialData.includes('x')) { const parts = initialData.split('x'); if (parts.length === 2) { mode = 'standard'; dia = parts[0]; len = parts[1]; } else { mode = 'custom'; custom = initialData; } }
         } else if (initialData === null) { mode = 'none'; }
+        else if (useRegionDefaults && initialData === undefined) {
+            // New placement with region defaults on — use per-level defaults
+            const def = getScrewDefault(levelId, zone);
+            if (def) { dia = def.diameter; len = def.length; mode = 'standard'; }
+            else { mode = 'none'; }
+        }
         const legacyFixationAnn = (initialData && typeof initialData === 'string' && initialTool && ['band','wire','cable'].includes(initialTool)) ? initialData : '';
         return { mode, dia, len, custom, ann: initialAnnotation !== undefined && initialAnnotation !== null ? initialAnnotation : legacyFixationAnn };
     };
@@ -197,8 +204,15 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
                 const inTextField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    if (e.shiftKey && !isEditing && onConfirmAndNext) handleSubmitAndNext();
-                    else handleSubmit();
+                    if (!isEditing && onConfirmAndNext) {
+                        // When confirmAndNextDefault: Enter = next, Shift+Enter = close
+                        // Otherwise: Enter = close, Shift+Enter = next
+                        const useNext = confirmAndNextDefault ? !e.shiftKey : e.shiftKey;
+                        if (useNext) handleSubmitAndNext();
+                        else handleSubmit();
+                    } else {
+                        handleSubmit();
+                    }
                 }
                 else if (e.key === 'Escape') { e.preventDefault(); onClose(); }
                 else if (!inTextField && (e.key === 'Delete' || e.key === 'Backspace') && isEditing && onDelete) { e.preventDefault(); onDelete(); }
@@ -270,11 +284,22 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
                         <div className="mt-3"><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.screw.annotation')}</label><input type="text" value={annotation} onChange={(e) => setAnnotation(e.target.value)} placeholder={t('modal.screw.annotation_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-amber-500 outline-none" /></div>
                     )}
                 </div>
-                <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center" title={t('shortcut.delete')}><IconTrash/> {t('button.remove')}</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title={t('shortcut.escape')}>{t('button.cancel')}</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg" title={t('shortcut.enter')}>{t('button.confirm')}</button>{!isEditing && onConfirmAndNext && (
-                        <button onClick={handleSubmitAndNext}
-                            className="px-4 py-2 rounded bg-slate-600 text-white hover:bg-slate-500 text-sm font-bold shadow"
-                            title="Shift+Enter">{t('modal.screw.confirm_and_next')}</button>
-                    )}</div></div>
+                <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">
+                    {isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center" title={t('shortcut.delete')}><IconTrash/> {t('button.remove')}</button> : <div></div>}
+                    <div className="flex gap-2">
+                        <button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title={t('shortcut.escape')}>{t('button.cancel')}</button>
+                        {!isEditing && onConfirmAndNext ? (<>
+                            <button onClick={confirmAndNextDefault ? handleSubmit : handleSubmitAndNext}
+                                className="px-4 py-2 rounded bg-slate-600 text-white hover:bg-slate-500 text-sm font-bold shadow"
+                                title={confirmAndNextDefault ? 'Shift+Enter' : 'Shift+Enter'}>{confirmAndNextDefault ? t('button.confirm') : t('modal.screw.confirm_and_next')}</button>
+                            <button onClick={confirmAndNextDefault ? handleSubmitAndNext : handleSubmit}
+                                className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg"
+                                title="Enter">{confirmAndNextDefault ? t('modal.screw.confirm_and_next') : t('button.confirm')}</button>
+                        </>) : (
+                            <button onClick={handleSubmit} className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg" title={t('shortcut.enter')}>{t('button.confirm')}</button>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     </Portal>);
