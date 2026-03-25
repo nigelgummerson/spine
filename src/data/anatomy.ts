@@ -100,7 +100,7 @@ export const ALL_LEVELS: Level[] = [
 // Disc height varies by region: lumbar ~30% body height, thoracic ~18%, cervical ~5mm
 export const DISC_MIN_PX = 8; // minimum rendered disc zone height in pixels
 export const getDiscHeight = (level: Level): number => {
-    if (level.type === 'Pelvis' || level.type === 'S' || level.id === 'Oc' || level.id === 'C1') return 0;
+    if (level.type === 'Pelvis' || level.type === 'pelvic' || level.type === 'S' || level.id === 'Oc' || level.id === 'C1') return 0;
     const h = getLevelHeight(level);
     if (level.type === 'L') return Math.round(h * 0.30);
     if (level.type === 'T') return Math.round(h * 0.18);
@@ -173,24 +173,27 @@ export const renderedYToYNorm = (renderedY: number, viewLevels: Level[], hScale:
 
 export const CHART_CONTENT_HEIGHT = 920;
 export const calculateAutoScale = (levels: Level[]): number => {
+    // Exclude pelvic levels — they have no vertebral body height and render
+    // within the PelvisRegion overlay, not as LevelRow entries
+    const vertebralLevels = levels.filter(l => l.type !== 'pelvic');
     let totalUnscaled = 0;
     let discCount = 0;
-    levels.forEach(level => {
+    vertebralLevels.forEach(level => {
         totalUnscaled += getLevelHeight(level) + getDiscHeight(level);
         if (getDiscHeight(level) > 0) discCount++;
     });
     if (totalUnscaled <= 0) return 0.5;
     // Account for fixed per-level costs: 1px border per level, min disc zone height
     // Add top/bottom padding for breathing room (iliac crests extend above L5)
-    const padding = levels.length > 20 ? 60 : 30; // more padding for whole-spine view
-    const borderCost = levels.length; // 1px border-b per level
+    const padding = vertebralLevels.length > 20 ? 60 : 30; // more padding for whole-spine view
+    const borderCost = vertebralLevels.length; // 1px border-b per level
     const available = CHART_CONTENT_HEIGHT - borderCost - padding;
     // Iterative: disc zones have min DISC_MIN_PX, so solve for scale
     // where scaled disc heights below DISC_MIN_PX get clamped
     let scale = available / totalUnscaled;
     for (let i = 0; i < 3; i++) {
         let minHeightExtra = 0;
-        levels.forEach(level => {
+        vertebralLevels.forEach(level => {
             const dh = getDiscHeight(level);
             if (dh > 0 && dh * scale < DISC_MIN_PX) {
                 minHeightExtra += DISC_MIN_PX - dh * scale;
