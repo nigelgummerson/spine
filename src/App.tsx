@@ -19,6 +19,7 @@ import { IconTrash, IconDownload, IconImage, IconCopy, IconUpload, IconSave,
 import { ChangeLogModal } from './components/modals/ChangeLogModal';
 import { HelpModal } from './components/modals/HelpModal';
 import { ScrewModal, modalKeyHandler } from './components/modals/ScrewModal';
+import { getNextEmptyLevel } from './utils/screwNavigation';
 import { CageModal } from './components/modals/CageModal';
 import { OsteotomyModal } from './components/modals/OsteotomyModal';
 import { ForceModal } from './components/modals/ForceModal';
@@ -460,6 +461,23 @@ const App = () => {
         }
     };
 
+    const handleScrewConfirmAndNext = (confirmedLevelId: string, confirmedZone: Zone) => {
+        const side = confirmedZone as 'left' | 'right';
+        if (side !== 'left' && side !== 'right') { setScrewModalOpen(false); return; }
+        const currentPlacements = activeChart === 'planned' ? plannedPlacements : completedPlacements;
+        const withJustPlaced = [...currentPlacements, { levelId: confirmedLevelId, zone: confirmedZone } as Placement];
+        const next = getNextEmptyLevel(confirmedLevelId, side, levels, withJustPlaced);
+        if (next) {
+            setPendingPlacement({ levelId: next.levelId, zone: next.zone, tool: lastUsedScrewType });
+            setEditingPlacementId(null);
+            setEditingData(undefined);
+            setEditingTool(lastUsedScrewType);
+            setEditingAnnotation('');
+        } else {
+            setScrewModalOpen(false);
+        }
+    };
+
     const handleOsteoConfirm = (data: any) => {
         setDefaultOsteoType(data.type);
         if (editingPlacementId) { updatePlacement(editingPlacementId, 'osteotomy', data); setEditingPlacementId(null); } 
@@ -819,6 +837,7 @@ const App = () => {
         <React.Fragment>
             <ScrewModal isOpen={screwModalOpen} onClose={() => setScrewModalOpen(false)}
                 onConfirm={handleScrewConfirm}
+                onConfirmAndNext={handleScrewConfirmAndNext}
                 onDelete={() => removePlacement(editingPlacementId!)}
                 initialData={editingData} initialTool={editingTool ?? undefined}
                 defaultDiameter={defaultDiameter} defaultLength={defaultLength}

@@ -70,6 +70,7 @@ interface ScrewModalProps {
     isOpen: boolean;
     onClose: () => void;
     onConfirm: (size: string | null, details: any, type: string, annotation: string, levelId: string, zone: Zone) => void;
+    onConfirmAndNext?: (confirmedLevelId: string, confirmedZone: Zone) => void;
     onDelete?: () => void;
     initialData?: string | null;
     initialTool?: string;
@@ -86,7 +87,7 @@ interface ScrewModalProps {
     useRegionDefaults: boolean;
 }
 
-export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, levelId, zone, levels, placements, showPelvis, useRegionDefaults }: ScrewModalProps) => {
+export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, levelId, zone, levels, placements, showPelvis, useRegionDefaults }: ScrewModalProps) => {
     if (!isOpen) return null;
     // Compute initial values from props (runs on mount since component unmounts when closed)
     const computeInitial = () => {
@@ -166,13 +167,24 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
         }
     }, [isOpen, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation]);
 
+    const computeFinalSize = () => {
+        if (isHookOnly || isFixation) return null;
+        if (mode === 'custom') return customText || "Custom";
+        if (mode === 'standard') return `${Number(diameter).toFixed(1)}x${length}`;
+        return null;
+    };
+
+    const computeDetails = () => (isHookOnly || isFixation) ? null : { diameter, length, mode, customText };
+
     const handleSubmit = () => {
-        let finalSize = null;
-        if (isHookOnly || isFixation) { finalSize = null; }
-        else if (mode === 'custom') finalSize = customText || "Custom";
-        else if (mode === 'standard') finalSize = `${Number(diameter).toFixed(1)}x${length}`;
-        onConfirm(finalSize, (isHookOnly || isFixation) ? null : { diameter, length, mode, customText }, selectedType, isPelvic ? '' : annotation, selectedLevel, selectedZone);
+        onConfirm(computeFinalSize(), computeDetails(), selectedType, isPelvic ? '' : annotation, selectedLevel, selectedZone);
         onClose();
+    };
+
+    const handleSubmitAndNext = () => {
+        onConfirm(computeFinalSize(), computeDetails(), selectedType, isPelvic ? '' : annotation, selectedLevel, selectedZone);
+        // Do NOT call onClose — pass confirmed level/zone so App can compute next
+        if (onConfirmAndNext) onConfirmAndNext(selectedLevel, selectedZone);
     };
     const isEditing = initialData !== undefined;
     const hookLabels: Record<string, string> = { pedicle_hook: t('clinical.hook.pedicle_hook'), tp_hook: t('clinical.hook.tp_hook'), tp_hook_up: t('clinical.hook.tp_hook_up'), sl_hook: t('clinical.hook.sl_hook'), il_hook: t('clinical.hook.il_hook') };
@@ -180,7 +192,33 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
     useEffect(() => { if (modalRef.current) modalRef.current.focus(); }, []);
 
     return (<Portal>
-        <div ref={modalRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
+        <div ref={modalRef} tabIndex={-1} style={{outline:'none'}} onKeyDown={(e) => {
+                const tag = (e.target as HTMLElement).tagName;
+                const inTextField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (e.shiftKey && !isEditing && onConfirmAndNext) handleSubmitAndNext();
+                    else handleSubmit();
+                }
+                else if (e.key === 'Escape') { e.preventDefault(); onClose(); }
+                else if (!inTextField && (e.key === 'Delete' || e.key === 'Backspace') && isEditing && onDelete) { e.preventDefault(); onDelete(); }
+                else if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const modal = e.currentTarget;
+                    const focusable = Array.from(modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')) as HTMLElement[];
+                    if (focusable.length === 0) return;
+                    const idx = focusable.indexOf(document.activeElement as HTMLElement);
+                    let next: number;
+                    if (idx === -1) {
+                        next = e.shiftKey ? focusable.length - 1 : 0;
+                    } else {
+                        next = e.shiftKey
+                            ? (idx <= 0 ? focusable.length - 1 : idx - 1)
+                            : (idx >= focusable.length - 1 ? 0 : idx + 1);
+                    }
+                    focusable[next].focus();
+                }
+            }} className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden">
                 <div className="bg-slate-900 text-white px-4 py-3 flex justify-between items-center"><h3 className="font-bold text-sm">{isEditing ? t('modal.screw.title_edit') : t('modal.screw.title_new')}</h3><button onClick={onClose} className="hover:text-red-400"><IconX /></button></div>
                 <div className="flex gap-2 px-6 pt-4 pb-2">
@@ -232,7 +270,11 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, 
                         <div className="mt-3"><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.screw.annotation')}</label><input type="text" value={annotation} onChange={(e) => setAnnotation(e.target.value)} placeholder={t('modal.screw.annotation_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-amber-500 outline-none" /></div>
                     )}
                 </div>
-                <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center" title={t('shortcut.delete')}><IconTrash/> {t('button.remove')}</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title={t('shortcut.escape')}>{t('button.cancel')}</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg" title={t('shortcut.enter')}>{t('button.confirm')}</button></div></div>
+                <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{isEditing ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center" title={t('shortcut.delete')}><IconTrash/> {t('button.remove')}</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold" title={t('shortcut.escape')}>{t('button.cancel')}</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-slate-800 text-white hover:bg-slate-700 text-sm font-bold shadow-lg" title={t('shortcut.enter')}>{t('button.confirm')}</button>{!isEditing && onConfirmAndNext && (
+                        <button onClick={handleSubmitAndNext}
+                            className="px-4 py-2 rounded bg-slate-600 text-white hover:bg-slate-500 text-sm font-bold shadow"
+                            title="Shift+Enter">{t('modal.screw.confirm_and_next')}</button>
+                    )}</div></div>
             </div>
         </div>
     </Portal>);
