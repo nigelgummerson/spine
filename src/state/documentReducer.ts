@@ -274,7 +274,10 @@ export function internalToV4Chart(placements: Placement[], cages: Cage[], connec
             forces.push({ id: p.id, type: fv4.type, direction: fv4.direction || undefined, level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left' });
             return;
         }
-        if (p.tool === 'unstable') return;
+        if (p.tool === 'unstable') {
+            elements.push({ id: p.id, type: 'marker', markerType: 'unstable', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', zone: p.zone });
+            return;
+        }
         const screwTypes = ['monoaxial', 'polyaxial', 'uniplanar'];
         const hookTypes = Object.keys(TOOL_TO_V4_HOOK);
         const fixTypes = Object.keys(TOOL_TO_V4_FIXATION);
@@ -365,6 +368,8 @@ export function v4ChartToInternal(chartData: any, notePositions: Record<string, 
             cages.push({ id: el.id, levelId: el.level, tool: (el.cage?.approach || 'TLIF').toLowerCase(), data: { height: String(el.cage?.height || ''), lordosis: String(el.cage?.lordosis || ''), side: el.side || 'bilateral', width: el.cage?.width ? String(el.cage.width) : undefined, length: el.cage?.length ? String(el.cage.length) : undefined } as any });
         } else if (el.type === 'connector') {
             connectors.push({ id: el.id, levelId: el.level, fraction: el.connector?.fraction || 0.5, tool: 'connector' });
+        } else if (el.type === 'marker' && el.markerType === 'unstable') {
+            placements.push({ id: el.id, levelId: el.level, zone: resolveZone(el), tool: 'unstable', data: null, annotation: '' });
         }
     });
     (chartData.forces || []).forEach((f: any) => {
