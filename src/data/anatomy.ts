@@ -31,6 +31,7 @@ interface ThoracicAnatomy extends AnatomyBase {
     pedW: number;
     pedH: number;
     tpW: number;  // transverse process projection per side (mm), Tan et al. 2004
+    tpH: number;  // transverse process craniocaudal height (mm)
 }
 
 interface LumbarAnatomy extends AnatomyBase {
@@ -38,6 +39,7 @@ interface LumbarAnatomy extends AnatomyBase {
     pedW: number;
     pedH: number;
     tpW: number;  // transverse process projection per side (mm), Tan et al. 2004
+    tpH: number;  // transverse process craniocaudal height (mm)
 }
 
 interface SacralAnatomy extends AnatomyBase {
@@ -90,23 +92,25 @@ export const VERTEBRA_ANATOMY: Record<string, VertAnatomyEntry> = {
     C5:  { region: 'cervical-subaxial', bodyW: 20.1, bodyH: 15.2, latMassW: 14, latMassH: 13 },
     C6:  { region: 'cervical-subaxial', bodyW: 21.6, bodyH: 15.2, latMassW: 14, latMassH: 13 },
     C7:  { region: 'cervical-subaxial', bodyW: 23.2, bodyH: 15.9, latMassW: 12, latMassH: 11, pedW: 5.5, pedH: 7 },
-    T1:  { region: 'thoracic', bodyW: 31.0, bodyH: 18.9, pedW: 9.3, pedH:  9.0, tpW: 21.0 },
-    T2:  { region: 'thoracic', bodyW: 28.9, bodyH: 20.5, pedW: 7.5, pedH: 10.3, tpW: 18.4 },
-    T3:  { region: 'thoracic', bodyW: 27.9, bodyH: 20.6, pedW: 6.0, pedH: 10.4, tpW: 15.4 },
-    T4:  { region: 'thoracic', bodyW: 28.6, bodyH: 21.3, pedW: 4.5, pedH: 10.3, tpW: 14.2 },
-    T5:  { region: 'thoracic', bodyW: 27.2, bodyH: 22.1, pedW: 5.0, pedH: 10.6, tpW: 14.8 },
-    T6:  { region: 'thoracic', bodyW: 28.3, bodyH: 22.9, pedW: 5.5, pedH: 10.2, tpW: 14.5 },
-    T7:  { region: 'thoracic', bodyW: 30.6, bodyH: 23.4, pedW: 6.0, pedH: 10.4, tpW: 13.1 },
-    T8:  { region: 'thoracic', bodyW: 31.9, bodyH: 24.0, pedW: 6.3, pedH: 10.9, tpW: 11.4 },
-    T9:  { region: 'thoracic', bodyW: 33.4, bodyH: 24.3, pedW: 6.3, pedH: 12.0, tpW: 10.7 },
-    T10: { region: 'thoracic', bodyW: 36.5, bodyH: 25.7, pedW: 6.5, pedH: 13.7, tpW: 7.7 },
-    T11: { region: 'thoracic', bodyW: 40.3, bodyH: 27.5, pedW: 7.8, pedH: 15.0, tpW: 4.4 },
-    T12: { region: 'thoracic', bodyW: 41.6, bodyH: 29.0, pedW: 8.3, pedH: 15.0, tpW: 2.6 },
-    L1:  { region: 'lumbar', bodyW: 44.8, bodyH: 30.2, pedW: 7.5, pedH: 15.4, tpW: 8.2 },
-    L2:  { region: 'lumbar', bodyW: 47.3, bodyH: 31.1, pedW: 8.2, pedH: 14.9, tpW: 13.1 },
-    L3:  { region: 'lumbar', bodyW: 49.7, bodyH: 29.8, pedW: 9.7, pedH: 14.5, tpW: 16.0 },
-    L4:  { region: 'lumbar', bodyW: 51.8, bodyH: 29.1, pedW: 11.5, pedH: 14.2, tpW: 12.8 },
-    L5:  { region: 'lumbar', bodyW: 49.9, bodyH: 27.0, pedW: 14.6, pedH: 14.7, tpW: 15.8 },
+    // tpH: thoracic TP craniocaudal height — T1=10.8mm (thickest), T7=7.9mm (thinnest).
+    // Lumbar TPs are thin flat plates ~8-10mm.
+    T1:  { region: 'thoracic', bodyW: 31.0, bodyH: 18.9, pedW: 9.3, pedH:  9.0, tpW: 21.0, tpH: 10.8 },
+    T2:  { region: 'thoracic', bodyW: 28.9, bodyH: 20.5, pedW: 7.5, pedH: 10.3, tpW: 18.4, tpH: 10.3 },
+    T3:  { region: 'thoracic', bodyW: 27.9, bodyH: 20.6, pedW: 6.0, pedH: 10.4, tpW: 15.4, tpH: 9.6 },
+    T4:  { region: 'thoracic', bodyW: 28.6, bodyH: 21.3, pedW: 4.5, pedH: 10.3, tpW: 14.2, tpH: 9.0 },
+    T5:  { region: 'thoracic', bodyW: 27.2, bodyH: 22.1, pedW: 5.0, pedH: 10.6, tpW: 14.8, tpH: 8.5 },
+    T6:  { region: 'thoracic', bodyW: 28.3, bodyH: 22.9, pedW: 5.5, pedH: 10.2, tpW: 14.5, tpH: 8.1 },
+    T7:  { region: 'thoracic', bodyW: 30.6, bodyH: 23.4, pedW: 6.0, pedH: 10.4, tpW: 13.1, tpH: 7.9 },
+    T8:  { region: 'thoracic', bodyW: 31.9, bodyH: 24.0, pedW: 6.3, pedH: 10.9, tpW: 11.4, tpH: 8.2 },
+    T9:  { region: 'thoracic', bodyW: 33.4, bodyH: 24.3, pedW: 6.3, pedH: 12.0, tpW: 10.7, tpH: 8.5 },
+    T10: { region: 'thoracic', bodyW: 36.5, bodyH: 25.7, pedW: 6.5, pedH: 13.7, tpW: 7.7, tpH: 9.0 },
+    T11: { region: 'thoracic', bodyW: 40.3, bodyH: 27.5, pedW: 7.8, pedH: 15.0, tpW: 4.4, tpH: 9.5 },
+    T12: { region: 'thoracic', bodyW: 41.6, bodyH: 29.0, pedW: 8.3, pedH: 15.0, tpW: 2.6, tpH: 9.5 },
+    L1:  { region: 'lumbar', bodyW: 44.8, bodyH: 30.2, pedW: 7.5, pedH: 15.4, tpW: 8.2, tpH: 9.0 },
+    L2:  { region: 'lumbar', bodyW: 47.3, bodyH: 31.1, pedW: 8.2, pedH: 14.9, tpW: 13.1, tpH: 8.5 },
+    L3:  { region: 'lumbar', bodyW: 49.7, bodyH: 29.8, pedW: 9.7, pedH: 14.5, tpW: 16.0, tpH: 8.0 },
+    L4:  { region: 'lumbar', bodyW: 51.8, bodyH: 29.1, pedW: 11.5, pedH: 14.2, tpW: 12.8, tpH: 8.5 },
+    L5:  { region: 'lumbar', bodyW: 49.9, bodyH: 27.0, pedW: 14.6, pedH: 14.7, tpW: 15.8, tpH: 10.0 },
     S1:  { region: 'sacral', bodyW: 100.0, bodyH: 28.0, pedW: 20.0, pedH: 14.0 }, // includes sacral ala
     S2:  { region: 'sacral', bodyW: 83.0, bodyH: 22.0, pedW: 18.0, pedH: 11.0 },
 };
@@ -173,6 +177,7 @@ interface ThoracicGeom extends GeomBase {
     pedCy: number;
     tpLeftX: number;   // SVG x of left TP tip
     tpRightX: number;  // SVG x of right TP tip
+    tpHalfH: number;   // SVG half-height of TP (craniocaudal)
 }
 
 interface LumbarGeom extends GeomBase {
@@ -184,6 +189,7 @@ interface LumbarGeom extends GeomBase {
     pedCy: number;
     tpLeftX: number;
     tpRightX: number;
+    tpHalfH: number;
 }
 
 interface SacralGeom extends GeomBase {
@@ -223,7 +229,8 @@ export const getVertSvgGeometry = (levelId: string): VertSvgGeometry | null => {
         const tpSvg = a.tpW * scale;
         const tpLeftX = left - tpSvg;
         const tpRightX = right + tpSvg;
-        return { region: a.region, left, right, cx, bw, pedLeftCx, pedRightCx, pedRx, pedRy, pedCy, tpLeftX, tpRightX };
+        const tpHalfH = (a.tpH * scale) / 2;
+        return { region: a.region, left, right, cx, bw, pedLeftCx, pedRightCx, pedRx, pedRy, pedCy, tpLeftX, tpRightX, tpHalfH };
     }
 
     if (a.region === 'sacral') {

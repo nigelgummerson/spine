@@ -161,9 +161,8 @@ export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale =
                     const pedStroke = isT ? "#94a3b8" : "#64748b";
                     const pedWidth = isT ? "1" : "1.5";
                     // Transverse processes — fill only, constant-height rectangles at pedicle level
-                    const tpH = geom.pedRy * 1.6; // TP craniocaudal height ~= pedicle height
-                    const tpTop = pedCy - tpH;
-                    const tpBot = pedCy + tpH;
+                    const tpTop = pedCy - geom.tpHalfH;
+                    const tpBot = pedCy + geom.tpHalfH;
                     return (
                         <g>
                             {/* Transverse processes (behind body, at pedicle level) */}
