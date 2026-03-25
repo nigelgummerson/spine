@@ -69,21 +69,13 @@ export const SCREW_DEFAULTS: Record<string, { diameter: string; length: string }
     L5: { diameter: '6.5', length: '45' },
     S1: { diameter: '7.0', length: '45' },
     S2: { diameter: '6.5', length: '35' },
+    S2AI: { diameter: '7.5', length: '80' },
+    Iliac: { diameter: '7.5', length: '80' },
+    'SI-J': { diameter: '7.0', length: '45' },
 };
 
-/** Pelvic zone overrides — keyed by zone prefix (without _left/_right). */
-const PELVIC_DEFAULTS: Record<string, { diameter: string; length: string }> = {
-    s2ai: { diameter: '7.5', length: '80' },
-    iliac: { diameter: '7.5', length: '80' },
-    si: { diameter: '7.0', length: '45' },
-};
-
-/** Get screw default for a level, optionally considering pelvic zone.
+/** Get screw default for a level.
  * Returns null for levels with no safe default (Oc, C1, C2, unknown). */
-export function getScrewDefault(levelId: string, zone?: string): { diameter: string; length: string } | null {
-    if (zone) {
-        const prefix = zone.replace(/_left$|_right$/, '');
-        if (PELVIC_DEFAULTS[prefix]) return PELVIC_DEFAULTS[prefix];
-    }
+export function getScrewDefault(levelId: string): { diameter: string; length: string } | null {
     return SCREW_DEFAULTS[levelId] || null;
 }

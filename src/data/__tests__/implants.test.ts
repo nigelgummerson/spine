@@ -23,10 +23,10 @@ describe('getScrewDefault', () => {
     it('returns 7.0x45 for S1', () => {
         expect(getScrewDefault('S1')).toEqual({ diameter: '7.0', length: '45' });
     });
-    it('returns pelvic defaults for zone overrides', () => {
-        expect(getScrewDefault('S1', 's2ai_left')).toEqual({ diameter: '7.5', length: '80' });
-        expect(getScrewDefault('S1', 'iliac_left')).toEqual({ diameter: '7.5', length: '80' });
-        expect(getScrewDefault('S1', 'si_left')).toEqual({ diameter: '7.0', length: '45' });
+    it('returns pelvic defaults for pelvic level IDs', () => {
+        expect(getScrewDefault('S2AI')).toEqual({ diameter: '7.5', length: '80' });
+        expect(getScrewDefault('Iliac')).toEqual({ diameter: '7.5', length: '80' });
+        expect(getScrewDefault('SI-J')).toEqual({ diameter: '7.0', length: '45' });
     });
     it('returns S2 default for S2 pedicle', () => {
         expect(getScrewDefault('S2')).toEqual({ diameter: '6.5', length: '35' });

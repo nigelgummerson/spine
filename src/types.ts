@@ -1,7 +1,6 @@
 export type LevelId = string;
 
-export type Zone = 'left' | 'right' | 'mid' | 'disc' | 'force_left' | 'force_right'
-    | 's2ai_left' | 's2ai_right' | 'iliac_left' | 'iliac_right' | 'si_left' | 'si_right';
+export type Zone = 'left' | 'right' | 'mid' | 'disc' | 'force_left' | 'force_right';
 
 export type Side = 'left' | 'right' | 'bilateral' | 'midline';
 
