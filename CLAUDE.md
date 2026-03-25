@@ -4,8 +4,8 @@
 A web application for pre-operative spinal surgery planning. Deployed as a code-split web build to GitHub Pages for connected hospital computers, with a standalone single-file download for offline use. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 22 languages (16 European + Hindi + Arabic with RTL + Hebrew with RTL + Chinese Simplified + Japanese + Korean).
 
 ## Current Status
-- **Version:** v2.5.20-beta
-- **Last Updated:** 2026-03-24
+- **Version:** v2.5.30-beta
+- **Last Updated:** 2026-03-25
 - **License:** GNU GPLv3
 - **Language:** TypeScript (strict)
 
@@ -152,7 +152,7 @@ spine-planner/
 - **ScrewModal:** Three-tier visual hierarchy (SCREWS > HOOKS > BANDS & OTHERS), annotations for screws and hooks, free-text description for fixation
 - **Osteotomies:** Schwab 1-6 + Corpectomy, grouped into Posterior/Anterior optgroups. VCR/ML-VCR/Corpectomy show reconstruction cage text input
 - **Bone graft:** Multi-select checkboxes (Local Bone, Autograft, Allograft, Synthetics, DBM, BMP) + free-text notes
-- **JSON v4 format:** `schema.format: 'spinal-instrumentation'`, `schema.version: 4`. Unified `elements` array with typed sub-objects. Each element has `side` (left/right/bilateral/midline) and `zone` (precise zone type including pelvic zones: s2ai_left/right, iliac_left/right, si_left/right). `zone` field added v2.5.x for pelvic fixation; older files fall back to `side`. Forces, rods, notes, boneGraft as separate arrays within plan/construct. Document metadata (UUID, timestamps). UI state separated. Loads v2/v3 legacy files. Schema: `docs/spinal-instrumentation-schema-v4.json`
+- **JSON v4 format:** `schema.format: 'spinal-instrumentation'`, `schema.version: 4`. Unified `elements` array with typed sub-objects (screw, hook, fixation, cage, osteotomy, connector, marker). Each element has `side` (left/right/bilateral/midline) and `zone` (left/right/mid/disc/force_left/force_right). Pelvic fixation uses first-class level IDs (S2AI, Iliac, SI-J) with standard left/right zones — old files with pelvic zone variants (s2ai_left etc.) are auto-migrated on load via `migratePelvicPlacements()`. Forces, rods, notes, boneGraft as separate arrays within plan/construct. Document metadata (UUID, timestamps). UI state separated. Loads v2/v3 legacy files. Schema: `docs/spinal-instrumentation-schema-v4.json`
 - **Connectors:** Level-anchored `{levelId, fraction}` (branch); legacy `{yNorm}` migrated on load
 - **Session cache:** localStorage key `spine_planner_v2`, formatVersion 3
 - **Save/load:** Shared `serializeState()` / `deserializeState()` functions; loads formatVersion >= 2. Zod validates both v4 and legacy formats on load. localStorage data runs through `migrateStoredData()` before validation.
