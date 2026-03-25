@@ -30,13 +30,122 @@ export const SpineVertebra = ({ label, type, height, isCorpectomy, heightScale =
         <svg viewBox={`0 0 160 ${height}`} className="w-full h-full block" overflow="visible">
             <line x1="80" y1="-2" x2="80" y2={height + 2} stroke="#cbd5e1" strokeDasharray="3 3" />
             <g>
-                {type === 'Oc' && <path d="M30,2 Q80,45 130,2 L130,10 Q80,50 30,10 Z" transform={`scale(1, ${height/30})`} {...common} fill="#f1f5f9" />}
+                {type === 'Oc' && geom && geom.region === 'occiput' && (() => {
+                    const g = geom;
+                    const t = VERT_PAD;
+                    const b = height - VERT_PAD;
+                    const m = (t + b) / 2;
+                    return (
+                        <g>
+                            {/* Skull base — wide convex arc */}
+                            <path d={`M${g.left},${b} Q${g.cx},${t - 8} ${g.right},${b} L${g.right},${b} Q${g.cx},${m + 4} ${g.left},${b} Z`}
+                                {...common} />
+                            {/* Occipital condyles */}
+                            <ellipse cx={g.condyleLeftCx} cy={b - g.condyleRy} rx={g.condyleRx} ry={g.condyleRy}
+                                fill="#e8ecf0" stroke="#94a3b8" strokeWidth="1" />
+                            <ellipse cx={g.condyleRightCx} cy={b - g.condyleRy} rx={g.condyleRx} ry={g.condyleRy}
+                                fill="#e8ecf0" stroke="#94a3b8" strokeWidth="1" />
+                            {/* Foramen magnum */}
+                            <ellipse cx={g.cx} cy={m} rx={g.foramenRx} ry={g.foramenRy}
+                                fill="white" stroke="#94a3b8" strokeWidth="0.8" strokeDasharray="3 2" />
+                        </g>
+                    );
+                })()}
 
-                {type === 'C' && (
-                    <g transform={`scale(1, ${height/24})`}>
-                        <path d="M45,4 Q80,-2 115,4 L120,18 Q80,24 40,18 Z" {...common} />
-                    </g>
-                )}
+                {type === 'C' && geom && geom.region === 'cervical-upper' && label === 'C1' && (() => {
+                    const g = geom;
+                    const t = VERT_PAD;
+                    const b = height - VERT_PAD;
+                    const m = (t + b) / 2;
+                    return (
+                        <g>
+                            {/* Posterior arch — left and right arcs */}
+                            <path d={`M${g.latMassLeftCx + g.latMassRx},${m} Q${g.cx},${t} ${g.cx - 6},${m}`} fill="none" stroke="#94a3b8" strokeWidth="1.5" />
+                            <path d={`M${g.latMassRightCx - g.latMassRx},${m} Q${g.cx},${t} ${g.cx + 6},${m}`} fill="none" stroke="#94a3b8" strokeWidth="1.5" />
+                            {/* Posterior tubercle */}
+                            <rect x={g.cx - 5} y={m - 5} width={10} height={10} rx={3} fill={common.fill} stroke="#94a3b8" strokeWidth="1.5" />
+                            {/* Lateral masses — rounded rectangles */}
+                            <rect x={g.latMassLeftCx - g.latMassRx} y={g.latMassCy - g.latMassRy}
+                                width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
+                                fill={common.fill} stroke="#94a3b8" strokeWidth="1.5" />
+                            <rect x={g.latMassRightCx - g.latMassRx} y={g.latMassCy - g.latMassRy}
+                                width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
+                                fill={common.fill} stroke="#94a3b8" strokeWidth="1.5" />
+                        </g>
+                    );
+                })()}
+
+                {type === 'C' && geom && geom.region === 'cervical-upper' && label === 'C2' && (() => {
+                    const g = geom;
+                    const t = VERT_PAD;
+                    const b = height - VERT_PAD;
+                    const c = 3;
+                    return (
+                        <g>
+                            {/* Vertebral body */}
+                            <rect x={g.left} y={t} width={g.bw} height={b - t} rx={c} {...common} />
+                            {/* Pars interarticularis — rounded rectangles */}
+                            <rect x={g.latMassLeftCx - g.latMassRx} y={g.latMassCy - g.latMassRy}
+                                width={g.latMassRx * 2} height={g.latMassRy * 2} rx={3}
+                                fill={common.fill} stroke="#94a3b8" strokeWidth="1.5" />
+                            <rect x={g.latMassRightCx - g.latMassRx} y={g.latMassCy - g.latMassRy}
+                                width={g.latMassRx * 2} height={g.latMassRy * 2} rx={3}
+                                fill={common.fill} stroke="#94a3b8" strokeWidth="1.5" />
+                        </g>
+                    );
+                })()}
+
+                {type === 'C' && geom && geom.region === 'cervical-subaxial' && !geom.pedRx && (() => {
+                    const g = geom;
+                    const t = VERT_PAD;
+                    const b = height - VERT_PAD;
+                    const c = 3;
+                    const w = 1.5;
+                    const m = (t + b) / 2;
+                    const endCurve = 1.5;
+                    const bodyPath = `M${g.left},${t+c} Q${g.left},${t} ${g.left+c},${t} Q${g.cx},${t+endCurve} ${g.right-c},${t} Q${g.right},${t} ${g.right},${t+c} Q${g.right-w},${m} ${g.right},${b-c} Q${g.right},${b} ${g.right-c},${b} Q${g.cx},${b-endCurve} ${g.left+c},${b} Q${g.left},${b} ${g.left},${b-c} Q${g.left+w},${m} ${g.left},${t+c} Z`;
+                    return (
+                        <g>
+                            <path d={bodyPath} {...common} />
+                            <rect x={g.latMassLeftCx - g.latMassRx} y={g.latMassCy - g.latMassRy}
+                                width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
+                                fill={common.fill} stroke="#94a3b8" strokeWidth="1" />
+                            <rect x={g.latMassRightCx - g.latMassRx} y={g.latMassCy - g.latMassRy}
+                                width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
+                                fill={common.fill} stroke="#94a3b8" strokeWidth="1" />
+                        </g>
+                    );
+                })()}
+
+                {type === 'C' && geom && geom.region === 'cervical-subaxial' && !!geom.pedRx && (() => {
+                    const g = geom;
+                    const t = VERT_PAD;
+                    const b = height - VERT_PAD;
+                    const c = 3;
+                    const w = 2;
+                    const m = (t + b) / 2;
+                    const endCurve = 1.5;
+                    const bodyPath = `M${g.left},${t+c} Q${g.left},${t} ${g.left+c},${t} Q${g.cx},${t+endCurve} ${g.right-c},${t} Q${g.right},${t} ${g.right},${t+c} Q${g.right-w},${m} ${g.right},${b-c} Q${g.right},${b} ${g.right-c},${b} Q${g.cx},${b-endCurve} ${g.left+c},${b} Q${g.left},${b} ${g.left},${b-c} Q${g.left+w},${m} ${g.left},${t+c} Z`;
+                    return (
+                        <g>
+                            <path d={bodyPath} {...common} />
+                            <rect x={g.latMassLeftCx - g.latMassRx} y={g.latMassCy - g.latMassRy}
+                                width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
+                                fill={common.fill} stroke="#94a3b8" strokeWidth="1" strokeDasharray="3 2" />
+                            <rect x={g.latMassRightCx - g.latMassRx} y={g.latMassCy - g.latMassRy}
+                                width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
+                                fill={common.fill} stroke="#94a3b8" strokeWidth="1" strokeDasharray="3 2" />
+                            {g.pedLeftCx && g.pedRx && g.pedRy && (
+                                <>
+                                    <ellipse cx={g.pedLeftCx} cy={m} rx={g.pedRx} ry={g.pedRy}
+                                        fill="none" stroke="#94a3b8" strokeWidth="1" />
+                                    <ellipse cx={g.pedRightCx} cy={m} rx={g.pedRx} ry={g.pedRy}
+                                        fill="none" stroke="#94a3b8" strokeWidth="1" />
+                                </>
+                            )}
+                        </g>
+                    );
+                })()}
 
                 {(type === 'T' || type === 'L') && geom && (geom.region === 'thoracic' || geom.region === 'lumbar') && (() => {
                     const l = geom.left, r = geom.right;
