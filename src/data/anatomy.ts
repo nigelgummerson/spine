@@ -312,7 +312,7 @@ const DISC_HEIGHT_MM: Record<string, number> = {
     T7: 4.5, T8: 5.2, T9: 6.0, T10: 7.2, T11: 6.0, T12: 5.6,
     L1: 6.9, L2: 8.1, L3: 8.7, L4: 9.2, L5: 8.8,
 };
-export const DISC_MIN_PX = 8; // minimum rendered disc zone height in pixels
+export const DISC_MIN_PX = 6; // minimum rendered disc zone height in pixels
 export const getDiscHeight = (level: Level): number => {
     if (level.type === 'Pelvis' || level.type === 'pelvic' || level.type === 'S' || level.id === 'Oc' || level.id === 'C1') return 0;
     const mm = DISC_HEIGHT_MM[level.id];
