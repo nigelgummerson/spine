@@ -171,8 +171,10 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
             const v = computeInitial();
             if (initialTool) setSelectedType(initialTool);
             setMode(v.mode); setDiameter(v.dia); setLength(v.len); setCustomText(v.custom); setAnnotation(v.ann);
+            setSelectedLevel(levelId);
+            setSelectedZone(zone);
         }
-    }, [isOpen, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation]);
+    }, [isOpen, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, levelId, zone]);
 
     const computeFinalSize = () => {
         if (isHookOnly || isFixation) return null;
