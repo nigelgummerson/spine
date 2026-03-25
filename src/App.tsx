@@ -73,6 +73,8 @@ const App = () => {
     const [viewMode, setViewMode] = useState('thoracolumbar');
     const [showPelvis, setShowPelvis] = useState(() => localStorage.getItem('spine_planner_pelvis') === 'true');
     const togglePelvis = () => { setShowPelvis(v => { const next = !v; localStorage.setItem('spine_planner_pelvis', String(next)); return next; }); };
+    const [useRegionDefaults, setUseRegionDefaults] = useState(() => localStorage.getItem('spine_planner_region_defaults') === 'true');
+    const toggleRegionDefaults = () => { setUseRegionDefaults(v => { const next = !v; localStorage.setItem('spine_planner_region_defaults', String(next)); return next; }); };
     const [scale, setScale] = useState(1);
     const [incognitoMode, setIncognitoMode] = useState(false);
     const [isEditingDate, setIsEditingDate] = useState(false);
@@ -956,6 +958,7 @@ const App = () => {
                                     return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{shortLabels[vm]}</button>;
                                 })}
                                 {viewMode !== 'cervical' && <button onClick={togglePelvis} title={showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')} className={`px-2 py-2 text-[10px] rounded border font-bold ${showPelvis ? '' : 'hover:brightness-125'}`} style={showPelvis ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>P</button>}
+                                <button onClick={toggleRegionDefaults} title={t('sidebar.region_defaults')} className={`px-2 py-2 text-[10px] rounded border font-bold ${useRegionDefaults ? '' : 'hover:brightness-125'}`} style={useRegionDefaults ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>D</button>
                             </div>
                         </div>
                     ) : (
@@ -976,6 +979,7 @@ const App = () => {
                                     return <button key={vm} onClick={() => setViewMode(vm)} title={t('sidebar.view.' + vm)} className={`px-3 py-2 text-[10px] rounded border font-bold ${active ? '' : 'hover:brightness-125'}`} style={active ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{shortLabels[vm]}</button>;
                                 })}
                                 {viewMode !== 'cervical' && <button onClick={togglePelvis} title={showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')} className={`px-2 py-2 text-[10px] rounded border font-bold ${showPelvis ? '' : 'hover:brightness-125'}`} style={showPelvis ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>P</button>}
+                                <button onClick={toggleRegionDefaults} title={t('sidebar.region_defaults')} className={`px-2 py-2 text-[10px] rounded border font-bold ${useRegionDefaults ? '' : 'hover:brightness-125'}`} style={useRegionDefaults ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>D</button>
                             </div>
                             <div className="w-px h-5 bg-white/20 mx-1"></div>
                             <button onClick={() => { copyPlanToCompleted(); switchPortraitTab(2); }} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold hover:bg-white/10 hover:brightness-125 shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)' }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
@@ -1117,6 +1121,7 @@ const App = () => {
                         {viewMode !== 'cervical' && (
                             <button onClick={togglePelvis} className={`mt-1.5 w-full py-1.5 px-1 text-[10px] rounded border font-bold transition-all ${showPelvis ? 'border-transparent' : 'hover:brightness-125'}`} style={showPelvis ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{showPelvis ? t('sidebar.hide_pelvis') : t('sidebar.show_pelvis')}</button>
                         )}
+                        <button onClick={toggleRegionDefaults} title={t('sidebar.region_defaults')} className={`mt-1.5 w-full py-1.5 px-1 text-[10px] rounded border font-bold transition-all ${useRegionDefaults ? 'border-transparent' : 'hover:brightness-125'}`} style={useRegionDefaults ? { backgroundColor: scheme.activeBg, color: scheme.activeText, borderColor: scheme.activeBorder } : { backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{t('sidebar.region_defaults')}</button>
                     </div>
 
                     {/* 4. File Operations */}
