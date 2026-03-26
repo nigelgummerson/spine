@@ -157,6 +157,23 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   'XLIF/LLIF Cage',
   'OLIF Cage',
   'ALIF Cage',
+  // Rod materials and specifications: international abbreviations and terms
+  'CP Titanium',
+  'PEEK',
+  'Transition',
+  'Material',
+  'Diameter (mm)',
+  'Contour',
+  'Rail',
+  'Notes',
+  'Profil',
+  'Round',
+  'Straight',
+  'Titanium alloy',
+  'Cobalt chrome',
+  'Stainless steel',
+  'Surgeon-bent',
+  'Pre-contoured',
   // Clinical measurement terms used in English internationally
   'Lordosis (°)',
   // Zone labels: Left/Right kept in English for Hindi (transliterated language uses English anatomical terms)

@@ -95,6 +95,14 @@ const rod = z.object({
     side: z.string(),
     id: z.string().optional(),
     freeText: z.string().optional(),
+    material: z.string().optional(),
+    diameter: z.number().optional(),
+    profile: z.string().optional(),
+    length: z.number().optional(),
+    contour: z.string().optional(),
+    notes: z.string().optional(),
+    transitionFrom: z.number().optional(),
+    transitionTo: z.number().optional(),
 }).passthrough();
 
 // --- Note ---

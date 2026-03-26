@@ -138,6 +138,7 @@ export interface ModalOrchestratorProps {
     defaultCustomText: string;
     defaultOsteoType: string;
     defaultOsteoAngle: string;
+    screwSystem: string;
 
 }
 
@@ -166,6 +167,7 @@ export const ModalOrchestrator = ({
     levels, scheme, plannedPlacements, completedPlacements, activeChart,
     defaultDiameter, defaultLength, defaultScrewMode, defaultCustomText,
     defaultOsteoType, defaultOsteoAngle,
+    screwSystem,
 }: ModalOrchestratorProps) => (
     <React.Fragment>
         <ScrewModal isOpen={openModal === 'screw'} onClose={() => setOpenModal(null)}
@@ -181,7 +183,8 @@ export const ModalOrchestrator = ({
             levels={levels}
             placements={activeChart === 'planned' ? plannedPlacements : completedPlacements}
             useRegionDefaults={useRegionDefaults}
-            confirmAndNextDefault={confirmAndNextDefault} />
+            confirmAndNextDefault={confirmAndNextDefault}
+            screwSystem={screwSystem} />
         <OsteotomyModal isOpen={openModal === 'osteotomy'} onClose={onOsteoClose} onConfirm={onOsteoConfirm} onDelete={onOsteoDelete} initialData={editingData as OsteotomyData | null | undefined} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} discLevelOnly={osteoDiscLevel}
             levelId={pendingPlacement?.levelId || (editingPlacementId ? [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId)?.levelId : undefined)} />
         <CageModal isOpen={openModal === 'cage'} onClose={() => setOpenModal(null)} onConfirm={onCageConfirm} onDelete={onCageDelete} initialData={editingData as { tool: string; data: CageData } | null | undefined} levelId={editingCageLevel ?? ''} levels={levels} />

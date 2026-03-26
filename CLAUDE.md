@@ -4,7 +4,7 @@
 A web application for pre-operative spinal surgery planning. Deployed as a code-split web build to GitHub Pages for connected hospital computers, with a standalone single-file download for offline use. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 22 languages (16 European + Hindi + Arabic with RTL + Hebrew with RTL + Chinese Simplified + Japanese + Korean).
 
 ## Current Status
-- **Version:** v2.7.2-beta
+- **Version:** v2.7.3-beta
 - **Last Updated:** 2026-03-25
 - **License:** GNU GPLv3
 - **Language:** TypeScript (strict)

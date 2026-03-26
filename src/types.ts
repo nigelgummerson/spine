@@ -60,6 +60,17 @@ export interface BoneGraft {
     notes: string;
 }
 
+export interface RodData {
+    material: string;      // 'titanium' | 'cpt' | 'cobalt_chrome' | 'stainless_steel' | 'peek' | 'ultra' | ''
+    diameter: string;      // e.g., '5.5' or ''
+    profile: string;       // 'round' | 'rail' | 'transition' | ''
+    length: string;        // mm, e.g., '120' or ''
+    contour: string;       // 'surgeon_bent' | 'pre_contoured' | 'pre_bent_generic' | 'patient_specific' | 'straight' | ''
+    notes: string;         // free text for anything else
+    transitionFrom?: string;  // e.g., '3.5' (diameter in mm) — only when profile === 'transition'
+    transitionTo?: string;    // e.g., '5.5' (diameter in mm) — only when profile === 'transition'
+}
+
 export interface PatientData {
     name: string;
     id: string;
@@ -68,10 +79,10 @@ export interface PatientData {
     date: string;
     company: string;
     screwSystem: string;
-    leftRod: string;
-    rightRod: string;
-    planLeftRod: string;
-    planRightRod: string;
+    leftRod: RodData;
+    rightRod: RodData;
+    planLeftRod: RodData;
+    planRightRod: RodData;
     boneGraft: BoneGraft;
 }
 
@@ -105,6 +116,7 @@ export type DocumentAction =
     | { type: 'UPDATE_NOTE_POSITION'; chart: Chart; id: string; offsetX: number; offsetY: number }
     | { type: 'REMOVE_NOTE'; chart: Chart; id: string }
     | { type: 'SET_PATIENT_FIELD'; field: string; value: string }
+    | { type: 'SET_ROD'; chart: Chart; side: 'left' | 'right'; rod: RodData }
     | { type: 'SET_BONE_GRAFT'; types: string[]; notes: string }
     | { type: 'SET_RECON_LABEL_POSITION'; id: string; offsetX: number; offsetY: number }
     | { type: 'NEW_PATIENT' }

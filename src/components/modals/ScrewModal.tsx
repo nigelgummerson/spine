@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { t } from '../../i18n/i18n';
-import { DIAMETER_OPTIONS, LENGTH_OPTIONS, getScrewDefault } from '../../data/implants';
+import { DIAMETER_OPTIONS, LENGTH_OPTIONS, getScrewDefault, checkScrewSize, getSystemCatalogue } from '../../data/implants';
 import { HOOK_TYPES, NO_SIZE_TYPES } from '../../data/clinical';
 import { InstrumentIcon } from '../chart/InstrumentIcon';
 import { IconTrash, IconX } from '../icons';
@@ -85,9 +85,10 @@ interface ScrewModalProps {
     placements: Placement[];
     useRegionDefaults: boolean;
     confirmAndNextDefault?: boolean;
+    screwSystem?: string;
 }
 
-export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, levelId, zone, levels, placements, useRegionDefaults, confirmAndNextDefault }: ScrewModalProps) => {
+export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, levelId, zone, levels, placements, useRegionDefaults, confirmAndNextDefault, screwSystem }: ScrewModalProps) => {
     if (!isOpen) return null;
     // Compute initial values from props (runs on mount since component unmounts when closed)
     const computeInitial = () => {
@@ -252,7 +253,34 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
                     </div>
                     {isScrew && (<>
                         <div className="flex gap-2 mb-4">{['standard','custom','none'].map(m => { const labels: Record<string, string> = { standard: t('modal.screw.mode_standard'), custom: t('modal.screw.mode_custom'), none: t('modal.screw.mode_none') }; const active = mode === m; return <button key={m} onClick={() => setMode(m)} className={`flex-1 py-1 text-xs font-bold rounded border transition-all ${active ? 'bg-amber-500 text-slate-900 border-amber-600' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>{labels[m]}</button>; })}</div>
-                        {mode === 'standard' && (<div className="space-y-4"><div className="grid grid-cols-4 gap-2"><select value={diameter} onChange={(e) => setDiameter(e.target.value)} onWheel={selectWheelHandler} title={t('hint.scroll_to_change')} className="col-span-4 w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{DIAMETER_OPTIONS.map(d => <option key={d} value={d}>{d} mm</option>)}</select></div><select value={length} onChange={(e) => setLength(e.target.value)} onWheel={selectWheelHandler} title={t('hint.scroll_to_change')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{LENGTH_OPTIONS.map(l => <option key={l} value={l}>{l} mm</option>)}</select></div>)}
+                        {mode === 'standard' && (() => {
+                            const sizeWarning = screwSystem ? checkScrewSize(screwSystem, parseFloat(diameter), parseInt(length, 10)) : null;
+                            const cat = screwSystem ? getSystemCatalogue(screwSystem) : null;
+                            // Available lengths for current diameter (from catalogue)
+                            const availableLengths = cat?.screwLengthsByDiameter[parseFloat(diameter).toFixed(1)];
+                            // Check if length exists in ANY diameter for this system
+                            const lengthInAnyDiameter = cat ? Object.values(cat.screwLengthsByDiameter).some(arr => arr.includes(parseInt(length, 10))) : false;
+                            const hasCat = !!cat;
+                            return (<div className="space-y-4"><div className="grid grid-cols-4 gap-2"><select value={diameter} onChange={(e) => setDiameter(e.target.value)} onWheel={selectWheelHandler} title={t('hint.scroll_to_change')} className="col-span-4 w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{DIAMETER_OPTIONS.map(d => {
+                                const dimAvail = !hasCat || cat!.screwDiameters.includes(parseFloat(d));
+                                return <option key={d} value={d}>{d} mm{!dimAvail ? ' \u26A0' : ''}</option>;
+                            })}</select></div>
+                            {sizeWarning?.diameterWarning && (
+                                <div className="text-amber-600 text-xs -mt-2">{t('alert.size_not_available', { value: diameter, system: screwSystem! })}</div>
+                            )}
+                            <select value={length} onChange={(e) => setLength(e.target.value)} onWheel={selectWheelHandler} title={t('hint.scroll_to_change')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg font-mono focus:border-amber-500 outline-none">{LENGTH_OPTIONS.map(l => {
+                                const lenAvail = !availableLengths || availableLengths.includes(l);
+                                return <option key={l} value={l}>{l} mm{!lenAvail ? ' \u26A0' : ''}</option>;
+                            })}</select>
+                            {sizeWarning?.lengthWarning && (
+                                <div className="text-amber-600 text-xs -mt-2">{lengthInAnyDiameter
+                                    ? t('alert.size_not_in_diameter', { value: length, diameter, system: screwSystem! })
+                                    : t('alert.size_not_available', { value: length, system: screwSystem! })
+                                }</div>
+                            )}
+                            {hasCat && <div className="text-slate-400 text-[10px]">{'\u26A0'} = {t('alert.kit_note', { system: screwSystem! })}</div>}
+                            </div>);
+                        })()}
                         {mode === 'custom' && <input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} placeholder={t('modal.screw.custom_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg focus:border-amber-500 outline-none" autoFocus />}
                         {mode === 'none' && <div className="text-center py-6 text-slate-400 text-sm italic">{t('modal.screw.icon_only')}</div>}
                         {useRegionDefaults && mode === 'standard' && (() => {

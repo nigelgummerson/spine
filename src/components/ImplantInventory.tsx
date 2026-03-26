@@ -2,11 +2,12 @@ import React, { useState, useMemo } from 'react';
 import { t } from '../i18n/i18n';
 import { INVENTORY_CATEGORIES, getDiscLabel } from '../data/clinical';
 import { formatScrewSize } from '../utils/formatScrewSize';
-import type { Placement, ToolDefinition, Level, OsteotomyData, CageData } from '../types';
+import { formatRodSummary, isRodEmpty } from '../data/implants';
+import type { Placement, ToolDefinition, Level, OsteotomyData, CageData, RodData } from '../types';
 
 interface Rods {
-    left?: string;
-    right?: string;
+    left?: RodData;
+    right?: RodData;
 }
 
 interface ImplantInventoryProps {
@@ -48,7 +49,7 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
     }, [placements, tools, visibleLevelIds, levels]);
 
     const hasImplants = Object.values(grouped).some(cat => Object.keys(cat).length > 0);
-    const hasRods = rods && (rods.left || rods.right);
+    const hasRods = rods && (!isRodEmpty(rods.left as RodData) || !isRodEmpty(rods.right as RodData));
 
     const totalItems = Object.values(grouped).reduce((sum, cat) => sum + Object.keys(cat).length, 0);
     const useColumns = totalItems > 3;
@@ -116,13 +117,15 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
                     });
                 });
                 if (hasRods) {
+                    const leftSummary = rods.left ? formatRodSummary(rods.left) : '';
+                    const rightSummary = rods.right ? formatRodSummary(rods.right) : '';
                     catEntries.push({
-                        lines: 1 + (rods.left ? 1 : 0) + (rods.right ? 1 : 0),
+                        lines: 1 + (leftSummary ? 1 : 0) + (rightSummary ? 1 : 0),
                         node: (
                             <div key="rods" className={large ? 'mb-3' : 'mb-1'}>
                                 <div className={`${szSm} font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 ${large ? 'pb-1 mb-1' : 'pb-0.5 mb-0'}`}>{t('inventory.rods')}</div>
-                                {rods.left && <div className={`${sz} leading-tight ${py} border-b border-slate-50`}><span className="text-slate-700 font-medium">{t('inventory.rod_left')} {rods.left}</span></div>}
-                                {rods.right && <div className={`${sz} leading-tight ${py} border-b border-slate-50`}><span className="text-slate-700 font-medium">{t('inventory.rod_right')} {rods.right}</span></div>}
+                                {leftSummary && <div className={`${sz} leading-tight ${py} border-b border-slate-50`}><span className="text-slate-700 font-medium">{t('inventory.rod_left')} {leftSummary}</span></div>}
+                                {rightSummary && <div className={`${sz} leading-tight ${py} border-b border-slate-50`}><span className="text-slate-700 font-medium">{t('inventory.rod_right')} {rightSummary}</span></div>}
                             </div>
                         ),
                     });

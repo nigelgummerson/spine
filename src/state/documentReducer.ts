@@ -1,6 +1,7 @@
 // src/state/documentReducer.ts
 import { WHOLE_SPINE_MAP } from '../data/anatomy';
-import type { DocumentState, DocumentAction, Placement, Cage, Connector, Note, Chart, PatientData, OsteotomyData, Zone } from '../types';
+import { createEmptyRod } from '../data/implants';
+import type { DocumentState, DocumentAction, Placement, Cage, Connector, Note, Chart, PatientData, RodData, OsteotomyData, Zone } from '../types';
 
 // --- V4 mapping tables ---
 
@@ -34,7 +35,8 @@ export function createInitialState(): DocumentState {
             name: '', id: '', surgeon: '', location: '',
             date: new Date().toISOString().split('T')[0],
             company: '', screwSystem: '',
-            leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '',
+            leftRod: createEmptyRod(), rightRod: createEmptyRod(),
+            planLeftRod: createEmptyRod(), planRightRod: createEmptyRod(),
             boneGraft: { types: [], notes: '' },
         },
         plannedPlacements: [],
@@ -165,6 +167,16 @@ export function documentReducer(state: DocumentState, action: DocumentAction): D
             return { ...state, patientData: { ...state.patientData, [action.field]: action.value } };
         }
 
+        case 'SET_ROD': {
+            const rodField = action.chart === 'plan'
+                ? (action.side === 'left' ? 'planLeftRod' : 'planRightRod')
+                : (action.side === 'left' ? 'leftRod' : 'rightRod');
+            return {
+                ...state,
+                patientData: { ...state.patientData, [rodField]: action.rod },
+            };
+        }
+
         case 'SET_BONE_GRAFT': {
             return {
                 ...state,
@@ -260,9 +272,9 @@ export function documentReducer(state: DocumentState, action: DocumentAction): D
 
 // --- Serialization helpers ---
 
-interface RodText {
-    left?: string;
-    right?: string;
+interface RodInput {
+    left?: RodData;
+    right?: RodData;
 }
 
 interface V4Element {
@@ -292,7 +304,15 @@ interface V4Force {
 interface V4Rod {
     id: string;
     side: string;
-    freeText: string;
+    freeText?: string;
+    material?: string;
+    diameter?: number;
+    profile?: string;
+    length?: number;
+    contour?: string;
+    notes?: string;
+    transitionFrom?: number;
+    transitionTo?: number;
 }
 
 interface V4Note {
@@ -317,7 +337,7 @@ interface V4ChartData {
     notes?: V4Note[];
 }
 
-export function internalToV4Chart(placements: Placement[], cages: Cage[], connectors: Connector[], notes: Note[], rodText: RodText): V4ChartResult {
+export function internalToV4Chart(placements: Placement[], cages: Cage[], connectors: Connector[], notes: Note[], rodInput: RodInput): V4ChartResult {
     const elements: V4Element[] = [];
     const forces: V4Force[] = [];
     (placements || []).forEach(p => {
@@ -379,8 +399,25 @@ export function internalToV4Chart(placements: Placement[], cages: Cage[], connec
         elements.push({ id: cn.id, type: 'connector', level: cn.levelId, side: 'midline', connector: { connectorType: 'crosslink', fraction: cn.fraction } });
     });
     const rods: V4Rod[] = [];
-    if (rodText?.left) rods.push({ id: 'rod-left', side: 'left', freeText: rodText.left });
-    if (rodText?.right) rods.push({ id: 'rod-right', side: 'right', freeText: rodText.right });
+    const serializeRod = (rod: RodData | undefined, side: string): V4Rod | null => {
+        if (!rod) return null;
+        const hasData = rod.material || rod.diameter || rod.profile || rod.length || rod.contour || rod.notes || rod.transitionFrom || rod.transitionTo;
+        if (!hasData) return null;
+        const v4Rod: V4Rod = { id: `rod-${side}`, side };
+        if (rod.material) v4Rod.material = rod.material;
+        if (rod.diameter) v4Rod.diameter = parseFloat(rod.diameter);
+        if (rod.profile) v4Rod.profile = rod.profile;
+        if (rod.length) v4Rod.length = parseFloat(rod.length);
+        if (rod.contour) v4Rod.contour = rod.contour;
+        if (rod.notes) v4Rod.notes = rod.notes;
+        if (rod.transitionFrom) v4Rod.transitionFrom = parseFloat(rod.transitionFrom);
+        if (rod.transitionTo) v4Rod.transitionTo = parseFloat(rod.transitionTo);
+        return v4Rod;
+    };
+    const leftV4Rod = serializeRod(rodInput?.left, 'left');
+    const rightV4Rod = serializeRod(rodInput?.right, 'right');
+    if (leftV4Rod) rods.push(leftV4Rod);
+    if (rightV4Rod) rods.push(rightV4Rod);
     const v4Notes = (notes || []).map(n => ({ id: n.id, level: n.levelId, text: n.text, showArrow: n.showArrow || false }));
     const notePositions: Record<string, { offsetX: number; offsetY: number }> = {};
     (notes || []).forEach(n => { if (n.offsetX !== undefined) notePositions[n.id] = { offsetX: n.offsetX, offsetY: n.offsetY }; });
@@ -392,8 +429,8 @@ interface InternalChartResult {
     cages: Cage[];
     connectors: Connector[];
     notes: Note[];
-    rodLeft: string;
-    rodRight: string;
+    rodLeft: RodData;
+    rodRight: RodData;
 }
 
 export function v4ChartToInternal(chartData: V4ChartData, notePositions: Record<string, { offsetX: number; offsetY: number }>): InternalChartResult {
@@ -437,9 +474,30 @@ export function v4ChartToInternal(chartData: V4ChartData, notePositions: Record<
         const pos = notePositions?.[n.id] || { offsetX: -140, offsetY: 0 };
         notes.push({ id: n.id, tool: 'note', levelId: n.level, text: n.text, offsetX: pos.offsetX, offsetY: pos.offsetY, showArrow: n.showArrow || false });
     });
+    const deserializeV4Rod = (v4Rod: V4Rod | undefined): RodData => {
+        if (!v4Rod) return createEmptyRod();
+        // Structured rod data (new format) — check all fields that serializeRod can write
+        if (v4Rod.material || v4Rod.diameter || v4Rod.profile || v4Rod.length || v4Rod.contour || v4Rod.notes || v4Rod.transitionFrom || v4Rod.transitionTo) {
+            return {
+                material: v4Rod.material || '',
+                diameter: v4Rod.diameter ? String(v4Rod.diameter) : '',
+                profile: v4Rod.profile || '',
+                length: v4Rod.length ? String(v4Rod.length) : '',
+                contour: v4Rod.contour || '',
+                notes: v4Rod.notes || '',
+                transitionFrom: v4Rod.transitionFrom ? String(v4Rod.transitionFrom) : '',
+                transitionTo: v4Rod.transitionTo ? String(v4Rod.transitionTo) : '',
+            };
+        }
+        // Legacy freeText format — preserve in notes field
+        if (v4Rod.freeText) {
+            return { ...createEmptyRod(), notes: v4Rod.freeText };
+        }
+        return createEmptyRod();
+    };
     const rodLeft = (chartData.rods || []).find((r: V4Rod) => r.side === 'left');
     const rodRight = (chartData.rods || []).find((r: V4Rod) => r.side === 'right');
-    return { placements, cages, connectors, notes, rodLeft: rodLeft?.freeText || '', rodRight: rodRight?.freeText || '' };
+    return { placements, cages, connectors, notes, rodLeft: deserializeV4Rod(rodLeft), rodRight: deserializeV4Rod(rodRight) };
 }
 
 // --- Serialize ---
@@ -447,11 +505,11 @@ export function v4ChartToInternal(chartData: V4ChartData, notePositions: Record<
 export function serializeState(state: DocumentState, viewMode: string, colourScheme: string, currentVersion: string, currentLang: string, prefs?: { showPelvis?: boolean; useRegionDefaults?: boolean; confirmAndNext?: boolean }) {
     const planChart = internalToV4Chart(
         state.plannedPlacements, state.plannedCages, state.plannedConnectors, state.plannedNotes,
-        { left: state.patientData.planLeftRod, right: state.patientData.planRightRod }
+        { left: state.patientData.planLeftRod as RodData, right: state.patientData.planRightRod as RodData }
     );
     const constChart = internalToV4Chart(
         state.completedPlacements, state.completedCages, state.completedConnectors, state.completedNotes,
-        { left: state.patientData.leftRod, right: state.patientData.rightRod }
+        { left: state.patientData.leftRod as RodData, right: state.patientData.rightRod as RodData }
     );
     return {
         schema: {
@@ -524,7 +582,8 @@ export function deserializeDocument(json: Record<string, any>): { state: Documen
             surgeon: json.case?.surgeon || '', location: json.case?.location || '',
             date: json.case?.date || new Date().toISOString().split('T')[0],
             company: json.implantSystem?.manufacturer || '', screwSystem: json.implantSystem?.system || '',
-            leftRod: '', rightRod: '', planLeftRod: '', planRightRod: '',
+            leftRod: createEmptyRod(), rightRod: createEmptyRod(),
+            planLeftRod: createEmptyRod(), planRightRod: createEmptyRod(),
             boneGraft: { types: (json.plan?.boneGraft?.types || []).map((t: string) => V4_BONEGRAFT_TO_TOOL[t] || t), notes: json.plan?.boneGraft?.notes || '' },
         };
 
@@ -560,7 +619,19 @@ export function deserializeDocument(json: Record<string, any>): { state: Documen
     }
 
     // v3 / v2 legacy format
-    if (json.patient) state.patientData = json.patient;
+    if (json.patient) {
+        state.patientData = json.patient;
+        // Migrate string rod fields to RodData objects
+        const migrateRodField = (val: unknown): RodData => {
+            if (typeof val === 'string' && val) return { ...createEmptyRod(), notes: val };
+            if (typeof val === 'object' && val !== null && 'material' in val) return val as RodData;
+            return createEmptyRod();
+        };
+        state.patientData.leftRod = migrateRodField(state.patientData.leftRod);
+        state.patientData.rightRod = migrateRodField(state.patientData.rightRod);
+        state.patientData.planLeftRod = migrateRodField(state.patientData.planLeftRod);
+        state.patientData.planRightRod = migrateRodField(state.patientData.planRightRod);
+    }
     if (json.plan) {
         if (json.plan.implants) state.plannedPlacements = migratePelvicPlacements(json.plan.implants);
         if (json.plan.cages) state.plannedCages = json.plan.cages;
