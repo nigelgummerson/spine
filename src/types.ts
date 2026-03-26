@@ -100,6 +100,7 @@ export interface DocumentState {
     plannedNotes: Note[];
     completedNotes: Note[];
     reconLabelPositions: Record<string, { offsetX: number; offsetY: number }>;
+    disclaimerAcceptedAt: string | null;
 }
 
 export type DocumentAction =
@@ -122,6 +123,7 @@ export type DocumentAction =
     | { type: 'NEW_PATIENT' }
     | { type: 'COPY_PLAN_TO_CONSTRUCT'; genId: () => string }
     | { type: 'CLEAR_CONSTRUCT' }
+    | { type: 'ACCEPT_DISCLAIMER' }
     | { type: 'LOCK_DOCUMENT' }
     | { type: 'UNLOCK_DOCUMENT' }
     | { type: 'LOAD_DOCUMENT'; document: DocumentState }

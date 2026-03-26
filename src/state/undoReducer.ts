@@ -22,6 +22,7 @@ const NON_UNDOABLE_ACTIONS: Set<string> = new Set([
     'SET_PATIENT_FIELD',
     'SET_RECON_LABEL_POSITION',
     'UPDATE_NOTE_POSITION',
+    'ACCEPT_DISCLAIMER',
 ]);
 
 /** Actions that reset the undo stack entirely */

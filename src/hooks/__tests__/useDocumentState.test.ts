@@ -297,7 +297,112 @@ describe('useDocumentState', () => {
         expect(result.current.hasLoaded).toBe(true);
     });
 
-    // 14. changeTheme and setViewMode are called when loading saved state with those values
+    // --- Sync safety tests ---
+
+    // 14. Sync payload is Zod-validated (invalid payload rejected)
+    it('rejects invalid sync payload (Zod validation)', async () => {
+        const useDocumentState = await importHook();
+        const showToast = vi.fn();
+        const params = makeParams({ showToast });
+        const { result } = renderHook(() => useDocumentState(params));
+
+        // Wait for mount effects
+        await act(async () => {
+            vi.advanceTimersByTime(100);
+        });
+
+        // Find the channel instance and simulate an incoming 'state' message with invalid v4 payload
+        const channels = MockBroadcastChannel.instances;
+        expect(channels.length).toBeGreaterThan(0);
+        const appChannel = channels[0];
+
+        // Simulate receiving an invalid state message directly (bypass postMessage routing)
+        const invalidPayload = { schema: { version: 4 }, document: 'not-an-object' };
+        appChannel.onmessage!(new MessageEvent('message', {
+            data: { type: 'state', appVersion: CURRENT_VERSION, payload: invalidPayload, version: 1 },
+        }));
+
+        // State should remain unchanged — patient name still empty
+        expect(result.current.state.patientData.name).toBe('');
+    });
+
+    // 15. Sync is rejected when local record is locked
+    it('rejects sync when local record is locked', async () => {
+        const useDocumentState = await importHook();
+        const showToast = vi.fn();
+        const params = makeParams({ showToast });
+        const { result } = renderHook(() => useDocumentState(params));
+
+        // Lock the document
+        act(() => {
+            result.current.dispatch({ type: 'LOCK_DOCUMENT' });
+        });
+        await act(async () => {
+            vi.advanceTimersByTime(300);
+        });
+        expect(result.current.state.lockedAt).toBeTruthy();
+
+        // Simulate an incoming valid sync state message
+        const channels = MockBroadcastChannel.instances;
+        const appChannel = channels[0];
+        const validState = createInitialState();
+        validState.patientData.name = 'Sync Patient';
+        const validPayload = serializeState(validState, 'plan', 'default', CURRENT_VERSION, 'en');
+
+        appChannel.onmessage!(new MessageEvent('message', {
+            data: { type: 'state', appVersion: CURRENT_VERSION, payload: validPayload, version: 99 },
+        }));
+
+        // State should remain locked with original name, not the synced name
+        expect(result.current.state.patientData.name).toBe('');
+        expect(result.current.state.lockedAt).toBeTruthy();
+        expect(showToast).toHaveBeenCalledWith('Sync blocked — record is locked', 'error');
+    });
+
+    // --- Privacy mode tests ---
+
+    // 16. Incognito mode removes localStorage key
+    it('incognito mode removes localStorage key', async () => {
+        const useDocumentState = await importHook();
+        // Seed localStorage with valid data
+        localStorage.setItem('spine_planner_v2', makeValidV4State('SecretPatient'));
+        expect(localStorage.getItem('spine_planner_v2')).not.toBeNull();
+
+        const params = makeParams({ incognitoMode: true });
+        renderHook(() => useDocumentState(params));
+
+        // Wait for effects
+        await act(async () => {
+            vi.advanceTimersByTime(300);
+        });
+
+        // localStorage key should be removed
+        expect(localStorage.getItem('spine_planner_v2')).toBeNull();
+    });
+
+    // 17. Language preference survives incognito toggle
+    it('language preference survives incognito toggle', async () => {
+        const useDocumentState = await importHook();
+        // Set language preference (these are stored under separate keys, exempt from incognito)
+        localStorage.setItem('spine_planner_lang', 'de');
+        localStorage.setItem('spine_planner_theme', 'navy');
+
+        const params = makeParams({ incognitoMode: true });
+        renderHook(() => useDocumentState(params));
+
+        await act(async () => {
+            vi.advanceTimersByTime(300);
+        });
+
+        // Document data key removed, but lang/theme preferences are untouched
+        expect(localStorage.getItem('spine_planner_v2')).toBeNull();
+        expect(localStorage.getItem('spine_planner_lang')).toBe('de');
+        expect(localStorage.getItem('spine_planner_theme')).toBe('navy');
+    });
+
+    // --- Original tests continue ---
+
+    // 18. changeTheme and setViewMode are called when loading saved state with those values
     it('calls changeTheme and setViewMode from saved state', async () => {
         const useDocumentState = await importHook();
         const state = createInitialState();

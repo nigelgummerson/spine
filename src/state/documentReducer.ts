@@ -48,6 +48,7 @@ export function createInitialState(): DocumentState {
         plannedNotes: [],
         completedNotes: [],
         reconLabelPositions: {},
+        disclaimerAcceptedAt: null,
     };
 }
 
@@ -62,7 +63,7 @@ function chartKey(chart: Chart, arrayName: ArraySuffix): keyof DocumentState {
 // --- Reducer ---
 
 const LOCK_EXEMPT_ACTIONS: Set<string> = new Set([
-    'UNLOCK_DOCUMENT', 'LOAD_DOCUMENT', 'NEW_PATIENT',
+    'UNLOCK_DOCUMENT', 'LOAD_DOCUMENT', 'NEW_PATIENT', 'ACCEPT_DISCLAIMER',
 ]);
 
 export function documentReducer(state: DocumentState, action: DocumentAction): DocumentState {
@@ -273,6 +274,10 @@ export function documentReducer(state: DocumentState, action: DocumentAction): D
                     rightRod: createEmptyRod(),
                 },
             };
+        }
+
+        case 'ACCEPT_DISCLAIMER': {
+            return { ...state, disclaimerAcceptedAt: new Date().toISOString() };
         }
 
         case 'LOCK_DOCUMENT': {
@@ -539,7 +544,7 @@ export function serializeState(state: DocumentState, viewMode: string, colourSch
             schemaUrl: 'https://plan.skeletalsurgery.com/spine/schema/v4/spinal-instrumentation.json',
             generator: { name: 'Spinal Instrumentation Plan & Record', version: currentVersion, url: 'https://plan.skeletalsurgery.com/spine' },
         },
-        document: { id: state.documentId, created: state.documentCreated, modified: new Date().toISOString(), language: currentLang, ...(state.lockedAt && { lockedAt: state.lockedAt }) },
+        document: { id: state.documentId, created: state.documentCreated, modified: new Date().toISOString(), language: currentLang, ...(state.lockedAt && { lockedAt: state.lockedAt }), ...(state.disclaimerAcceptedAt && { disclaimerAcceptedAt: state.disclaimerAcceptedAt }) },
         patient: { name: state.patientData.name, identifier: state.patientData.id },
         case: { date: state.patientData.date, surgeon: state.patientData.surgeon, location: state.patientData.location || '' },
         implantSystem: { manufacturer: state.patientData.company, system: state.patientData.screwSystem },
@@ -598,6 +603,7 @@ export function deserializeDocument(json: Record<string, any>): { state: Documen
         if (json.document?.id) state.documentId = json.document.id;
         if (json.document?.created) state.documentCreated = json.document.created;
         state.lockedAt = json.document?.lockedAt || null;
+        state.disclaimerAcceptedAt = json.document?.disclaimerAcceptedAt || null;
 
         const pd: PatientData = {
             name: json.patient?.name || '', id: json.patient?.identifier || '',

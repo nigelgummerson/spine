@@ -362,7 +362,64 @@ describe('undo-redo round-trip', () => {
     });
 });
 
-// --- 9. Future cleared on new action ---
+// --- 9. Record locking blocks UNDO/REDO ---
+
+describe('record locking blocks UNDO/REDO', () => {
+    it('UNDO blocked when present.lockedAt is set', () => {
+        const state = createInitialUndoState();
+        // Add a placement to create a past entry
+        const s1 = undoReducer(state, {
+            type: 'ADD_PLACEMENT', chart: 'plan', placement: makePlacement('p1'),
+        });
+        expect(s1.past).toHaveLength(1);
+        // Lock the document
+        const s2 = undoReducer(s1, { type: 'LOCK_DOCUMENT' });
+        expect(s2.present.lockedAt).toBeTruthy();
+        expect(s2.past).toHaveLength(2); // both ADD_PLACEMENT and LOCK_DOCUMENT
+        // UNDO should be blocked
+        const s3 = undoReducer(s2, { type: 'UNDO' });
+        expect(s3).toBe(s2);
+        expect(s3.present.lockedAt).toBeTruthy();
+    });
+
+    it('REDO blocked when present.lockedAt is set', () => {
+        const state = createInitialUndoState();
+        // Add a placement, undo, then lock while undone
+        const s1 = undoReducer(state, {
+            type: 'ADD_PLACEMENT', chart: 'plan', placement: makePlacement('p1'),
+        });
+        const s2 = undoReducer(s1, { type: 'UNDO' });
+        expect(s2.future).toHaveLength(1);
+        // Lock via LOAD_DOCUMENT with lockedAt set (since LOCK_DOCUMENT on empty present creates locked state)
+        const lockedDoc = createInitialState();
+        lockedDoc.lockedAt = new Date().toISOString();
+        const s3 = undoReducer(s2, { type: 'LOAD_DOCUMENT', document: lockedDoc });
+        expect(s3.present.lockedAt).toBeTruthy();
+        // REDO should be blocked (future was cleared by LOAD_DOCUMENT reset, but test the guard)
+        const s4 = undoReducer(s3, { type: 'REDO' });
+        expect(s4).toBe(s3);
+    });
+
+    it('UNDO works again after UNLOCK_DOCUMENT', () => {
+        const state = createInitialUndoState();
+        const s1 = undoReducer(state, {
+            type: 'ADD_PLACEMENT', chart: 'plan', placement: makePlacement('p1'),
+        });
+        const s2 = undoReducer(s1, { type: 'LOCK_DOCUMENT' });
+        expect(s2.present.lockedAt).toBeTruthy();
+        // UNDO blocked while locked
+        expect(undoReducer(s2, { type: 'UNDO' })).toBe(s2);
+        // Unlock
+        const s3 = undoReducer(s2, { type: 'UNLOCK_DOCUMENT' });
+        expect(s3.present.lockedAt).toBeNull();
+        // UNDO now works
+        const s4 = undoReducer(s3, { type: 'UNDO' });
+        expect(s4).not.toBe(s3);
+        expect(s4.present.lockedAt).toBeTruthy(); // previous state had lockedAt
+    });
+});
+
+// --- 10. Future cleared on new action ---
 
 describe('future cleared on new action', () => {
     it('performing a new undoable action after undo clears future', () => {

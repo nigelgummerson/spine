@@ -2,6 +2,10 @@ import { Component, type ReactNode, type ErrorInfo } from 'react';
 
 interface Props {
     children: ReactNode;
+    /** Called when user clicks the dismiss/reset button instead of reloading */
+    onReset?: () => void;
+    /** Custom message shown in the fallback UI */
+    fallbackMessage?: string;
 }
 
 interface State {
@@ -26,6 +30,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
     handleDismiss = () => {
         this.setState({ hasError: false, error: null });
+        this.props.onReset?.();
     };
 
     render() {
@@ -36,7 +41,7 @@ export class ErrorBoundary extends Component<Props, State> {
                         <div className="text-4xl mb-4">&#9888;</div>
                         <h1 className="text-xl font-bold text-slate-900 mb-2">Something went wrong</h1>
                         <p className="text-sm text-slate-600 mb-4">
-                            Your data has been auto-saved to the browser. Reloading should restore your work.
+                            {this.props.fallbackMessage || 'Your data has been auto-saved to the browser. Reloading should restore your work.'}
                         </p>
                         {this.state.error && (
                             <pre className="text-xs text-left bg-slate-100 p-3 rounded mb-4 overflow-auto max-h-32 text-slate-500">
@@ -54,7 +59,7 @@ export class ErrorBoundary extends Component<Props, State> {
                                 onClick={this.handleDismiss}
                                 className="px-4 py-2 bg-slate-200 text-slate-700 rounded font-medium hover:bg-slate-300"
                             >
-                                Try to continue
+                                {this.props.onReset ? 'Close' : 'Try to continue'}
                             </button>
                         </div>
                     </div>

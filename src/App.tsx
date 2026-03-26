@@ -23,6 +23,7 @@ import { useDocumentState } from './hooks/useDocumentState';
 import { useModalState } from './hooks/useModalState';
 import { useToast } from './hooks/useToast';
 import { RodModal } from './components/modals/RodModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { formatRodSummary, isRodEmpty, createEmptyRod } from './data/implants';
 import type { ColourScheme, ToolDefinition, Placement, Level, Zone, OsteotomyData, Cage, Note, RodData } from './types';
 
@@ -348,6 +349,8 @@ const App = () => {
         return () => window.removeEventListener('keydown', handleShortcut);
     }, [openModal, forcePopover, disclaimerAccepted, viewMode, canUndo, canRedo, levels, kbFocusLevel, kbFocusZone, kbNavActive, isLocked]);
 
+    // calculateAutoScale is O(n) but levels identity only changes on viewMode/showPelvis,
+    // not on ResizeObserver fires, so useMemo already prevents redundant recalculation.
     const heightScale = useMemo(() => calculateAutoScale(levels), [levels]);
 
     // Compute focused level ID for keyboard navigation (excludes pelvic levels)
@@ -878,7 +881,8 @@ const App = () => {
         setForcePopover(null);
     };
 
-    const modals = <ModalOrchestrator
+    const closeModal = useCallback(() => setOpenModal(null), []);
+    const modals = <ErrorBoundary onReset={closeModal} fallbackMessage="Something went wrong — close and try again."><ModalOrchestrator
         openModal={openModal} setOpenModal={setOpenModal}
         editingData={editingData} editingTool={editingTool}
         editingPlacementId={editingPlacementId} editingAnnotation={editingAnnotation}
@@ -912,7 +916,7 @@ const App = () => {
         defaultScrewMode={defaultScrewMode} defaultCustomText={defaultCustomText}
         defaultOsteoType={defaultOsteoType} defaultOsteoAngle={defaultOsteoAngle}
         screwSystem={patientData.screwSystem}
-    />;
+    /></ErrorBoundary>;
 
 
     // ============================================================
@@ -978,7 +982,7 @@ const App = () => {
                     </div>
                 )}
             {/* Toast notifications rendered by ToastProvider in main.tsx */}
-            {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerTick(n => n + 1); if (syncChannelRef.current) syncChannelRef.current.postMessage({ type: 'lang_accepted', appVersion: CURRENT_VERSION, lang: currentLang }); }} />}
+            {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); dispatch({ type: 'ACCEPT_DISCLAIMER' }); setDisclaimerTick(n => n + 1); if (syncChannelRef.current) syncChannelRef.current.postMessage({ type: 'lang_accepted', appVersion: CURRENT_VERSION, lang: currentLang }); }} />}
             </div>
         );
     }
@@ -1012,7 +1016,7 @@ const App = () => {
                 </div>
             </div>
             {/* Toast notifications rendered by ToastProvider in main.tsx */}
-            {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); setDisclaimerTick(n => n + 1); if (syncChannelRef.current) syncChannelRef.current.postMessage({ type: 'lang_accepted', appVersion: CURRENT_VERSION, lang: currentLang }); }} />}
+            {!disclaimerAccepted && <DisclaimerModal lang={currentLang} onLangChange={changeLang} onAccept={() => { acceptDisclaimer(currentLang); dispatch({ type: 'ACCEPT_DISCLAIMER' }); setDisclaimerTick(n => n + 1); if (syncChannelRef.current) syncChannelRef.current.postMessage({ type: 'lang_accepted', appVersion: CURRENT_VERSION, lang: currentLang }); }} />}
             {disclaimerAccepted && <OnboardingTour activeChart={activeChart} setActiveChart={setActiveChart} />}
         </div>
     );

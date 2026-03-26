@@ -171,6 +171,7 @@ export const v4Schema = z.object({
         modified: z.string().optional(),
         language: z.string().optional(),
         lockedAt: z.string().optional(),
+        disclaimerAcceptedAt: z.string().optional(),
     }).strict().optional(),
     patient: z.object({
         name: z.string().optional(),

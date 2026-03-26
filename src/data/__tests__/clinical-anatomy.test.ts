@@ -5,7 +5,9 @@ import {
   INVENTORY_CATEGORIES,
   HOOK_TYPES,
   getDiscLabel,
+  getPermittedOsteotomyTypes,
 } from '../clinical';
+import { getScrewDefault, SCREW_DEFAULTS } from '../implants';
 import {
   ALL_LEVELS,
   VERTEBRA_ANATOMY,
@@ -440,5 +442,193 @@ describe('cervical anatomy data', () => {
         const scale = calculateAutoScale(cervical);
         expect(scale).toBeGreaterThanOrEqual(0.5);
         expect(scale).toBeLessThanOrEqual(1.5);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// QA5: Cage permissibility — modal-level disabled states
+// ---------------------------------------------------------------------------
+
+describe('CAGE_PERMISSIBILITY — disabled levels', () => {
+    it('ACDF is disabled for levels outside C2-C7', () => {
+        expect(CAGE_PERMISSIBILITY.acdf).not.toContain('L1');
+        expect(CAGE_PERMISSIBILITY.acdf).not.toContain('T5');
+        expect(CAGE_PERMISSIBILITY.acdf).not.toContain('C1');
+        expect(CAGE_PERMISSIBILITY.acdf).not.toContain('Oc');
+    });
+
+    it('PLIF is disabled for levels outside T11-L5', () => {
+        expect(CAGE_PERMISSIBILITY.plif).not.toContain('C5');
+        expect(CAGE_PERMISSIBILITY.plif).not.toContain('T5');
+        expect(CAGE_PERMISSIBILITY.plif).not.toContain('T10');
+        expect(CAGE_PERMISSIBILITY.plif).not.toContain('S1');
+    });
+
+    it('TLIF is disabled for levels outside T11-L5', () => {
+        expect(CAGE_PERMISSIBILITY.tlif).not.toContain('C5');
+        expect(CAGE_PERMISSIBILITY.tlif).not.toContain('T5');
+        expect(CAGE_PERMISSIBILITY.tlif).not.toContain('T10');
+    });
+
+    it('XLIF is disabled at L5', () => {
+        expect(CAGE_PERMISSIBILITY.xlif).not.toContain('L5');
+    });
+
+    it('XLIF is disabled at cervical levels', () => {
+        expect(CAGE_PERMISSIBILITY.xlif).not.toContain('C5');
+    });
+
+    it('OLIF is disabled for levels outside T12-L4', () => {
+        expect(CAGE_PERMISSIBILITY.olif).not.toContain('T11');
+        expect(CAGE_PERMISSIBILITY.olif).not.toContain('L5');
+        expect(CAGE_PERMISSIBILITY.olif).not.toContain('C5');
+    });
+
+    it('ALIF is disabled for levels outside L3-L5', () => {
+        expect(CAGE_PERMISSIBILITY.alif).not.toContain('L2');
+        expect(CAGE_PERMISSIBILITY.alif).not.toContain('T12');
+        expect(CAGE_PERMISSIBILITY.alif).not.toContain('C5');
+    });
+});
+
+// ---------------------------------------------------------------------------
+// QA6: Osteotomy restriction tests
+// ---------------------------------------------------------------------------
+
+describe('getPermittedOsteotomyTypes', () => {
+    it('returns empty array for Oc (no osteotomies)', () => {
+        expect(getPermittedOsteotomyTypes('Oc')).toEqual([]);
+    });
+
+    it('returns empty array for C1 (no osteotomies)', () => {
+        expect(getPermittedOsteotomyTypes('C1')).toEqual([]);
+    });
+
+    it('returns empty array for C2 (no osteotomies)', () => {
+        expect(getPermittedOsteotomyTypes('C2')).toEqual([]);
+    });
+
+    it('returns only Corpectomy for C5 (cervical subaxial)', () => {
+        expect(getPermittedOsteotomyTypes('C5')).toEqual(['Corpectomy']);
+    });
+
+    it('returns only Corpectomy for C3', () => {
+        expect(getPermittedOsteotomyTypes('C3')).toEqual(['Corpectomy']);
+    });
+
+    it('returns only Corpectomy for C7', () => {
+        expect(getPermittedOsteotomyTypes('C7')).toEqual(['Corpectomy']);
+    });
+
+    it('returns null (all permitted) for T5', () => {
+        expect(getPermittedOsteotomyTypes('T5')).toBeNull();
+    });
+
+    it('returns null (all permitted) for L3', () => {
+        expect(getPermittedOsteotomyTypes('L3')).toBeNull();
+    });
+
+    it('returns null (all permitted) for T1', () => {
+        expect(getPermittedOsteotomyTypes('T1')).toBeNull();
+    });
+});
+
+// ---------------------------------------------------------------------------
+// QA8: Screw defaults at modal level
+// ---------------------------------------------------------------------------
+
+describe('getScrewDefault', () => {
+    it('returns { diameter: "3.5", length: "14" } for C3', () => {
+        expect(getScrewDefault('C3')).toEqual({ diameter: '3.5', length: '14' });
+    });
+
+    it('returns { diameter: "3.5", length: "14" } for C7', () => {
+        expect(getScrewDefault('C7')).toEqual({ diameter: '3.5', length: '14' });
+    });
+
+    it('returns null for Oc (no safe default)', () => {
+        expect(getScrewDefault('Oc')).toBeNull();
+    });
+
+    it('returns null for C1 (no safe default)', () => {
+        expect(getScrewDefault('C1')).toBeNull();
+    });
+
+    it('returns null for C2 (no safe default)', () => {
+        expect(getScrewDefault('C2')).toBeNull();
+    });
+
+    it('returns expected thoracic default for T1', () => {
+        expect(getScrewDefault('T1')).toEqual({ diameter: '4.5', length: '28' });
+    });
+
+    it('returns expected lumbar default for L3', () => {
+        expect(getScrewDefault('L3')).toEqual({ diameter: '6.5', length: '45' });
+    });
+
+    it('returns expected pelvic default for S2AI', () => {
+        expect(getScrewDefault('S2AI')).toEqual({ diameter: '7.5', length: '80' });
+    });
+
+    it('returns null for unknown level', () => {
+        expect(getScrewDefault('X99')).toBeNull();
+    });
+
+    it('has defaults for all levels C3 through S2AI', () => {
+        const expectedLevels = [
+            'C3','C4','C5','C6','C7',
+            'T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12',
+            'L1','L2','L3','L4','L5',
+            'S1','S2','S2AI','Iliac','SI-J',
+        ];
+        for (const level of expectedLevels) {
+            expect(getScrewDefault(level)).not.toBeNull();
+        }
+    });
+});
+
+// ---------------------------------------------------------------------------
+// QA10: Chart stress test — whole spine + pelvis
+// ---------------------------------------------------------------------------
+
+describe('chart stress test — whole spine', () => {
+    it('getLevelHeight returns positive values for all standard levels', () => {
+        for (const level of ALL_LEVELS) {
+            const height = getLevelHeight(level);
+            expect(height).toBeGreaterThan(0);
+        }
+    });
+
+    it('calculateAutoScale with whole spine returns a valid scale factor', () => {
+        const scale = calculateAutoScale(ALL_LEVELS);
+        expect(scale).toBeGreaterThan(0);
+        expect(scale).toBeLessThan(2);
+        expect(typeof scale).toBe('number');
+        expect(Number.isFinite(scale)).toBe(true);
+    });
+
+    it('buildHeightMap handles all 28 levels without error', () => {
+        const { map, totalHeight } = buildHeightMap(ALL_LEVELS, 1);
+        expect(map).toHaveLength(28);
+        expect(totalHeight).toBeGreaterThan(0);
+    });
+
+    it('buildHeightMap entries cover from Oc to Pelvis', () => {
+        const { map } = buildHeightMap(ALL_LEVELS, 1);
+        expect(map[0].levelId).toBe('Oc');
+        expect(map[map.length - 1].levelId).toBe('Pelvis');
+    });
+
+    it('levelToYNorm returns valid values for all levels including pelvic', () => {
+        for (const level of ALL_LEVELS) {
+            const y = levelToYNorm(level.id);
+            expect(y).toBeGreaterThanOrEqual(0);
+            expect(y).toBeLessThanOrEqual(1000);
+        }
+    });
+
+    it('WHOLE_SPINE_MAP covers all 28 levels', () => {
+        expect(WHOLE_SPINE_MAP.map).toHaveLength(ALL_LEVELS.length);
+        expect(WHOLE_SPINE_MAP.totalHeight).toBeGreaterThan(0);
     });
 });

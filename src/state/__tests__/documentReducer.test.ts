@@ -360,6 +360,185 @@ describe('COPY_PLAN_TO_CONSTRUCT', () => {
     });
 });
 
+// --- Record locking ---
+
+describe('record locking', () => {
+    function lockState() {
+        const state = createInitialState();
+        return documentReducer(state, { type: 'LOCK_DOCUMENT' });
+    }
+
+    it('LOCK_DOCUMENT sets lockedAt timestamp', () => {
+        const state = createInitialState();
+        expect(state.lockedAt).toBeNull();
+        const locked = documentReducer(state, { type: 'LOCK_DOCUMENT' });
+        expect(locked.lockedAt).toBeTruthy();
+        expect(typeof locked.lockedAt).toBe('string');
+    });
+
+    it('locked record rejects ADD_PLACEMENT (returns unchanged state)', () => {
+        const locked = lockState();
+        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
+        const result = documentReducer(locked, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
+        expect(result).toBe(locked);
+        expect(result.plannedPlacements).toHaveLength(0);
+    });
+
+    it('locked record rejects UPDATE_PLACEMENT', () => {
+        const state = createInitialState();
+        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
+        const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
+        const locked = documentReducer(s1, { type: 'LOCK_DOCUMENT' });
+        const result = documentReducer(locked, { type: 'UPDATE_PLACEMENT', chart: 'plan', id: 'p1', tool: 'monoaxial', data: '5.5x40', annotation: '' });
+        expect(result).toBe(locked);
+        expect(result.plannedPlacements[0].tool).toBe('polyaxial');
+    });
+
+    it('locked record rejects REMOVE_PLACEMENT', () => {
+        const state = createInitialState();
+        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
+        const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
+        const locked = documentReducer(s1, { type: 'LOCK_DOCUMENT' });
+        const result = documentReducer(locked, { type: 'REMOVE_PLACEMENT', chart: 'plan', id: 'p1' });
+        expect(result).toBe(locked);
+        expect(result.plannedPlacements).toHaveLength(1);
+    });
+
+    it('locked record rejects SET_CAGE', () => {
+        const locked = lockState();
+        const cage = { id: 'cage1', levelId: 'L4', tool: 'tlif', data: { height: '10', lordosis: '5', side: 'bilateral' } } as Cage;
+        const result = documentReducer(locked, { type: 'SET_CAGE', chart: 'plan', cage });
+        expect(result).toBe(locked);
+    });
+
+    it('locked record rejects REMOVE_CAGE', () => {
+        const state = createInitialState();
+        const cage = { id: 'cage1', levelId: 'L4', tool: 'tlif', data: { height: '10', lordosis: '5', side: 'bilateral' } } as Cage;
+        const s1 = documentReducer(state, { type: 'SET_CAGE', chart: 'plan', cage });
+        const locked = documentReducer(s1, { type: 'LOCK_DOCUMENT' });
+        const result = documentReducer(locked, { type: 'REMOVE_CAGE', chart: 'plan', levelId: 'L4' });
+        expect(result).toBe(locked);
+        expect(result.plannedCages).toHaveLength(1);
+    });
+
+    it('locked record rejects ADD_CONNECTOR', () => {
+        const locked = lockState();
+        const conn = { id: 'c1', levelId: 'T8', fraction: 0.5, tool: 'connector' };
+        const result = documentReducer(locked, { type: 'ADD_CONNECTOR', chart: 'plan', connector: conn });
+        expect(result).toBe(locked);
+    });
+
+    it('locked record rejects REMOVE_CONNECTOR', () => {
+        const state = createInitialState();
+        const conn = { id: 'c1', levelId: 'T8', fraction: 0.5, tool: 'connector' };
+        const s1 = documentReducer(state, { type: 'ADD_CONNECTOR', chart: 'plan', connector: conn });
+        const locked = documentReducer(s1, { type: 'LOCK_DOCUMENT' });
+        const result = documentReducer(locked, { type: 'REMOVE_CONNECTOR', chart: 'plan', id: 'c1' });
+        expect(result).toBe(locked);
+        expect(result.plannedConnectors).toHaveLength(1);
+    });
+
+    it('locked record rejects ADD_NOTE', () => {
+        const locked = lockState();
+        const note = { id: 'n1', tool: 'note', levelId: 'T5', text: 'Check', offsetX: -140, offsetY: 0, showArrow: false };
+        const result = documentReducer(locked, { type: 'ADD_NOTE', chart: 'plan', note });
+        expect(result).toBe(locked);
+    });
+
+    it('locked record rejects UPDATE_NOTE', () => {
+        const state = createInitialState();
+        const note = { id: 'n1', tool: 'note', levelId: 'T5', text: 'Check', offsetX: -140, offsetY: 0, showArrow: false };
+        const s1 = documentReducer(state, { type: 'ADD_NOTE', chart: 'plan', note });
+        const locked = documentReducer(s1, { type: 'LOCK_DOCUMENT' });
+        const result = documentReducer(locked, { type: 'UPDATE_NOTE', chart: 'plan', id: 'n1', text: 'Changed', showArrow: true });
+        expect(result).toBe(locked);
+        expect(result.plannedNotes[0].text).toBe('Check');
+    });
+
+    it('locked record rejects REMOVE_NOTE', () => {
+        const state = createInitialState();
+        const note = { id: 'n1', tool: 'note', levelId: 'T5', text: 'Check', offsetX: -140, offsetY: 0, showArrow: false };
+        const s1 = documentReducer(state, { type: 'ADD_NOTE', chart: 'plan', note });
+        const locked = documentReducer(s1, { type: 'LOCK_DOCUMENT' });
+        const result = documentReducer(locked, { type: 'REMOVE_NOTE', chart: 'plan', id: 'n1' });
+        expect(result).toBe(locked);
+        expect(result.plannedNotes).toHaveLength(1);
+    });
+
+    it('locked record rejects SET_PATIENT_FIELD', () => {
+        const locked = lockState();
+        const result = documentReducer(locked, { type: 'SET_PATIENT_FIELD', field: 'name', value: 'John' });
+        expect(result).toBe(locked);
+        expect(result.patientData.name).toBe('');
+    });
+
+    it('locked record rejects SET_ROD', () => {
+        const locked = lockState();
+        const rod = { material: 'CoCr', diameter: '5.5', profile: '', length: '', contour: '', notes: '', transitionFrom: '', transitionTo: '' };
+        const result = documentReducer(locked, { type: 'SET_ROD', chart: 'plan', side: 'left', rod });
+        expect(result).toBe(locked);
+    });
+
+    it('locked record rejects SET_BONE_GRAFT', () => {
+        const locked = lockState();
+        const result = documentReducer(locked, { type: 'SET_BONE_GRAFT', types: ['Local Bone'], notes: 'test' });
+        expect(result).toBe(locked);
+        expect(result.patientData.boneGraft.types).toEqual([]);
+    });
+
+    it('locked record rejects COPY_PLAN_TO_CONSTRUCT', () => {
+        const state = createInitialState();
+        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
+        const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
+        const locked = documentReducer(s1, { type: 'LOCK_DOCUMENT' });
+        let counter = 0;
+        const result = documentReducer(locked, { type: 'COPY_PLAN_TO_CONSTRUCT', genId: () => `gen-${++counter}` });
+        expect(result).toBe(locked);
+        expect(result.completedPlacements).toHaveLength(0);
+    });
+
+    it('locked record rejects CLEAR_CONSTRUCT', () => {
+        const state = createInitialState();
+        const p = { id: 'p1', levelId: 'T5', zone: 'left', tool: 'polyaxial', data: '6.5x45', annotation: '' } as Placement;
+        const s1 = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'construct', placement: p });
+        const locked = documentReducer(s1, { type: 'LOCK_DOCUMENT' });
+        const result = documentReducer(locked, { type: 'CLEAR_CONSTRUCT' });
+        expect(result).toBe(locked);
+        expect(result.completedPlacements).toHaveLength(1);
+    });
+
+    it('locked record ALLOWS UNLOCK_DOCUMENT', () => {
+        const locked = lockState();
+        const result = documentReducer(locked, { type: 'UNLOCK_DOCUMENT' });
+        expect(result).not.toBe(locked);
+        expect(result.lockedAt).toBeNull();
+    });
+
+    it('locked record ALLOWS NEW_PATIENT', () => {
+        const locked = lockState();
+        const result = documentReducer(locked, { type: 'NEW_PATIENT' });
+        expect(result).not.toBe(locked);
+        expect(result.lockedAt).toBeNull();
+        expect(result.patientData.name).toBe('');
+    });
+
+    it('locked record ALLOWS LOAD_DOCUMENT', () => {
+        const locked = lockState();
+        const freshState = createInitialState();
+        freshState.patientData.name = 'Loaded Patient';
+        const result = documentReducer(locked, { type: 'LOAD_DOCUMENT', document: freshState });
+        expect(result.patientData.name).toBe('Loaded Patient');
+    });
+
+    it('lockedAt timestamp survives serialize/deserialize round-trip', () => {
+        const state = createInitialState();
+        const locked = documentReducer(state, { type: 'LOCK_DOCUMENT' });
+        const json = serializeState(locked, 'thoracolumbar', 'default', '2.7.0', 'en');
+        const result = deserializeDocument(json);
+        expect(result.state.lockedAt).toBe(locked.lockedAt);
+    });
+});
+
 describe('Serialization round-trip', () => {
     it('serialize then deserialize produces equivalent state', () => {
         const state = createInitialState();
