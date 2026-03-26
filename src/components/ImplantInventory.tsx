@@ -33,9 +33,10 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
                 if (typeof p.data === 'string' && tool.needsSize) { key = `${toolLabel} (${formatScrewSize(p.data)}mm)`; }
                 else if (p.tool === 'osteotomy' && typeof p.data === 'object') { const od = p.data as OsteotomyData; key = od.angle != null && String(od.angle) !== '' ? `${od.shortLabel} (${od.angle}°)` : od.shortLabel; }
                 else if (typeof p.data === 'object' && p.data !== null && 'height' in p.data) {
-                    const cd = p.data as unknown as CageData; // legacy: cage data in placement
+                    const cd = p.data as unknown as CageData;
                     const sideStr = p.tool !== 'acdf' && cd.side && cd.side !== 'bilateral' && cd.side !== 'midline' ? ` (${cd.side.charAt(0).toUpperCase()})` : '';
-                    key = `${toolLabel} ${cd.height}mm ${cd.lordosis || '0'}°${sideStr}`;
+                    const expStr = cd.expandable ? ` ${t('inventory.cage.expandable_suffix')}` : '';
+                    key = cd.height ? `${toolLabel} ${cd.height}mm ${cd.lordosis || '0'}°${sideStr}${expStr}` : `${toolLabel}${sideStr}${expStr}`;
                 }
                 else if (p.data !== 'Custom' && typeof p.data !== 'object') { key = `${toolLabel} ${p.data}`; }
             }

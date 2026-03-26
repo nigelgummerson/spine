@@ -1,38 +1,22 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { t, detectLanguage, getCurrentLang, setCurrentLang, SUPPORTED_LANGUAGES, LOCALE_MAP } from './i18n/i18n';
+import { t, detectLanguage, setCurrentLang, SUPPORTED_LANGUAGES } from './i18n/i18n';
 import { genId } from './utils/id';
 import usePortrait from './hooks/usePortrait';
 import { useExport } from './hooks/useExport';
-import { CURRENT_VERSION, CHANGE_LOG, formatDate } from './data/changelog';
-import { BONE_GRAFT_OPTIONS, BONE_GRAFT_LABEL_KEYS, IMPLANT_COMPANIES, SCREW_SYSTEMS,
-         DIAMETER_OPTIONS, LENGTH_OPTIONS } from './data/implants';
-import { _light, _dark, COLOUR_SCHEMES, AUTO_THEME_FROM_COMPANY, COMPANY_THEME_MAP } from './data/themes';
-import { CAGE_PERMISSIBILITY, HOOK_TYPES, NO_SIZE_TYPES, NOTE_PRESET_KEYS, CAGE_TYPES,
-         APPROACH_GROUPS, getDiscLabel, FORCE_TYPES, INVENTORY_CATEGORIES, getPermittedOsteotomyTypes } from './data/clinical';
-import { REGIONS, getLevelHeight,
-         ALL_LEVELS, DISC_MIN_PX, getDiscHeight, buildHeightMap,
-         levelToYNorm, yNormToRenderedY, renderedYToYNorm, CHART_CONTENT_HEIGHT,
-         calculateAutoScale } from './data/anatomy';
-import { IconTrash, IconDownload, IconImage, IconCopy, IconUpload, IconSave,
-         IconCC, IconX, IconPDF, IconHelp, IconLink, IconHistory, IconCardinal, IconGear } from './components/icons';
-import { ChangeLogModal } from './components/modals/ChangeLogModal';
-import { HelpModal } from './components/modals/HelpModal';
-import { PreferencesModal } from './components/modals/PreferencesModal';
-import { ScrewModal, modalKeyHandler } from './components/modals/ScrewModal';
+import { CURRENT_VERSION } from './data/changelog';
+import { COLOUR_SCHEMES } from './data/themes';
+import { CAGE_PERMISSIBILITY, NO_SIZE_TYPES, CAGE_TYPES,
+         getDiscLabel, getPermittedOsteotomyTypes } from './data/clinical';
+import { getLevelHeight, calculateAutoScale } from './data/anatomy';
 import { getNextEmptyLevel } from './utils/screwNavigation';
-import { CageModal } from './components/modals/CageModal';
-import { OsteotomyModal } from './components/modals/OsteotomyModal';
-import { ForceModal } from './components/modals/ForceModal';
-import { NoteModal } from './components/modals/NoteModal';
-import { ScrewSystemCombo } from './components/ScrewSystemCombo';
+import { ModalOrchestrator } from './components/ModalOrchestrator';
+import type { ModalId } from './components/ModalOrchestrator';
 import { CreditsFooter } from './components/CreditsFooter';
 import { DemographicsPanel } from './components/DemographicsPanel';
 import { ImplantInventory } from './components/ImplantInventory';
 import { Sidebar } from './components/Sidebar';
 import { PortraitToolbar } from './components/PortraitToolbar';
 import { ChartPaper } from './components/chart/ChartPaper';
-import { InstrumentIcon } from './components/chart/InstrumentIcon';
-import { Portal } from './components/Portal';
 import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, resetDisclaimer, getDisclaimerTimestamp } from './components/modals/DisclaimerModal';
 import { OnboardingTour } from './components/OnboardingTour';
 import { useDocumentState } from './hooks/useDocumentState';
@@ -47,6 +31,7 @@ interface CageConfirmData {
     length: string;
     lordosis: string;
     side: string;
+    expandable: boolean;
 }
 
 /** Data shape returned by OsteotomyModal.onConfirm */
@@ -147,7 +132,6 @@ const App = () => {
     const setPatientField = (field: string, value: string) => dispatch({ type: 'SET_PATIENT_FIELD', field, value });
 
     // MODALS — single discriminated state for exclusive modals
-    type ModalId = 'screw' | 'osteotomy' | 'cage' | 'force' | 'help' | 'note' | 'changelog' | 'preferences' | null;
     const [openModal, setOpenModal] = useState<ModalId>(null);
     const [forcePopover, setForcePopover] = useState<{ x: number; y: number; existingTool: string | null; existingId: string | null } | null>(null);
     const [pendingNoteTool, setPendingNoteTool] = useState<{ tool: string; levelId: string; offsetX: number; offsetY: number } | null>(null);
@@ -155,6 +139,11 @@ const App = () => {
 
     const [confirmNewPatient, setConfirmNewPatient] = useState(false);
     const [confirmClearConstruct, setConfirmClearConstruct] = useState(false);
+    const [confirmLock, setConfirmLock] = useState(false);
+    const [confirmUnlock, setConfirmUnlock] = useState(false);
+
+    // Record lock state
+    const isLocked = !!state.lockedAt;
     const [exportPicker, setExportPicker] = useState<string | null>(null);
     // Disclaimer: shown on first load and after New Patient
     const [disclaimerTick, setDisclaimerTick] = useState(0);
@@ -278,6 +267,9 @@ const App = () => {
             const tag = (e.target as HTMLElement)?.tagName;
             if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target as HTMLElement)?.isContentEditable) return;
 
+            // Skip placement shortcuts when document is locked
+            if (isLocked) return;
+
             // Arrow key navigation for spine chart
             const navLevels = levels.filter(l => l.type !== 'pelvic');
             const zoneOrder: ('left' | 'mid' | 'right')[] = ['left', 'mid', 'right'];
@@ -342,7 +334,7 @@ const App = () => {
         };
         window.addEventListener('keydown', handleShortcut);
         return () => window.removeEventListener('keydown', handleShortcut);
-    }, [openModal, forcePopover, disclaimerAccepted, viewMode, canUndo, canRedo, levels, kbFocusLevel, kbFocusZone, kbNavActive]);
+    }, [openModal, forcePopover, disclaimerAccepted, viewMode, canUndo, canRedo, levels, kbFocusLevel, kbFocusZone, kbNavActive, isLocked]);
 
     const heightScale = useMemo(() => calculateAutoScale(levels), [levels]);
 
@@ -561,7 +553,7 @@ const App = () => {
         dispatch({
             type: 'SET_CAGE',
             chart: activeChart === 'planned' ? 'plan' : 'construct',
-            cage: { id: genId(), levelId: lvl, tool: data.type, data: { height: data.height, width: data.width, length: data.length, lordosis: data.lordosis, side: data.side } },
+            cage: { id: genId(), levelId: lvl, tool: data.type, data: { height: data.height, width: data.width, length: data.length, lordosis: data.lordosis, side: data.side, expandable: data.expandable || undefined } },
         });
     };
 
@@ -801,9 +793,22 @@ const App = () => {
     // --- Shared sub-elements (used in both portrait and landscape) ---
     const demographicsContent = <DemographicsPanel patientData={patientData} dispatch={dispatch} setPatientField={setPatientField} changeTheme={changeTheme} showFinalInventory={showFinalInventory} setShowFinalInventory={setShowFinalInventory} plannedPlacements={plannedPlacements} completedPlacements={completedPlacements} plannedCages={plannedCages} completedCages={completedCages} plannedConnectors={plannedConnectors} completedConnectors={completedConnectors} allTools={allTools} levels={levels} currentLang={currentLang} />;
 
-    const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={heightScale} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('planLeftRod', e.target.innerText)} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('planRightRod', e.target.innerText)} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} isActive={activeChart === 'planned'} activeBg={scheme.activeBg} activeText={scheme.activeText} focusedLevelId={activeChart === 'planned' ? kbFocusLevelId : null} focusedZone={kbFocusZone} />;
+    const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isLocked || isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={heightScale} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('planLeftRod', e.target.innerText)} placeholder={t('patient.plan_rod_left_placeholder')}>{patientData.planLeftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('planRightRod', e.target.innerText)} placeholder={t('patient.plan_rod_right_placeholder')}>{patientData.planRightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} isActive={activeChart === 'planned'} activeBg={scheme.activeBg} activeText={scheme.activeText} focusedLevelId={activeChart === 'planned' ? kbFocusLevelId : null} focusedZone={kbFocusZone} isLocked={isLocked} />;
 
-    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={heightScale} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('leftRod', e.target.innerText)} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('rightRod', e.target.innerText)} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} isActive={activeChart === 'completed'} activeBg={scheme.activeBg} activeText={scheme.activeText} focusedLevelId={activeChart === 'completed' ? kbFocusLevelId : null} focusedZone={kbFocusZone} />;
+    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isLocked || isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={heightScale} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-right" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('leftRod', e.target.innerText)} placeholder={t('patient.rod_left_placeholder')}>{patientData.leftRod}</div></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><div className="editable-field text-[10px] py-0.5 px-1 text-left" style={{ minWidth: '60px' }} contentEditable suppressContentEditableWarning onPaste={handlePastePlainText} onBlur={e => setPatientField('rightRod', e.target.innerText)} placeholder={t('patient.rod_right_placeholder')}>{patientData.rightRod}</div></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} isActive={activeChart === 'completed'} activeBg={scheme.activeBg} activeText={scheme.activeText} focusedLevelId={activeChart === 'completed' ? kbFocusLevelId : null} focusedZone={kbFocusZone} isLocked={isLocked} />;
+
+    const finishCaseAction = () => setConfirmLock(true);
+    const executeFinishCase = () => {
+        setConfirmLock(false);
+        dispatch({ type: 'LOCK_DOCUMENT' });
+        showToast(t('sidebar.finish_case'), 'info');
+    };
+    const unlockRecordAction = () => setConfirmUnlock(true);
+    const executeUnlockRecord = () => {
+        setConfirmUnlock(false);
+        dispatch({ type: 'UNLOCK_DOCUMENT' });
+        showToast(t('sidebar.unlock_record'), 'info');
+    };
 
     const newPatientAction = () => setConfirmNewPatient(true);
     const executeNewPatient = () => {
@@ -816,167 +821,57 @@ const App = () => {
         // (manual broadcast used stale pre-dispatch state, causing bounce)
     };
 
-    const modals = (
-        <React.Fragment>
-            <ScrewModal isOpen={openModal === 'screw'} onClose={() => setOpenModal(null)}
-                onConfirm={handleScrewConfirm}
-                onConfirmAndNext={handleScrewConfirmAndNext}
-                onDelete={() => removePlacement(editingPlacementId!)}
-                initialData={editingData as string | null | undefined} initialTool={editingTool ?? undefined}
-                defaultDiameter={defaultDiameter} defaultLength={defaultLength}
-                defaultMode={defaultScrewMode} defaultCustomText={defaultCustomText}
-                initialAnnotation={editingAnnotation}
-                levelId={pendingPlacement?.levelId || (editingPlacementId ? [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId)?.levelId : '') || ''}
-                zone={(pendingPlacement?.zone || (editingPlacementId ? [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId)?.zone : 'left') || 'left') as Zone}
-                levels={levels}
-                placements={activeChart === 'planned' ? plannedPlacements : completedPlacements}
-                useRegionDefaults={useRegionDefaults}
-                confirmAndNextDefault={confirmAndNextDefault} />
-            <OsteotomyModal isOpen={openModal === 'osteotomy'} onClose={() => { setOpenModal(null); setOsteoDiscLevel(undefined); }} onConfirm={handleOsteoConfirm} onDelete={() => removePlacement(editingPlacementId!)} initialData={editingData as OsteotomyData | null | undefined} defaultType={defaultOsteoType} defaultAngle={defaultOsteoAngle} discLevelOnly={osteoDiscLevel}
-                levelId={pendingPlacement?.levelId || (editingPlacementId ? [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId)?.levelId : undefined)} />
-            <CageModal isOpen={openModal === 'cage'} onClose={() => setOpenModal(null)} onConfirm={handleCageConfirm} onDelete={handleDeleteCage} initialData={editingData as { tool: string; data: CageData } | null | undefined} levelId={editingCageLevel ?? ''} levels={levels} />
-            <ForceModal isOpen={openModal === 'force'} onClose={() => setOpenModal(null)} onConfirm={handleForceConfirm} />
-            {forcePopover && (() => {
-                const popW = 200, popH = forcePopover.existingTool ? 300 : 260;
-                const px = Math.min(forcePopover.x, window.innerWidth - popW - 8);
-                const py = Math.min(forcePopover.y - popH / 2, window.innerHeight - popH - 8);
-                const handleForceSelect = (forceId: string) => {
-                    if (forcePopover.existingId) {
-                        // Replace: remove old, place new
-                        const chart = activeChart === 'planned' ? 'plan' : 'construct';
-                        dispatch({ type: 'REMOVE_PLACEMENT', chart, id: forcePopover.existingId });
-                    }
-                    handleForceConfirm(forceId);
-                    setForcePopover(null);
-                };
-                const handleForceRemove = () => {
-                    if (forcePopover.existingId) {
-                        const chart = activeChart === 'planned' ? 'plan' : 'construct';
-                        dispatch({ type: 'REMOVE_PLACEMENT', chart, id: forcePopover.existingId });
-                    }
-                    setPendingForceZone(null);
-                    setForcePopover(null);
-                };
-                return (<Portal>
-                    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true"
-                        onKeyDown={e => {
-                            if (e.key === 'Escape') { e.preventDefault(); setForcePopover(null); }
-                            else if ((e.key === 'Delete' || e.key === 'Backspace') && forcePopover.existingId) { e.preventDefault(); handleForceRemove(); }
-                            else if (e.key === 'Tab') {
-                                e.preventDefault();
-                                const btns = Array.from(document.querySelectorAll('.force-picker-btn')) as HTMLElement[];
-                                const idx = btns.indexOf(document.activeElement as HTMLElement);
-                                const next = e.shiftKey ? (idx <= 0 ? btns.length - 1 : idx - 1) : (idx >= btns.length - 1 ? 0 : idx + 1);
-                                btns[next]?.focus();
-                            }
-                        }}
-                        onClick={() => setForcePopover(null)}>
-                        <div className="absolute bg-white rounded-lg shadow-2xl overflow-hidden animate-[fadeIn_0.1s_ease-out]"
-                            style={{ left: Math.max(8, px), top: Math.max(8, py), width: popW }}
-                            onClick={e => e.stopPropagation()}>
-                            <div className="bg-blue-700 text-white px-3 py-1.5 text-center text-xs font-bold">{t('modal.force.title')}</div>
-                            <div className="p-2 grid grid-cols-2 gap-1.5">
-                                {FORCE_TYPES.map((f, i) => (
-                                    <button key={f.id} onClick={() => handleForceSelect(f.id)}
-                                        autoFocus={i === 0}
-                                        className={`force-picker-btn flex flex-col items-center gap-1 p-2 rounded border transition-all outline-none focus:ring-2 focus:ring-blue-400 ${
-                                            forcePopover.existingTool === f.id
-                                                ? 'bg-blue-600 border-blue-700 text-white'
-                                                : 'border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300'
-                                        }`}>
-                                        <InstrumentIcon type={f.icon} className="w-7 h-7" color={forcePopover.existingTool === f.id ? '#ffffff' : '#2563eb'} />
-                                        <span className={`text-[9px] font-bold leading-tight text-center ${forcePopover.existingTool === f.id ? 'text-blue-100' : 'text-slate-700'}`}>{t(f.labelKey)}</span>
-                                    </button>
-                                ))}
-                            </div>
-                            {forcePopover.existingTool && (
-                                <div className="px-2 pb-2">
-                                    <button onClick={handleForceRemove}
-                                        className="w-full px-2 py-1.5 rounded text-xs font-bold text-red-600 hover:bg-red-50 border border-red-200 transition-colors">{t('button.remove')}</button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </Portal>);
-            })()}
-            <HelpModal isOpen={openModal === 'help'} onClose={() => setOpenModal(null)} />
-            <PreferencesModal isOpen={openModal === 'preferences'} onClose={() => setOpenModal(null)} useRegionDefaults={useRegionDefaults} onToggleRegionDefaults={toggleRegionDefaults} confirmAndNextDefault={confirmAndNextDefault} onToggleConfirmAndNextDefault={toggleConfirmAndNextDefault} />
-            <ChangeLogModal isOpen={openModal === 'changelog'} onClose={() => setOpenModal(null)} />
-            {exportPicker && <Portal><div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: () => handleExportWithChoice(exportPicker, false), onClose: () => setExportPicker(null), onDelete: undefined, isEditing: false })} onClick={() => setExportPicker(null)} ref={el => el?.focus()}>
-                <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
-                    <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold uppercase tracking-wider text-center">{exportPicker.toUpperCase()}</div>
-                    <div className="p-3 flex flex-col gap-2">
-                        <button onClick={() => handleExportWithChoice(exportPicker, false)} className="w-full px-4 py-3 rounded text-sm font-bold border transition-colors hover:brightness-95" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }}>{t('export.plan')}</button>
-                        <button onClick={() => handleExportWithChoice(exportPicker, true)} className="w-full px-4 py-3 rounded text-sm font-bold text-white bg-slate-800 hover:bg-slate-700">{t('export.construct')}</button>
-                    </div>
-                </div>
-            </div></Portal>}
-            {confirmClearConstruct && <Portal><div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: confirmClearConstructAction, onClose: () => setConfirmClearConstruct(false), onDelete: undefined, isEditing: false })} onClick={() => setConfirmClearConstruct(false)} ref={el => el?.focus()}>
-                <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
-                    <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold">{t('sidebar.clear_construct')}</div>
-                    <div className="p-5 text-sm text-slate-600">{t('alert.clear_construct')}</div>
-                    <div className="bg-slate-50 px-4 py-3 flex justify-end gap-2 border-t border-slate-100">
-                        <button onClick={() => setConfirmClearConstruct(false)} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.cancel')}</button>
-                        <button onClick={confirmClearConstructAction} className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 text-sm font-bold">{t('button.confirm')}</button>
-                    </div>
-                </div>
-            </div></Portal>}
-            {confirmNewPatient && <Portal><div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={modalKeyHandler({ onSubmit: executeNewPatient, onClose: () => setConfirmNewPatient(false), onDelete: undefined, isEditing: false })} onClick={() => setConfirmNewPatient(false)} ref={el => el?.focus()}>
-                <div className="bg-white rounded-lg shadow-2xl w-full max-w-xs overflow-hidden" onClick={e => e.stopPropagation()}>
-                    <div className="bg-slate-700 text-white px-4 py-3 text-sm font-bold">{t('sidebar.new_patient')}</div>
-                    <div className="p-5 text-sm text-slate-600">{t('alert.new_patient')}</div>
-                    <div className="bg-slate-50 px-4 py-3 flex justify-end gap-2 border-t border-slate-100">
-                        <button onClick={() => setConfirmNewPatient(false)} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.cancel')}</button>
-                        <button onClick={executeNewPatient} className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 text-sm font-bold">{t('button.confirm')}</button>
-                    </div>
-                </div>
-            </div></Portal>}
-            {discPickerLevel && (() => {
-                const pickerButtons = [
-                    { action: handleDiscPickCage, label: t('help.cages.title'), cls: 'text-sky-800 bg-sky-50 border-sky-200 hover:bg-sky-100 focus:ring-2 focus:ring-sky-400' },
-                    { action: handleDiscPickOsteo, label: t('help.osteotomies.title'), cls: 'text-amber-800 bg-amber-50 border-amber-200 hover:bg-amber-100 focus:ring-2 focus:ring-amber-400' },
-                ];
-                // Position popover near click, clamped to viewport
-                const popW = 180, popH = 120;
-                const px = Math.min(discPickerLevel.x, window.innerWidth - popW - 8);
-                const py = Math.min(discPickerLevel.y - popH / 2, window.innerHeight - popH - 8);
-                return (<Portal>
-                    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true"
-                        onKeyDown={e => {
-                            if (e.key === 'Escape') { e.preventDefault(); setDiscPickerLevel(null); }
-                            else if (e.key === 'Enter') {
-                                e.preventDefault();
-                                const focused = document.activeElement as HTMLElement;
-                                if (focused?.tagName === 'BUTTON') focused.click();
-                                else handleDiscPickCage();
-                            }
-                            else if (e.key === 'Tab') {
-                                e.preventDefault();
-                                const btns = Array.from(document.querySelectorAll('.disc-picker-btn')) as HTMLElement[];
-                                const idx = btns.indexOf(document.activeElement as HTMLElement);
-                                const next = e.shiftKey ? (idx <= 0 ? btns.length - 1 : idx - 1) : (idx >= btns.length - 1 ? 0 : idx + 1);
-                                btns[next]?.focus();
-                            }
-                        }}
-                        onClick={() => setDiscPickerLevel(null)}>
-                        <div className="absolute bg-white rounded-lg shadow-2xl overflow-hidden animate-[fadeIn_0.1s_ease-out]"
-                            style={{ left: Math.max(8, px), top: Math.max(8, py), width: popW }}
-                            onClick={e => e.stopPropagation()}>
-                            <div className="bg-slate-700 text-white px-3 py-1.5 text-center text-xs font-bold uppercase tracking-wider">{getDiscLabel(discPickerLevel.levelId, levels)}</div>
-                            <div className="p-1.5 flex flex-col gap-1">
-                                {pickerButtons.map((btn, i) => (
-                                    <button key={i} onClick={btn.action}
-                                        className={`disc-picker-btn w-full px-3 py-2 rounded text-sm font-bold border transition-colors outline-none ${btn.cls}`}
-                                        autoFocus={i === 0}>{btn.label}</button>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </Portal>);
-            })()}
-            <NoteModal isOpen={openModal === 'note'} onClose={() => { setOpenModal(null); setEditingNote(null); setPendingNoteTool(null); }} onConfirm={handleNoteConfirm} onDelete={handleNoteDelete} initialText={editingNote?.text || ''} initialShowArrow={editingNote ? editingNote.showArrow : undefined} isEditing={!!editingNote} />
-        </React.Fragment>
-    );
+    const handleForceSelectFromPopover = (forceId: string) => {
+        if (forcePopover?.existingId) {
+            const chart = activeChart === 'planned' ? 'plan' : 'construct';
+            dispatch({ type: 'REMOVE_PLACEMENT', chart, id: forcePopover.existingId });
+        }
+        handleForceConfirm(forceId);
+        setForcePopover(null);
+    };
+    const handleForceRemoveFromPopover = () => {
+        if (forcePopover?.existingId) {
+            const chart = activeChart === 'planned' ? 'plan' : 'construct';
+            dispatch({ type: 'REMOVE_PLACEMENT', chart, id: forcePopover.existingId });
+        }
+        setPendingForceZone(null);
+        setForcePopover(null);
+    };
+
+    const modals = <ModalOrchestrator
+        openModal={openModal} setOpenModal={setOpenModal}
+        editingData={editingData} editingTool={editingTool}
+        editingPlacementId={editingPlacementId} editingAnnotation={editingAnnotation}
+        editingCageLevel={editingCageLevel} pendingPlacement={pendingPlacement}
+        osteoDiscLevel={osteoDiscLevel} pendingNoteTool={pendingNoteTool} editingNote={editingNote}
+        discPickerLevel={discPickerLevel} setDiscPickerLevel={setDiscPickerLevel}
+        forcePopover={forcePopover} setForcePopover={setForcePopover}
+        confirmNewPatient={confirmNewPatient} setConfirmNewPatient={setConfirmNewPatient}
+        confirmClearConstruct={confirmClearConstruct} setConfirmClearConstruct={setConfirmClearConstruct}
+        exportPicker={exportPicker} setExportPicker={setExportPicker}
+        onScrewConfirm={handleScrewConfirm} onScrewConfirmAndNext={handleScrewConfirmAndNext}
+        onScrewDelete={() => removePlacement(editingPlacementId!)}
+        onOsteoConfirm={handleOsteoConfirm} onOsteoDelete={() => removePlacement(editingPlacementId!)}
+        onOsteoClose={() => { setOpenModal(null); setOsteoDiscLevel(undefined); }}
+        onCageConfirm={handleCageConfirm} onCageDelete={handleDeleteCage}
+        onForceConfirm={handleForceConfirm} onForceSelect={handleForceSelectFromPopover}
+        onForceRemove={handleForceRemoveFromPopover} setPendingForceZone={setPendingForceZone}
+        onNoteConfirm={handleNoteConfirm} onNoteDelete={handleNoteDelete}
+        setEditingNote={setEditingNote} setPendingNoteTool={setPendingNoteTool}
+        onDiscPickCage={handleDiscPickCage} onDiscPickOsteo={handleDiscPickOsteo}
+        onConfirmNewPatient={executeNewPatient} onConfirmClearConstruct={confirmClearConstructAction}
+        confirmLock={confirmLock} setConfirmLock={setConfirmLock} confirmUnlock={confirmUnlock} setConfirmUnlock={setConfirmUnlock}
+        onConfirmLock={executeFinishCase} onConfirmUnlock={executeUnlockRecord}
+        onExportWithChoice={handleExportWithChoice}
+        useRegionDefaults={useRegionDefaults} onToggleRegionDefaults={toggleRegionDefaults}
+        confirmAndNextDefault={confirmAndNextDefault} onToggleConfirmAndNextDefault={toggleConfirmAndNextDefault}
+        levels={levels} scheme={scheme}
+        plannedPlacements={plannedPlacements} completedPlacements={completedPlacements}
+        activeChart={activeChart}
+        defaultDiameter={defaultDiameter} defaultLength={defaultLength}
+        defaultScrewMode={defaultScrewMode} defaultCustomText={defaultCustomText}
+        defaultOsteoType={defaultOsteoType} defaultOsteoAngle={defaultOsteoAngle}
+    />;
 
 
     // ============================================================
@@ -988,7 +883,7 @@ const App = () => {
                 {modals}
                 <input type="file" ref={fileInputRef} onChange={loadProjectJSON} className="hidden" accept=".json" />
 
-                <PortraitToolbar scheme={scheme} colourScheme={colourScheme} changeTheme={changeTheme} currentLang={currentLang} changeLang={changeLang} selectedTool={selectedTool} setSelectedTool={setSelectedTool} viewMode={viewMode} setViewMode={setViewMode} showPelvis={showPelvis} togglePelvis={togglePelvis} incognitoMode={incognitoMode} setIncognitoMode={setIncognitoMode} syncConnected={syncConnected} isViewOnly={isViewOnly} tools={tools} fileInputRef={fileInputRef} loadProjectJSON={loadProjectJSON} saveProjectJSON={saveProjectJSON} promptExportJPG={promptExportJPG} promptExportPDF={promptExportPDF} copyPlanToCompleted={() => { copyPlanToCompleted(); switchPortraitTab(2); }} onConfirmClearConstruct={() => setConfirmClearConstruct(true)} newPatientAction={newPatientAction} onOpenPreferences={() => setOpenModal('preferences')} onOpenHelp={() => setOpenModal('help')} onOpenChangelog={() => setOpenModal('changelog')} portraitTab={portraitTab} switchPortraitTab={switchPortraitTab} />
+                <PortraitToolbar scheme={scheme} colourScheme={colourScheme} changeTheme={changeTheme} currentLang={currentLang} changeLang={changeLang} selectedTool={selectedTool} setSelectedTool={setSelectedTool} viewMode={viewMode} setViewMode={setViewMode} showPelvis={showPelvis} togglePelvis={togglePelvis} incognitoMode={incognitoMode} setIncognitoMode={setIncognitoMode} syncConnected={syncConnected} isViewOnly={isViewOnly} tools={tools} fileInputRef={fileInputRef} loadProjectJSON={loadProjectJSON} saveProjectJSON={saveProjectJSON} promptExportJPG={promptExportJPG} promptExportPDF={promptExportPDF} copyPlanToCompleted={() => { copyPlanToCompleted(); switchPortraitTab(2); }} onConfirmClearConstruct={() => setConfirmClearConstruct(true)} newPatientAction={newPatientAction} onOpenPreferences={() => setOpenModal('preferences')} onOpenHelp={() => setOpenModal('help')} onOpenChangelog={() => setOpenModal('changelog')} portraitTab={portraitTab} switchPortraitTab={switchPortraitTab} isLocked={isLocked} onFinishCase={finishCaseAction} onUnlockRecord={unlockRecordAction} />
 
                 {/* Portrait Content - swipeable tabs */}
                 <div ref={portraitContentRef} className="flex-1 overflow-hidden relative bg-slate-300"
@@ -1036,7 +931,7 @@ const App = () => {
                             <div dir="ltr" className="flex-[3] flex flex-col h-full min-w-0 overflow-hidden">
                                 <ChartPaper title={t('export.construct')} placements={completedPlacements} onZoneClick={() => {}} onPlacementClick={() => {}} tools={allTools} readOnly={true} levels={levels} showForces={false} heightScale={heightScale} cages={completedCages} onDiscClick={() => {}} connectors={completedConnectors} onConnectorUpdate={() => {}} onConnectorRemove={() => {}} viewMode={viewMode} notes={completedNotes} onNoteUpdate={() => {}} onNoteRemove={() => {}} onNoteClick={() => {}} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-right">{patientData.leftRod}</span></div><div className="flex items-center justify-start gap-1"><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className="text-[10px] py-0.5 px-1 text-left">{patientData.rightRod}</span></div></React.Fragment>} reconLabelPositions={reconLabelPositions} />
                             </div>
-                            <div className="absolute bottom-1 end-2 text-[8px] text-slate-300 font-mono">{getDisclaimerTimestamp() ? `${t('disclaimer.accepted_label')} ${getDisclaimerTimestamp()}` : ''} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
+                            <div className="absolute bottom-1 end-2 text-[8px] text-slate-300 font-mono">{state.lockedAt ? `${t('export.record_finalised')}: ${state.lockedAt.replace('T',' ').substring(0,19)} | ` : ''}{getDisclaimerTimestamp() ? `${t('disclaimer.accepted_label')} ${getDisclaimerTimestamp()}` : ''} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
                         </div>
                     </div>
                 )}
@@ -1054,7 +949,7 @@ const App = () => {
             {modals}
 
             <div className="flex-1 overflow-hidden bg-slate-200 flex relative">
-                <Sidebar scheme={scheme} colourScheme={colourScheme} changeTheme={changeTheme} currentLang={currentLang} changeLang={changeLang} selectedTool={selectedTool} setSelectedTool={setSelectedTool} activeChart={activeChart} setActiveChart={setActiveChart} viewMode={viewMode} setViewMode={setViewMode} showPelvis={showPelvis} togglePelvis={togglePelvis} incognitoMode={incognitoMode} setIncognitoMode={setIncognitoMode} syncConnected={syncConnected} tools={tools} fileInputRef={fileInputRef} loadProjectJSON={loadProjectJSON} saveProjectJSON={saveProjectJSON} promptExportJPG={promptExportJPG} promptExportPDF={promptExportPDF} copyPlanToCompleted={copyPlanToCompleted} clearConstruct={clearConstruct} newPatientAction={newPatientAction} onOpenPreferences={() => setOpenModal('preferences')} onOpenHelp={() => setOpenModal('help')} onOpenChangelog={() => setOpenModal('changelog')} />
+                <Sidebar scheme={scheme} colourScheme={colourScheme} changeTheme={changeTheme} currentLang={currentLang} changeLang={changeLang} selectedTool={selectedTool} setSelectedTool={setSelectedTool} activeChart={activeChart} setActiveChart={setActiveChart} viewMode={viewMode} setViewMode={setViewMode} showPelvis={showPelvis} togglePelvis={togglePelvis} incognitoMode={incognitoMode} setIncognitoMode={setIncognitoMode} syncConnected={syncConnected} tools={tools} fileInputRef={fileInputRef} loadProjectJSON={loadProjectJSON} saveProjectJSON={saveProjectJSON} promptExportJPG={promptExportJPG} promptExportPDF={promptExportPDF} copyPlanToCompleted={copyPlanToCompleted} clearConstruct={clearConstruct} newPatientAction={newPatientAction} onOpenPreferences={() => setOpenModal('preferences')} onOpenHelp={() => setOpenModal('help')} onOpenChangelog={() => setOpenModal('changelog')} isLocked={isLocked} onFinishCase={finishCaseAction} onUnlockRecord={unlockRecordAction} />
 
                 <div ref={containerWrapperRef} id="print-wrapper" className="flex-1 flex items-center justify-center p-8 bg-slate-300 overflow-hidden relative">
                     <div style={{ transform: `scale(${scale})` }}>
@@ -1068,7 +963,7 @@ const App = () => {
                                 {constructChart}
                                 {activeChart !== 'completed' && !isPortrait && <div className="absolute inset-0 bg-slate-400/20 cursor-pointer z-20" data-export-hide="true" />}
                             </div>
-                            <div className="absolute bottom-1 end-2 text-[8px] text-slate-300 font-mono">{getDisclaimerTimestamp() ? `${t('disclaimer.accepted_label')} ${getDisclaimerTimestamp()}` : ''} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
+                            <div className="absolute bottom-1 end-2 text-[8px] text-slate-300 font-mono">{state.lockedAt ? `${t('export.record_finalised')}: ${state.lockedAt.replace('T',' ').substring(0,19)} | ` : ''}{getDisclaimerTimestamp() ? `${t('disclaimer.accepted_label')} ${getDisclaimerTimestamp()}` : ''} | {new Date().toISOString().replace('T',' ').substring(0,19)} | {CURRENT_VERSION}</div>
                         </div>
                     </div>
                 </div>

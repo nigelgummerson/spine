@@ -39,6 +39,9 @@ export interface PortraitToolbarProps {
     onOpenChangelog: () => void;
     portraitTab: number;
     switchPortraitTab: (tab: number) => void;
+    isLocked: boolean;
+    onFinishCase: () => void;
+    onUnlockRecord: () => void;
 }
 
 export const PortraitToolbar = ({
@@ -50,6 +53,7 @@ export const PortraitToolbar = ({
     promptExportJPG, promptExportPDF, copyPlanToCompleted, onConfirmClearConstruct,
     newPatientAction, onOpenPreferences, onOpenHelp, onOpenChangelog,
     portraitTab, switchPortraitTab,
+    isLocked, onFinishCase, onUnlockRecord,
 }: PortraitToolbarProps) => {
     const [themeOpen, setThemeOpen] = useState(false);
 
@@ -139,6 +143,11 @@ export const PortraitToolbar = ({
                         <div className="w-px h-5 bg-white/20 mx-1"></div>
                         <button onClick={() => { copyPlanToCompleted(); switchPortraitTab(2); }} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold hover:bg-white/10 hover:brightness-125 shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)' }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
                         <button onClick={onConfirmClearConstruct} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold hover:bg-white/10 hover:brightness-125 shrink-0 border" style={{ borderColor: 'rgba(255,255,255,0.2)', color: '#dc2626' }} title={t('sidebar.clear_construct')}><IconTrash /> {t('sidebar.clear_construct')}</button>
+                        {isLocked ? (
+                            <button onClick={onUnlockRecord} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold shrink-0 border hover:brightness-125" style={{ backgroundColor: '#d97706', borderColor: '#b45309', color: '#fff' }}>{t('sidebar.unlock_record')}</button>
+                        ) : (
+                            <button onClick={onFinishCase} className="flex items-center gap-1 px-2.5 py-2 rounded text-[10px] font-bold shrink-0 border hover:brightness-125" style={{ backgroundColor: '#0d9488', borderColor: '#0f766e', color: '#fff' }}>{t('sidebar.finish_case')}</button>
+                        )}
                         <div className={`shrink-0 w-5 h-5 rounded-full cursor-pointer ${incognitoMode ? 'bg-red-500' : 'bg-white/20'}`} onClick={() => setIncognitoMode(!incognitoMode)} title={t('sidebar.session_privacy')}></div>
                         <button onClick={newPatientAction} className="p-2.5 rounded shrink-0" style={{ color: '#dc2626' }} title={t('sidebar.new_patient')}><IconTrash /></button>
                     </div>

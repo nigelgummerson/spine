@@ -68,7 +68,7 @@ const OVERFLOW_THRESHOLDS: Array<{
 }> = [
   // Exclude _tooltip and _hint suffixes — these are popover strings, not labels.
   // Max observed: pl "Piersiowo-lędźwiowy (T1-Miednica)" = 33 chars.
-  { pattern: /^sidebar\.(?!.*_tooltip)(?!.*_hint)/, max: 35, label: 'sidebar.* (labels)' },
+  { pattern: /^sidebar\.(?!.*_tooltip)(?!.*_hint)(?!.*_confirm)/, max: 35, label: 'sidebar.* (labels)' },
   // modal.*.title* — section titles in modals.
   // Max observed: el "Επεξεργασία εμφυτεύματος" = 24 chars.
   { pattern: /^modal\..*\.title/, max: 30, label: 'modal.*.title*' },
@@ -126,6 +126,7 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   'Allograft',
   'Standard PSO',
   // Very short labels / abbreviations where English form is universal
+  '(exp.)',
   'UIV',
   'LIV',
   'L:',

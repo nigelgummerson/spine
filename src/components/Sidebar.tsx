@@ -37,6 +37,9 @@ export interface SidebarProps {
     onOpenPreferences: () => void;
     onOpenHelp: () => void;
     onOpenChangelog: () => void;
+    isLocked: boolean;
+    onFinishCase: () => void;
+    onUnlockRecord: () => void;
 }
 
 export const Sidebar = ({
@@ -47,6 +50,7 @@ export const Sidebar = ({
     tools, fileInputRef, loadProjectJSON, saveProjectJSON,
     promptExportJPG, promptExportPDF, copyPlanToCompleted, clearConstruct,
     newPatientAction, onOpenPreferences, onOpenHelp, onOpenChangelog,
+    isLocked, onFinishCase, onUnlockRecord,
 }: SidebarProps) => {
     const [themeOpen, setThemeOpen] = useState(false);
 
@@ -80,6 +84,13 @@ export const Sidebar = ({
                 <div className="grid grid-cols-2 gap-1 mt-2">
                     <button onClick={copyPlanToCompleted} className="flex items-center justify-center gap-1 hover:brightness-125 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }} title={t('sidebar.confirm_plan_tooltip')}><IconCopy /> {t('sidebar.confirm_all')}</button>
                     <button onClick={clearConstruct} className="flex items-center justify-center gap-1 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:bg-red-50 hover:border-red-300 hover:text-red-600" style={{ backgroundColor: scheme.btnBg, borderColor: scheme.btnBorder }} title={t('sidebar.clear_construct_tooltip')}><IconTrash /> {t('sidebar.clear_construct')}</button>
+                </div>
+                <div className="mt-2">
+                    {isLocked ? (
+                        <button onClick={onUnlockRecord} className="w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: '#d97706', borderColor: '#b45309', color: '#fff' }}>{t('sidebar.unlock_record')}</button>
+                    ) : (
+                        <button onClick={onFinishCase} className="w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded text-[10px] font-bold border transition-colors hover:brightness-125" style={{ backgroundColor: '#0d9488', borderColor: '#0f766e', color: '#fff' }}>{t('sidebar.finish_case')}</button>
+                    )}
                 </div>
             </div>
 

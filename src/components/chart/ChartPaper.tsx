@@ -48,6 +48,7 @@ export interface ChartPaperProps {
     activeText?: string;
     focusedLevelId?: string | null;
     focusedZone?: 'left' | 'right' | 'mid';
+    isLocked?: boolean;
 }
 
 // Header area height in SVG units
@@ -56,7 +57,7 @@ const COL_HEADER_H = 20;  // Column headers (LEFT / RIGHT / FORCE)
 const ROD_HEADER_H = 22;  // Rod text row
 const CONTENT_TOP = TITLE_H + COL_HEADER_H + ROD_HEADER_H;
 
-export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements, ghostConnectors, onGhostConnectorClick, ghostCages, onGhostCageClick, reconLabelPositions, onReconLabelUpdate, onPelvisZoneClick, isActive, activeBg, activeText, focusedLevelId, focusedZone }) => {
+export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placements, ghostPlacements, onZoneClick, onPlacementClick, onGhostClick, tools, readOnly, levels, showForces, heightScale, cages, onDiscClick, connectors, onConnectorUpdate, onConnectorRemove, rodHeader, viewMode, notes, onNoteUpdate, onNoteRemove, onNoteClick, ghostNotes, onGhostNoteClick, forcePlacements, ghostConnectors, onGhostConnectorClick, ghostCages, onGhostCageClick, reconLabelPositions, onReconLabelUpdate, onPelvisZoneClick, isActive, activeBg, activeText, focusedLevelId, focusedZone, isLocked }) => {
     const svgRef = useRef<SVGSVGElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [chartWidth, setChartWidth] = useState(500);
@@ -219,7 +220,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placem
     <div ref={containerRef} className="flex-1 flex flex-col h-full border-l border-slate-200 bg-white relative overflow-hidden">
         {/* Title bar — HTML, fixed at top */}
         <div className={`${forcePlacements ? 'px-2 py-1' : 'p-2'} bg-slate-50 border-b border-slate-200 text-center shrink-0`}>
-            <div className="font-bold text-sm text-slate-800 uppercase tracking-wider flex items-center justify-center gap-2">{title}{isActive && <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide" data-export-hide="true" style={{ backgroundColor: activeBg || '#005EB8', color: activeText || '#fff', lineHeight: '1.1' }}>{t('sidebar.editing')}</span>}</div>
+            <div className="font-bold text-sm text-slate-800 uppercase tracking-wider flex items-center justify-center gap-2">{title}{isLocked ? <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide" data-export-hide="true" style={{ backgroundColor: '#dc2626', color: '#fff', lineHeight: '1.1' }}>{t('chart.locked')}</span> : isActive && <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide" data-export-hide="true" style={{ backgroundColor: activeBg || '#005EB8', color: activeText || '#fff', lineHeight: '1.1' }}>{t('sidebar.editing')}</span>}</div>
             {forcePlacements && <div className="flex items-center justify-center gap-3 -mt-0.5">
                 <span className="text-[10px] font-normal text-blue-400 italic">{t('chart.force_plan_only')}</span>
                 {ghostPlacements && <span className="flex items-center gap-1 text-[10px] font-bold" style={{ color: '#14b8a6' }}><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" strokeWidth="3"><circle cx="12" cy="12" r="9" /><path d="M7 7l10 10M17 7l-10 10" /></svg>= {t('export.plan')}</span>}

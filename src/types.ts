@@ -28,6 +28,7 @@ export interface CageData {
     side: string;
     width?: string;
     length?: string;
+    expandable?: boolean;
 }
 
 export interface Cage {
@@ -77,6 +78,7 @@ export interface PatientData {
 export interface DocumentState {
     documentId: string;
     documentCreated: string;
+    lockedAt: string | null;
     patientData: PatientData;
     plannedPlacements: Placement[];
     completedPlacements: Placement[];
@@ -108,6 +110,8 @@ export type DocumentAction =
     | { type: 'NEW_PATIENT' }
     | { type: 'COPY_PLAN_TO_CONSTRUCT'; genId: () => string }
     | { type: 'CLEAR_CONSTRUCT' }
+    | { type: 'LOCK_DOCUMENT' }
+    | { type: 'UNLOCK_DOCUMENT' }
     | { type: 'LOAD_DOCUMENT'; document: DocumentState }
     | { type: 'UNDO' }
     | { type: 'REDO' };

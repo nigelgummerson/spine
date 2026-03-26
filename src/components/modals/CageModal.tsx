@@ -15,6 +15,7 @@ interface CageModalInitialData {
         length?: string;
         lordosis?: string;
         side?: string;
+        expandable?: boolean;
     };
 }
 
@@ -25,6 +26,7 @@ interface CageConfirmData {
     length: string;
     lordosis: string;
     side: string;
+    expandable: boolean;
 }
 
 interface CageModalProps {
@@ -64,6 +66,7 @@ export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, l
     const [length, setLength] = useState(initialData?.data?.length || initDef?.defaults?.length || '25');
     const [lordosis, setLordosis] = useState(initialData?.data?.lordosis || initDef?.defaults?.lordosis || '0');
     const [side, setSide] = useState(initialData?.data?.side || initDef?.defaultSide || 'left');
+    const [expandable, setExpandable] = useState(initialData?.data?.expandable || false);
 
     useEffect(() => {
         if (isOpen) {
@@ -74,6 +77,7 @@ export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, l
                 setLength(initialData.data.length || '25');
                 setLordosis(initialData.data.lordosis || '0');
                 setSide(initialData.data.side || CAGE_TYPES.find(ct => ct.id === initialData.tool)?.defaultSide || 'left');
+                setExpandable(initialData.data.expandable || false);
             } else {
                 const def = CAGE_TYPES.find(ct => ct.id === safeInitType);
                 setType(safeInitType);
@@ -84,6 +88,7 @@ export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, l
                     setLordosis(def.defaults.lordosis);
                     setSide(def.defaultSide);
                 }
+                setExpandable(false);
             }
         }
     }, [isOpen, initialData]);
@@ -98,13 +103,14 @@ export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, l
             setLordosis(def.defaults.lordosis);
             setSide(def.defaultSide);
         }
+        setExpandable(false);
     };
 
     const selectedDef = CAGE_TYPES.find(ct => ct.id === type);
     const discLabel = levels ? getDiscLabel(levelId, levels) : levelId;
 
     const handleSubmit = () => {
-        onConfirm({ type, height, width, length, lordosis, side });
+        onConfirm({ type, height, width, length, lordosis, side, expandable });
         onClose();
     };
     const cageRef = useRef<HTMLDivElement>(null);
@@ -177,6 +183,10 @@ export const CageModal = ({ isOpen, onClose, onConfirm, onDelete, initialData, l
                         <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{t('modal.cage.width')}</label><input type="number" value={width} onChange={e => setWidth(e.target.value)} onWheel={numberWheelHandler(setWidth, 1, 0)} title={t('hint.scroll_to_change')} placeholder="-" className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 font-mono text-center focus:border-sky-500 outline-none"/></div>
                     </div>
                     <button type="button" onClick={() => { setHeight(''); setWidth(''); setLength(''); setLordosis(''); }} className="text-[10px] text-slate-400 hover:text-slate-600 font-bold uppercase tracking-wider">{t('modal.cage.clear_dimensions')}</button>
+                    <label className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer hover:text-slate-900">
+                        <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500 shrink-0" checked={expandable} onChange={e => setExpandable(e.target.checked)} />
+                        <span>{t('modal.cage.expandable')}</span>
+                    </label>
                 </div>
                 <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">{initialData ? <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center"><IconTrash/> {t('button.remove')}</button> : <div></div>}<div className="flex gap-2"><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.cancel')}</button><button onClick={handleSubmit} className="px-6 py-2 rounded bg-sky-800 text-white hover:bg-sky-700 text-sm font-bold shadow-lg">{t('button.confirm')}</button></div></div>
             </div>

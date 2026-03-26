@@ -29,6 +29,7 @@ export function createInitialState(): DocumentState {
     return {
         documentId: crypto.randomUUID(),
         documentCreated: new Date().toISOString(),
+        lockedAt: null,
         patientData: {
             name: '', id: '', surgeon: '', location: '',
             date: new Date().toISOString().split('T')[0],
@@ -240,6 +241,14 @@ export function documentReducer(state: DocumentState, action: DocumentAction): D
             };
         }
 
+        case 'LOCK_DOCUMENT': {
+            return { ...state, lockedAt: new Date().toISOString() };
+        }
+
+        case 'UNLOCK_DOCUMENT': {
+            return { ...state, lockedAt: null };
+        }
+
         case 'LOAD_DOCUMENT': {
             return { ...action.document };
         }
@@ -267,7 +276,7 @@ interface V4Element {
     hook?: { hookType: string };
     fixation?: { fixationType: string; description?: string };
     osteotomy?: { osteotomyType: string; schwabGrade?: number; correctionAngle?: number; reconstructionCage?: string };
-    cage?: { approach: string; height?: number; width?: number; length?: number; lordosis?: number };
+    cage?: { approach: string; height?: number; width?: number; length?: number; lordosis?: number; expandable?: boolean };
     connector?: { connectorType: string; fraction: number };
     annotation?: string;
 }
@@ -362,6 +371,7 @@ export function internalToV4Chart(placements: Placement[], cages: Cage[], connec
             if (c.data.width) cage.width = Number(c.data.width);
             if (c.data.length) cage.length = Number(c.data.length);
             if (c.data.lordosis) cage.lordosis = Number(c.data.lordosis);
+            if (c.data.expandable) cage.expandable = true;
         }
         elements.push({ id: c.id, type: 'cage', level: c.levelId, side: c.data?.side || 'bilateral', cage });
     });
@@ -410,7 +420,7 @@ export function v4ChartToInternal(chartData: V4ChartData, notePositions: Record<
             const osteoZone: Zone = (el.zone as Zone) || (isDisc ? 'disc' : 'mid');
             placements.push({ id: el.id, levelId: el.level, zone: osteoZone, tool: 'osteotomy', data: { type: v3Type, shortLabel: osteoType === 'facetectomy' ? 'Facet' : (v3Type.length <= 6 ? v3Type : v3Type.substring(0, 3).toUpperCase()), angle: el.osteotomy?.correctionAngle ?? null, reconstructionCage: el.osteotomy?.reconstructionCage || '' }, annotation: '' });
         } else if (el.type === 'cage') {
-            cages.push({ id: el.id, levelId: el.level, tool: (el.cage?.approach || 'TLIF').toLowerCase(), data: { height: String(el.cage?.height || ''), lordosis: String(el.cage?.lordosis || ''), side: el.side || 'bilateral', width: el.cage?.width ? String(el.cage.width) : undefined, length: el.cage?.length ? String(el.cage.length) : undefined } });
+            cages.push({ id: el.id, levelId: el.level, tool: (el.cage?.approach || 'TLIF').toLowerCase(), data: { height: String(el.cage?.height || ''), lordosis: String(el.cage?.lordosis || ''), side: el.side || 'bilateral', width: el.cage?.width ? String(el.cage.width) : undefined, length: el.cage?.length ? String(el.cage.length) : undefined, expandable: el.cage?.expandable || undefined } });
         } else if (el.type === 'connector') {
             connectors.push({ id: el.id, levelId: el.level, fraction: el.connector?.fraction || 0.5, tool: 'connector' });
         } else if (el.type === 'marker' && el.markerType === 'unstable') {
@@ -449,7 +459,7 @@ export function serializeState(state: DocumentState, viewMode: string, colourSch
             schemaUrl: 'https://plan.skeletalsurgery.com/spine/schema/v4/spinal-instrumentation.json',
             generator: { name: 'Spinal Instrumentation Plan & Record', version: currentVersion, url: 'https://plan.skeletalsurgery.com/spine' },
         },
-        document: { id: state.documentId, created: state.documentCreated, modified: new Date().toISOString(), language: currentLang },
+        document: { id: state.documentId, created: state.documentCreated, modified: new Date().toISOString(), language: currentLang, ...(state.lockedAt && { lockedAt: state.lockedAt }) },
         patient: { name: state.patientData.name, identifier: state.patientData.id },
         case: { date: state.patientData.date, surgeon: state.patientData.surgeon, location: state.patientData.location || '' },
         implantSystem: { manufacturer: state.patientData.company, system: state.patientData.screwSystem },
@@ -507,6 +517,7 @@ export function deserializeDocument(json: Record<string, any>): { state: Documen
     if (json.schema?.version === 4) {
         if (json.document?.id) state.documentId = json.document.id;
         if (json.document?.created) state.documentCreated = json.document.created;
+        state.lockedAt = json.document?.lockedAt || null;
 
         const pd: PatientData = {
             name: json.patient?.name || '', id: json.patient?.identifier || '',

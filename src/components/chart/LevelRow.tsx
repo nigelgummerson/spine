@@ -441,9 +441,10 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
                 ? ` (${cage.data.side.charAt(0).toUpperCase()})` : '';
             const hasDims = cage.data.height || cage.data.lordosis;
             const isCervicalWhole = viewMode === 'whole' && level.type === 'C';
+            const expSuffix = cage.data.expandable ? ' exp.' : '';
             const cageLabel = hasDims
-                ? `${cage.tool.toUpperCase()} ${cage.data.height}H ${cage.data.lordosis || '0'}\u00B0${sideChar}`
-                : `${cage.tool.toUpperCase()}${sideChar}`;
+                ? `${cage.tool.toUpperCase()} ${cage.data.height}H ${cage.data.lordosis || '0'}\u00B0${sideChar}${expSuffix}`
+                : `${cage.tool.toUpperCase()}${sideChar}${expSuffix}`;
             const labelColor = isGhost ? '#14b8a6' : '#0369a1';
             const fontSize = isCervicalWhole ? Math.max(8, cageLabelPx * 0.6) : cageLabelPx;
             return (
