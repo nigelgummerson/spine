@@ -250,7 +250,7 @@ describe('MAX_HISTORY cap', () => {
             state = undoReducer(state, {
                 type: 'ADD_PLACEMENT',
                 chart: 'plan',
-                placement: makePlacement(`p${i}`, `T${i + 1}` as any, i % 2 === 0 ? 'left' : 'right'),
+                placement: makePlacement(`p${i}`, `T${i + 1}`, i % 2 === 0 ? 'left' : 'right'),
             });
         }
         expect(state.past).toHaveLength(20);
@@ -289,6 +289,7 @@ describe('no-op passthrough', () => {
 
     it('returns same state for unknown action type', () => {
         const state = createInitialUndoState();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- intentionally testing unknown action type
         const result = undoReducer(state, { type: 'NONSENSE' } as any);
         expect(result).toBe(state);
     });

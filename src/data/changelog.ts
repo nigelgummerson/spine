@@ -1,4 +1,5 @@
-import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
+import { formatDate } from '../i18n/i18n';
+export { formatDate };
 
 export const CURRENT_VERSION: string = "v2.7.33-beta";
 
@@ -95,12 +96,3 @@ export const CHANGE_LOG: ChangeLogEntry[] = [
     ]}
 ];
 
-export const formatDate = (isoString: string): string => {
-    const lang = getCurrentLang();
-    const locale = LOCALE_MAP[lang] || 'en-GB';
-    try {
-        return new Date(isoString).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
-    } catch {
-        return isoString;
-    }
-};

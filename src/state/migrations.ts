@@ -3,8 +3,7 @@
 // Each migration transforms data from version N to N+1.
 // When a new schema version is added, add a migration function here.
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- migrations operate on untyped stored JSON
-type MigrationFn = (data: Record<string, any>) => Record<string, any>;
+type MigrationFn = (data: Record<string, unknown>) => Record<string, unknown>;
 
 // Registry: key is the source version, value migrates to the next version.
 // Currently empty — v4 is the latest schema version.
@@ -19,10 +18,10 @@ const migrations: Record<number, MigrationFn> = {
  * v2/v3 legacy: data.formatVersion (returned as-is — legacy files are not migrated,
  *   they are handled by the legacy deserialisation path in deserializeDocument)
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- JSON boundary: shape unknown before detection
-function detectVersion(data: Record<string, any>): number | null {
-    if (data?.schema?.version) return data.schema.version;
-    if (data?.formatVersion) return data.formatVersion;
+function detectVersion(data: Record<string, unknown>): number | null {
+    const schema = data?.schema as Record<string, unknown> | undefined;
+    if (schema?.version && typeof schema.version === 'number') return schema.version;
+    if (data?.formatVersion && typeof data.formatVersion === 'number') return data.formatVersion;
     return null;
 }
 
@@ -37,8 +36,7 @@ export const LATEST_SCHEMA_VERSION = 4;
  * Legacy v2/v3 data passes through unchanged — it uses a separate
  * deserialisation path that handles format differences directly.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- JSON boundary: operates on untyped localStorage data
-export function migrateStoredData(data: Record<string, any>): Record<string, any> {
+export function migrateStoredData(data: Record<string, unknown>): Record<string, unknown> {
     const version = detectVersion(data);
     if (version === null) {
         throw new Error('Unrecognised data format: no schema version found');

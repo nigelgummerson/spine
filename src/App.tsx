@@ -20,10 +20,11 @@ import { ChartPaper } from './components/chart/ChartPaper';
 import { DisclaimerModal, isDisclaimerAccepted, acceptDisclaimer, resetDisclaimer, getDisclaimerTimestamp } from './components/modals/DisclaimerModal';
 import { OnboardingTour } from './components/OnboardingTour';
 import { useDocumentState } from './hooks/useDocumentState';
+import { useModalState } from './hooks/useModalState';
 import { useToast } from './hooks/useToast';
 import { RodModal } from './components/modals/RodModal';
 import { formatRodSummary, isRodEmpty, createEmptyRod } from './data/implants';
-import type { ColourScheme, ToolDefinition, Placement, Level, Zone, OsteotomyData, CageData, Cage, Note, RodData } from './types';
+import type { ColourScheme, ToolDefinition, Placement, Level, Zone, OsteotomyData, Cage, Note, RodData } from './types';
 
 /** Data shape returned by CageModal.onConfirm */
 interface CageConfirmData {
@@ -52,9 +53,6 @@ interface ScrewDetails {
     customText: string;
 }
 
-/** Editing data can be placement data, cage data for ghost cages, or undefined for new entries */
-type EditingData = string | OsteotomyData | CageData | Cage | null | undefined;
-
 /** Paste handler for contentEditable fields — strips HTML, inserts plain text only. */
 const handlePastePlainText = (e: React.ClipboardEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -76,7 +74,7 @@ const App = () => {
     const [showFinalInventory, setShowFinalInventory] = useState(false);
     const [currentLang, setCurrentLangState] = useState(detectLanguage());
 
-    const RTL_LANGUAGES = ['ar', 'he', 'fa', 'ur'];
+    const RTL_LANGUAGES = ['ar', 'he'];
     const isRTL = RTL_LANGUAGES.includes(currentLang);
 
     const changeLang = (code: string) => {
@@ -133,14 +131,30 @@ const App = () => {
     } = state;
     const setPatientField = (field: string, value: string) => dispatch({ type: 'SET_PATIENT_FIELD', field, value });
 
-    // MODALS — single discriminated state for exclusive modals
-    const [openModal, setOpenModal] = useState<ModalId>(null);
-    const [forcePopover, setForcePopover] = useState<{ x: number; y: number; existingTool: string | null; existingId: string | null } | null>(null);
-    const [pendingNoteTool, setPendingNoteTool] = useState<{ tool: string; levelId: string; offsetX: number; offsetY: number } | null>(null);
-    const [editingNote, setEditingNote] = useState<Note | null>(null);
-    const [rodModalOpen, setRodModalOpen] = useState(false);
-    const [rodModalChart, setRodModalChart] = useState<'plan' | 'construct'>('plan');
-    const [rodModalSide, setRodModalSide] = useState<'left' | 'right'>('left');
+    // MODALS — all modal/editing state centralised in useModalState
+    const {
+        openModal, setOpenModal,
+        forcePopover, setForcePopover,
+        pendingNoteTool, setPendingNoteTool,
+        editingNote, setEditingNote,
+        rodModalOpen, setRodModalOpen,
+        rodModalChart, setRodModalChart,
+        rodModalSide, setRodModalSide,
+        confirmNewPatient, setConfirmNewPatient,
+        confirmClearConstruct, setConfirmClearConstruct,
+        confirmLock, setConfirmLock,
+        confirmUnlock, setConfirmUnlock,
+        exportPicker, setExportPicker,
+        pendingPlacement, setPendingPlacement,
+        editingPlacementId, setEditingPlacementId,
+        editingData, setEditingData,
+        editingTool, setEditingTool,
+        editingCageLevel, setEditingCageLevel,
+        discPickerLevel, setDiscPickerLevel,
+        editingAnnotation, setEditingAnnotation,
+        osteoDiscLevel, setOsteoDiscLevel,
+        pendingForceZone, setPendingForceZone,
+    } = useModalState();
     const openRodModal = (chart: 'plan' | 'construct', side: 'left' | 'right') => {
         setRodModalChart(chart); setRodModalSide(side); setRodModalOpen(true);
     };
@@ -151,28 +165,14 @@ const App = () => {
         dispatch({ type: 'SET_ROD', chart: rodModalChart, side, rod: createEmptyRod() });
     };
 
-    const [confirmNewPatient, setConfirmNewPatient] = useState(false);
-    const [confirmClearConstruct, setConfirmClearConstruct] = useState(false);
-    const [confirmLock, setConfirmLock] = useState(false);
-    const [confirmUnlock, setConfirmUnlock] = useState(false);
-
     // Record lock state
     const isLocked = !!state.lockedAt;
-    const [exportPicker, setExportPicker] = useState<string | null>(null);
     // Disclaimer: shown on first load and after New Patient
     const [disclaimerTick, setDisclaimerTick] = useState(0);
     const disclaimerAccepted = isDisclaimerAccepted(currentLang);
 
-    // EDITING STATE
     // Track recently confirmed placements (not yet in rendered state) for Confirm & Next skip logic
     const recentPlacementsRef = useRef<{ levelId: string; zone: string }[]>([]);
-    const [pendingPlacement, setPendingPlacement] = useState<{ levelId: string; zone: string; tool: string } | null>(null);
-    const [editingPlacementId, setEditingPlacementId] = useState<string | null>(null);
-    const [editingData, setEditingData] = useState<EditingData>(undefined);
-    const [editingTool, setEditingTool] = useState<string | null>(null);
-    const [editingCageLevel, setEditingCageLevel] = useState<string | null>(null);
-    const [discPickerLevel, setDiscPickerLevel] = useState<{ levelId: string; x: number; y: number } | null>(null);
-    const [editingAnnotation, setEditingAnnotation] = useState('');
 
     // KEYBOARD NAVIGATION STATE
     const [kbFocusLevel, setKbFocusLevel] = useState<number | null>(null); // index into levels array
@@ -185,9 +185,7 @@ const App = () => {
     const [defaultCustomText, setDefaultCustomText] = useState('');
     const [defaultOsteoType, setDefaultOsteoType] = useState('PSO');
     const [defaultOsteoAngle, setDefaultOsteoAngle] = useState('25');
-    const [osteoDiscLevel, setOsteoDiscLevel] = useState<boolean | undefined>(undefined);
-    const [pendingForceZone, setPendingForceZone] = useState<{ levelId: string; zone: string } | null>(null);
-    
+
     const exportRef = useRef<HTMLDivElement>(null);
     const containerWrapperRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -400,8 +398,8 @@ const App = () => {
         return () => observer.disconnect();
     }, [isPortrait]);
 
-    // ALL TOOL DEFINITIONS (for rendering and lookup)
-    const allTools: ToolDefinition[] = [
+    // ALL TOOL DEFINITIONS (for rendering and lookup) — memoised to preserve reference identity
+    const allTools: ToolDefinition[] = useMemo(() => [
         { id: 'monoaxial', labelKey: 'tool.monoaxial', icon: 'monoaxial', needsSize: true, type: 'implant' },
         { id: 'polyaxial', labelKey: 'tool.polyaxial', icon: 'polyaxial', needsSize: true, type: 'implant' },
         { id: 'uniplanar', labelKey: 'tool.uniplanar', icon: 'uniplanar', needsSize: true, type: 'implant' },
@@ -425,7 +423,7 @@ const App = () => {
         { id: 'derotate_cw', labelKey: 'tool.derotate_cw', icon: 'derotate_cw', type: 'force' },
         { id: 'derotate_ccw', labelKey: 'tool.derotate_ccw', icon: 'derotate_ccw', type: 'force' },
         { id: 'note', labelKey: 'tool.note', icon: 'note', type: 'annotation' },
-    ];
+    ], []);
 
     // SIDEBAR PALETTE
     const tools = [
@@ -804,12 +802,40 @@ const App = () => {
         showToast(t('alert.construct_cleared'));
     };
 
+    // --- Stable callback refs for ChartPaper (prevents memo-busting on unrelated re-renders) ---
+    const chartHandlersRef = useRef({
+        handleZoneClick, handlePlacementClick, handleGhostClick, handleDiscClick,
+        handleNoteClick, handleGhostNoteClick,
+        handleGhostConnectorClick, handleGhostCageClick, handlePelvisZoneClick,
+        updateConnector, removeConnector, updateNotePosition, removeNote, updateReconLabelPosition,
+    });
+    chartHandlersRef.current = {
+        handleZoneClick, handlePlacementClick, handleGhostClick, handleDiscClick,
+        handleNoteClick, handleGhostNoteClick, handleGhostConnectorClick, handleGhostCageClick,
+        handlePelvisZoneClick, updateConnector, removeConnector, updateNotePosition, removeNote,
+        updateReconLabelPosition,
+    };
+    const stableZoneClick = useCallback((levelId: string, zone: string) => chartHandlersRef.current.handleZoneClick(levelId, zone), []);
+    const stablePlacementClick = useCallback((p: Placement) => chartHandlersRef.current.handlePlacementClick(p), []);
+    const stableGhostClick = useCallback((p: Placement) => chartHandlersRef.current.handleGhostClick(p), []);
+    const stableDiscClick = useCallback((levelId: string) => chartHandlersRef.current.handleDiscClick(levelId), []);
+    const stableNoteClick = useCallback((note: Note) => chartHandlersRef.current.handleNoteClick(note), []);
+    const stableGhostNoteClick = useCallback((note: Note) => chartHandlersRef.current.handleGhostNoteClick?.(note), []);
+    const stableGhostConnectorClick = useCallback((conn: { levelId: string; fraction: number }) => chartHandlersRef.current.handleGhostConnectorClick(conn), []);
+    const stableGhostCageClick = useCallback((cage: Cage) => chartHandlersRef.current.handleGhostCageClick(cage), []);
+    const stablePelvisZoneClick = useCallback((levelId: string, zone: string) => chartHandlersRef.current.handlePelvisZoneClick(levelId, zone), []);
+    const stableConnectorUpdate = useCallback((id: string, pos: { levelId: string; fraction: number }) => chartHandlersRef.current.updateConnector(id, pos), []);
+    const stableConnectorRemove = useCallback((id: string) => chartHandlersRef.current.removeConnector(id), []);
+    const stableNoteUpdate = useCallback((id: string, pos: { offsetX: number; offsetY: number }) => chartHandlersRef.current.updateNotePosition(id, pos), []);
+    const stableNoteRemove = useCallback((id: string) => chartHandlersRef.current.removeNote(id), []);
+    const stableReconLabelUpdate = useCallback((id: string, pos: { offsetX: number; offsetY: number }) => chartHandlersRef.current.updateReconLabelPosition(id, pos), []);
+
     // --- Shared sub-elements (used in both portrait and landscape) ---
     const demographicsContent = <DemographicsPanel patientData={patientData} dispatch={dispatch} setPatientField={setPatientField} changeTheme={changeTheme} showFinalInventory={showFinalInventory} setShowFinalInventory={setShowFinalInventory} plannedPlacements={plannedPlacements} completedPlacements={completedPlacements} plannedCages={plannedCages} completedCages={completedCages} plannedConnectors={plannedConnectors} completedConnectors={completedConnectors} allTools={allTools} levels={levels} currentLang={currentLang} />;
 
-    const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isLocked || isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={heightScale} cages={plannedCages} onDiscClick={handleDiscClick} connectors={plannedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1 cursor-pointer hover:bg-slate-50 rounded px-1" onClick={() => openRodModal('plan', 'left')}><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className={`text-[10px] py-0.5 px-1 text-right ${isRodEmpty(patientData.planLeftRod) ? 'text-slate-300 italic' : 'text-slate-700'}`} style={{ minWidth: '60px' }}>{isRodEmpty(patientData.planLeftRod) ? t('patient.click_to_set') : formatRodSummary(patientData.planLeftRod)}</span></div><div className="flex items-center justify-start gap-1 cursor-pointer hover:bg-slate-50 rounded px-1" onClick={() => openRodModal('plan', 'right')}><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className={`text-[10px] py-0.5 px-1 text-left ${isRodEmpty(patientData.planRightRod) ? 'text-slate-300 italic' : 'text-slate-700'}`} style={{ minWidth: '60px' }}>{isRodEmpty(patientData.planRightRod) ? t('patient.click_to_set') : formatRodSummary(patientData.planRightRod)}</span></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} isActive={activeChart === 'planned'} activeBg={scheme.activeBg} activeText={scheme.activeText} focusedLevelId={activeChart === 'planned' ? kbFocusLevelId : null} focusedZone={kbFocusZone} isLocked={isLocked} />;
+    const planChart = <ChartPaper title={t('export.plan')} placements={plannedPlacements} onZoneClick={stableZoneClick} onPlacementClick={stablePlacementClick} tools={allTools} readOnly={isLocked || isViewOnly || activeChart !== 'planned'} levels={levels} showForces={true} heightScale={heightScale} cages={plannedCages} onDiscClick={stableDiscClick} connectors={plannedConnectors} onConnectorUpdate={stableConnectorUpdate} onConnectorRemove={stableConnectorRemove} viewMode={viewMode} notes={plannedNotes} onNoteUpdate={stableNoteUpdate} onNoteRemove={stableNoteRemove} onNoteClick={stableNoteClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1 cursor-pointer hover:bg-slate-50 rounded px-1" onClick={() => openRodModal('plan', 'left')}><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className={`text-[10px] py-0.5 px-1 text-right ${isRodEmpty(patientData.planLeftRod) ? 'text-slate-300 italic' : 'text-slate-700'}`} style={{ minWidth: '60px' }}>{isRodEmpty(patientData.planLeftRod) ? t('patient.click_to_set') : formatRodSummary(patientData.planLeftRod)}</span></div><div className="flex items-center justify-start gap-1 cursor-pointer hover:bg-slate-50 rounded px-1" onClick={() => openRodModal('plan', 'right')}><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className={`text-[10px] py-0.5 px-1 text-left ${isRodEmpty(patientData.planRightRod) ? 'text-slate-300 italic' : 'text-slate-700'}`} style={{ minWidth: '60px' }}>{isRodEmpty(patientData.planRightRod) ? t('patient.click_to_set') : formatRodSummary(patientData.planRightRod)}</span></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={stableReconLabelUpdate} onPelvisZoneClick={stablePelvisZoneClick} isActive={activeChart === 'planned'} activeBg={scheme.activeBg} activeText={scheme.activeText} focusedLevelId={activeChart === 'planned' ? kbFocusLevelId : null} focusedZone={kbFocusZone} isLocked={isLocked} />;
 
-    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={handleGhostClick} onZoneClick={handleZoneClick} onPlacementClick={handlePlacementClick} tools={allTools} readOnly={isLocked || isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={heightScale} cages={completedCages} onDiscClick={handleDiscClick} connectors={completedConnectors} onConnectorUpdate={updateConnector} onConnectorRemove={removeConnector} viewMode={viewMode} notes={completedNotes} onNoteUpdate={updateNotePosition} onNoteRemove={removeNote} onNoteClick={handleNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={handleGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={handleGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1 cursor-pointer hover:bg-slate-50 rounded px-1" onClick={() => { if (isRodEmpty(patientData.leftRod) && !isRodEmpty(patientData.planLeftRod)) { dispatch({ type: 'SET_ROD', chart: 'construct', side: 'left', rod: { ...patientData.planLeftRod } }); showToast(t('alert.undone') ? 'Rod confirmed from plan' : 'Rod confirmed', 'info'); } else { openRodModal('construct', 'left'); } }}><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className={`text-[10px] py-0.5 px-1 text-right ${isRodEmpty(patientData.leftRod) ? (isRodEmpty(patientData.planLeftRod) ? 'text-slate-300 italic' : 'text-teal-500 italic opacity-75') : 'text-slate-700'}`} style={{ minWidth: '60px' }}>{isRodEmpty(patientData.leftRod) ? (isRodEmpty(patientData.planLeftRod) ? t('patient.click_to_set') : formatRodSummary(patientData.planLeftRod)) : formatRodSummary(patientData.leftRod)}</span></div><div className="flex items-center justify-start gap-1 cursor-pointer hover:bg-slate-50 rounded px-1" onClick={() => { if (isRodEmpty(patientData.rightRod) && !isRodEmpty(patientData.planRightRod)) { dispatch({ type: 'SET_ROD', chart: 'construct', side: 'right', rod: { ...patientData.planRightRod } }); showToast('Rod confirmed from plan', 'info'); } else { openRodModal('construct', 'right'); } }}><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className={`text-[10px] py-0.5 px-1 text-left ${isRodEmpty(patientData.rightRod) ? (isRodEmpty(patientData.planRightRod) ? 'text-slate-300 italic' : 'text-teal-500 italic opacity-75') : 'text-slate-700'}`} style={{ minWidth: '60px' }}>{isRodEmpty(patientData.rightRod) ? (isRodEmpty(patientData.planRightRod) ? t('patient.click_to_set') : formatRodSummary(patientData.planRightRod)) : formatRodSummary(patientData.rightRod)}</span></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={updateReconLabelPosition} onPelvisZoneClick={handlePelvisZoneClick} isActive={activeChart === 'completed'} activeBg={scheme.activeBg} activeText={scheme.activeText} focusedLevelId={activeChart === 'completed' ? kbFocusLevelId : null} focusedZone={kbFocusZone} isLocked={isLocked} />;
+    const constructChart = <ChartPaper title={t('export.construct')} placements={completedPlacements} ghostPlacements={isPortrait ? plannedPlacements : undefined} onGhostClick={stableGhostClick} onZoneClick={stableZoneClick} onPlacementClick={stablePlacementClick} tools={allTools} readOnly={isLocked || isViewOnly || activeChart !== 'completed'} levels={levels} showForces={isPortrait} forcePlacements={isPortrait ? plannedPlacements : undefined} heightScale={heightScale} cages={completedCages} onDiscClick={stableDiscClick} connectors={completedConnectors} onConnectorUpdate={stableConnectorUpdate} onConnectorRemove={stableConnectorRemove} viewMode={viewMode} notes={completedNotes} onNoteUpdate={stableNoteUpdate} onNoteRemove={stableNoteRemove} onNoteClick={stableNoteClick} ghostConnectors={isPortrait ? plannedConnectors : undefined} onGhostConnectorClick={stableGhostConnectorClick} ghostCages={isPortrait ? plannedCages : undefined} onGhostCageClick={stableGhostCageClick} rodHeader={<React.Fragment><div className="flex items-center justify-end gap-1 cursor-pointer hover:bg-slate-50 rounded px-1" onClick={() => { if (isRodEmpty(patientData.leftRod) && !isRodEmpty(patientData.planLeftRod)) { dispatch({ type: 'SET_ROD', chart: 'construct', side: 'left', rod: { ...patientData.planLeftRod } }); showToast(t('alert.undone') ? 'Rod confirmed from plan' : 'Rod confirmed', 'info'); } else { openRodModal('construct', 'left'); } }}><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className={`text-[10px] py-0.5 px-1 text-right ${isRodEmpty(patientData.leftRod) ? (isRodEmpty(patientData.planLeftRod) ? 'text-slate-300 italic' : 'text-teal-500 italic opacity-75') : 'text-slate-700'}`} style={{ minWidth: '60px' }}>{isRodEmpty(patientData.leftRod) ? (isRodEmpty(patientData.planLeftRod) ? t('patient.click_to_set') : formatRodSummary(patientData.planLeftRod)) : formatRodSummary(patientData.leftRod)}</span></div><div className="flex items-center justify-start gap-1 cursor-pointer hover:bg-slate-50 rounded px-1" onClick={() => { if (isRodEmpty(patientData.rightRod) && !isRodEmpty(patientData.planRightRod)) { dispatch({ type: 'SET_ROD', chart: 'construct', side: 'right', rod: { ...patientData.planRightRod } }); showToast('Rod confirmed from plan', 'info'); } else { openRodModal('construct', 'right'); } }}><span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">{t('patient.rod')}:</span><span className={`text-[10px] py-0.5 px-1 text-left ${isRodEmpty(patientData.rightRod) ? (isRodEmpty(patientData.planRightRod) ? 'text-slate-300 italic' : 'text-teal-500 italic opacity-75') : 'text-slate-700'}`} style={{ minWidth: '60px' }}>{isRodEmpty(patientData.rightRod) ? (isRodEmpty(patientData.planRightRod) ? t('patient.click_to_set') : formatRodSummary(patientData.planRightRod)) : formatRodSummary(patientData.rightRod)}</span></div></React.Fragment>} reconLabelPositions={reconLabelPositions} onReconLabelUpdate={stableReconLabelUpdate} onPelvisZoneClick={stablePelvisZoneClick} isActive={activeChart === 'completed'} activeBg={scheme.activeBg} activeText={scheme.activeText} focusedLevelId={activeChart === 'completed' ? kbFocusLevelId : null} focusedZone={kbFocusZone} isLocked={isLocked} />;
 
     const finishCaseAction = () => setConfirmLock(true);
     const executeFinishCase = () => {

@@ -33,6 +33,10 @@ const STACK_RESET_ACTIONS: Set<string> = new Set([
 export function undoReducer(state: UndoState, action: DocumentAction): UndoState {
     switch (action.type) {
         case 'UNDO': {
+            if (state.present.lockedAt) {
+                console.warn('Rejected UNDO — record is locked');
+                return state;
+            }
             if (state.past.length === 0) return state;
             const previous = state.past[state.past.length - 1];
             return {
@@ -43,6 +47,10 @@ export function undoReducer(state: UndoState, action: DocumentAction): UndoState
         }
 
         case 'REDO': {
+            if (state.present.lockedAt) {
+                console.warn('Rejected REDO — record is locked');
+                return state;
+            }
             if (state.future.length === 0) return state;
             const next = state.future[0];
             return {

@@ -89,18 +89,23 @@ export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialDa
         onClose();
     };
     const isEditing = !!initialData;
+    const noTypesPermitted = filteredTypes.length === 0;
     const osteoRef = useRef<HTMLDivElement>(null);
     useEffect(() => { if (osteoRef.current) osteoRef.current.focus(); }, []);
     return (<Portal>
         <div ref={osteoRef} tabIndex={-1} style={{outline:'none'}}
-            onKeyDown={modalKeyHandler({ onSubmit: handleSubmit, onClose, onDelete, isEditing })}
+            onKeyDown={modalKeyHandler({ onSubmit: noTypesPermitted ? onClose : handleSubmit, onClose, onDelete, isEditing })}
             className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true">
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-sm overflow-hidden">
                 <div className="bg-amber-800 text-white px-4 py-3 flex justify-between items-center">
                     <h3 className="font-bold text-sm">{isEditing ? t('modal.osteotomy.title_edit') : t('modal.osteotomy.title_new')}</h3>
                     <button onClick={onClose} className="hover:text-red-200"><IconX /></button>
                 </div>
-                <div className="p-6 space-y-4">
+                {noTypesPermitted ? (
+                <div className="p-6">
+                    <p className="text-sm text-slate-600">{t('alert.no_osteotomy_at_level')}</p>
+                </div>
+                ) : <div className="p-6 space-y-4">
                     <div>
                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('modal.osteotomy.type')}</label>
                         <select value={type} onChange={handleTypeChange} onWheel={selectWheelHandler} title={t('hint.scroll_to_change')}
@@ -138,8 +143,11 @@ export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialDa
                                 className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-amber-500 outline-none" />
                         </div>
                     )}
-                </div>
+                </div>}
                 <div className="bg-slate-50 px-4 py-3 flex justify-between border-t border-slate-100">
+                    {noTypesPermitted ? (
+                        <><div></div><button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.close')}</button></>
+                    ) : (<>
                     {isEditing ? (
                         <button onClick={onDelete} className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm font-bold flex gap-1 items-center">
                             <IconTrash/> {t('button.remove')}
@@ -149,6 +157,7 @@ export const OsteotomyModal = ({ isOpen, onClose, onConfirm, onDelete, initialDa
                         <button onClick={onClose} className="px-4 py-2 rounded text-slate-500 hover:bg-slate-200 text-sm font-bold">{t('button.cancel')}</button>
                         <button onClick={handleSubmit} className="px-6 py-2 rounded bg-amber-800 text-white hover:bg-amber-700 text-sm font-bold shadow-lg">{t('button.confirm')}</button>
                     </div>
+                    </>)}
                 </div>
             </div>
         </div>

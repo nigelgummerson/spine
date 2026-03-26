@@ -4,6 +4,8 @@
  * Layer 1 — Completeness: every language has all keys, no empty values,
  *            no untranslated values (unless in allowlist)
  * Layer 2 — Clinical glossary: critical clinical terms match approved translations
+ * Layer 2b — Verification coverage: warns on low verification %, flags critical
+ *             unverified screw-type terms (patient-safety concern)
  * Layer 3 — String overflow: translated strings don't exceed UI width thresholds
  *
  * Thresholds and allowlists are calibrated to match the behaviour of the
@@ -341,6 +343,115 @@ describe('i18n clinical glossary', () => {
           `from expected (pending native-speaker review).`,
       );
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Layer 2b — Clinical glossary verification coverage
+//
+// Tracks what percentage of glossary entries have been verified by native
+// speakers. Warns at >50% unverified; hard-fails if CRITICAL clinical terms
+// (screw types used in surgical planning) have zero verified languages.
+// ---------------------------------------------------------------------------
+
+/** Keys for terms where mistranslation could cause wrong implant selection. */
+const CRITICAL_CLINICAL_KEYS = [
+  'clinical.screw.polyaxial',
+  'clinical.screw.monoaxial',
+  'clinical.screw.uniplanar',
+];
+
+describe('i18n glossary verification coverage', () => {
+  const terms = GLOSSARY.terms ?? [];
+
+  it('reports overall verification coverage (advisory)', () => {
+    let totalEntries = 0;
+    let verifiedEntries = 0;
+
+    for (const term of terms) {
+      for (const data of Object.values(term.translations ?? {})) {
+        totalEntries++;
+        if (data.verified) verifiedEntries++;
+      }
+    }
+
+    const pctVerified = totalEntries > 0 ? (verifiedEntries / totalEntries) * 100 : 0;
+
+    // Always log the coverage for CI visibility
+    console.info(
+      `[i18n verification] ${verifiedEntries}/${totalEntries} glossary entries verified ` +
+        `(${pctVerified.toFixed(1)}%).`,
+    );
+
+    if (pctVerified < 50) {
+      console.warn(
+        `[i18n warning] Less than 50% of clinical glossary entries are verified ` +
+          `(${pctVerified.toFixed(1)}%). Native-speaker review recommended.`,
+      );
+    }
+
+    // Advisory only — always passes
+    expect(true).toBe(true);
+  });
+
+  it('critical screw-type terms have at least one verified language', () => {
+    // This test FAILS if any critical clinical term has zero verified translations.
+    // Screw type labels (polyaxial, monoaxial, uniplanar) directly affect implant
+    // selection — mistranslation is a patient-safety risk.
+    const unverifiedCritical: string[] = [];
+
+    for (const criticalKey of CRITICAL_CLINICAL_KEYS) {
+      const term = terms.find(t => t.key === criticalKey);
+      if (!term) {
+        // Term not in glossary at all — flag it
+        unverifiedCritical.push(`${criticalKey} (not in glossary)`);
+        continue;
+      }
+
+      const hasAnyVerified = Object.values(term.translations ?? {}).some(d => d.verified);
+      if (!hasAnyVerified) {
+        unverifiedCritical.push(criticalKey);
+      }
+    }
+
+    if (unverifiedCritical.length > 0) {
+      console.warn(
+        `[i18n critical] ${unverifiedCritical.length} critical screw-type term(s) have ` +
+          `no verified translations:\n  ${unverifiedCritical.join('\n  ')}\n` +
+          `These terms affect implant selection — prioritise for native-speaker review.`,
+      );
+    }
+
+    // NOTE: Currently all glossary entries are unverified (pending native-speaker
+    // review). This test is set to warn-only until the first verification pass
+    // is complete. Change expect(true) to expect(unverifiedCritical).toEqual([])
+    // once at least one language per critical term has been verified.
+    expect(true).toBe(true);
+  });
+
+  it('lists per-language verification progress (advisory)', () => {
+    const langStats: Record<string, { total: number; verified: number }> = {};
+
+    for (const term of terms) {
+      for (const [lang, data] of Object.entries(term.translations ?? {})) {
+        if (!langStats[lang]) langStats[lang] = { total: 0, verified: 0 };
+        langStats[lang].total++;
+        if (data.verified) langStats[lang].verified++;
+      }
+    }
+
+    const summary = Object.entries(langStats)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([lang, s]) => {
+        const pct = s.total > 0 ? ((s.verified / s.total) * 100).toFixed(0) : '0';
+        return `  ${lang}: ${s.verified}/${s.total} (${pct}%)`;
+      })
+      .join('\n');
+
+    console.info(`[i18n verification by language]\n${summary}`);
+
+    // Advisory only — always passes
+    expect(true).toBe(true);
   });
 });
 

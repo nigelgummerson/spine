@@ -6,16 +6,17 @@ import React from 'react';
 // --- Global mocks required by jsdom ---
 
 // ResizeObserver is not implemented in jsdom — mock with a fixed width
+/* eslint-disable @typescript-eslint/no-explicit-any -- partial jsdom mocks for browser APIs */
 globalThis.ResizeObserver = class {
     private cb: ResizeObserverCallback;
     constructor(cb: ResizeObserverCallback) { this.cb = cb; }
-    observe(target: Element) {
+    observe(_target: Element) {
         // Fire callback with a synthetic entry so chartWidth gets a usable value
-        this.cb([{ contentRect: { width: 500, height: 800 } } as any], this as any);
+        this.cb([{ contentRect: { width: 500, height: 800 } } as unknown as ResizeObserverEntry], this as unknown as ResizeObserver);
     }
     unobserve() {}
     disconnect() {}
-} as any;
+} as unknown as typeof ResizeObserver;
 
 // jsdom returns 0 for clientWidth — override for container elements
 Object.defineProperty(HTMLDivElement.prototype, 'clientWidth', { get: () => 500, configurable: true });
@@ -23,7 +24,8 @@ Object.defineProperty(HTMLDivElement.prototype, 'clientWidth', { get: () => 500,
 // SVGSVGElement.getScreenCTM — identity matrix
 SVGSVGElement.prototype.getScreenCTM = (() => {
     return { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 } as DOMMatrix;
-}) as any;
+}) as unknown as typeof SVGSVGElement.prototype.getScreenCTM;
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 // measureText relies on canvas which jsdom doesn't support
 vi.mock('../../utils/measureText', () => ({

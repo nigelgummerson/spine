@@ -2,8 +2,7 @@
 import { RefObject } from 'react';
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
-import { t } from '../i18n/i18n';
-import { formatDate } from '../data/changelog';
+import { t, formatDate } from '../i18n/i18n';
 import { deserializeDocument } from '../state/documentReducer';
 import { validateV4, validateLegacy, ValidationError } from '../state/schema';
 import { computeChecksum, verifyChecksum } from '../utils/checksum';

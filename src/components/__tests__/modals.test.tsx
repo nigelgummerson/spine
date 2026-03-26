@@ -9,13 +9,13 @@ afterEach(() => {
     document.body.innerHTML = '';
 });
 import { HelpModal } from '../modals/HelpModal';
-import type { Zone } from '../../types';
+import type { Zone, Placement } from '../../types';
 
 const defaultScrewProps = {
     levelId: 'L4',
     zone: 'left' as Zone,
     levels: [{ id: 'L3', type: 'L' }, { id: 'L4', type: 'L' }, { id: 'L5', type: 'L' }],
-    placements: [] as any[],
+    placements: [] as Placement[],
     useRegionDefaults: false,
 };
 import { ChangeLogModal } from '../modals/ChangeLogModal';

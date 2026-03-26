@@ -61,7 +61,16 @@ function chartKey(chart: Chart, arrayName: ArraySuffix): keyof DocumentState {
 
 // --- Reducer ---
 
+const LOCK_EXEMPT_ACTIONS: Set<string> = new Set([
+    'UNLOCK_DOCUMENT', 'LOAD_DOCUMENT', 'NEW_PATIENT',
+]);
+
 export function documentReducer(state: DocumentState, action: DocumentAction): DocumentState {
+    if (state.lockedAt && !LOCK_EXEMPT_ACTIONS.has(action.type)) {
+        console.warn(`Rejected action "${action.type}" — record is locked`);
+        return state;
+    }
+
     switch (action.type) {
 
         // --- Placement CRUD ---

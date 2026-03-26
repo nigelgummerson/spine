@@ -1,7 +1,7 @@
 // src/state/__tests__/documentReducer.test.js
 import { describe, it, expect } from 'vitest';
 import { createInitialState, documentReducer, serializeState, deserializeDocument } from '../documentReducer';
-import type { Placement, Cage, DocumentAction } from '../../types';
+import type { Placement, Cage, DocumentAction, OsteotomyData } from '../../types';
 
 // --- Task 9: createInitialState ---
 
@@ -209,6 +209,7 @@ describe('Edge cases', () => {
 
     it('unknown action type returns unchanged state', () => {
         const state = createInitialState();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- intentionally testing unknown action type
         const next = documentReducer(state, { type: 'NONSENSE' } as any);
         expect(next).toBe(state);
     });
@@ -354,8 +355,8 @@ describe('COPY_PLAN_TO_CONSTRUCT', () => {
         const p = { id: 'p1', levelId: 'T10', zone: 'mid', tool: 'osteotomy', data: { type: 'PSO', angle: 30, shortLabel: 'PSO', reconstructionCage: 'mesh cage' }, annotation: '' } as Placement;
         let s = documentReducer(state, { type: 'ADD_PLACEMENT', chart: 'plan', placement: p });
         s = documentReducer(s, { type: 'COPY_PLAN_TO_CONSTRUCT', genId: mockGenId });
-        expect((s.completedPlacements[0].data as any).angle).toBeNull();
-        expect((s.completedPlacements[0].data as any).reconstructionCage).toBe('');
+        expect((s.completedPlacements[0].data as OsteotomyData).angle).toBeNull();
+        expect((s.completedPlacements[0].data as OsteotomyData).reconstructionCage).toBe('');
     });
 });
 

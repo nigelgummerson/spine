@@ -10,11 +10,11 @@ import { t } from '../i18n/i18n';
 import type { DocumentState, DocumentAction } from '../types';
 
 /** Validate sync payload using the same Zod checks as file load */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- JSON boundary: untrusted data from BroadcastChannel
-function validateSyncPayload(payload: Record<string, any>): void {
-    if (payload?.schema?.version === 4) {
+function validateSyncPayload(payload: Record<string, unknown>): void {
+    const schema = payload?.schema as Record<string, unknown> | undefined;
+    if (schema?.version === 4) {
         validateV4(payload);
-    } else if (payload?.formatVersion >= 2) {
+    } else if (typeof payload?.formatVersion === 'number' && payload.formatVersion >= 2) {
         validateLegacy(payload);
     } else {
         throw new Error('Unrecognised sync payload format');
@@ -106,30 +106,53 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
         });
     }, []);
 
+    // Wrap dispatch to broadcast immediately for NEW_PATIENT (bypass 200ms debounce)
+    const wrappedDispatch: typeof dispatch = useCallback((action) => {
+        dispatch(action);
+        if ('type' in action && action.type === 'NEW_PATIENT' && syncChannelRef.current) {
+            // Cancel any pending debounced broadcast — the peer must see the cleared state now
+            clearTimeout(syncTimerRef.current!);
+            localChangePendingRef.current = true;
+            syncVersionRef.current++;
+            const freshState = createInitialState();
+            syncChannelRef.current.postMessage({
+                type: 'state', appVersion: CURRENT_VERSION,
+                payload: serializeState(freshState, viewModeRef.current, colourSchemeRef.current, CURRENT_VERSION, currentLangRef.current, {
+                    showPelvis: showPelvisRef.current, useRegionDefaults: useRegionDefaultsRef.current, confirmAndNext: confirmAndNextRef.current,
+                }),
+                version: syncVersionRef.current,
+                incognito: incognitoRef.current,
+            });
+            localChangePendingRef.current = false;
+        }
+    }, []);
+
     // AUTO-LOAD from localStorage on mount
     useEffect(() => {
         const saved = localStorage.getItem('spine_planner_v2');
         if (saved) {
             try {
                 const parsed = migrateStoredData(JSON.parse(saved));
-                if (parsed.schema?.version === 4) {
+                const parsedSchema = parsed.schema as Record<string, unknown> | undefined;
+                const parsedDoc = parsed.document as Record<string, unknown> | undefined;
+                if (parsedSchema?.version === 4) {
                     validateV4(parsed);
-                    const result = deserializeDocument(parsed);
+                    const result = deserializeDocument(parsed as Record<string, any>);
                     dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
                     if (result.viewMode) setViewMode(result.viewMode);
                     if (result.colourScheme) changeTheme(result.colourScheme);
                     // Stale data warning — check document.modified timestamp
-                    const modified = parsed.document?.modified;
-                    if (modified && !incognitoMode) {
+                    const modified = parsedDoc?.modified;
+                    if (modified && typeof modified === 'string' && !incognitoMode) {
                         const ageMs = Date.now() - new Date(modified).getTime();
                         const ageDays = Math.floor(ageMs / (24 * 60 * 60 * 1000));
                         if (ageDays >= 7) {
                             showToast?.(t('alert.stale_data', { days: ageDays }), 'warn');
                         }
                     }
-                } else if (parsed.formatVersion >= 2) {
+                } else if (typeof parsed.formatVersion === 'number' && parsed.formatVersion >= 2) {
                     validateLegacy(parsed);
-                    const result = deserializeDocument(parsed);
+                    const result = deserializeDocument(parsed as Record<string, any>);
                     dispatch({ type: 'LOAD_DOCUMENT', document: result.state });
                     if (result.viewMode) setViewMode(result.viewMode);
                     if (result.colourScheme) changeTheme(result.colourScheme);
@@ -228,6 +251,11 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
                 lastPongRef.current = Date.now();
                 setSyncConnected(true);
                 if (msg.payload) {
+                    if (stateRef.current.lockedAt) {
+                        console.warn('Rejecting sync: local record is locked');
+                        showToast?.('Sync blocked — record is locked', 'error');
+                        return;
+                    }
                     try {
                         validateSyncPayload(msg.payload);
                         clearTimeout(syncTimerRef.current!);
@@ -246,6 +274,12 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
                 if (msg.payload) {
                     // Reject incoming sync if we have local changes pending broadcast
                     if (localChangePendingRef.current) return;
+                    // Reject incoming sync if local record is locked
+                    if (stateRef.current.lockedAt) {
+                        console.warn('Rejecting sync: local record is locked');
+                        showToast?.('Sync blocked — record is locked', 'error');
+                        return;
+                    }
                     try {
                         validateSyncPayload(msg.payload);
                         clearTimeout(syncTimerRef.current!);
@@ -275,6 +309,8 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
             if (lastPongRef.current > 0 && Date.now() - lastPongRef.current > 10000) {
                 setSyncConnected(false);
                 lastPongRef.current = 0;
+                // Peer is gone — reset incognito flag so localStorage saving resumes
+                peerIncognitoRef.current = false;
             }
         }, 5000);
 
@@ -290,5 +326,5 @@ export function useDocumentState({ viewMode, colourScheme, changeTheme, changeLa
         };
     }, [hasLoaded]);
 
-    return { state, dispatch, serialize, syncChannelRef, syncConnected, hasLoaded, canUndo, canRedo, undo, redo };
+    return { state, dispatch: wrappedDispatch, serialize, syncChannelRef, syncConnected, hasLoaded, canUndo, canRedo, undo, redo };
 }

@@ -14,7 +14,7 @@ class MockBroadcastChannel {
         this.name = name;
         MockBroadcastChannel.instances.push(this);
     }
-    postMessage(data: any) {
+    postMessage(data: unknown) {
         MockBroadcastChannel.instances.forEach(ch => {
             if (ch !== this && ch.name === this.name && ch.onmessage) {
                 ch.onmessage(new MessageEvent('message', { data }));
@@ -26,12 +26,13 @@ class MockBroadcastChannel {
     static reset() { MockBroadcastChannel.instances = []; }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: partial BroadcastChannel implementation
 globalThis.BroadcastChannel = MockBroadcastChannel as any;
 
 // --- Helpers ---
 
 /** Default params for useDocumentState — all stubs */
-function makeParams(overrides: Record<string, any> = {}) {
+function makeParams(overrides: Record<string, unknown> = {}) {
     return {
         viewMode: 'plan',
         colourScheme: 'default',

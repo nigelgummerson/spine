@@ -54,6 +54,16 @@ let _currentLang: string = detectLanguage();
 export const getCurrentLang = (): string => _currentLang;
 export const setCurrentLang = (code: string): void => { _currentLang = code; };
 
+export const formatDate = (isoString: string, lang?: string): string => {
+    const l = lang || _currentLang;
+    const locale = LOCALE_MAP[l] || 'en-GB';
+    try {
+        return new Date(isoString).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
+    } catch {
+        return isoString;
+    }
+};
+
 export const t = (key: string, replacements?: Record<string, string | number>): string => {
     const dict = TRANS[_currentLang] ?? TRANS.en;
     let str = dict[key] ?? TRANS.en[key] ?? key;

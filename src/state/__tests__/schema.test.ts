@@ -6,7 +6,8 @@ import { migrateStoredData, LATEST_SCHEMA_VERSION } from '../migrations';
 import type { Placement } from '../../types';
 
 // Helper: minimal valid v4 JSON
-function validV4(): any {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- test helper: needs mutable deep property access for validation edge cases
+function validV4(): Record<string, any> {
     return {
         schema: { format: 'spinal-instrumentation', version: 4 },
         document: { id: 'test-id', created: '2026-01-01T00:00:00Z' },
@@ -58,13 +59,19 @@ describe('validateV4', () => {
         expect(() => validateV4(json)).not.toThrow();
     });
 
-    it('accepts unknown extra fields (forward compatibility)', () => {
+    it('accepts unknown extra fields at root level (forward compatibility)', () => {
         const json = validV4();
         json.futureField = 'something';
+        json.futureSection = { nested: true };
+        expect(() => validateV4(json)).not.toThrow();
+    });
+
+    it('rejects unknown extra fields on elements (strict sub-objects)', () => {
+        const json = validV4();
         json.plan.elements = [
             { id: 'e1', type: 'screw', level: 'T5', side: 'left', screw: { headType: 'polyaxial' }, futureField: true },
         ];
-        expect(() => validateV4(json)).not.toThrow();
+        expect(() => validateV4(json)).toThrow(ValidationError);
     });
 
     // --- Rejection tests ---
@@ -159,6 +166,86 @@ describe('validateV4', () => {
         expect(() => validateV4(json)).toThrow(ValidationError);
     });
 
+    // --- Positive number validation ---
+
+    it('rejects negative screw diameter', () => {
+        const json = validV4();
+        json.plan.elements = [
+            { id: 'e1', type: 'screw', level: 'T5', side: 'left', screw: { headType: 'polyaxial', diameter: -3.5 } },
+        ];
+        expect(() => validateV4(json)).toThrow(ValidationError);
+    });
+
+    it('rejects zero screw length', () => {
+        const json = validV4();
+        json.plan.elements = [
+            { id: 'e1', type: 'screw', level: 'T5', side: 'left', screw: { headType: 'polyaxial', length: 0 } },
+        ];
+        expect(() => validateV4(json)).toThrow(ValidationError);
+    });
+
+    it('rejects negative cage height', () => {
+        const json = validV4();
+        json.plan.elements = [
+            { id: 'e1', type: 'cage', level: 'L4', side: 'bilateral', cage: { approach: 'TLIF', height: -10 } },
+        ];
+        expect(() => validateV4(json)).toThrow(ValidationError);
+    });
+
+    it('rejects zero cage width', () => {
+        const json = validV4();
+        json.plan.elements = [
+            { id: 'e1', type: 'cage', level: 'L4', side: 'bilateral', cage: { approach: 'TLIF', width: 0 } },
+        ];
+        expect(() => validateV4(json)).toThrow(ValidationError);
+    });
+
+    it('rejects negative rod diameter', () => {
+        const json = validV4();
+        json.plan.rods = [
+            { id: 'rod-left', side: 'left', diameter: -5.5 },
+        ];
+        expect(() => validateV4(json)).toThrow(ValidationError);
+    });
+
+    it('accepts valid positive clinical measurements', () => {
+        const json = validV4();
+        json.plan.elements = [
+            { id: 'e1', type: 'screw', level: 'T5', side: 'left', screw: { headType: 'polyaxial', diameter: 6.5, length: 45 } },
+            { id: 'e2', type: 'cage', level: 'L4', side: 'bilateral', cage: { approach: 'TLIF', height: 10, width: 26, length: 32 } },
+        ];
+        json.plan.rods = [
+            { id: 'rod-left', side: 'left', diameter: 5.5, length: 120 },
+        ];
+        expect(() => validateV4(json)).not.toThrow();
+    });
+
+    // --- Strict sub-object validation ---
+
+    it('rejects unknown fields on screw sub-object', () => {
+        const json = validV4();
+        json.plan.elements = [
+            { id: 'e1', type: 'screw', level: 'T5', side: 'left', screw: { headType: 'polyaxial', unknownField: true } },
+        ];
+        expect(() => validateV4(json)).toThrow(ValidationError);
+    });
+
+    it('rejects unknown fields on force objects', () => {
+        const json = validV4();
+        json.plan.forces = [
+            { id: 'f1', type: 'compression', level: 'T5', side: 'left', unknownField: 42 },
+        ];
+        expect(() => validateV4(json)).toThrow(ValidationError);
+    });
+
+    it('rejects unknown fields on rod objects', () => {
+        const json = validV4();
+        json.plan.rods = [
+            { id: 'rod-left', side: 'left', freeText: 'CoCr', unknownField: true },
+        ];
+        expect(() => validateV4(json)).toThrow(ValidationError);
+    });
+
     // --- Error format ---
 
     it('ValidationError has issues array and descriptive message', () => {
@@ -169,12 +256,13 @@ describe('validateV4', () => {
         try {
             validateV4(json);
             expect.fail('Should have thrown');
-        } catch (err: any) {
+        } catch (err: unknown) {
             expect(err).toBeInstanceOf(ValidationError);
-            expect(err.issues).toBeInstanceOf(Array);
-            expect(err.issues.length).toBeGreaterThan(0);
-            expect(err.message).toContain('Invalid file');
-            expect(err.message).toContain('error');
+            const ve = err as ValidationError;
+            expect(ve.issues).toBeInstanceOf(Array);
+            expect(ve.issues.length).toBeGreaterThan(0);
+            expect(ve.message).toContain('Invalid file');
+            expect(ve.message).toContain('error');
         }
     });
 });
@@ -198,15 +286,16 @@ describe('pelvic zone round-trip', () => {
         expect(result.state.plannedPlacements).toHaveLength(3);
         // After migration, old pelvic zone placements are promoted to new level IDs with standard zones
         const placements = result.state.plannedPlacements;
-        expect(placements.find((p: any) => p.levelId === 'S2AI' && p.zone === 'left')).toBeDefined();
-        expect(placements.find((p: any) => p.levelId === 'Iliac' && p.zone === 'right')).toBeDefined();
-        expect(placements.find((p: any) => p.levelId === 'SI-J' && p.zone === 'left')).toBeDefined();
+        expect(placements.find((p: Placement) => p.levelId === 'S2AI' && p.zone === 'left')).toBeDefined();
+        expect(placements.find((p: Placement) => p.levelId === 'Iliac' && p.zone === 'right')).toBeDefined();
+        expect(placements.find((p: Placement) => p.levelId === 'SI-J' && p.zone === 'left')).toBeDefined();
     });
 });
 
 // --- Legacy v2/v3 validation ---
 
-function validLegacy(): any {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- test helper: needs mutable deep property access for validation edge cases
+function validLegacy(): Record<string, any> {
     return {
         formatVersion: 3,
         patient: { name: 'Test Patient', id: '123' },

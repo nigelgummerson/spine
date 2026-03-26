@@ -24,52 +24,66 @@ const level = z.string().regex(levelPattern, 'Invalid vertebral level');
 // --- Side enum ---
 const side = z.enum(['left', 'right', 'bilateral', 'midline']);
 
-// --- Element type-specific sub-objects (loose validation with passthrough) ---
+// --- Positive number refinement for clinical measurements ---
+const positiveNumber = z.number().positive('Must be a positive number');
+
+// --- Element type-specific sub-objects ---
+// These shapes are fully known — .strict() rejects unknown fields.
 
 const screwObj = z.object({
     headType: z.string(),
-    diameter: z.number().optional(),
-    length: z.number().optional(),
-}).passthrough().optional();
+    diameter: positiveNumber.optional(),
+    length: positiveNumber.optional(),
+}).strict().optional();
 
 const hookObj = z.object({
     hookType: z.string(),
-}).passthrough().optional();
+}).strict().optional();
 
 const fixationObj = z.object({
     fixationType: z.string(),
     description: z.string().optional(),
-}).passthrough().optional();
+}).strict().optional();
 
 const cageObj = z.object({
     approach: z.string(),
-    height: z.number().optional(),
-    width: z.number().optional(),
-    length: z.number().optional(),
+    height: positiveNumber.optional(),
+    width: positiveNumber.optional(),
+    length: positiveNumber.optional(),
     lordosis: z.number().optional(),
-}).passthrough().optional();
+    expandable: z.boolean().optional(),
+}).strict().optional();
 
 const osteotomyObj = z.object({
     osteotomyType: z.string(),
     schwabGrade: z.number().optional(),
     correctionAngle: z.number().optional(),
     reconstructionCage: z.string().optional(),
-}).passthrough().optional();
+}).strict().optional();
 
 const connectorObj = z.object({
     connectorType: z.string(),
     fraction: z.number().min(0).max(1).optional(),
-}).passthrough().optional();
+}).strict().optional();
 
 // --- Element ---
 
 const elementType = z.enum(['screw', 'hook', 'fixation', 'cage', 'osteotomy', 'connector', 'marker']);
+
+// Element zone — the internal placement zone written by the serializer
+// Includes legacy pelvic zones (s2ai_left etc.) which the serializer may write for
+// old pelvic placements stored on S1; these are migrated on deserialization.
+const elementZone = z.enum([
+    'left', 'right', 'mid', 'disc', 'force_left', 'force_right',
+    's2ai_left', 's2ai_right', 'iliac_left', 'iliac_right', 'si_left', 'si_right',
+]).optional();
 
 const element = z.object({
     id: z.string(),
     type: elementType,
     level,
     side,
+    zone: elementZone,
     annotation: z.string().optional(),
     screw: screwObj,
     hook: hookObj,
@@ -77,7 +91,8 @@ const element = z.object({
     cage: cageObj,
     osteotomy: osteotomyObj,
     connector: connectorObj,
-}).passthrough();
+    markerType: z.string().optional(),
+}).strict();
 
 // --- Force ---
 
@@ -87,7 +102,7 @@ const force = z.object({
     level,
     side,
     direction: z.string().optional(),
-}).passthrough();
+}).strict();
 
 // --- Rod ---
 
@@ -96,14 +111,14 @@ const rod = z.object({
     id: z.string().optional(),
     freeText: z.string().optional(),
     material: z.string().optional(),
-    diameter: z.number().optional(),
+    diameter: positiveNumber.optional(),
     profile: z.string().optional(),
-    length: z.number().optional(),
+    length: positiveNumber.optional(),
     contour: z.string().optional(),
     notes: z.string().optional(),
-    transitionFrom: z.number().optional(),
-    transitionTo: z.number().optional(),
-}).passthrough();
+    transitionFrom: positiveNumber.optional(),
+    transitionTo: positiveNumber.optional(),
+}).strict();
 
 // --- Note ---
 
@@ -112,14 +127,14 @@ const note = z.object({
     level,
     text: z.string(),
     showArrow: z.boolean().optional(),
-}).passthrough();
+}).strict();
 
 // --- Bone graft ---
 
 const boneGraft = z.object({
     types: z.array(z.string()).optional(),
     notes: z.string().optional(),
-}).passthrough().optional();
+}).strict().optional();
 
 // --- Construct data (plan or construct) ---
 
@@ -129,41 +144,59 @@ const constructData = z.object({
     rods: z.array(rod).optional(),
     notes: z.array(note).optional(),
     boneGraft: boneGraft,
-}).passthrough().optional();
+}).strict().optional();
+
+// --- Schema metadata ---
+
+const generator = z.object({
+    name: z.string(),
+    version: z.string(),
+    url: z.string().optional(),
+}).strict().optional();
 
 // --- Top-level v4 schema ---
+// .passthrough() on root: forward compatibility — newer app versions may add top-level
+// sections (e.g. "outcomes", "imaging") that older versions should preserve on load/save.
 
 export const v4Schema = z.object({
     schema: z.object({
         format: z.literal('spinal-instrumentation'),
         version: z.literal(4),
-    }).passthrough(),
+        schemaUrl: z.string().optional(),
+        generator: generator,
+    }).strict(),
     document: z.object({
         id: z.string(),
         created: z.string(),
         modified: z.string().optional(),
         language: z.string().optional(),
-    }).passthrough().optional(),
+        lockedAt: z.string().optional(),
+    }).strict().optional(),
     patient: z.object({
         name: z.string().optional(),
         identifier: z.string().optional(),
-    }).passthrough().optional(),
+    }).strict().optional(),
     case: z.object({
         date: z.string().optional(),
         surgeon: z.string().optional(),
         location: z.string().optional(),
-    }).passthrough().optional(),
+    }).strict().optional(),
     implantSystem: z.object({
         manufacturer: z.string().optional(),
         system: z.string().optional(),
-    }).passthrough().optional(),
+    }).strict().optional(),
     plan: constructData,
     construct: constructData,
     ui: z.object({
         viewMode: z.string().optional(),
         colourScheme: z.string().optional(),
-        notePositions: z.record(z.string(), z.any()).optional(),
-    }).passthrough().optional(),
+        notePositions: z.record(z.string(), z.object({ offsetX: z.number(), offsetY: z.number() }).passthrough()).optional(),
+        preferences: z.object({
+            showPelvis: z.boolean().optional(),
+            useRegionDefaults: z.boolean().optional(),
+            confirmAndNext: z.boolean().optional(),
+        }).strict().optional(),
+    }).strict().optional(),
 }).passthrough();
 
 // --- Inferred type ---
@@ -181,6 +214,8 @@ export function validateV4(json: unknown): V4Document {
 }
 
 // --- Legacy v2/v3 schema (loose — validates basic shape only) ---
+// Legacy schemas use .passthrough() throughout because v2/v3 files may contain
+// any number of extra fields from older app versions that we don't fully document.
 
 const legacyZone = z.enum(['left', 'right', 'mid', 'disc', 'force_left', 'force_right',
     's2ai_left', 's2ai_right', 'iliac_left', 'iliac_right', 'si_left', 'si_right']);
