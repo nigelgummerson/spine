@@ -161,6 +161,7 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   'CP Titanium',
   'PEEK',
   'Transition',
+  'Surgeon-contoured',
   'Material',
   'Diameter (mm)',
   'Contour',

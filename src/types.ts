@@ -65,7 +65,7 @@ export interface RodData {
     diameter: string;      // e.g., '5.5' or ''
     profile: string;       // 'round' | 'rail' | 'transition' | ''
     length: string;        // mm, e.g., '120' or ''
-    contour: string;       // 'surgeon_bent' | 'pre_contoured' | 'pre_bent_generic' | 'patient_specific' | 'straight' | ''
+    contour: string;       // 'surgeon_contoured' | 'pre_contoured' | 'patient_specific' | 'straight' | ''
     notes: string;         // free text for anything else
     transitionFrom?: string;  // e.g., '3.5' (diameter in mm) — only when profile === 'transition'
     transitionTo?: string;    // e.g., '5.5' (diameter in mm) — only when profile === 'transition'

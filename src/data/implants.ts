@@ -36,7 +36,7 @@ export const SCREW_SYSTEMS: Record<string, string[]> = {
 
 export const ROD_MATERIALS = ['titanium', 'cpt', 'cobalt_chrome', 'stainless_steel', 'peek'] as const;
 export const ROD_PROFILES = ['round', 'rail', 'transition'] as const;
-export const ROD_CONTOURS = ['surgeon_bent', 'pre_contoured', 'patient_specific', 'straight'] as const;
+export const ROD_CONTOURS = ['surgeon_contoured', 'pre_contoured', 'patient_specific', 'straight'] as const;
 export const ROD_DIAMETERS = ['3.5', '4.0', '4.5', '4.75', '5.0', '5.5', '6.0', '6.35'] as const;
 
 /** Short display labels for rod materials (not translated — international abbreviations) */
@@ -66,12 +66,12 @@ export function formatRodSummary(rod: RodData): string {
         const to = rod.transitionTo || '?';
         parts.push(`Transition ${from}\u2192${to}mm`);
     } else {
-        if (rod.diameter) parts.push(`${rod.diameter}mm`);
+        if (rod.diameter) { const d = parseFloat(rod.diameter); parts.push(`${isNaN(d) ? rod.diameter : d.toFixed(1)}mm`); }
         if (rod.profile === 'rail') parts.push('rail');
     }
     if (rod.material) parts.push(ROD_MATERIAL_ABBREV[rod.material] || rod.material);
     if (rod.contour) {
-        const contourLabels: Record<string, string> = { surgeon_bent: 'surgeon-bent', pre_contoured: 'pre-contoured', patient_specific: 'patient-specific', straight: 'straight' };
+        const contourLabels: Record<string, string> = { surgeon_contoured: 'surgeon-contoured', pre_contoured: 'pre-contoured', patient_specific: 'patient-specific', straight: 'straight' };
         parts.push(contourLabels[rod.contour] || rod.contour);
     }
     if (rod.length) parts.push(`${rod.length}mm`);
