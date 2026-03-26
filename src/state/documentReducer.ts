@@ -1,6 +1,6 @@
 // src/state/documentReducer.ts
 import { WHOLE_SPINE_MAP } from '../data/anatomy';
-import { createEmptyRod } from '../data/implants';
+import { createEmptyRod, isRodEmpty } from '../data/implants';
 import type { DocumentState, DocumentAction, Placement, Cage, Connector, Note, Chart, PatientData, RodData, OsteotomyData, Zone } from '../types';
 
 // --- V4 mapping tables ---
@@ -231,7 +231,14 @@ export function documentReducer(state: DocumentState, action: DocumentAction): D
                 !state.completedNotes.some(cn => cn.levelId === pn.levelId)
             );
 
-            if (newPlacements.length === 0 && newConnectors.length === 0 && newNotes.length === 0 && newCages.length === 0) {
+            // Copy plan rods to construct if construct rods are empty
+            const newLeftRod = isRodEmpty(state.patientData.leftRod) && !isRodEmpty(state.patientData.planLeftRod)
+                ? { ...state.patientData.planLeftRod } : state.patientData.leftRod;
+            const newRightRod = isRodEmpty(state.patientData.rightRod) && !isRodEmpty(state.patientData.planRightRod)
+                ? { ...state.patientData.planRightRod } : state.patientData.rightRod;
+            const rodsChanged = newLeftRod !== state.patientData.leftRod || newRightRod !== state.patientData.rightRod;
+
+            if (newPlacements.length === 0 && newConnectors.length === 0 && newNotes.length === 0 && newCages.length === 0 && !rodsChanged) {
                 return state; // No changes — caller checks for this
             }
 
@@ -240,6 +247,7 @@ export function documentReducer(state: DocumentState, action: DocumentAction): D
                 completedPlacements: [...state.completedPlacements, ...newPlacements],
                 completedCages: [...state.completedCages, ...newCages],
                 completedConnectors: [...state.completedConnectors, ...newConnectors],
+                patientData: rodsChanged ? { ...state.patientData, leftRod: newLeftRod, rightRod: newRightRod } : state.patientData,
             };
         }
 
@@ -250,6 +258,11 @@ export function documentReducer(state: DocumentState, action: DocumentAction): D
                 completedCages: [],
                 completedConnectors: [],
                 completedNotes: [],
+                patientData: {
+                    ...state.patientData,
+                    leftRod: createEmptyRod(),
+                    rightRod: createEmptyRod(),
+                },
             };
         }
 
