@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "SYMPHONY OCT",
+  "manufacturer": "DePuy Synthes",
+  "type": "oct",
+  "status": "active",
+  "notes": "Occipitocervicothoracic fixation system.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [3.5, 4.0],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

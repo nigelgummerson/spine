@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Cypher MIS",
+  "manufacturer": "Highridge Medical",
+  "type": "mis",
+  "status": "active",
+  "notes": "",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5],
+    "materials": ["titanium"],
+    "profiles": ["round"]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "uCentum",
+  "manufacturer": "ulrich medical",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Screw diameter range 4.5-11.5mm.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [6.0],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

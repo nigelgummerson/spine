@@ -1,0 +1,20 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "MESA 2",
+  "manufacturer": "Stryker",
+  "alsoSoldBy": ["VB Spine"],
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Originally K2M, now Stryker. Polyaxial diameters 4.0-9.5mm, lengths 20-110mm. Rail rods available (MESA Rail).",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5, 6.0],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round", "rail"]
+  }
+}

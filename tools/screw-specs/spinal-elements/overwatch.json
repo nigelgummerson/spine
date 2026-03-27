@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Overwatch",
+  "manufacturer": "Spinal Elements",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Screw diameter range 4.5-10.5mm.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5],
+    "materials": ["titanium"],
+    "profiles": ["round"]
+  }
+}

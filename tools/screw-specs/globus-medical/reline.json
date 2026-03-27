@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Reline",
+  "manufacturer": "Globus Medical",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Deformity system family (Reline Open, MAS, Fenestrated, MOD Open).",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5, 6.0],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

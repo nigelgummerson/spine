@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Cortium",
+  "manufacturer": "ulrich medical",
+  "type": "oct",
+  "status": "active",
+  "notes": "Launched August 2025. Lateral mass, pedicle, smooth shank, thoracic screws.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [],
+    "materials": [],
+    "profiles": ["round"]
+  }
+}

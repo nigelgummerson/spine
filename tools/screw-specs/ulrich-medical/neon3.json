@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "neon3",
+  "manufacturer": "ulrich medical",
+  "type": "oct",
+  "status": "active",
+  "notes": "Screw diameters 3.5, 4.0, 4.5, 5.5mm. Length range 10-55mm.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [4.0],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

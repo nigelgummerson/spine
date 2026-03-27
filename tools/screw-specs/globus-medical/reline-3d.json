@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Reline 3D",
+  "manufacturer": "Globus Medical",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "AIS deformity correction system. Traction screw design with dual to quad lead threadform.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [6.0],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

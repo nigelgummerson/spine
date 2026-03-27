@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Infinity OCT",
+  "manufacturer": "Medtronic",
+  "type": "oct",
+  "status": "active",
+  "notes": "Occipitocervical-upper thoracic system (C1-T3). Connects to CD Horizon and Vertex rods.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [],
+    "materials": ["titanium"],
+    "profiles": ["round"]
+  }
+}

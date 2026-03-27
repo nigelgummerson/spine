@@ -1,0 +1,20 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "MESA Small Stature",
+  "manufacturer": "Stryker",
+  "alsoSoldBy": ["VB Spine"],
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Paediatric/small stature variant of MESA. 4.5mm rods. Zero-Torque Technology (same as MESA 2). Originally K2M.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [4.5],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

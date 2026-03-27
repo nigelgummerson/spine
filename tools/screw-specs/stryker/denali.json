@@ -1,0 +1,20 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "DENALI",
+  "manufacturer": "Stryker",
+  "alsoSoldBy": ["VB Spine"],
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Originally K2M. Top-loading system with off-axis screw height adjustment. Colour-coded implants by length.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5, 6.0],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

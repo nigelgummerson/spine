@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Lotus",
+  "manufacturer": "Spinal Elements",
+  "type": "cervical",
+  "status": "active",
+  "notes": "Posterior cervicothoracic fixation system.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [3.5],
+    "materials": ["titanium"],
+    "profiles": ["round"]
+  }
+}

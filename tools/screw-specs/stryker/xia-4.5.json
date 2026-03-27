@@ -1,0 +1,20 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Xia 4.5",
+  "manufacturer": "Stryker",
+  "alsoSoldBy": ["VB Spine"],
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Small-rod variant of Xia family. 4.5mm rods (not 4.75mm). Low-profile 12.1mm tulip head. Transition rods to 3.5, 5.5, 6.0mm systems. Vitallium = CoCr.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [4.5],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

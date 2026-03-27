@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "QUARTEX OCT",
+  "manufacturer": "Globus Medical",
+  "type": "oct",
+  "status": "active",
+  "notes": "Occipitocervicothoracic system. 90 degree conical screw angulation.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [3.5, 4.0],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

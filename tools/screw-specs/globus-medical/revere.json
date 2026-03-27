@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "REVERE",
+  "manufacturer": "Globus Medical",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Double lead thread design. REVERE 6.35 Deformity variant also exists.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5],
+    "materials": ["titanium", "stainless_steel"],
+    "profiles": ["round"]
+  }
+}

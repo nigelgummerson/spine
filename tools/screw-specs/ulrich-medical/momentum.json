@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Momentum",
+  "manufacturer": "ulrich medical",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Screw diameter range 4.5-10.0mm, length range 25-110mm.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5, 6.0],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

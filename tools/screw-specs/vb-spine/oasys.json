@@ -1,0 +1,23 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "OASYS",
+  "manufacturer": "VB Spine",
+  "type": "oct",
+  "status": "active",
+  "notes": "Occipitocervicothoracic system. Transition rods to 3.5, 4.5, 5.5, 6.0mm systems. Hooks in 4 throat heights (3.5, 5.0, 6.5, 8.0mm). Vitallium = CoCr.",
+  "source": "OASYS Spinal System Surgical Technique Guide",
+  "lastVerified": "2026-03-27",
+  "screws": {
+    "diameters": [3.5, 4.0, 4.5],
+    "lengthsByDiameter": {
+      "3.5": [10, 12, 14, 16, 18, 20],
+      "4.0": [10, 12, 14, 16, 18, 20],
+      "4.5": [20, 24, 28, 32, 36, 40, 44, 48, 52]
+    }
+  },
+  "rods": {
+    "diameters": [3.5],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

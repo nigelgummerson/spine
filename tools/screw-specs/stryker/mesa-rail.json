@@ -1,0 +1,20 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "MESA Rail",
+  "manufacturer": "Stryker",
+  "alsoSoldBy": ["VB Spine"],
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Uses MESA 2 screws with I-beam/rail-profile rods. 5.5mm CoCr rail is 210% stronger in flexion-extension than round. Compatible with MESA 2 Cricket instrumentation.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5],
+    "materials": ["cobalt_chrome"],
+    "profiles": ["rail"]
+  }
+}

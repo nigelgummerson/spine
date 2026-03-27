@@ -1,0 +1,29 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Solera",
+  "manufacturer": "Medtronic",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "CD HORIZON SOLERA 5.5/6.0mm system. No 7.0mm diameter (jumps 6.5 to 7.5). CHROMALOY = CoCr.",
+  "source": "CD HORIZON SOLERA 4.75 and 5.5/6.0mm Surgical Technique",
+  "lastVerified": "2026-03-27",
+  "screws": {
+    "diameters": [4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.5, 8.5, 9.5],
+    "lengthsByDiameter": {
+      "4.0": [20, 25, 30, 35, 40, 45, 50, 55],
+      "4.5": [20, 25, 30, 35, 40, 45, 50, 55],
+      "5.0": [20, 25, 30, 35, 40, 45, 50, 55],
+      "5.5": [20, 25, 30, 35, 40, 45, 50, 55, 60],
+      "6.0": [20, 25, 30, 35, 40, 45, 50, 55, 60],
+      "6.5": [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 80, 90, 100],
+      "7.5": [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 80, 90, 100],
+      "8.5": [25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 80, 90, 100],
+      "9.5": [25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 80, 90, 100]
+    }
+  },
+  "rods": {
+    "diameters": [5.5, 6.0],
+    "materials": ["titanium", "cpt", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

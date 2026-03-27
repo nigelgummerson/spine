@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Phoenix MIS",
+  "manufacturer": "Orthofix",
+  "type": "mis",
+  "status": "active",
+  "notes": "Percutaneous system. Screw diameter range 4.0-7.5mm, length range 25-60mm.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5],
+    "materials": ["titanium"],
+    "profiles": ["round"]
+  }
+}

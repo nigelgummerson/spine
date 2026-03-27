@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "MATRIX",
+  "manufacturer": "DePuy Synthes",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Universal system covering degenerative, deformity, MIS, and trauma. Pedicle probe range 5.0-7.0mm. Rod materials: pure Ti (hard), TAN alloy (extra-hard), CoCrMo (extra-hard).",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

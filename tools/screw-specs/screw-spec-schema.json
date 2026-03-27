@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "screw-spec-schema.json",
+  "title": "Screw System Specification",
+  "description": "Standard format for spinal screw system catalogues. Used to import/export system data into spine-planner's SYSTEM_CATALOGUE.",
+  "type": "object",
+  "required": ["system", "manufacturer", "type", "screws", "rods"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "system": {
+      "type": "string",
+      "description": "System name as it appears in SCREW_SYSTEMS (e.g. 'Xia 3', 'CREO')"
+    },
+    "manufacturer": {
+      "type": "string",
+      "description": "Primary manufacturer name as it appears in IMPLANT_COMPANIES"
+    },
+    "alsoSoldBy": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Other companies that sell this system (e.g. VB Spine sells Stryker systems)"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["cervical", "thoracolumbar", "oct", "mis"],
+      "description": "System category — cervical, thoracolumbar, occipitocervical (oct), or minimally invasive (mis)"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "discontinued", "legacy"],
+      "description": "Whether this system is currently manufactured and sold"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free-text notes about the system"
+    },
+    "source": {
+      "type": "string",
+      "description": "Document or catalogue the data was taken from"
+    },
+    "lastVerified": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the data was last verified against manufacturer documentation (ISO 8601)"
+    },
+    "screws": {
+      "type": "object",
+      "required": ["diameters", "lengthsByDiameter"],
+      "properties": {
+        "diameters": {
+          "type": "array",
+          "items": { "type": "number" },
+          "description": "Available screw diameters in mm, sorted ascending"
+        },
+        "lengthsByDiameter": {
+          "type": "object",
+          "description": "Available screw lengths (mm) keyed by diameter string (e.g. '6.5'). Each value is a sorted array of lengths.",
+          "patternProperties": {
+            "^\\d+\\.\\d$": {
+              "type": "array",
+              "items": { "type": "number" }
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "rods": {
+      "type": "object",
+      "required": ["diameters", "materials", "profiles"],
+      "properties": {
+        "diameters": {
+          "type": "array",
+          "items": { "type": "number" },
+          "description": "Available rod diameters in mm"
+        },
+        "materials": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["titanium", "cpt", "cobalt_chrome", "stainless_steel", "peek"]
+          },
+          "description": "Available rod materials (must match ROD_MATERIALS in implants.ts)"
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["round", "rail", "transition"]
+          },
+          "description": "Available rod profiles (must match ROD_PROFILES in implants.ts)"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

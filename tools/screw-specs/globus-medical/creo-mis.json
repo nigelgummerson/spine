@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "CREO MIS",
+  "manufacturer": "Globus Medical",
+  "type": "mis",
+  "status": "active",
+  "notes": "Percutaneous extension of CREO platform.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [4.75, 5.5],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

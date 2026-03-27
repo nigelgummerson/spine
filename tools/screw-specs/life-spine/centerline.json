@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "CENTERLINE",
+  "manufacturer": "Life Spine",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Midline/cortical trajectory system. 4.75mm CoCr rods.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [4.75],
+    "materials": ["cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

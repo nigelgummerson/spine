@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Precept",
+  "manufacturer": "Globus Medical",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Originally NuVasive, now Globus Medical following 2023 merger.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [],
+    "materials": ["titanium"],
+    "profiles": ["round"]
+  }
+}

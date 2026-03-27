@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Virage OCT",
+  "manufacturer": "Highridge Medical",
+  "type": "oct",
+  "status": "active",
+  "notes": "OCT system. Occipital screws: 4.5mm and 5.25mm (6-16mm). Bone screws: 2.3mm (10-16mm). Pedicle/lateral mass screw sizes not extracted (image-based tables in PDF).",
+  "source": "Virage OCT Spinal Fixation System Surgical Technique Guide",
+  "lastVerified": "2026-03-27",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [3.5],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

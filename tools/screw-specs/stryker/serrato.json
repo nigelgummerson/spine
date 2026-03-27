@@ -1,0 +1,20 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Serrato",
+  "manufacturer": "Stryker",
+  "alsoSoldBy": ["VB Spine"],
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Part of Xia 3 family but distinct instruments. Polyaxial, cannulated polyaxial, reduction, and medial biased designs. Vitallium = CoCr.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5, 6.0],
+    "materials": ["titanium", "cpt", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "VIPER PRIME",
+  "manufacturer": "DePuy Synthes",
+  "type": "mis",
+  "status": "active",
+  "notes": "MIS posterior fixation. No 5.5 or 6.5mm diameters (uses whole/half mm steps: 5.0, 6.0, 7.0, 7.5). CFX Fenestrated and standard X-TAB polyaxial variants.",
+  "source": "VIPER PRIME System Surgical Technique (103407663 Rev 1)",
+  "lastVerified": "2026-03-27",
+  "screws": {
+    "diameters": [4.5, 5.0, 6.0, 7.0, 7.5],
+    "lengthsByDiameter": {
+      "4.5": [30, 35, 40, 45, 50, 55, 60],
+      "5.0": [30, 35, 40, 45, 50, 55, 60],
+      "6.0": [30, 35, 40, 45, 50, 55, 60],
+      "7.0": [30, 35, 40, 45, 50, 55, 60],
+      "7.5": [30, 35, 40, 45, 50, 55, 60]
+    }
+  },
+  "rods": {
+    "diameters": [5.5],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

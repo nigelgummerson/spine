@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Solera Voyager",
+  "manufacturer": "Medtronic",
+  "type": "mis",
+  "status": "active",
+  "notes": "MIS/percutaneous variant of Solera. Uses Solera screws on both 4.75 and 5.5/6.0 platforms.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [4.75, 5.5, 6.0],
+    "materials": ["titanium", "cpt", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

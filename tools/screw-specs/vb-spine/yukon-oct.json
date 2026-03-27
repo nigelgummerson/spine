@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "YUKON OCT",
+  "manufacturer": "VB Spine",
+  "type": "oct",
+  "status": "active",
+  "notes": "Occipitocervicothoracic system. Originally K2M. 60 degree coronal swing, 105 degree total polyaxial angulation. Transition rods 4.0-5.5mm available. Partial lengths from GUDID — full matrix needed from STG.",
+  "source": "Stryker YUKON OCT product page + GUDID entries",
+  "lastVerified": "2026-03-27",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [3.5, 4.0],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

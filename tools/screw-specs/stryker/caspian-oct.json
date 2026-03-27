@@ -1,0 +1,20 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "CASPIAN OCT",
+  "manufacturer": "Stryker",
+  "alsoSoldBy": ["VB Spine"],
+  "type": "oct",
+  "status": "active",
+  "notes": "Occipital anchor/plate system, compatible with MESA Mini and DENALI Mini.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [],
+    "materials": ["titanium"],
+    "profiles": ["round"]
+  }
+}

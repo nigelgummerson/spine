@@ -1,0 +1,25 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "SureLOK",
+  "manufacturer": "Precision Spine",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "5.5mm system. Screw diameters 4.5-8.5mm (odd-only above 5.5). 5.5mm screws available to 120mm for pelvic fixation.",
+  "source": "SureLOK Pedicle Screw System Surgical Technique",
+  "lastVerified": "2026-03-27",
+  "screws": {
+    "diameters": [4.5, 5.5, 6.5, 7.5, 8.5],
+    "lengthsByDiameter": {
+      "4.5": [25, 30, 35, 40, 45, 50, 55],
+      "5.5": [30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 90, 100, 110, 120],
+      "6.5": [30, 35, 40, 45, 50, 55],
+      "7.5": [30, 35, 40, 45, 50, 55],
+      "8.5": [30, 35, 40, 45, 50, 55]
+    }
+  },
+  "rods": {
+    "diameters": [5.5],
+    "materials": ["titanium", "cobalt_chrome", "stainless_steel"],
+    "profiles": ["round"]
+  }
+}

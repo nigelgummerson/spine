@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Mercury",
+  "manufacturer": "Spinal Elements",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Screw diameter range 4.5-8.5mm. CoCr rods available in Total Spine variant.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5],
+    "materials": ["titanium", "cobalt_chrome"],
+    "profiles": ["round"]
+  }
+}

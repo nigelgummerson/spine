@@ -1,0 +1,23 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Solstice OCT",
+  "manufacturer": "Life Spine",
+  "type": "oct",
+  "status": "active",
+  "notes": "Occipitocervicothoracic system. 5.0mm occipital screws (6-13mm) also available. 3.5mm rods.",
+  "source": "Solstice OCT Spinal Fixation System Surgical Technique",
+  "lastVerified": "2026-03-27",
+  "screws": {
+    "diameters": [3.5, 4.0, 4.5],
+    "lengthsByDiameter": {
+      "3.5": [10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 45, 50],
+      "4.0": [10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 45, 50],
+      "4.5": [10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 45, 50]
+    }
+  },
+  "rods": {
+    "diameters": [3.5],
+    "materials": ["titanium"],
+    "profiles": ["round"]
+  }
+}

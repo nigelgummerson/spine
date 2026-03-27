@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "S4",
+  "manufacturer": "Aesculap / B. Braun",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "S4 thoracolumbar system. Separate S4 Cervical system also exists (3.5mm rods, cervical screws 3.5-4.0mm, transition rods 3.5/5.5mm).",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5],
+    "materials": ["titanium"],
+    "profiles": ["round"]
+  }
+}

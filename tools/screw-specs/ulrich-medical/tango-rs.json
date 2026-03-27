@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "tango RS",
+  "manufacturer": "ulrich medical",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Percutaneous system with cannulated screws. Screw diameters 5.5, 6.5, 7.5mm. Colour-coded (yellow/green/blue).",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [6.0],
+    "materials": ["titanium"],
+    "profiles": ["round"]
+  }
+}

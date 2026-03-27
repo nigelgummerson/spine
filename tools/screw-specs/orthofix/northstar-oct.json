@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "NorthStar OCT",
+  "manufacturer": "Orthofix",
+  "type": "oct",
+  "status": "active",
+  "notes": "Originally SeaSpine, now Orthofix. Polyaxial screw diameters 4.5, 5.5mm. Lengths 24-34mm in 2mm increments.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [3.5],
+    "materials": ["titanium"],
+    "profiles": ["round"]
+  }
+}

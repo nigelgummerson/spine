@@ -1,0 +1,19 @@
+{
+  "$schema": "../screw-spec-schema.json",
+  "system": "Polaris",
+  "manufacturer": "Highridge Medical",
+  "type": "thoracolumbar",
+  "status": "active",
+  "notes": "Polaris 5.5 system. Screw diameter range 4.0-8.5mm.",
+  "source": "",
+  "lastVerified": "",
+  "screws": {
+    "diameters": [],
+    "lengthsByDiameter": {}
+  },
+  "rods": {
+    "diameters": [5.5],
+    "materials": ["titanium", "cobalt_chrome", "stainless_steel"],
+    "profiles": ["round"]
+  }
+}
