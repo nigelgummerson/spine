@@ -1,6 +1,6 @@
 import React from 'react';
 import { t } from '../../i18n/i18n';
-import { getDiscHeight, getLevelHeight, getVertSvgGeometry, DISC_MIN_PX } from '../../data/anatomy';
+import { getDiscHeight, getLevelHeight, getVertSvgGeometry, DISC_MIN_PX, VERT_PAD } from '../../data/anatomy';
 import { HOOK_TYPES, FORCE_TYPES } from '../../data/clinical';
 const FIXATION_TYPES = ['band', 'wire', 'cable'];
 import { InstrumentIcon } from './InstrumentIcon';
@@ -125,8 +125,12 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
     let viewBoxScrewCy: number;
     if (geom && (geom.region === 'thoracic' || geom.region === 'lumbar' || geom.region === 'sacral')) {
         viewBoxScrewCy = geom.pedCy;
+    } else if (geom && geom.region === 'cervical-subaxial' && geom.pedRx) {
+        // C7: pedicle vertical centre (same formula as thoracic)
+        viewBoxScrewCy = VERT_PAD + (geom.pedRy ?? 0) + 5;
     } else if (geom && (geom.region === 'cervical-upper' || geom.region === 'cervical-subaxial')) {
-        viewBoxScrewCy = geom.latMassCy;
+        // C3-C6: lower quadrant of lateral mass — shift 30% of lateral mass height downward
+        viewBoxScrewCy = geom.latMassCy + geom.latMassRy * 0.3;
     } else {
         viewBoxScrewCy = viewBoxHeight / 2;
     }
@@ -150,9 +154,36 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
     } else if (geom && geom.region === 'occiput') {
         chartScrewLeftCx = vertX + (geom.screwLeftCx / 160) * scaledWidth;
         chartScrewRightCx = vertX + (geom.screwRightCx / 160) * scaledWidth;
-    } else if (geom && (geom.region === 'cervical-upper' || geom.region === 'cervical-subaxial')) {
+    } else if (geom && geom.region === 'cervical-upper') {
         chartScrewLeftCx = vertX + (geom.latMassLeftCx / 160) * scaledWidth;
         chartScrewRightCx = vertX + (geom.latMassRightCx / 160) * scaledWidth;
+    } else if (geom && geom.region === 'cervical-subaxial') {
+        if (geom.pedLeftCx !== undefined && geom.pedRightCx !== undefined) {
+            // C7: use pedicle positions
+            chartScrewLeftCx = vertX + (geom.pedLeftCx / 160) * scaledWidth;
+            chartScrewRightCx = vertX + (geom.pedRightCx / 160) * scaledWidth;
+        } else {
+            // C3-C6: lateral mass screw entry point — lower medial quadrant
+            const medialOffset = geom.latMassRx * 0.3 * (scaledWidth / 160);
+            const chartLmLeftCx = vertX + (geom.latMassLeftCx / 160) * scaledWidth;
+            const chartLmRightCx = vertX + (geom.latMassRightCx / 160) * scaledWidth;
+            chartScrewLeftCx = chartLmLeftCx + medialOffset;   // medial = toward midline = +X for left
+            chartScrewRightCx = chartLmRightCx - medialOffset; // medial = toward midline = -X for right
+        }
+    }
+
+    // Body edges and TP edges in chart coordinates — for zone boundaries and label positioning
+    const chartBodyLeft = geom ? vertX + (geom.left / 160) * scaledWidth : vertX;
+    const chartBodyRight = geom ? vertX + (geom.right / 160) * scaledWidth : vertX + scaledWidth;
+    // Outer edge = TP tip for T/L, lateral mass edge for cervical, body edge for others
+    let chartOuterLeft = chartBodyLeft;
+    let chartOuterRight = chartBodyRight;
+    if (geom && (geom.region === 'thoracic' || geom.region === 'lumbar')) {
+        chartOuterLeft = vertX + (geom.tpLeftX / 160) * scaledWidth;
+        chartOuterRight = vertX + (geom.tpRightX / 160) * scaledWidth;
+    } else if (geom && (geom.region === 'cervical-upper' || geom.region === 'cervical-subaxial')) {
+        chartOuterLeft = vertX + ((geom.latMassLeftCx - geom.latMassRx) / 160) * scaledWidth;
+        chartOuterRight = vertX + ((geom.latMassRightCx + geom.latMassRx) / 160) * scaledWidth;
     }
 
     /** Render items for a zone (left, right, force_left, force_right) */
@@ -163,11 +194,10 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
             : null;
         const isForceZone = zone.startsWith('force');
 
-        // Sacral: position at L5 pedicle alignment
-        // All others: zone centre based on baseScrewPx so cervical/thoracolumbar centres align
+        // Position zone centre at anatomical screw entry point when available
         const zoneCx = isForceZone ? zoneX + zoneW / 2
-            : isSacral && zone === 'left' && chartScrewLeftCx !== undefined ? chartScrewLeftCx
-            : isSacral && zone === 'right' && chartScrewRightCx !== undefined ? chartScrewRightCx
+            : zone === 'left' && chartScrewLeftCx !== undefined ? chartScrewLeftCx
+            : zone === 'right' && chartScrewRightCx !== undefined ? chartScrewRightCx
             : zone === 'left' ? zoneX + zoneW - baseScrewPx / 2 - 4
             : zone === 'right' ? zoneX + baseScrewPx / 2 + 4
             : zoneX + zoneW / 2;
@@ -218,12 +248,12 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
             const showData = p.data && !isHookItem && !isFixation;
             const showAnn = !!ann;
 
-            // Position icon: sacral at anatomy-based position; all others at zone edge
+            // Position icon: centre on anatomical screw entry point
             let iconX: number;
             const iconY = zoneCy - iH / 2;
             if (align === 'center') {
                 iconX = zoneCx - iW / 2;
-            } else if (isSacral) {
+            } else if ((zone === 'left' && chartScrewLeftCx !== undefined) || (zone === 'right' && chartScrewRightCx !== undefined)) {
                 iconX = zoneCx - iW / 2;
             } else if (align === 'left') {
                 iconX = zoneX + zoneW - iW - 4;
@@ -241,8 +271,11 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
             elements.push(
                 <g key={p.id} cursor={!readOnly ? 'pointer' : 'default'}
                     onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}>
-                    {align === 'left' && (labelText || annText) && (
-                        <foreignObject x={zoneX + 4} y={0} width={iconX - zoneX - 6} height={rowHeight} overflow="visible" pointerEvents="none">
+                    {align === 'left' && (labelText || annText) && (() => {
+                        const labelRight = chartOuterLeft - 2;
+                        const labelW = labelRight - leftZoneX;
+                        return (
+                        <foreignObject x={leftZoneX} y={0} width={Math.max(0, labelW)} height={rowHeight} overflow="visible" pointerEvents="none">
                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' }}>
                                 <div style={{ width: '100%', display: 'flex', flexDirection: isInline ? 'row-reverse' : 'column', alignItems: isInline ? 'center' : 'flex-end', gap: isInline ? 3 : 0, lineHeight: 1 }}>
                                     {labelText && <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>}
@@ -251,11 +284,14 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
                                     </div>}
                                 </div>
                             </div>
-                        </foreignObject>
-                    )}
+                        </foreignObject>);
+                    })()}
                     {renderIcon(tool?.icon || '', iconX, iconY, iW, iH, undefined, zone === 'left' ? 'left' : zone === 'right' ? 'right' : undefined)}
-                    {align === 'right' && (labelText || annText) && (
-                        <foreignObject x={iconX + iW + 2} y={0} width={zoneX + zoneW - iconX - iW - 12} height={rowHeight} overflow="visible" pointerEvents="none">
+                    {align === 'right' && (labelText || annText) && (() => {
+                        const labelLeft = chartOuterRight + 2;
+                        const labelW = rightZoneX + sideZoneW - labelLeft;
+                        return (
+                        <foreignObject x={labelLeft} y={0} width={Math.max(0, labelW)} height={rowHeight} overflow="visible" pointerEvents="none">
                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' }}>
                                 <div style={{ width: '100%', display: 'flex', flexDirection: isInline ? 'row' : 'column', alignItems: isInline ? 'center' : 'flex-start', gap: isInline ? 3 : 0, lineHeight: 1 }}>
                                     {labelText && <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 'bold', fontSize: labelPx, color: '#334155', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>}
@@ -264,8 +300,8 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
                                     </div>}
                                 </div>
                             </div>
-                        </foreignObject>
-                    )}
+                        </foreignObject>);
+                    })()}
                     {align === 'center' && labelText && (
                         <text x={zoneCx} y={iconY + iH / 2 - 1}
                             textAnchor="middle" dominantBaseline="middle"
@@ -297,7 +333,7 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
             const iconY = zoneCy - iH / 2;
             if (align === 'center') {
                 iconX = zoneCx - iW / 2;
-            } else if (isSacral) {
+            } else if ((zone === 'left' && chartScrewLeftCx !== undefined) || (zone === 'right' && chartScrewRightCx !== undefined)) {
                 iconX = zoneCx - iW / 2;
             } else if (align === 'left') {
                 iconX = zoneX + zoneW - iW - 4;
@@ -312,26 +348,32 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
             elements.push(
                 <g key={'ghost-' + ghostItem.id} opacity={0.75} cursor="pointer"
                     onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostItem); }}>
-                    {align === 'left' && labelText && (
-                        <foreignObject x={zoneX + 4} y={0} width={iconX - zoneX - 6} height={rowHeight} overflow="visible" pointerEvents="none">
+                    {align === 'left' && labelText && (() => {
+                        const labelRight = chartOuterLeft - 2;
+                        const labelW = labelRight - leftZoneX;
+                        return (
+                        <foreignObject x={leftZoneX} y={0} width={Math.max(0, labelW)} height={rowHeight} overflow="visible" pointerEvents="none">
                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' }}>
                                 <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: 1 }}>
                                     <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 'bold', fontSize: labelPx, color: '#0f172a', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>
                                 </div>
                             </div>
-                        </foreignObject>
-                    )}
+                        </foreignObject>);
+                    })()}
                     <rect x={iconX} y={iconY} width={iW} height={iH} fill="transparent" pointerEvents="all" />
                     {renderIcon(tool?.icon || '', iconX, iconY, iW, iH, '#14b8a6', zone === 'left' ? 'left' : zone === 'right' ? 'right' : undefined)}
-                    {align === 'right' && labelText && (
-                        <foreignObject x={iconX + iW + 2} y={0} width={zoneX + zoneW - iconX - iW - 12} height={rowHeight} overflow="visible" pointerEvents="none">
+                    {align === 'right' && labelText && (() => {
+                        const labelLeft = chartOuterRight + 2;
+                        const labelW = rightZoneX + sideZoneW - labelLeft;
+                        return (
+                        <foreignObject x={labelLeft} y={0} width={Math.max(0, labelW)} height={rowHeight} overflow="visible" pointerEvents="none">
                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', overflow: 'visible', pointerEvents: 'auto' }}>
                                 <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
                                     <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 'bold', fontSize: labelPx, color: '#0f172a', whiteSpace: 'nowrap', paddingLeft: 1, paddingRight: 1 }}>{labelText}</span>
                                 </div>
                             </div>
-                        </foreignObject>
-                    )}
+                        </foreignObject>);
+                    })()}
                     {align === 'center' && labelText && (
                         <text x={zoneCx} y={iconY + iH / 2 - 1}
                             textAnchor="middle" dominantBaseline="middle"
@@ -353,7 +395,6 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
     const renderMidContent = () => {
         const midItems = getItems('mid').filter(p => p.tool !== 'connector');
         const elements: React.ReactElement[] = [];
-
         midItems.forEach(p => {
             const tool = tools.find(item => item.id === p.tool);
             let displayLabel: string = '';
@@ -517,33 +558,80 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
             {/* Level border bottom */}
             <line x1={0} y1={rowHeight} x2={chartWidth} y2={rowHeight} stroke="#f1f5f9" strokeWidth={1} />
 
-            {/* Vertebral body + mid zone — sacral mid zone disabled when pelvis expanded */}
+            {/* Vertebral body SVG (visual only, no pointer events) */}
+            <svg x={vertX} y={0} width={scaledWidth} height={rowHeight} overflow="visible" style={{ pointerEvents: 'none' }}>
+                <SpineVertebra label={level.id} type={level.type} height={getLevelHeight(level)} isCorpectomy={isCorpectomy} heightScale={heightScale} />
+            </svg>
+
+            {/* Mid zone — osteotomy click area, body width only */}
             {(() => {
                 const midClickable = !readOnly && !isSacral;
+                const midX = chartBodyLeft;
+                const midW = chartBodyRight - chartBodyLeft;
                 return (
                 <g onMouseEnter={midClickable ? (e) => { (e.currentTarget.querySelector('.mid-bg') as SVGRectElement)?.setAttribute('fill', 'rgba(253, 230, 138, 0.45)'); } : undefined}
                    onMouseLeave={midClickable ? (e) => { (e.currentTarget.querySelector('.mid-bg') as SVGRectElement)?.setAttribute('fill', 'transparent'); } : undefined}>
-                <rect className="mid-bg" x={vertX} y={0} width={scaledWidth} height={rowHeight}
+                <rect className="mid-bg" x={midX} y={0} width={midW} height={rowHeight}
                     fill="transparent" cursor={midClickable ? 'pointer' : 'default'}
                     onClick={() => midClickable && onZoneClick(level.id, 'mid')} />
-                <svg x={vertX} y={0} width={scaledWidth} height={rowHeight} overflow="visible" style={{ pointerEvents: 'none' }}>
-                    <SpineVertebra label={level.id} type={level.type} height={getLevelHeight(level)} isCorpectomy={isCorpectomy} heightScale={heightScale} />
-                </svg>
                 {renderMidContent()}
             </g>);
             })()}
 
-            {/* Left/right zones */}
+            {/* Screw click zones — from body edge outward through pedicle/TP area */}
+            {!readOnly && !isSacral && (() => {
+                const leftScrewX = leftZoneX;
+                const leftScrewW = chartBodyLeft - leftZoneX;
+                const rightScrewX = chartBodyRight;
+                const rightScrewW = rightZoneX + sideZoneW - chartBodyRight;
+                const hoverFillScrew = 'rgba(148, 163, 184, 0.25)';
+                return (
+                    <>
+                        <g onMouseEnter={(e) => { (e.currentTarget.querySelector('.screw-bg') as SVGRectElement)?.setAttribute('fill', hoverFillScrew); }}
+                           onMouseLeave={(e) => { (e.currentTarget.querySelector('.screw-bg') as SVGRectElement)?.setAttribute('fill', 'transparent'); }}>
+                            <rect className="screw-bg" x={leftScrewX} y={0} width={leftScrewW} height={rowHeight}
+                                fill="transparent" cursor="crosshair"
+                                onClick={() => onZoneClick(level.id, 'left')} />
+                        </g>
+                        <g onMouseEnter={(e) => { (e.currentTarget.querySelector('.screw-bg') as SVGRectElement)?.setAttribute('fill', hoverFillScrew); }}
+                           onMouseLeave={(e) => { (e.currentTarget.querySelector('.screw-bg') as SVGRectElement)?.setAttribute('fill', 'transparent'); }}>
+                            <rect className="screw-bg" x={rightScrewX} y={0} width={rightScrewW} height={rowHeight}
+                                fill="transparent" cursor="crosshair"
+                                onClick={() => onZoneClick(level.id, 'right')} />
+                        </g>
+                    </>
+                );
+            })()}
+
+            {/* Pedicle click circles — overlay on vertebral body, intercept clicks before mid-zone osteotomy */}
+            {!readOnly && !isSacral && chartScrewLeftCx !== undefined && chartScrewRightCx !== undefined && (() => {
+                const pedClickR = Math.max(screwPx * 0.7, 14);
+                return (
+                    <>
+                        <circle cx={chartScrewLeftCx} cy={chartScrewCy} r={pedClickR}
+                            fill="transparent" cursor="crosshair" style={{ pointerEvents: 'all' }}
+                            onMouseEnter={(e) => e.currentTarget.setAttribute('fill', 'rgba(148, 163, 184, 0.25)')}
+                            onMouseLeave={(e) => e.currentTarget.setAttribute('fill', 'transparent')}
+                            onClick={(e) => { e.stopPropagation(); onZoneClick(level.id, 'left'); }} />
+                        <circle cx={chartScrewRightCx} cy={chartScrewCy} r={pedClickR}
+                            fill="transparent" cursor="crosshair" style={{ pointerEvents: 'all' }}
+                            onMouseEnter={(e) => e.currentTarget.setAttribute('fill', 'rgba(148, 163, 184, 0.25)')}
+                            onMouseLeave={(e) => e.currentTarget.setAttribute('fill', 'transparent')}
+                            onClick={(e) => { e.stopPropagation(); onZoneClick(level.id, 'right'); }} />
+                    </>
+                );
+            })()}
+
+            {/* Left/right zones — icons and labels (click handled by screw zones above for non-sacral) */}
             {showForces && renderZoneContent('force_left', forceLeftX, forceW, 'center')}
-            {/* Sacral levels: pelvis hidden = extended left/right zones; pelvis shown = no zones (PelvisRegion handles all targets) */}
             {isSacral && !levels.some(l => l.id === 'S2')
                 ? <>
                     {renderZoneContent('left', leftZoneX, sideZoneW + scaledWidth / 2, 'left')}
                     {renderZoneContent('right', vertX + scaledWidth / 2, sideZoneW + scaledWidth / 2, 'right')}
                 </>
                 : !isSacral && <>
-                    {renderZoneContent('left', leftZoneX, sideZoneW, 'left')}
-                    {renderZoneContent('right', rightZoneX, sideZoneW, 'right')}
+                    {renderZoneContent('left', leftZoneX, chartBodyLeft - leftZoneX, 'left')}
+                    {renderZoneContent('right', chartBodyRight, rightZoneX + sideZoneW - chartBodyRight, 'right')}
                 </>
             }
             {showForces && renderZoneContent('force_right', forceRightX, forceW, 'center')}

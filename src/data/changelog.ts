@@ -1,6 +1,6 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION: string = "v2.7.32-beta";
+export const CURRENT_VERSION: string = "v2.7.33-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -12,8 +12,12 @@ interface ChangeLogEntry {
 // Keep entries brief, non-technical, and focused on what the surgeon can do.
 // Detailed technical changelog is in CLAUDE.md for developers/agents.
 export const CHANGE_LOG: ChangeLogEntry[] = [
-    { version: "v2.7.32-beta", date: "2026-03-27", changes: [
-        "Offline Use help section translated into all 15 European languages (was showing English).",
+    { version: "v2.7.33-beta", date: "2026-03-27", changes: [
+        "Screw icons placed on anatomical pedicles (thoracolumbar) and lateral mass entry points (C3-C6). C7 uses pedicle positions.",
+        "Click zones redesigned — vertebral body width matches anatomy per level, pedicle circles open screw modal, osteotomy click area limited to body.",
+        "Size labels positioned at transverse process edge, outside the spine outline.",
+        "Quick reference RTL support for Arabic and Hebrew.",
+        "Offline Use help section translated into all 15 European languages.",
     ]},
     { version: "v2.7.3-beta", date: "2026-03-26", changes: [
         "Structured rod recording — material, diameter, profile, length, and contour via a dedicated modal. Transition rods supported (e.g. 3.5mm to 5.5mm).",

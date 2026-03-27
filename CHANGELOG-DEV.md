@@ -2,7 +2,22 @@
 
 Detailed technical changes by version. For user-facing changes see the in-app changelog (`src/data/changelog.ts`).
 
-## v2.7.32-beta (2026-03-27)
+## v2.7.33-beta (2026-03-27)
+
+### Anatomical screw placement
+- Screw icons positioned on anatomical pedicle ellipses (T1-L5) using published pedicle centre coordinates from `getVertSvgGeometry()`
+- C7 uses pedicle positions (pedW: 5.5mm, pedH: 7mm) instead of lateral mass
+- C3-C6 lateral mass screw entry point: 30% medial + 30% inferior offset from lateral mass centre (Magerl technique approximation)
+- Size labels anchored at TP tip edge (T/L) or lateral mass edge (cervical), right-aligned for left side, left-aligned for right
+
+### Click zone redesign
+- Mid-zone (osteotomy) width now matches per-level vertebral body width from anatomy data, not full 160-unit scaledWidth
+- Screw click zones span from body edge outward to side zone edge, covering pedicle/TP area
+- Pedicle click circles overlaid on vertebral body, intercept clicks before osteotomy handler via `stopPropagation`
+- Circle radius: `max(screwPx * 0.7, 14)` with grey hover highlight
+
+### Quick reference RTL
+- `dir="rtl"` set on `<html>` element for Arabic and Hebrew in `public/quick-reference.html`
 
 ### i18n: Offline Use help section translated
 - `help.offline_use.title` and `help.offline_use.body` translated into all 15 European languages (de, fr, es, it, pt, sv, nb, da, fi, nl, pl, el, tr, uk, ru). These keys were added in v2.3.1 (web/standalone split) but only translated for the later language batch (hi, ar, he, zh-Hans, ja, ko).
