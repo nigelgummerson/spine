@@ -4,8 +4,8 @@
 A web application for pre-operative spinal surgery planning. Deployed as a code-split web build to GitHub Pages for connected hospital computers, with a standalone single-file download for offline use. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 22 languages (16 European + Hindi + Arabic with RTL + Hebrew with RTL + Chinese Simplified + Japanese + Korean).
 
 ## Current Status
-- **Version:** v2.7.31-beta
-- **Last Updated:** 2026-03-25
+- **Version:** v2.7.32-beta
+- **Last Updated:** 2026-03-27
 - **License:** GNU GPLv3
 - **Language:** TypeScript (strict)
 
@@ -94,6 +94,7 @@ spine-planner/
 - **All dependencies bundled** — no CDN calls, fully offline
 
 ## Version History (Recent)
+- **v2.7.32-beta** (2026-03-27): i18n fix — `help.offline_use.title` and `help.offline_use.body` translated into all 15 European languages (were showing English since v2.3.1 web/standalone split).
 - **v2.7.0-beta** (2026-03-25): Expert review implementation — 5-agent review (surgeon, UI/UX, regulatory, frontend, spec) with 28 actionable items. Undo/redo (Ctrl+Z, 20-level history). React Error Boundary. BroadcastChannel sync now Zod-validated. Privacy mode sync leakage fixed. Force and disc pickers converted to inline popovers. Cage permissibility shows level ranges on disabled types. Cervical osteotomy restrictions (C1/C2 blocked, C3-C7 corpectomy only). UIV/LIV note presets. ALIF at L3/4. First-run onboarding tour. EDITING badge on active chart. Patient identity enlarged. Keyboard shortcuts consistent (Enter = Confirm & Next always). Liability disclaimer (22 languages). Report a Problem help section. Service worker for offline web build. React.memo on 6 chart components. TypeScript `any` reduced from ~65 to 5. Hover opacity increased. Focus restore on modal close. Paste sanitisation. localStorage try/catch. Specification synced (19 gaps). 295 tests, zero type errors.
 - **v2.6.0-beta** (2026-03-25): Cervical anatomy redesign — occiput, C1 atlas, C2 axis, subaxial C3-C6, and C7 each rendered with anatomically distinct SVG shapes including lateral masses and articular pillars. Lateral mass click zones for cervical screw placement. Whole-spine rescaled to Tan 2004 vertebral body height proportions with per-level disc heights from Koeller 1986. Transverse processes shown on all thoracolumbar vertebrae with per-level craniocaudal heights from Berry 1987. Implant company data audit (web-searched 2026-03-25): Zimmer Biomet renamed to Highridge Medical, 3 non-pedicle-screw companies removed (SpineGuard, Aurora Spine, SI-BONE), 10 legacy/discontinued systems removed, 4 new systems added (LONGITUDE II, QUARTEX OCT, LineSider, Cortium). 13 manufacturers, 71 screw systems. ACDF cages now visible in whole-spine view with scaled-down labels. Preferences (pelvis, region defaults, confirm behaviour) sync between dual windows via BroadcastChannel. Pelvic fixation as first-class levels (S2AI, Iliac, SI-J). ScrewModal level selector, Confirm & Next rapid entry, region size defaults, PreferencesModal. 295 tests across 8 files.
 - **v2.5.20-beta** (2026-03-24): Portrait inventory tab (4th tab, large text for theatre). Fullscreen API toggle in portrait and landscape. Confirm Plan / Clear Construct buttons in portrait toolbar. Ghost click routing fixed — disc overlay routes to correct cage/osteotomy modal with pre-filled data. Ghost icon hit area fix. Annotations don't carry from plan to construct. Sync bounce fix (timestamp guard replaces boolean). Language count dynamic via SUPPORTED_LANGUAGES.length. Release workflow now triggers on all version tags. RELEASING.md added. 252 tests across 5 files.

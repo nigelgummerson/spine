@@ -1,6 +1,6 @@
 import { getCurrentLang, LOCALE_MAP } from '../i18n/i18n';
 
-export const CURRENT_VERSION: string = "v2.7.31-beta";
+export const CURRENT_VERSION: string = "v2.7.32-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -12,6 +12,9 @@ interface ChangeLogEntry {
 // Keep entries brief, non-technical, and focused on what the surgeon can do.
 // Detailed technical changelog is in CLAUDE.md for developers/agents.
 export const CHANGE_LOG: ChangeLogEntry[] = [
+    { version: "v2.7.32-beta", date: "2026-03-27", changes: [
+        "Offline Use help section translated into all 15 European languages (was showing English).",
+    ]},
     { version: "v2.7.3-beta", date: "2026-03-26", changes: [
         "Structured rod recording — material, diameter, profile, length, and contour via a dedicated modal. Transition rods supported (e.g. 3.5mm to 5.5mm).",
         "Kit-aware size validation — sizes not listed in the selected screw system catalogue are flagged in the screw modal (Xia 3 proof of concept).",

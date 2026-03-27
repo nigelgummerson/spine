@@ -151,7 +151,7 @@ export interface SystemCatalogue {
 export const SYSTEM_CATALOGUE: Record<string, SystemCatalogue> = {
     'Xia 3': {
         type: 'thoracolumbar',
-        screwDiameters: [4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.5, 9.5, 10.5],
+        screwDiameters: [4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8.5, 9.5, 10.5],
         screwLengthsByDiameter: {
             '4.0':  [20, 22, 25, 30, 35, 40, 45],
             '4.5':  [20, 22, 25, 30, 35, 40, 45],
@@ -165,7 +165,7 @@ export const SYSTEM_CATALOGUE: Record<string, SystemCatalogue> = {
             '9.5':  [40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100],
             '10.5': [40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100],
         },
-        rodDiameters: [5.5, 6.0],
+        rodDiameters: [5.5, 6],
         rodMaterials: ['titanium', 'cobalt_chrome', 'cpt'],
         rodProfiles: ['round'],
         notes: 'Flagship thoracolumbar system. Vitallium = CoCr. CP-Ti rods also available.',

@@ -2,6 +2,11 @@
 
 Detailed technical changes by version. For user-facing changes see the in-app changelog (`src/data/changelog.ts`).
 
+## v2.7.32-beta (2026-03-27)
+
+### i18n: Offline Use help section translated
+- `help.offline_use.title` and `help.offline_use.body` translated into all 15 European languages (de, fr, es, it, pt, sv, nb, da, fi, nl, pl, el, tr, uk, ru). These keys were added in v2.3.1 (web/standalone split) but only translated for the later language batch (hi, ar, he, zh-Hans, ja, ko).
+
 ## v2.6.0-beta (2026-03-25)
 
 ### Cervical Anatomy Redesign

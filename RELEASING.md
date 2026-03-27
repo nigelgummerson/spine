@@ -46,8 +46,8 @@ Live at: https://plan.skeletalsurgery.com/spine/
 ## Creating a Standalone Release (offline HTML)
 The standalone single-file build is for offline distribution (USB, email, intranet).
 
-1. Tag the commit: `git tag v2.7.31-beta` (must match pattern `v*.*.*` or `v*.*.*-*`)
-2. Push the tag: `git push origin v2.7.31-beta`
+1. Tag the commit: `git tag v2.7.32-beta` (must match pattern `v*.*.*` or `v*.*.*-*`)
+2. Push the tag: `git push origin v2.7.32-beta`
 3. GitHub Actions (`.github/workflows/release.yml`) automatically:
    - Runs tests
    - Builds standalone HTML via `npm run build:standalone`
