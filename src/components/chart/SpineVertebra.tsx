@@ -143,11 +143,11 @@ export const SpineVertebra = React.memo(({ label, type, height, isCorpectomy, he
                             <rect x={g.latMassRightCx - g.latMassRx} y={g.latMassCy - g.latMassRy}
                                 width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
                                 fill={common.fill} stroke="#94a3b8" strokeWidth="1" strokeDasharray="3 2" />
-                            {g.pedLeftCx && g.pedRx && g.pedRy && (
+                            {g.pedLeftCx && g.pedRx && g.pedRy && g.pedCy && (
                                 <>
-                                    <ellipse cx={g.pedLeftCx} cy={m} rx={g.pedRx} ry={g.pedRy}
+                                    <ellipse cx={g.pedLeftCx} cy={g.pedCy} rx={g.pedRx} ry={g.pedRy}
                                         fill="none" stroke="#94a3b8" strokeWidth="1" />
-                                    <ellipse cx={g.pedRightCx} cy={m} rx={g.pedRx} ry={g.pedRy}
+                                    <ellipse cx={g.pedRightCx} cy={g.pedCy} rx={g.pedRx} ry={g.pedRy}
                                         fill="none" stroke="#94a3b8" strokeWidth="1" />
                                 </>
                             )}

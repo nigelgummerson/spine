@@ -167,6 +167,7 @@ interface CervicalSubaxialGeom extends GeomBase {
     pedRightCx?: number;
     pedRx?: number;
     pedRy?: number;
+    pedCy?: number;
 }
 
 interface ThoracicGeom extends GeomBase {
@@ -296,6 +297,7 @@ export const getVertSvgGeometry = (levelId: string): VertSvgGeometry | null => {
             base.pedRightCx = right - pedInset - 3;
             base.pedRx = pedRx;
             base.pedRy = pedRy;
+            base.pedCy = VERT_PAD + pedRy + 5;
         }
         return base;
     }

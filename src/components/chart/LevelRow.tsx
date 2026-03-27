@@ -125,9 +125,9 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
     let viewBoxScrewCy: number;
     if (geom && (geom.region === 'thoracic' || geom.region === 'lumbar' || geom.region === 'sacral')) {
         viewBoxScrewCy = geom.pedCy;
-    } else if (geom && geom.region === 'cervical-subaxial' && geom.pedRx) {
-        // C7: match SpineVertebra which draws pedicle ellipses at vertical centre
-        viewBoxScrewCy = viewBoxHeight / 2;
+    } else if (geom && geom.region === 'cervical-subaxial' && geom.pedCy) {
+        // C7: use pedCy from geometry (same formula as thoracic — upper portion of body)
+        viewBoxScrewCy = geom.pedCy;
     } else if (geom && (geom.region === 'cervical-upper' || geom.region === 'cervical-subaxial')) {
         // C3-C6: lower quadrant of lateral mass — shift 30% of lateral mass height downward
         viewBoxScrewCy = geom.latMassCy + geom.latMassRy * 0.3;
