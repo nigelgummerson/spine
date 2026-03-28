@@ -30,9 +30,8 @@ const LEVEL_ORDER: string[] = [
 const PELVIC_IDS = new Set(['S2AI', 'Iliac']);
 const SIJ_ID = 'SI-J';
 
-/** Build a suffix like " — T4-L1 + Pelvis" from placements with implants */
+/** Build a level range string like "T4–Pelvis + SIJ fixation" */
 function buildLevelRange(placements: Placement[], tools: ToolDefinition[]): string {
-    // Only count screws, hooks, fixation (type === 'implant')
     const implantToolIds = new Set(tools.filter(t => t.type === 'implant').map(t => t.id));
     const levelIds = new Set<string>();
     for (const p of placements) {
@@ -54,16 +53,18 @@ function buildLevelRange(placements: Placement[], tools: ToolDefinition[]): stri
         if (idx > maxIdx) maxIdx = idx;
     }
 
-    const parts: string[] = [];
+    // Build range: top–bottom, with "Pelvis" replacing bottom if pelvic fixation extends beyond spinal levels
+    let range = '';
     if (minIdx <= maxIdx) {
         const top = LEVEL_ORDER[minIdx];
-        const bottom = LEVEL_ORDER[maxIdx];
-        parts.push(top === bottom ? top : `${top}\u2013${bottom}`);
+        const bottom = hasPelvic ? 'Pelvis' : LEVEL_ORDER[maxIdx];
+        range = top === bottom ? top : `${top}\u2013${bottom}`;
+    } else if (hasPelvic) {
+        range = 'Pelvis';
     }
-    if (hasPelvic) parts.push('Pelvis');
-    if (hasSIJ) parts.push('SIJ');
 
-    return parts.length > 0 ? ` \u2014 ${parts.join(' + ')}` : '';
+    const suffix = hasSIJ ? ' + SIJ fixation' : '';
+    return range ? ` \u2014 ${range}${suffix}` : (hasSIJ ? ` \u2014 SIJ fixation` : '');
 }
 
 export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, levels, rods, large }: ImplantInventoryProps) => {
