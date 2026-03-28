@@ -210,7 +210,7 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   'e.g. 5.5mm CoCr 120mm',
   'e.g. 5.5mm TiAlV 120mm',
   // Safety notice — Hindi retains English per ASSI convention
-  'Schematic — verify against patient imaging',
+  'Schematic — verify against patient anatomy and imaging',
   // Offline use — English placeholders pending native-speaker translation review
   'Offline Use',
   'This app works best online for automatic updates. For use without internet, <a href="https://github.com/nigelgummerson/spine/releases/latest" target="_blank" rel="noopener noreferrer" class="underline hover:text-slate-800">download the standalone version</a>.',

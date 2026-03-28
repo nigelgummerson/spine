@@ -275,12 +275,14 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
                 // Lateral mass trajectory: reposition to Magerl entry point (lower medial quadrant)
                 if (traj === 'lateral_mass' && 'latMassLeftCx' in geom) {
                     const medialOff = geom.latMassRx * 0.3 * (scaledWidth / 160);
-                    const inferiorOff = geom.latMassRy * 0.3 * heightScale;
                     const lmCx = screwSide === 'left'
                         ? vertX + (geom.latMassLeftCx / 160) * scaledWidth + medialOff
                         : vertX + (geom.latMassRightCx / 160) * scaledWidth - medialOff;
+                    // Y at lateral mass centre + 30% inferior (lower medial quadrant)
+                    const lmCyChart = geom.latMassCy * heightScale;
+                    const inferiorOff = geom.latMassRy * 0.3 * heightScale;
                     iconX = lmCx - iW / 2;
-                    iconY += inferiorOff;
+                    iconY = lmCyChart + inferiorOff - iH / 2;
                 }
                 const angles = getTrajectoryAngle(level.id, traj);
                 if (angles && getEntryPointOffset(traj, screwSide) && 'pedRx' in geom && 'pedCy' in geom) {
@@ -416,12 +418,13 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
                 const traj = ghostItem.trajectory || (() => { const opts = getTrajectoryOptions(level.id); return opts ? (opts.find(o => o.isDefault) || opts[0]).id : 'pedicle'; })();
                 if (traj === 'lateral_mass' && 'latMassLeftCx' in geom) {
                     const medialOff = geom.latMassRx * 0.3 * (scaledWidth / 160);
-                    const inferiorOff = geom.latMassRy * 0.3 * heightScale;
                     const lmCx = screwSide === 'left'
                         ? vertX + (geom.latMassLeftCx / 160) * scaledWidth + medialOff
                         : vertX + (geom.latMassRightCx / 160) * scaledWidth - medialOff;
+                    const lmCyChart = geom.latMassCy * heightScale;
+                    const inferiorOff = geom.latMassRy * 0.3 * heightScale;
                     iconX = lmCx - iW / 2;
-                    iconY += inferiorOff;
+                    iconY = lmCyChart + inferiorOff - iH / 2;
                 }
                 const angles = getTrajectoryAngle(level.id, traj);
                 if (angles && getEntryPointOffset(traj, screwSide) && 'pedRx' in geom && 'pedCy' in geom) {
