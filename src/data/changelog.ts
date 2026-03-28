@@ -20,6 +20,13 @@ export const CHANGE_LOG: ChangeLogEntry[] = [
         "Quick reference RTL support for Arabic and Hebrew.",
         "Offline Use help section translated into all 15 European languages.",
     ]},
+    { version: "v2.7.32-beta", date: "2026-03-26", changes: [
+        "Record locking now fully enforced — locked records cannot be modified via any path, including dual-window sync.",
+        "Osteotomy modal blocks placement at occiput, C1, and C2 with a translated message.",
+        "Disclaimer acceptance recorded in the document for audit purposes.",
+        "Modal crashes no longer take down the whole app — close and try again.",
+        "Date display uses your language's date format.",
+    ]},
     { version: "v2.7.3-beta", date: "2026-03-26", changes: [
         "Structured rod recording — material, diameter, profile, length, and contour via a dedicated modal. Transition rods supported (e.g. 3.5mm to 5.5mm).",
         "Kit-aware size validation — sizes not listed in the selected screw system catalogue are flagged in the screw modal (Xia 3 proof of concept).",

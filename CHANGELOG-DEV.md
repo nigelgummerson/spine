@@ -22,6 +22,41 @@ Detailed technical changes by version. For user-facing changes see the in-app ch
 ### i18n: Offline Use help section translated
 - `help.offline_use.title` and `help.offline_use.body` translated into all 15 European languages (de, fr, es, it, pt, sv, nb, da, fi, nl, pl, el, tr, uk, ru). These keys were added in v2.3.1 (web/standalone split) but only translated for the later language batch (hi, ar, he, zh-Hans, ja, ko).
 
+## v2.7.32-beta (2026-03-26)
+
+### Expert Review Implementation (5-agent, 68 findings)
+
+**Safety (Phase 1):**
+- Record lock enforced at reducer level — `LOCK_EXEMPT_ACTIONS` set (`UNLOCK_DOCUMENT`, `LOAD_DOCUMENT`, `NEW_PATIENT`); all other actions return unchanged state when `lockedAt` set
+- UNDO/REDO blocked in undoReducer when `present.lockedAt` set
+- BroadcastChannel sync rejected on locked records with error toast
+- NEW_PATIENT broadcasts immediately (bypasses 200ms debounce, cancels pending timer)
+- OsteotomyModal blocks selection at Oc/C1/C2 with translated `alert.no_osteotomy_at_level` message
+- `peerIncognitoRef` resets on 10s heartbeat timeout (CS7)
+- `RTL_LANGUAGES` cleaned — removed unsupported `fa`/`ur`
+
+**Architecture (Phase 3):**
+- `useDocumentState.ts` (320 lines) split into `useBroadcastSync.ts` (230 lines), `useAutoSave.ts` (100 lines), and composition layer (120 lines). Public API unchanged, App.tsx unmodified.
+- `useModalState.ts` extracted from App.tsx — 21 useState declarations moved to dedicated hook
+- 14 `useCallback` wrappers + `chartHandlersRef` stable ref pattern for ChartPaper callback props
+- `ErrorBoundary` wraps `ModalOrchestrator` with `onReset` callback
+- ~15 `any` types replaced with proper types; remaining documented with eslint-disable
+
+**Schema & Data (Phase 4):**
+- 15 `.passthrough()` replaced with `.strict()` on v4 sub-objects
+- Defensive numeric validation: screw diameter/length, cage height/width/length, rod diameter/length must be positive
+- `disclaimerAcceptedAt` added to DocumentState, serialised to JSON v4
+- `formatDate()` consolidated in `src/i18n/i18n.ts` using `Intl.DateTimeFormat`
+- 3 advisory glossary verification tests
+
+**Tests (100 new, 1273 total across 43 files):**
+- `useExport.test.ts` — 27 tests (save/load JSON, export JPG/PDF, checksum, incognito)
+- `documentReducer.test.ts` — 18 new (lock enforcement on all CRUD actions)
+- `undoReducer.test.ts` — 3 new (UNDO/REDO blocked when locked)
+- `useDocumentState.test.ts` — 4 new (sync validation, lock rejection, privacy)
+- `clinical-anatomy.test.ts` — 32 new (cage permissibility, osteotomy restrictions, screw defaults, chart stress)
+- `checksum.test.ts` — 8, `id.test.ts` — 3, `measureText.test.ts` — 5
+
 ## v2.6.0-beta (2026-03-25)
 
 ### Cervical Anatomy Redesign
