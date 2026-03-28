@@ -124,6 +124,7 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   'Osteo',
   'Pars',
   'Translaminar',
+  'Transarticular',
   'Pedicle',
   'Lateral mass',
   'Cages',
