@@ -38,9 +38,9 @@ export const SCREW_SYSTEMS: Record<string, string[]> = {
 interface RetainerInfo { name: string; perScrew: number }
 const RETAINER_DEFAULTS: Record<string, RetainerInfo> = {
     // Medtronic: break-off set screws
-    'Medtronic': { name: 'Set screw', perScrew: 1 },
+    'Medtronic': { name: 'Setscrew', perScrew: 1 },
     // DePuy Synthes: "set screw" (unitised set screw or dual innie set screw — from EXPEDIUM IFU)
-    'DePuy Synthes': { name: 'Set screw', perScrew: 1 },
+    'DePuy Synthes': { name: 'Setscrew', perScrew: 1 },
     // Stryker Xia family: "blocker" (buttress thread)
     'Stryker': { name: 'Blocker', perScrew: 1 },
     'VB Spine': { name: 'Blocker', perScrew: 1 },
@@ -55,10 +55,10 @@ const NO_RETAINER_SYSTEMS = new Set([
 ]);
 // Systems with specific retainer names different from company default
 const SYSTEM_RETAINER_OVERRIDE: Record<string, RetainerInfo> = {
-    'EXPEDIUM VERSE': { name: 'Set screw', perScrew: 1 },
+    'EXPEDIUM VERSE': { name: 'Setscrew', perScrew: 1 },
     'Xia 3': { name: 'Blocker', perScrew: 1 },
     'Xia 4.5': { name: 'Blocker', perScrew: 1 },
-    'Everest': { name: 'Locking set screw', perScrew: 1 },
+    'Everest': { name: 'Locking setscrew', perScrew: 1 },
     'CREO': { name: 'Locking cap', perScrew: 1 },
     'CREO MIS': { name: 'Locking cap', perScrew: 1 },
 };
@@ -66,7 +66,7 @@ const SYSTEM_RETAINER_OVERRIDE: Record<string, RetainerInfo> = {
 /** Get retainer info for a screw system. Returns null if no retainer needed. */
 export function getRetainerInfo(company: string, system: string): RetainerInfo | null {
     if (NO_RETAINER_SYSTEMS.has(system)) return null;
-    return SYSTEM_RETAINER_OVERRIDE[system] || RETAINER_DEFAULTS[company] || { name: 'Set screw', perScrew: 1 };
+    return SYSTEM_RETAINER_OVERRIDE[system] || RETAINER_DEFAULTS[company] || { name: 'Setscrew', perScrew: 1 };
 }
 
 // --- Rod specification constants ---
