@@ -1,0 +1,519 @@
+{
+  "schema": {
+    "format": "spinal-instrumentation",
+    "version": 4,
+    "schemaUrl": "https://plan.skeletalsurgery.com/spine/schema/v4/spinal-instrumentation.json",
+    "generator": {
+      "name": "Spinal Instrumentation Plan & Record",
+      "version": "2.7.31-beta",
+      "url": "https://plan.skeletalsurgery.com/spine"
+    }
+  },
+  "document": {
+    "id": "d4e5f6a7-b8c9-4d0e-a1f2-3b4c5d6e7f80",
+    "created": "2026-03-28T10:00:00Z",
+    "modified": "2026-03-28T10:30:00Z",
+    "language": "en",
+    "disclaimerAcceptedAt": "2026-03-28T10:00:30Z"
+  },
+  "patient": {
+    "name": "Demo Patient",
+    "identifier": "DEMO-001"
+  },
+  "case": {
+    "date": "2026-03-28",
+    "surgeon": "Mr A Smith",
+    "location": "Leeds General Infirmary"
+  },
+  "implantSystem": {
+    "manufacturer": "Stryker",
+    "system": "Xia 3"
+  },
+  "plan": {
+    "elements": [
+      {
+        "id": "plan-c7-left",
+        "type": "screw",
+        "level": "C7",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 3.5, "length": 14 },
+        "annotation": "lateral mass"
+      },
+      {
+        "id": "plan-c7-right",
+        "type": "screw",
+        "level": "C7",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 3.5, "length": 14 },
+        "annotation": "pedicle"
+      },
+      {
+        "id": "plan-t3-left",
+        "type": "fixation",
+        "level": "T3",
+        "side": "left",
+        "zone": "left",
+        "fixation": { "fixationType": "sublaminar-band" }
+      },
+      {
+        "id": "plan-t4-left",
+        "type": "screw",
+        "level": "T4",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 4.5, "length": 30 }
+      },
+      {
+        "id": "plan-t4-right",
+        "type": "screw",
+        "level": "T4",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 4.5, "length": 30 }
+      },
+      {
+        "id": "plan-t4-left-hook",
+        "type": "hook",
+        "level": "T4",
+        "side": "left",
+        "zone": "left",
+        "hook": { "hookType": "pedicle" },
+        "annotation": "claw construct"
+      },
+      {
+        "id": "plan-t5-left",
+        "type": "screw",
+        "level": "T5",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 4.5, "length": 30 }
+      },
+      {
+        "id": "plan-t5-right",
+        "type": "screw",
+        "level": "T5",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 4.5, "length": 30 }
+      },
+      {
+        "id": "plan-t6-left",
+        "type": "screw",
+        "level": "T6",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 4.5, "length": 30 }
+      },
+      {
+        "id": "plan-t6-right",
+        "type": "screw",
+        "level": "T6",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 4.5, "length": 30 }
+      },
+      {
+        "id": "plan-t7-left",
+        "type": "screw",
+        "level": "T7",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 5.0, "length": 35 }
+      },
+      {
+        "id": "plan-t7-right",
+        "type": "screw",
+        "level": "T7",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 5.0, "length": 35 }
+      },
+      {
+        "id": "plan-t8-left",
+        "type": "screw",
+        "level": "T8",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 5.0, "length": 35 }
+      },
+      {
+        "id": "plan-t8-right",
+        "type": "screw",
+        "level": "T8",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 5.0, "length": 35 }
+      },
+      {
+        "id": "plan-t9-left",
+        "type": "screw",
+        "level": "T9",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 5.0, "length": 35 }
+      },
+      {
+        "id": "plan-t9-right",
+        "type": "screw",
+        "level": "T9",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 5.0, "length": 35 }
+      },
+      {
+        "id": "plan-t10-left",
+        "type": "screw",
+        "level": "T10",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 5.5, "length": 35 }
+      },
+      {
+        "id": "plan-t10-right",
+        "type": "screw",
+        "level": "T10",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 5.5, "length": 35 }
+      },
+      {
+        "id": "plan-t11-left",
+        "type": "screw",
+        "level": "T11",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 5.5, "length": 40 }
+      },
+      {
+        "id": "plan-t11-right",
+        "type": "screw",
+        "level": "T11",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 5.5, "length": 40 }
+      },
+      {
+        "id": "plan-t12-left",
+        "type": "screw",
+        "level": "T12",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 6.0, "length": 40 }
+      },
+      {
+        "id": "plan-t12-right",
+        "type": "screw",
+        "level": "T12",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 6.0, "length": 40 }
+      },
+      {
+        "id": "plan-l1-left",
+        "type": "screw",
+        "level": "L1",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 6.0, "length": 45 }
+      },
+      {
+        "id": "plan-l1-right",
+        "type": "screw",
+        "level": "L1",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 6.0, "length": 45 }
+      },
+      {
+        "id": "plan-l2-left",
+        "type": "screw",
+        "level": "L2",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 6.5, "length": 45 }
+      },
+      {
+        "id": "plan-l2-right",
+        "type": "screw",
+        "level": "L2",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 6.5, "length": 45 }
+      },
+      {
+        "id": "plan-l3-left-cbt",
+        "type": "screw",
+        "level": "L3",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 5.0, "length": 30 },
+        "annotation": "cortical trajectory",
+        "trajectory": "cortical"
+      },
+      {
+        "id": "plan-l3-right",
+        "type": "screw",
+        "level": "L3",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 6.5, "length": 45 }
+      },
+      {
+        "id": "plan-l4-left",
+        "type": "screw",
+        "level": "L4",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 6.5, "length": 45 }
+      },
+      {
+        "id": "plan-l4-right",
+        "type": "screw",
+        "level": "L4",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 6.5, "length": 45 }
+      },
+      {
+        "id": "plan-l5-left",
+        "type": "screw",
+        "level": "L5",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 6.5, "length": 45 }
+      },
+      {
+        "id": "plan-l5-right",
+        "type": "screw",
+        "level": "L5",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 6.5, "length": 45 }
+      },
+      {
+        "id": "plan-s1-left",
+        "type": "screw",
+        "level": "S1",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 7.0, "length": 45 }
+      },
+      {
+        "id": "plan-s1-right",
+        "type": "screw",
+        "level": "S1",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 7.0, "length": 45 }
+      },
+      {
+        "id": "plan-s2ai-left",
+        "type": "screw",
+        "level": "S2AI",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 7.5, "length": 80 }
+      },
+      {
+        "id": "plan-s2ai-right",
+        "type": "screw",
+        "level": "S2AI",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 7.5, "length": 80 }
+      },
+      {
+        "id": "plan-osteo-t11t12",
+        "type": "osteotomy",
+        "level": "T11",
+        "side": "midline",
+        "zone": "disc",
+        "osteotomy": {
+          "osteotomyType": "ponte",
+          "schwabGrade": 2,
+          "correctionAngle": 10
+        }
+      },
+      {
+        "id": "plan-osteo-l2",
+        "type": "osteotomy",
+        "level": "L2",
+        "side": "midline",
+        "zone": "mid",
+        "osteotomy": {
+          "osteotomyType": "PSO",
+          "schwabGrade": 3,
+          "correctionAngle": 30,
+          "reconstructionCage": "VBR mesh"
+        }
+      },
+      {
+        "id": "plan-cage-l4l5",
+        "type": "cage",
+        "level": "L4",
+        "side": "left",
+        "cage": {
+          "approach": "TLIF",
+          "height": 10,
+          "lordosis": 10
+        }
+      },
+      {
+        "id": "plan-cage-l5s1",
+        "type": "cage",
+        "level": "L5",
+        "side": "bilateral",
+        "cage": {
+          "approach": "ALIF",
+          "height": 14,
+          "lordosis": 15
+        }
+      },
+      {
+        "id": "plan-xlink-t8",
+        "type": "connector",
+        "level": "T8",
+        "side": "midline",
+        "connector": { "connectorType": "crosslink", "fraction": 0.5 }
+      },
+      {
+        "id": "plan-xlink-l3",
+        "type": "connector",
+        "level": "L3",
+        "side": "midline",
+        "connector": { "connectorType": "crosslink", "fraction": 0.5 }
+      }
+    ],
+    "forces": [
+      {
+        "id": "plan-force-distraction-t4",
+        "type": "distraction",
+        "level": "T4",
+        "side": "left"
+      },
+      {
+        "id": "plan-force-compression-l5",
+        "type": "compression",
+        "level": "L5",
+        "side": "left"
+      },
+      {
+        "id": "plan-force-translate-t10",
+        "type": "translation",
+        "direction": "left",
+        "level": "T10",
+        "side": "left"
+      }
+    ],
+    "rods": [
+      {
+        "id": "rod-left",
+        "side": "left",
+        "material": "titanium",
+        "diameter": 5.5,
+        "profile": "round",
+        "contour": "surgeon_contoured",
+        "length": 400
+      },
+      {
+        "id": "rod-right",
+        "side": "right",
+        "material": "titanium",
+        "diameter": 5.5,
+        "profile": "transition",
+        "contour": "surgeon_contoured",
+        "length": 420,
+        "transitionFrom": 3.5,
+        "transitionTo": 5.5
+      }
+    ],
+    "notes": [
+      { "id": "plan-note-uiv", "level": "T4", "text": "UIV", "showArrow": false },
+      { "id": "plan-note-liv", "level": "S2AI", "text": "LIV", "showArrow": false },
+      { "id": "plan-note-rod-transition", "level": "T12", "text": "Rod transition", "showArrow": true },
+      { "id": "plan-note-decomp-l3", "level": "L3", "text": "Decompression", "showArrow": true },
+      { "id": "plan-note-decomp-l4", "level": "L4", "text": "Decompression", "showArrow": true }
+    ],
+    "boneGraft": {
+      "types": ["local-bone", "allograft", "BMP"],
+      "notes": "Posterior fusion T4-S1"
+    }
+  },
+  "construct": {
+    "elements": [
+      {
+        "id": "const-t4-left",
+        "type": "screw",
+        "level": "T4",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 4.5, "length": 30 }
+      },
+      {
+        "id": "const-t4-right",
+        "type": "screw",
+        "level": "T4",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 4.5, "length": 30 }
+      },
+      {
+        "id": "const-l5-left",
+        "type": "screw",
+        "level": "L5",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 6.5, "length": 45 }
+      },
+      {
+        "id": "const-l5-right",
+        "type": "screw",
+        "level": "L5",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 6.5, "length": 45 }
+      },
+      {
+        "id": "const-s1-left",
+        "type": "screw",
+        "level": "S1",
+        "side": "left",
+        "zone": "left",
+        "screw": { "headType": "polyaxial", "diameter": 7.0, "length": 45 }
+      },
+      {
+        "id": "const-s1-right",
+        "type": "screw",
+        "level": "S1",
+        "side": "right",
+        "zone": "right",
+        "screw": { "headType": "polyaxial", "diameter": 7.0, "length": 45 }
+      }
+    ],
+    "forces": [],
+    "rods": [],
+    "notes": [],
+    "boneGraft": {
+      "types": [],
+      "notes": ""
+    }
+  },
+  "ui": {
+    "colourScheme": "stryker",
+    "viewMode": "plan",
+    "notePositions": {
+      "plan-note-uiv": { "offsetX": -30, "offsetY": 0 },
+      "plan-note-liv": { "offsetX": -30, "offsetY": 0 },
+      "plan-note-rod-transition": { "offsetX": 40, "offsetY": 0 },
+      "plan-note-decomp-l3": { "offsetX": 40, "offsetY": 0 },
+      "plan-note-decomp-l4": { "offsetX": 40, "offsetY": 0 }
+    },
+    "preferences": {
+      "showPelvis": true,
+      "useRegionDefaults": true,
+      "confirmAndNext": true
+    }
+  }
+}

@@ -292,6 +292,9 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
                     {isScrew && (<>
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{t('modal.screw.section_size')}</div>
                         <div className="flex gap-2 mb-4">{['standard','custom','none'].map(m => { const labels: Record<string, string> = { standard: t('modal.screw.mode_standard'), custom: t('modal.screw.mode_custom'), none: t('modal.screw.mode_none') }; const active = mode === m; return <button key={m} onClick={() => setMode(m)} className={`flex-1 py-1 text-xs font-bold rounded border transition-all ${active ? 'bg-amber-500 text-slate-900 border-amber-600' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>{labels[m]}</button>; })}</div>
+                        {useRegionDefaults && mode === 'standard' && (
+                            <div className="text-[9px] text-slate-400 italic mb-1">{t('modal.screw.defaults_disclaimer')}</div>
+                        )}
                         {mode === 'standard' && (() => {
                             const sizeWarning = screwSystem ? checkScrewSize(screwSystem, parseFloat(diameter), parseInt(length, 10)) : null;
                             const cat = screwSystem ? getSystemCatalogue(screwSystem) : null;

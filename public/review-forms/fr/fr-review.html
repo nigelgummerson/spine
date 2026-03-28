@@ -190,7 +190,7 @@
         <div class="header-top">
             <div>
                 <h1>Spinal Instrumentation Plan & Record: Translation Review</h1>
-                <span class="lang-badge">French / Français (fr) — v2.7.35-beta</span>
+                <span class="lang-badge">French / Français (fr) — v2.8.0-beta</span>
             </div>
             <div class="header-actions">
                 <a href="../guide.html" target="_blank" style="color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: none; padding: 6px 10px;" title="How to use this form">Guide</a>
@@ -202,7 +202,7 @@
         </div>
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-            <div class="progress-text" id="progress-text">0 of 358 items reviewed (0%)</div>
+            <div class="progress-text" id="progress-text">0 of 364 items reviewed (0%)</div>
             <div class="save-hint" id="save-hint"></div>
         </div>
     </div>
@@ -225,7 +225,7 @@
             <div class="nav-sections">
                 <a href="#section-0" class="nav-link" data-section="0">App Header &amp; Sidebar <span class="nav-count" id="nav-count-0">0/41</span></a>
             <a href="#section-1" class="nav-link" data-section="1">Patient Demographics <span class="nav-count" id="nav-count-1">0/24</span></a>
-            <a href="#section-2" class="nav-link" data-section="2">Implant Modal: Screws, Hooks &amp; Bands <span class="nav-count" id="nav-count-2">0/36</span></a>
+            <a href="#section-2" class="nav-link" data-section="2">Implant Modal: Screws, Hooks &amp; Bands <span class="nav-count" id="nav-count-2">0/37</span></a>
             <a href="#section-3" class="nav-link" data-section="3">Cage Modal: Interbody Cages <span class="nav-count" id="nav-count-3">0/25</span></a>
             <a href="#section-4" class="nav-link" data-section="4">Osteotomy Modal <span class="nav-count" id="nav-count-4">0/29</span></a>
             <a href="#section-5" class="nav-link" data-section="5">Force Modal <span class="nav-count" id="nav-count-5">0/7</span></a>
@@ -240,7 +240,7 @@
             <a href="#section-14" class="nav-link" data-section="14">Alerts &amp; Confirmations <span class="nav-count" id="nav-count-14">0/22</span></a>
             <a href="#section-15" class="nav-link" data-section="15">Credits &amp; Disclaimer <span class="nav-count" id="nav-count-15">0/12</span></a>
             <a href="#section-16" class="nav-link" data-section="16">Version History Modal <span class="nav-count" id="nav-count-16">0/1</span></a>
-            <a href="#section-17" class="nav-link" data-section="17">Other <span class="nav-count" id="nav-count-17">0/42</span></a>
+            <a href="#section-17" class="nav-link" data-section="17">Other <span class="nav-count" id="nav-count-17">0/47</span></a>
                 <div class="nav-divider"></div>
                 <a href="#section-bugs" class="nav-link nav-link-bugs" data-section="bugs">Bug Reports <span class="nav-count" id="nav-count-bugs">0</span></a>
             </div>
@@ -3010,6 +3010,39 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="modal.screw.defaults_disclaimer" data-section="2" id="item-modal.screw.defaults_disclaimer">
+            <div class="item-header">
+                <code class="key-label">modal.screw.defaults_disclaimer</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Default starting values — adjust to fit patient anatomy</div>
+                </div>
+                <div class="col-translation">
+                    <label>Français</label>
+                    <textarea class="translation-field" data-key="modal.screw.defaults_disclaimer" data-original="Default starting values — adjust to fit patient anatomy">Default starting values — adjust to fit patient anatomy</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.screw.defaults_disclaimer" value="correct" data-key="modal.screw.defaults_disclaimer">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.screw.defaults_disclaimer" value="corrected" data-key="modal.screw.defaults_disclaimer">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.screw.defaults_disclaimer" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="modal.screw.description" data-section="2" id="item-modal.screw.description">
             <div class="item-header">
                 <code class="key-label">modal.screw.description</code>
@@ -3249,11 +3282,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">No default size — anatomy is highly variable at {level}</div>
+                    <div class="english-text">No default size at {level} — verify dimensions against patient CT</div>
                 </div>
                 <div class="col-translation">
                     <label>Français</label>
-                    <textarea class="translation-field" data-key="modal.screw.no_default_size" data-original="Pas de taille par défaut — anatomie très variable à {level}">Pas de taille par défaut — anatomie très variable à {level}</textarea>
+                    <textarea class="translation-field" data-key="modal.screw.no_default_size" data-original="Pas de taille par défaut à {level} — vérifier les dimensions avec le scanner du patient">Pas de taille par défaut à {level} — vérifier les dimensions avec le scanner du patient</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -8149,7 +8182,7 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Schematic — verify against patient anatomy and imaging</div>
+                    <div class="english-text">Schematic documentation only — verify all placements against patient anatomy</div>
                 </div>
                 <div class="col-translation">
                     <label>Français</label>
@@ -8797,11 +8830,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Schwab 1-2 (Facet, Ponte) are placed at the &lt;strong&gt;disc level&lt;/strong&gt; - click the space between vertebrae. Schwab 3+ (PSO, VCR, etc.) are placed on the &lt;strong&gt;vertebral body&lt;/strong&gt; - click the midline. VCR, ML-VCR, and Corpectomy include a reconstruction cage description field.</div>
+                    <div class="english-text">A single &lt;strong&gt;Osteotomy&lt;/strong&gt; button handles both posterior osteotomies and anterior corpectomy — select the type within the modal. Schwab 1-2 (Facet, Ponte) are placed at the &lt;strong&gt;disc level&lt;/strong&gt; — click the space between vertebrae. Schwab 3+ (PSO, VCR, etc.) are placed on the &lt;strong&gt;vertebral body&lt;/strong&gt; — click the midline. VCR, ML-VCR, and Corpectomy include a reconstruction cage description field.</div>
                 </div>
                 <div class="col-translation">
                     <label>Français</label>
-                    <textarea class="translation-field" data-key="help.osteotomies.body" data-original="Cliquez sur le &lt;strong&gt;corps vertébral&lt;/strong&gt; (ligne médiane) pour placer une ostéotomie. Grades Schwab 1-6 plus corporectomie antérieure. VCR, ML-VCR et Corporectomie incluent un champ de description pour la cage de reconstruction.">Cliquez sur le &lt;strong&gt;corps vertébral&lt;/strong&gt; (ligne médiane) pour placer une ostéotomie. Grades Schwab 1-6 plus corporectomie antérieure. VCR, ML-VCR et Corporectomie incluent un champ de description pour la cage de reconstruction.</textarea>
+                    <textarea class="translation-field" data-key="help.osteotomies.body" data-original="Un seul bouton &lt;strong&gt;Ostéotomie&lt;/strong&gt; gère à la fois les ostéotomies postérieures et la corporectomie antérieure — sélectionnez le type dans la fenêtre. Cliquez sur le &lt;strong&gt;corps vertébral&lt;/strong&gt; (ligne médiane) pour placer une ostéotomie. Grades Schwab 1-6 plus corporectomie antérieure. VCR, ML-VCR et Corporectomie incluent un champ de description pour la cage de reconstruction.">Un seul bouton &lt;strong&gt;Ostéotomie&lt;/strong&gt; gère à la fois les ostéotomies postérieures et la corporectomie antérieure — sélectionnez le type dans la fenêtre. Cliquez sur le &lt;strong&gt;corps vertébral&lt;/strong&gt; (ligne médiane) pour placer une ostéotomie. Grades Schwab 1-6 plus corporectomie antérieure. VCR, ML-VCR et Corporectomie incluent un champ de description pour la cage de reconstruction.</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -9160,11 +9193,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Click &lt;strong&gt;left or right&lt;/strong&gt; of a vertebra to place an implant. The modal shows the target level — change it to move a screw to a different vertebra. &lt;strong&gt;Confirm &amp; Next&lt;/strong&gt; (or Shift+Enter) places the screw and advances to the next level. Choose from 3 screw types, 5 hooks, or bands/wires/cables. Toggle &lt;strong&gt;Show Pelvis&lt;/strong&gt; in the sidebar (&lt;strong&gt;P&lt;/strong&gt; button in portrait) for S2AI, iliac, and SI-J fixation. Open &lt;strong&gt;Preferences&lt;/strong&gt; (gear icon) to enable region size defaults and confirm-and-next as default behaviour.</div>
+                    <div class="english-text">Click &lt;strong&gt;left or right&lt;/strong&gt; of a vertebra to place an implant. The modal shows the target level — change it to move a screw to a different vertebra. A trajectory selector (pedicle, lateral mass, pars, translaminar, cortical) appears at appropriate cervical and lumbar levels. &lt;strong&gt;Confirm &amp; Next&lt;/strong&gt; (or Shift+Enter) places the screw and advances to the next level. Choose from 3 screw types, 5 hooks, or bands/wires/cables. Toggle &lt;strong&gt;Show Pelvis&lt;/strong&gt; in the sidebar (&lt;strong&gt;P&lt;/strong&gt; button in portrait) for S2AI, iliac, and SI-J fixation. Open &lt;strong&gt;Preferences&lt;/strong&gt; (gear icon) to enable region size defaults and confirm-and-next as default behaviour.</div>
                 </div>
                 <div class="col-translation">
                     <label>Français</label>
-                    <textarea class="translation-field" data-key="help.screws_hooks.body" data-original="Cliquez à &lt;strong&gt;gauche ou à droite&lt;/strong&gt; d&#x27;une vertèbre pour placer un implant. La fenêtre affiche le niveau cible — modifiez-le pour déplacer une vis vers une autre vertèbre. &lt;strong&gt;Confirmer &amp; Suivant&lt;/strong&gt; (ou Maj+Entrée) place la vis et passe au niveau suivant. Choisissez parmi 3 types de vis, 5 crochets, ou bandes/fils/câbles. Activez &lt;strong&gt;Afficher le bassin&lt;/strong&gt; dans la barre latérale (bouton &lt;strong&gt;P&lt;/strong&gt; en mode portrait) pour la fixation S2AI, iliaque et SI-J. Ouvrez les &lt;strong&gt;Préférences&lt;/strong&gt; (icône engrenage) pour activer les tailles par défaut par région et le comportement confirmer-et-suivant.">Cliquez à &lt;strong&gt;gauche ou à droite&lt;/strong&gt; d&#x27;une vertèbre pour placer un implant. La fenêtre affiche le niveau cible — modifiez-le pour déplacer une vis vers une autre vertèbre. &lt;strong&gt;Confirmer &amp; Suivant&lt;/strong&gt; (ou Maj+Entrée) place la vis et passe au niveau suivant. Choisissez parmi 3 types de vis, 5 crochets, ou bandes/fils/câbles. Activez &lt;strong&gt;Afficher le bassin&lt;/strong&gt; dans la barre latérale (bouton &lt;strong&gt;P&lt;/strong&gt; en mode portrait) pour la fixation S2AI, iliaque et SI-J. Ouvrez les &lt;strong&gt;Préférences&lt;/strong&gt; (icône engrenage) pour activer les tailles par défaut par région et le comportement confirmer-et-suivant.</textarea>
+                    <textarea class="translation-field" data-key="help.screws_hooks.body" data-original="Cliquez à &lt;strong&gt;gauche ou à droite&lt;/strong&gt; d&#x27;une vertèbre pour placer un implant. La fenêtre affiche le niveau cible — modifiez-le pour déplacer une vis vers une autre vertèbre. Un sélecteur de trajectoire (pédicule, masse latérale, pars, translaminaire, cortical) apparaît aux niveaux cervicaux et lombaires appropriés. &lt;strong&gt;Confirmer &amp; Suivant&lt;/strong&gt; (ou Maj+Entrée) place la vis et passe au niveau suivant. Choisissez parmi 3 types de vis, 5 crochets, ou bandes/fils/câbles. Activez &lt;strong&gt;Afficher le bassin&lt;/strong&gt; dans la barre latérale (bouton &lt;strong&gt;P&lt;/strong&gt; en mode portrait) pour la fixation S2AI, iliaque et SI-J. Ouvrez les &lt;strong&gt;Préférences&lt;/strong&gt; (icône engrenage) pour activer les tailles par défaut par région et le comportement confirmer-et-suivant.">Cliquez à &lt;strong&gt;gauche ou à droite&lt;/strong&gt; d&#x27;une vertèbre pour placer un implant. La fenêtre affiche le niveau cible — modifiez-le pour déplacer une vis vers une autre vertèbre. Un sélecteur de trajectoire (pédicule, masse latérale, pars, translaminaire, cortical) apparaît aux niveaux cervicaux et lombaires appropriés. &lt;strong&gt;Confirmer &amp; Suivant&lt;/strong&gt; (ou Maj+Entrée) place la vis et passe au niveau suivant. Choisissez parmi 3 types de vis, 5 crochets, ou bandes/fils/câbles. Activez &lt;strong&gt;Afficher le bassin&lt;/strong&gt; dans la barre latérale (bouton &lt;strong&gt;P&lt;/strong&gt; en mode portrait) pour la fixation S2AI, iliaque et SI-J. Ouvrez les &lt;strong&gt;Préférences&lt;/strong&gt; (icône engrenage) pour activer les tailles par défaut par région et le comportement confirmer-et-suivant.</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -9702,11 +9735,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">{cageType} is not permitted at {level}.</div>
+                    <div class="english-text">{cageType} is not available at {level} — see permitted range on disabled options.</div>
                 </div>
                 <div class="col-translation">
                     <label>Français</label>
-                    <textarea class="translation-field" data-key="alert.cage_not_permitted" data-original="{cageType} n&#x27;est pas autorisé à {level}.">{cageType} n&#x27;est pas autorisé à {level}.</textarea>
+                    <textarea class="translation-field" data-key="alert.cage_not_permitted" data-original="{cageType} n&#x27;est pas disponible à {level} — voir la plage autorisée sur les options désactivées.">{cageType} n&#x27;est pas disponible à {level} — voir la plage autorisée sur les options désactivées.</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -10969,6 +11002,39 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="clinical.trajectory.transarticular" data-section="17" id="item-clinical.trajectory.transarticular">
+            <div class="item-header">
+                <code class="key-label">clinical.trajectory.transarticular</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Transarticular</div>
+                </div>
+                <div class="col-translation">
+                    <label>Français</label>
+                    <textarea class="translation-field" data-key="clinical.trajectory.transarticular" data-original="Transarticulaire">Transarticulaire</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-clinical.trajectory.transarticular" value="correct" data-key="clinical.trajectory.transarticular">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-clinical.trajectory.transarticular" value="corrected" data-key="clinical.trajectory.transarticular">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="clinical.trajectory.transarticular" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="clinical.trajectory.translaminar" data-section="17" id="item-clinical.trajectory.translaminar">
             <div class="item-header">
                 <code class="key-label">clinical.trajectory.translaminar</code>
@@ -11200,6 +11266,39 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="modal.rod.apply_both" data-section="17" id="item-modal.rod.apply_both">
+            <div class="item-header">
+                <code class="key-label">modal.rod.apply_both</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Apply to both sides</div>
+                </div>
+                <div class="col-translation">
+                    <label>Français</label>
+                    <textarea class="translation-field" data-key="modal.rod.apply_both" data-original="Appliquer aux deux côtés">Appliquer aux deux côtés</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.rod.apply_both" value="correct" data-key="modal.rod.apply_both">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.rod.apply_both" value="corrected" data-key="modal.rod.apply_both">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.rod.apply_both" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="modal.rod.contour" data-section="17" id="item-modal.rod.contour">
             <div class="item-header">
                 <code class="key-label">modal.rod.contour</code>
@@ -11233,6 +11332,39 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="modal.rod.copy_to_other" data-section="17" id="item-modal.rod.copy_to_other">
+            <div class="item-header">
+                <code class="key-label">modal.rod.copy_to_other</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Copy to other side</div>
+                </div>
+                <div class="col-translation">
+                    <label>Français</label>
+                    <textarea class="translation-field" data-key="modal.rod.copy_to_other" data-original="Copier vers l&#x27;autre côté">Copier vers l&#x27;autre côté</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.rod.copy_to_other" value="correct" data-key="modal.rod.copy_to_other">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.rod.copy_to_other" value="corrected" data-key="modal.rod.copy_to_other">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.rod.copy_to_other" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="modal.rod.diameter" data-section="17" id="item-modal.rod.diameter">
             <div class="item-header">
                 <code class="key-label">modal.rod.diameter</code>
@@ -11263,6 +11395,39 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="modal.rod.diameter" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="modal.rod.left_length" data-section="17" id="item-modal.rod.left_length">
+            <div class="item-header">
+                <code class="key-label">modal.rod.left_length</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Left rod length</div>
+                </div>
+                <div class="col-translation">
+                    <label>Français</label>
+                    <textarea class="translation-field" data-key="modal.rod.left_length" data-original="Longueur tige gauche">Longueur tige gauche</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.rod.left_length" value="correct" data-key="modal.rod.left_length">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.rod.left_length" value="corrected" data-key="modal.rod.left_length">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.rod.left_length" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -11428,6 +11593,39 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="modal.rod.profile" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="modal.rod.right_length" data-section="17" id="item-modal.rod.right_length">
+            <div class="item-header">
+                <code class="key-label">modal.rod.right_length</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Right rod length</div>
+                </div>
+                <div class="col-translation">
+                    <label>Français</label>
+                    <textarea class="translation-field" data-key="modal.rod.right_length" data-original="Longueur tige droite">Longueur tige droite</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.rod.right_length" value="correct" data-key="modal.rod.right_length">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.rod.right_length" value="corrected" data-key="modal.rod.right_length">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.rod.right_length" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -11670,11 +11868,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Click a pedicle zone to place a screw</div>
+                    <div class="english-text">Click a screw zone to place a screw</div>
                 </div>
                 <div class="col-translation">
                     <label>Français</label>
-                    <textarea class="translation-field" data-key="onboarding.step1" data-original="Cliquez sur une zone pédiculaire pour placer une vis">Cliquez sur une zone pédiculaire pour placer une vis</textarea>
+                    <textarea class="translation-field" data-key="onboarding.step1" data-original="Cliquez sur une zone de vis pour placer une vis">Cliquez sur une zone de vis pour placer une vis</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -12268,7 +12466,7 @@
     (function() {
         const LANG = "fr";
         const STORAGE_KEY = "spine_review_" + LANG;
-        const TOTAL = 358;
+        const TOTAL = 364;
 
         // --- Reviewer details ---
 

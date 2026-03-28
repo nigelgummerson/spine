@@ -2,6 +2,10 @@
 
 Detailed technical changes by version. For user-facing changes see the in-app changelog (`src/data/changelog.ts`).
 
+## v2.8.0-beta (2026-03-28)
+
+Major version bump. See v2.7.34 for detailed technical changelog of trajectory system, screw shanks, and pedicle positioning. Additional v2.8.0 features: rod modal redesign (apply both sides, copy, default diameter from screw system), retainer/locking cap inventory, grouped note presets (Anatomy/Deformity/Surgical Plan), expanded keyboard shortcuts (I/N/X/U/O tools, F/S/E/R/D/,/? actions), export format picker (PDF or JPG via E key), spinal level range in inventory, schematic documentation notice, onboarding tour expanded to 5 steps with reset, anterior lateral mass outline, occipital condyle/foramen magnum labels.
+
 ## v2.7.35-beta (2026-03-28)
 
 Version bump, see v2.7.34 for technical changelog.
