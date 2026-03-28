@@ -213,7 +213,7 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   // Tool labels — Hindi retains English clinical terms per ASSI convention
   'Osteotomy / Corpectomy',
   // Safety notice — Hindi retains English per ASSI convention
-  'Schematic — verify against patient anatomy and imaging',
+  'Schematic documentation only — verify all placements against patient imaging',
   // Note presets and group headings — Hindi retains English per ASSI convention
   'Sacralized L5',
   'Lumbarized S1',
