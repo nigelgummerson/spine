@@ -160,7 +160,9 @@ export function useBroadcastSync({
                 lastPongRef.current = Date.now();
                 setSyncConnected(true);
                 if (msg.payload) {
-                    if (stateRef.current.lockedAt) {
+                    // Allow sync through if incoming state unlocks or re-locks (lock-exempt transition)
+                    const incomingLocked = msg.payload?.document?.lockedAt;
+                    if (stateRef.current.lockedAt && incomingLocked) {
                         console.warn('Rejecting sync: local record is locked');
                         showToast?.('Sync blocked — record is locked', 'error');
                         return;
@@ -183,7 +185,9 @@ export function useBroadcastSync({
                 if (msg.payload) {
                     // Reject incoming sync if we have local changes pending broadcast
                     if (localChangePendingRef.current) return;
-                    if (stateRef.current.lockedAt) {
+                    // Allow sync through if incoming state unlocks or re-locks (lock-exempt transition)
+                    const incomingLocked = msg.payload?.document?.lockedAt;
+                    if (stateRef.current.lockedAt && incomingLocked) {
                         console.warn('Rejecting sync: local record is locked');
                         showToast?.('Sync blocked — record is locked', 'error');
                         return;

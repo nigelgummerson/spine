@@ -327,7 +327,7 @@ describe('useDocumentState', () => {
     });
 
     // 15. Sync is rejected when local record is locked
-    it('rejects sync when local record is locked', async () => {
+    it('rejects sync of locked data when local record is locked', async () => {
         const useDocumentState = await importHook();
         const showToast = vi.fn();
         const params = makeParams({ showToast });
@@ -342,21 +342,55 @@ describe('useDocumentState', () => {
         });
         expect(result.current.state.lockedAt).toBeTruthy();
 
-        // Simulate an incoming valid sync state message
+        // Simulate incoming sync with a DIFFERENT locked state (should be rejected)
         const channels = MockBroadcastChannel.instances;
         const appChannel = channels[0];
-        const validState = createInitialState();
-        validState.patientData.name = 'Sync Patient';
-        const validPayload = serializeState(validState, 'plan', 'default', CURRENT_VERSION, 'en');
+        const lockedState = createInitialState();
+        lockedState.patientData.name = 'Other Locked Patient';
+        lockedState.lockedAt = new Date().toISOString();
+        const lockedPayload = serializeState(lockedState, 'plan', 'default', CURRENT_VERSION, 'en');
 
         appChannel.onmessage!(new MessageEvent('message', {
-            data: { type: 'state', appVersion: CURRENT_VERSION, payload: validPayload, version: 99 },
+            data: { type: 'state', appVersion: CURRENT_VERSION, payload: lockedPayload, version: 99 },
         }));
 
-        // State should remain locked with original name, not the synced name
+        // State should remain with original locked data
         expect(result.current.state.patientData.name).toBe('');
         expect(result.current.state.lockedAt).toBeTruthy();
         expect(showToast).toHaveBeenCalledWith('Sync blocked — record is locked', 'error');
+    });
+
+    it('allows unlock sync when local record is locked', async () => {
+        const useDocumentState = await importHook();
+        const showToast = vi.fn();
+        const params = makeParams({ showToast });
+        const { result } = renderHook(() => useDocumentState(params));
+
+        // Lock the document
+        act(() => {
+            result.current.dispatch({ type: 'LOCK_DOCUMENT' });
+        });
+        await act(async () => {
+            vi.advanceTimersByTime(300);
+        });
+        expect(result.current.state.lockedAt).toBeTruthy();
+
+        // Simulate incoming sync with UNLOCKED state (should be allowed — this is the unlock)
+        const channels = MockBroadcastChannel.instances;
+        const appChannel = channels[0];
+        const unlockedState = createInitialState();
+        unlockedState.patientData.name = 'Unlocked Patient';
+        const unlockedPayload = serializeState(unlockedState, 'plan', 'default', CURRENT_VERSION, 'en');
+
+        act(() => {
+            appChannel.onmessage!(new MessageEvent('message', {
+                data: { type: 'state', appVersion: CURRENT_VERSION, payload: unlockedPayload, version: 99 },
+            }));
+        });
+
+        // State should now be unlocked with the synced name
+        expect(result.current.state.lockedAt).toBeNull();
+        expect(result.current.state.patientData.name).toBe('Unlocked Patient');
     });
 
     // --- Privacy mode tests ---
