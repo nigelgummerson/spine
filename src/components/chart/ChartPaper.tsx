@@ -240,6 +240,9 @@ export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placem
             </div>}
         </div>
 
+        {/* Schematic notice */}
+        <div className="text-center text-[9px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 border-b border-amber-200 py-0.5 shrink-0">{t('chart.schematic_notice')}</div>
+
         {/* Column headers — HTML, fixed */}
         <div className="flex w-full px-2 text-sm font-bold uppercase tracking-tight text-center pointer-events-none shrink-0 py-1">
             {showForces && <div className="w-14 text-blue-400 text-left text-xs">{t('chart.header.force')}</div>}
