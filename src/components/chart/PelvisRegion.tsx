@@ -1,5 +1,6 @@
 import React from 'react';
-import { getLevelHeight, getVertSvgGeometry } from '../../data/anatomy';
+import { getLevelHeight, getVertSvgGeometry, VERT_SVG_SCALE } from '../../data/anatomy';
+import { getTrajectoryAngle, projectScrewShank } from '../../data/clinical';
 import { InstrumentIcon } from './InstrumentIcon';
 import { formatScrewSize } from '../../utils/formatScrewSize';
 import type { Placement, ToolDefinition } from '../../types';
@@ -135,24 +136,40 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = React.memo(({
                 const s2aiLeftX = cx - foramenHalfSpacing - r * 3.0;
                 const s2aiRightX = cx + foramenHalfSpacing + r * 3.0;
 
-                // S2AI trajectory: lateral and caudal, line starts at circle edge
+                // Pelvic screw shank — projected PA view using published angles
+                // S2AI: Chang 2009, O'Brien 2014 (~43° lateral, ~37° caudal)
+                // Iliac: ~23° lateral, ~5° caudal
+                const pelvicShank = (x: number, y: number, levelId: string, side: 'left' | 'right', screwData: string | null, color: string, opacity: number) => {
+                    const angles = getTrajectoryAngle(levelId);
+                    if (!angles) return null;
+                    let diamMm = 0, lenMm = 0;
+                    if (screwData && screwData.includes('x')) {
+                        const parts = screwData.split('x').map(Number);
+                        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]) && parts[1] > 0 && parts[1] <= 100) {
+                            diamMm = parts[0]; lenMm = parts[1];
+                        }
+                    }
+                    if (!lenMm) return null;
+                    const { dx, dy } = projectScrewShank(lenMm, angles, side, VERT_SVG_SCALE * heightScale);
+                    const strokeW = Math.max(1.5, diamMm * VERT_SVG_SCALE * heightScale);
+                    return <line x1={x} y1={y} x2={x + dx} y2={y + dy}
+                        stroke={color} strokeWidth={strokeW} strokeLinecap="round" opacity={opacity} pointerEvents="none" />;
+                };
+
+                // Legacy s2aiArrow for ghost targets (no screw data yet)
                 const arrowLen = r * 5.3;
                 const s2aiArrow = (x: number, y: number, dirX: number, color: string) => {
-                    // Direction vector: lateral (dirX) and caudal (0.4 ratio)
                     const dx = dirX * arrowLen;
                     const dy = arrowLen * 0.4;
                     const len = Math.sqrt(dx * dx + dy * dy);
-                    const nx = dx / len; // unit vector
+                    const nx = dx / len;
                     const ny = dy / len;
-                    // Start at circle edge, end at arrowLen
                     const startX = x + nx * r;
                     const startY = y + ny * r;
                     const endX = x + dx;
                     const endY = y + dy;
-                    // Arrowhead: rotated triangle aligned with direction
                     const headLen = 7;
                     const headW = 4;
-                    // Perpendicular to direction
                     const px = -ny * headW;
                     const py = nx * headW;
                     const baseX = endX - nx * headLen;
@@ -323,13 +340,16 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = React.memo(({
                     const fPx = isSi ? siLabelPx : labelPx;
                     const tp = textPos(x, y, side, variant);
                     const dirX = variant === 's2ai_left' ? -1 : variant === 's2ai_right' ? 1 : 0;
+                    const screwStr = typeof p.data === 'string' ? p.data : null;
                     return (
                         <g key={p.id} cursor={readOnly ? 'default' : 'pointer'}
                             onClick={(e) => { e.stopPropagation(); if (!readOnly && onPlacementClick) onPlacementClick(p); }}>
+                            {/* Screw shank — behind icon */}
+                            {(isS2ai || variant === 'iliac') && pelvicShank(x, y, p.levelId, side, screwStr, '#64748b', 0.6)}
                             <svg x={x - sW / 2} y={y - sH / 2} width={sW} height={sH} overflow="visible">
                                 <InstrumentIcon type={tool?.icon || 'polyaxial'} className="w-full h-full" side={side} />
                             </svg>
-                            {isS2ai && s2aiArrow(x, y, dirX, '#475569')}
+                            {isS2ai && !screwStr && s2aiArrow(x, y, dirX, '#475569')}
                             {p.data && typeof p.data === 'string' && (
                                 <text x={tp.tx} y={tp.ty} textAnchor={tp.anchor} fontSize={fPx}
                                     fontFamily="Inter, sans-serif" fontWeight="bold" fill="#0f172a">
@@ -360,13 +380,15 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = React.memo(({
                     const fPx = isSi ? siLabelPx : labelPx;
                     const tp = textPos(x, y, side, variant);
                     const dirX = variant === 's2ai_left' ? -1 : variant === 's2ai_right' ? 1 : 0;
+                    const screwStr = typeof p.data === 'string' ? p.data : null;
                     return (
                         <g key={'ghost-' + p.id} opacity={0.75} cursor="pointer"
                             onClick={(e) => { e.stopPropagation(); if (onGhostClick) onGhostClick(p); }}>
+                            {(isS2ai || variant === 'iliac') && pelvicShank(x, y, p.levelId, side, screwStr, '#14b8a6', 0.5)}
                             <svg x={x - sW / 2} y={y - sH / 2} width={sW} height={sH} overflow="visible">
                                 <InstrumentIcon type={tool?.icon || 'polyaxial'} className="w-full h-full" color="#14b8a6" side={side} />
                             </svg>
-                            {isS2ai && s2aiArrow(x, y, dirX, '#14b8a6')}
+                            {isS2ai && !screwStr && s2aiArrow(x, y, dirX, '#14b8a6')}
                             {p.data && typeof p.data === 'string' && (
                                 <text x={tp.tx} y={tp.ty} textAnchor={tp.anchor} fontSize={fPx}
                                     fontFamily="Inter, sans-serif" fontWeight="bold" fill="#0f172a">

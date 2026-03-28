@@ -127,6 +127,12 @@ const TRAJECTORY_ANGLE_DATA: Record<string, Record<string, TrajectoryAngle>> = {
     L5:  { pedicle: { transverse: 24, sagittal: 3 }, cortical: { transverse: -9, sagittal: -26 } },
     // S1: pedicle only — centered entry (wide sacral pedicle)
     S1:  { pedicle: { transverse: 25, sagittal: 0 } },
+    // S2AI (sacral alar-iliac): steep lateral + caudal trajectory through ilium
+    // Chang et al. 2009, O'Brien et al. 2014: ~40-45° lateral, ~35-40° caudal
+    S2AI: { pedicle: { transverse: -43, sagittal: 37 } },
+    // Iliac (traditional): PSIS entry toward AIIS
+    // ~20-25° lateral, ~5° caudal
+    Iliac: { pedicle: { transverse: -23, sagittal: 5 } },
 };
 
 /**
