@@ -2,6 +2,10 @@
 
 Detailed technical changes by version. For user-facing changes see the in-app changelog (`src/data/changelog.ts`).
 
+## v2.7.35-beta (2026-03-28)
+
+Version bump, see v2.7.34 for technical changelog.
+
 ## v2.7.34-beta (2026-03-28)
 
 ### Screw trajectory system

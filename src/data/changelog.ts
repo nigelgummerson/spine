@@ -1,7 +1,7 @@
 import { formatDate } from '../i18n/i18n';
 export { formatDate };
 
-export const CURRENT_VERSION: string = "v2.7.34-beta";
+export const CURRENT_VERSION: string = "v2.7.35-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -13,6 +13,18 @@ interface ChangeLogEntry {
 // Keep entries brief, non-technical, and focused on what the surgeon can do.
 // Detailed technical changelog is in CLAUDE.md for developers/agents.
 export const CHANGE_LOG: ChangeLogEntry[] = [
+    { version: "v2.7.35-beta", date: "2026-03-28", changes: [
+        "Screw trajectory selector — pedicle, lateral mass, pars, translaminar, or cortical at appropriate cervical and lumbar levels.",
+        "Screw shanks shown on the chart with published convergence angles and real foreshortening.",
+        "Pedicle positions corrected to published interpedicular distances.",
+        "Set screw / blocker / locking cap count added to inventory (per manufacturer).",
+        "Grouped note presets: Anatomy, Deformity, and Surgical Plan categories.",
+        "Keyboard shortcuts expanded — press ? for the full list.",
+        "Export format picker (PDF or JPG) via E key.",
+        "Onboarding tour expanded to 5 steps. Reset tour available in Help.",
+        "Inventory shows spinal level range (e.g. T4–Pelvis + SIJ fixation).",
+        "Schematic notice on chart: verify against patient anatomy and imaging.",
+    ]},
     { version: "v2.7.34-beta", date: "2026-03-28", changes: [
         "Screw trajectory selector — pedicle, lateral mass, pars, translaminar, or cortical bone trajectory (CBT) at appropriate levels.",
         "Screw shanks shown on the chart — projected PA view with published per-level convergence angles and real foreshortening.",
