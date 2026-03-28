@@ -24,6 +24,7 @@ interface CervicalSubaxialAnatomy extends AnatomyBase {
     latMassH: number;
     pedW?: number;
     pedH?: number;
+    pedCTC?: number;  // pedicle centre-to-centre distance (mm) — Karaikovic 1997, Arab CT PMC4999373
 }
 
 interface ThoracicAnatomy extends AnatomyBase {
@@ -90,11 +91,11 @@ export const VERTEBRA_ANATOMY: Record<string, VertAnatomyEntry> = {
     Oc:  { region: 'occiput', bodyW: 78, bodyH: 12, foramenMagnumW: 35, condyleW: 22 },
     C1:  { region: 'cervical-upper', bodyW: 22, bodyH: 10, latMassW: 16, latMassH: 12, totalWidth: 58 },
     C2:  { region: 'cervical-upper', bodyW: 18, bodyH: 20, latMassW: 12, latMassH: 14, totalWidth: 54 },
-    C3:  { region: 'cervical-subaxial', bodyW: 18.0, bodyH: 15.1, latMassW: 12.5, latMassH: 12 },
-    C4:  { region: 'cervical-subaxial', bodyW: 18.3, bodyH: 15.2, latMassW: 13, latMassH: 12.5 },
-    C5:  { region: 'cervical-subaxial', bodyW: 20.1, bodyH: 15.2, latMassW: 14, latMassH: 13 },
-    C6:  { region: 'cervical-subaxial', bodyW: 21.6, bodyH: 15.2, latMassW: 14, latMassH: 13 },
-    C7:  { region: 'cervical-subaxial', bodyW: 23.2, bodyH: 15.9, latMassW: 12, latMassH: 11, pedW: 5.5, pedH: 7 },
+    C3:  { region: 'cervical-subaxial', bodyW: 18.0, bodyH: 15.1, latMassW: 12.5, latMassH: 12, pedW: 4.5, pedH: 6.5, pedCTC: 29.5 },
+    C4:  { region: 'cervical-subaxial', bodyW: 18.3, bodyH: 15.2, latMassW: 13, latMassH: 12.5, pedW: 4.5, pedH: 6.5, pedCTC: 30.0 },
+    C5:  { region: 'cervical-subaxial', bodyW: 20.1, bodyH: 15.2, latMassW: 14, latMassH: 13, pedW: 5.0, pedH: 6.5, pedCTC: 31.0 },
+    C6:  { region: 'cervical-subaxial', bodyW: 21.6, bodyH: 15.2, latMassW: 14, latMassH: 13, pedW: 5.5, pedH: 6.5, pedCTC: 31.5 },
+    C7:  { region: 'cervical-subaxial', bodyW: 23.2, bodyH: 15.9, latMassW: 12, latMassH: 11, pedW: 5.5, pedH: 7, pedCTC: 31.5 },
     // tpH: thoracic TP craniocaudal height — T1=10.8mm (thickest), T7=7.9mm (thinnest).
     // Lumbar TPs are thin flat plates ~8-10mm.
     // pedCTC: pedicle centre-to-centre distance (mm) = IPD + pedW.
@@ -318,12 +319,24 @@ export const getVertSvgGeometry = (levelId: string): VertSvgGeometry | null => {
         if (a.pedW && a.pedH) {
             const pedRx = Math.max(1.5, (a.pedW * scale / 2));
             const pedRy = Math.max(2, (a.pedH * scale / 2));
-            const pedInset = (a.pedW * scale) * 0.5;
-            base.pedLeftCx = left + pedInset + 3;
-            base.pedRightCx = right - pedInset - 3;
+            let pedLeftCx: number, pedRightCx: number;
+            if (a.pedCTC) {
+                // Published centre-to-centre distance (same approach as thoracolumbar)
+                const halfCTC = (a.pedCTC * scale) / 2;
+                pedLeftCx = cx - halfCTC;
+                pedRightCx = cx + halfCTC;
+            } else {
+                // Fallback: inset from body edge
+                const pedInset = (a.pedW * scale) * 0.5;
+                pedLeftCx = left + pedInset + 3;
+                pedRightCx = right - pedInset - 3;
+            }
+            const pedCy = VERT_PAD + pedRy + 5;
+            base.pedLeftCx = pedLeftCx;
+            base.pedRightCx = pedRightCx;
             base.pedRx = pedRx;
             base.pedRy = pedRy;
-            base.pedCy = VERT_PAD + pedRy + 5;
+            base.pedCy = pedCy;
         }
         return base;
     }
