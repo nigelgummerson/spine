@@ -344,8 +344,8 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = React.memo(({
                     return (
                         <g key={p.id} cursor={readOnly ? 'default' : 'pointer'}
                             onClick={(e) => { e.stopPropagation(); if (!readOnly && onPlacementClick) onPlacementClick(p); }}>
-                            {/* Screw shank — behind icon */}
-                            {(isS2ai || variant === 'iliac') && pelvicShank(x, y, p.levelId, side, screwStr, '#64748b', 0.6)}
+                            {/* Screw shank — behind icon (disabled pending further work on pelvic shank positioning) */}
+                            {/* {(isS2ai || variant === 'iliac') && pelvicShank(x, y, p.levelId, side, screwStr, '#64748b', 0.6)} */}
                             <svg x={x - sW / 2} y={y - sH / 2} width={sW} height={sH} overflow="visible">
                                 <InstrumentIcon type={tool?.icon || 'polyaxial'} className="w-full h-full" side={side} />
                             </svg>
@@ -384,7 +384,7 @@ export const PelvisRegion: React.FC<PelvisRegionProps> = React.memo(({
                     return (
                         <g key={'ghost-' + p.id} opacity={0.75} cursor="pointer"
                             onClick={(e) => { e.stopPropagation(); if (onGhostClick) onGhostClick(p); }}>
-                            {(isS2ai || variant === 'iliac') && pelvicShank(x, y, p.levelId, side, screwStr, '#14b8a6', 0.5)}
+                            {/* {(isS2ai || variant === 'iliac') && pelvicShank(x, y, p.levelId, side, screwStr, '#14b8a6', 0.5)} */}
                             <svg x={x - sW / 2} y={y - sH / 2} width={sW} height={sH} overflow="visible">
                                 <InstrumentIcon type={tool?.icon || 'polyaxial'} className="w-full h-full" color="#14b8a6" side={side} />
                             </svg>
