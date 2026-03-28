@@ -269,7 +269,8 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
             // Entry Y positioned so vertical midpoint of shank = pedicle centre.
             // Entry X at lateral (pedicle) or medial (CBT) edge of ellipse at that Y.
             // For lateral mass trajectory at C7: reposition to lateral mass centre instead.
-            if (['monoaxial','polyaxial','uniplanar'].includes(p.tool) && geom) {
+            // Skip for sacral levels — S1/S2 screws align under L5 pedicles, not sacral anatomy.
+            if (['monoaxial','polyaxial','uniplanar'].includes(p.tool) && geom && !isSacral) {
                 const screwSide = zone === 'left' ? 'left' as const : 'right' as const;
                 const traj = p.trajectory || (() => { const opts = getTrajectoryOptions(level.id); return opts ? (opts.find(o => o.isDefault) || opts[0]).id : 'pedicle'; })();
                 // Lateral mass trajectory: reposition to Magerl entry point (lower medial quadrant)
@@ -413,7 +414,7 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
                 iconX = zoneX + 4;
             }
             // Offset ghost screw icon to entry point on pedicle ellipse (same logic as placed screws)
-            if (['monoaxial','polyaxial','uniplanar'].includes(ghostItem.tool) && geom) {
+            if (['monoaxial','polyaxial','uniplanar'].includes(ghostItem.tool) && geom && !isSacral) {
                 const screwSide = zone === 'left' ? 'left' as const : 'right' as const;
                 const traj = ghostItem.trajectory || (() => { const opts = getTrajectoryOptions(level.id); return opts ? (opts.find(o => o.isDefault) || opts[0]).id : 'pedicle'; })();
                 if (traj === 'lateral_mass' && 'latMassLeftCx' in geom) {
