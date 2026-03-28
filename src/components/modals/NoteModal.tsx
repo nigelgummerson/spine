@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { t } from '../../i18n/i18n';
-import { NOTE_PRESET_KEYS } from '../../data/clinical';
+import { NOTE_PRESET_GROUPS } from '../../data/clinical';
 import { modalKeyHandler } from './ScrewModal';
 import { IconTrash, IconX } from '../icons';
 import { Portal } from '../Portal';
@@ -49,11 +49,16 @@ export const NoteModal = ({ isOpen, onClose, onConfirm, onDelete, initialText, i
                         <input type="text" value={text} onChange={e => setText(e.target.value)} placeholder={t('modal.note.text_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-sm focus:border-violet-500 outline-none" autoFocus />
                         <div className="text-[9px] text-slate-400 mt-0.5">{t('modal.note.linebreak_hint')}</div>
                     </div>
-                    <div className="flex flex-wrap gap-1">
-                        {NOTE_PRESET_KEYS.map(key => { const label = t(key); return (
-                            <button key={key} onClick={() => setText(label)} className={`px-2 py-1 rounded text-[10px] font-medium border transition-all ${text === label ? 'bg-violet-100 border-violet-300 text-violet-800' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-violet-50 hover:border-violet-200'}`}>{label}</button>
-                        ); })}
-                    </div>
+                    {NOTE_PRESET_GROUPS.map(group => (
+                        <div key={group.labelKey}>
+                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{t(group.labelKey)}</div>
+                            <div className="flex flex-wrap gap-1">
+                                {group.keys.map(key => { const label = t(key); return (
+                                    <button key={key} onClick={() => setText(label)} className={`px-2 py-1 rounded text-[10px] font-medium border transition-all ${text === label ? 'bg-violet-100 border-violet-300 text-violet-800' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-violet-50 hover:border-violet-200'}`}>{label}</button>
+                                ); })}
+                            </div>
+                        </div>
+                    ))}
                     <label className="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" checked={showArrow} onChange={e => setShowArrow(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
                         <span className="text-xs text-slate-600">{t('modal.note.show_arrow')}</span>

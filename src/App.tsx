@@ -190,6 +190,7 @@ const App = () => {
     const exportRef = useRef<HTMLDivElement>(null);
     const containerWrapperRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const saveProjectJSONRef = useRef<(() => void) | null>(null);
 
     // PORTRAIT MODE
     const isPortrait = usePortrait();
@@ -280,6 +281,16 @@ const App = () => {
             const tag = (e.target as HTMLElement)?.tagName;
             if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target as HTMLElement)?.isContentEditable) return;
 
+            // Global shortcuts (work even when locked)
+            switch (e.key) {
+                case 'f': e.preventDefault(); if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); return;
+                case 's': e.preventDefault(); saveProjectJSONRef.current?.(); return;
+                case 'e': e.preventDefault(); setExportPicker('jpg'); return;
+                case ',': e.preventDefault(); setOpenModal('preferences'); return;
+                case '?': e.preventDefault(); setOpenModal('help'); return;
+                case 'h': e.preventDefault(); setOpenModal('help'); return;
+            }
+
             // Skip placement shortcuts when document is locked
             if (isLocked) return;
 
@@ -333,14 +344,19 @@ const App = () => {
                 return;
             }
 
-            switch (e.key.toLowerCase()) {
+            switch (e.key) {
+                // Views
                 case 'c': setViewMode('cervical'); break;
                 case 'l': setViewMode('t10_pelvis'); break;
                 case 't': setViewMode('thoracolumbar'); break;
                 case 'w': setViewMode('whole'); break;
                 case 'p': if (viewMode !== 'cervical') togglePelvis(); break;
+                // Tools
                 case 'i': setSelectedTool('implant'); break;
                 case 'n': setSelectedTool('note'); break;
+                case 'x': setSelectedTool('connector'); break;
+                case 'u': setSelectedTool('unstable'); break;
+                case 'o': setSelectedTool('osteotomy'); break;
                 default: return;
             }
             e.preventDefault();
@@ -430,7 +446,7 @@ const App = () => {
 
     // SIDEBAR PALETTE
     const tools = [
-        { categoryKey: 'sidebar.category.tools', items: allTools.filter(item => ['implant','connector','unstable','osteotomy','Corpectomy','note'].includes(item.id)) },
+        { categoryKey: 'sidebar.category.tools', items: allTools.filter(item => ['implant','connector','unstable','osteotomy','note'].includes(item.id)) },
     ];
 
     // LOGIC HANDLERS - zone determines behaviour
@@ -773,6 +789,7 @@ const App = () => {
         setPortraitExporting, showToast, activeChart, setActiveChart,
         setShowFinalInventory, setViewMode, changeTheme, fileInputRef,
     });
+    saveProjectJSONRef.current = saveProjectJSON;
     const promptExportJPG = () => setExportPicker('jpg');
     const promptExportPDF = () => setExportPicker('pdf');
     const handleExportWithChoice = async (format: string, useFinal: boolean) => {

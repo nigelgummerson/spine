@@ -4,6 +4,10 @@ import { t } from '../i18n/i18n';
 
 const STORAGE_KEY = 'spine_planner_onboarding_done';
 
+export function resetOnboardingTour(): void {
+    localStorage.removeItem(STORAGE_KEY);
+}
+
 interface SpotPosition {
     x: number;
     y: number;

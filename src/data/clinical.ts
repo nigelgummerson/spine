@@ -195,11 +195,12 @@ export const CAGE_PERMISSIBILITY: Record<string, string[]> = {
 export const HOOK_TYPES: string[] = ['pedicle_hook','tp_hook','tp_hook_up','sl_hook','il_hook'];
 export const NO_SIZE_TYPES: string[] = [...HOOK_TYPES, 'band', 'wire', 'cable'];
 
-export const NOTE_PRESET_KEYS: string[] = [
-    'clinical.note.uiv', 'clinical.note.liv',
-    'clinical.note.last_visible_rib', 'clinical.note.end_vertebra', 'clinical.note.apex',
-    'clinical.note.transitional_level', 'clinical.note.stable_vertebra', 'clinical.note.neutral_vertebra'
+export const NOTE_PRESET_GROUPS: { labelKey: string; keys: string[] }[] = [
+    { labelKey: 'modal.note.group_anatomy', keys: ['clinical.note.last_visible_rib', 'clinical.note.transitional_level', 'clinical.note.sacralized_l5', 'clinical.note.lumbarized_s1'] },
+    { labelKey: 'modal.note.group_deformity', keys: ['clinical.note.end_vertebra', 'clinical.note.apex', 'clinical.note.stable_vertebra', 'clinical.note.neutral_vertebra', 'clinical.note.fractured_vertebra'] },
+    { labelKey: 'modal.note.group_plan', keys: ['clinical.note.uiv', 'clinical.note.liv', 'clinical.note.rod_transition', 'clinical.note.decompression'] },
 ];
+export const NOTE_PRESET_KEYS: string[] = NOTE_PRESET_GROUPS.flatMap(g => g.keys);
 
 interface CageDefaults {
     height: string;

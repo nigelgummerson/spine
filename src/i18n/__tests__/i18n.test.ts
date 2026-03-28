@@ -81,8 +81,8 @@ const OVERFLOW_THRESHOLDS: Array<{
   // Max observed: es "Haga clic para introducir..." = 28 chars.
   { pattern: /^patient\.(?!.*placeholder)(?!.*enter_)/, max: 30, label: 'patient.* (labels)' },
   // tool.* — toolbar tool labels.
-  // Max observed: ru "Поперечный соединитель" = 22 chars.
-  { pattern: /^tool\./, max: 25, label: 'tool.*' },
+  // Max observed: ar "قطع العظم / استئصال الجسم الفقري" = 32 chars.
+  { pattern: /^tool\./, max: 35, label: 'tool.*' },
   // inventory.* — inventory section labels.
   // Max observed: it "Inventario del costrutto" = 24 chars.
   { pattern: /^inventory\./, max: 25, label: 'inventory.*' },
@@ -209,8 +209,23 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   'PI 55°, PT 25°, SVA 8cm, LL 35°, TK 45°',
   'e.g. 5.5mm CoCr 120mm',
   'e.g. 5.5mm TiAlV 120mm',
+  // Tool labels — Hindi retains English clinical terms per ASSI convention
+  'Osteotomy / Corpectomy',
   // Safety notice — Hindi retains English per ASSI convention
   'Schematic — verify against patient anatomy and imaging',
+  // Note presets and group headings — Hindi retains English per ASSI convention
+  'Sacralized L5',
+  'Lumbarized S1',
+  'Fractured vertebra',
+  'Rod transition',
+  'Decompression',
+  'Anatomy',
+  'Deformity',
+  'Surgical Plan',
+  // Onboarding tour — Hindi retains English per ASSI convention
+  'Onboarding Tour',
+  'Show the guided tour again on next page load.',
+  'Reset tour',
   // Offline use — English placeholders pending native-speaker translation review
   'Offline Use',
   'This app works best online for automatic updates. For use without internet, <a href="https://github.com/nigelgummerson/spine/releases/latest" target="_blank" rel="noopener noreferrer" class="underline hover:text-slate-800">download the standalone version</a>.',

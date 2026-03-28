@@ -1,6 +1,7 @@
 import React, { useRef, useState, useLayoutEffect } from 'react';
 import { t, SUPPORTED_LANGUAGES } from '../../i18n/i18n';
 import { CURRENT_VERSION } from '../../data/changelog';
+import { resetOnboardingTour } from '../OnboardingTour';
 import { IconX , IconCopy, IconSave, IconCC, IconLink} from '../icons';
 import { InstrumentIcon } from '../chart/InstrumentIcon';
 import { Portal } from '../Portal';
@@ -97,6 +98,10 @@ export const HelpModal = ({ isOpen, onClose }: HelpModalProps) => {
                     <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
                         <div className="min-w-[40px] pt-1"><span className="text-lg">&#x2696;</span></div>
                         <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.disclaimer.title')}</h4><p className="text-xs text-slate-600 leading-relaxed">{t('disclaimer.clinical_short')}</p></div>
+                    </div>
+                    <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
+                        <div className="min-w-[40px] pt-1"><span className="text-lg">&#x1F3AC;</span></div>
+                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.reset_tour.title')}</h4><p className="text-xs text-slate-600 leading-relaxed mb-1">{t('help.reset_tour.body')}</p><button onClick={() => { resetOnboardingTour(); onClose(); }} className="px-3 py-1 rounded text-xs font-bold bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700">{t('help.reset_tour.button')}</button></div>
                     </div>
                     <div className="border-t border-slate-200 pt-4 mt-2" style={{ breakInside: 'avoid', columnSpan: 'all' }}>
                         <p className="text-xs text-slate-700 leading-relaxed">
