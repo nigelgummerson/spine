@@ -285,10 +285,17 @@ const App = () => {
             switch (e.key) {
                 case 'f': e.preventDefault(); if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); return;
                 case 's': e.preventDefault(); saveProjectJSONRef.current?.(); return;
-                case 'e': e.preventDefault(); setExportPicker('jpg'); return;
+                case 'e': e.preventDefault(); setExportPicker('choose'); return;
                 case ',': e.preventDefault(); setOpenModal('preferences'); return;
                 case '?': e.preventDefault(); setOpenModal('help'); return;
                 case 'h': e.preventDefault(); setOpenModal('help'); return;
+                case 'r': e.preventDefault(); setRodModalChart(activeChart === 'planned' ? 'plan' : 'construct'); setRodModalSide('left'); setRodModalOpen(true); return;
+                case 'd': e.preventDefault(); if (isPortrait) switchPortraitTab(0); return;
+                // case 'g': ghost visibility toggle — TODO: needs showGhosts state
+                case '1': e.preventDefault(); if (isPortrait) switchPortraitTab(0); return;
+                case '2': e.preventDefault(); if (isPortrait) switchPortraitTab(1); return;
+                case '3': e.preventDefault(); if (isPortrait) switchPortraitTab(2); return;
+                case '4': e.preventDefault(); if (isPortrait) switchPortraitTab(3); return;
             }
 
             // Skip placement shortcuts when document is locked
@@ -363,7 +370,7 @@ const App = () => {
         };
         window.addEventListener('keydown', handleShortcut);
         return () => window.removeEventListener('keydown', handleShortcut);
-    }, [openModal, forcePopover, disclaimerAccepted, viewMode, canUndo, canRedo, levels, kbFocusLevel, kbFocusZone, kbNavActive, isLocked]);
+    }, [openModal, forcePopover, disclaimerAccepted, viewMode, canUndo, canRedo, levels, kbFocusLevel, kbFocusZone, kbNavActive, isLocked, isPortrait, activeChart]);
 
     // calculateAutoScale is O(n) but levels identity only changes on viewMode/showPelvis,
     // not on ResizeObserver fires, so useMemo already prevents redundant recalculation.

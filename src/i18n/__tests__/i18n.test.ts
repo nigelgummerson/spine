@@ -224,6 +224,7 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   'Surgical Plan',
   // Onboarding tour — Hindi retains English per ASSI convention
   'Onboarding Tour',
+  'Export Format',
   'Show the guided tour again on next page load.',
   'Reset tour',
   // Offline use — English placeholders pending native-speaker translation review

@@ -112,9 +112,20 @@ export const SpineVertebra = React.memo(({ label, type, height, isCorpectomy, he
                     const m = (t + b) / 2;
                     const endCurve = 1.5;
                     const bodyPath = `M${g.left},${t+c} Q${g.left},${t} ${g.left+c},${t} Q${g.cx},${t+endCurve} ${g.right-c},${t} Q${g.right},${t} ${g.right},${t+c} Q${g.right-w},${m} ${g.right},${b-c} Q${g.right},${b} ${g.right-c},${b} Q${g.cx},${b-endCurve} ${g.left+c},${b} Q${g.left},${b} ${g.left},${b-c} Q${g.left+w},${m} ${g.left},${t+c} Z`;
+                    // Anterior lateral mass: same size as posterior, shifted cranially by ~50% of height
+                    // Sources: Xu 1999 (lateral mass height), Panjabi 1991 (facet angle ~45°)
+                    const antShift = g.latMassRy * 1.0; // 50% of full height (latMassRy = half height)
                     return (
                         <g>
                             <path d={bodyPath} {...common} />
+                            {/* Anterior lateral mass (faded full rectangle, shifted cranially) */}
+                            <rect x={g.latMassLeftCx - g.latMassRx} y={g.latMassCy - g.latMassRy - antShift}
+                                width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
+                                fill="none" stroke="#94a3b8" strokeWidth="0.5" strokeDasharray="2 2" opacity={0.25} />
+                            <rect x={g.latMassRightCx - g.latMassRx} y={g.latMassCy - g.latMassRy - antShift}
+                                width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
+                                fill="none" stroke="#94a3b8" strokeWidth="0.5" strokeDasharray="2 2" opacity={0.25} />
+                            {/* Posterior lateral mass (solid) */}
                             <rect x={g.latMassLeftCx - g.latMassRx} y={g.latMassCy - g.latMassRy}
                                 width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
                                 fill={common.fill} stroke="#94a3b8" strokeWidth="1" />
@@ -134,9 +145,18 @@ export const SpineVertebra = React.memo(({ label, type, height, isCorpectomy, he
                     const m = (t + b) / 2;
                     const endCurve = 1.5;
                     const bodyPath = `M${g.left},${t+c} Q${g.left},${t} ${g.left+c},${t} Q${g.cx},${t+endCurve} ${g.right-c},${t} Q${g.right},${t} ${g.right},${t+c} Q${g.right-w},${m} ${g.right},${b-c} Q${g.right},${b} ${g.right-c},${b} Q${g.cx},${b-endCurve} ${g.left+c},${b} Q${g.left},${b} ${g.left},${b-c} Q${g.left+w},${m} ${g.left},${t+c} Z`;
+                    const antShift = g.latMassRy * 1.0;
                     return (
                         <g>
                             <path d={bodyPath} {...common} />
+                            {/* Anterior lateral mass (faded full rectangle, shifted cranially) */}
+                            <rect x={g.latMassLeftCx - g.latMassRx} y={g.latMassCy - g.latMassRy - antShift}
+                                width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
+                                fill="none" stroke="#94a3b8" strokeWidth="0.5" strokeDasharray="2 2" opacity={0.25} />
+                            <rect x={g.latMassRightCx - g.latMassRx} y={g.latMassCy - g.latMassRy - antShift}
+                                width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
+                                fill="none" stroke="#94a3b8" strokeWidth="0.5" strokeDasharray="2 2" opacity={0.25} />
+                            {/* Posterior lateral mass (dashed — C7 also has pedicle) */}
                             <rect x={g.latMassLeftCx - g.latMassRx} y={g.latMassCy - g.latMassRy}
                                 width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
                                 fill={common.fill} stroke="#94a3b8" strokeWidth="1" strokeDasharray="3 2" />
