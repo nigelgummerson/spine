@@ -1,6 +1,177 @@
 import type { Level } from '../types';
 
 /**
+ * Screw trajectory options per cervical level.
+ * Returns null for non-cervical levels (trajectory not applicable — always pedicle).
+ * Returns an array of { id, labelKey } for levels with multiple trajectory options.
+ */
+export const TRAJECTORY_OPTIONS: { id: string; labelKey: string }[] = [
+    { id: 'pedicle', labelKey: 'clinical.trajectory.pedicle' },
+    { id: 'lateral_mass', labelKey: 'clinical.trajectory.lateral_mass' },
+    { id: 'pars', labelKey: 'clinical.trajectory.pars' },
+    { id: 'translaminar', labelKey: 'clinical.trajectory.translaminar' },
+    { id: 'cortical', labelKey: 'clinical.trajectory.cortical' },
+];
+
+export function getTrajectoryOptions(levelId: string): { id: string; labelKey: string; isDefault?: boolean }[] | null {
+    if (levelId === 'Oc') return null; // occipital plate — no trajectory selector
+    if (levelId === 'C1') return [{ ...TRAJECTORY_OPTIONS[1], isDefault: true }]; // lateral mass only
+    if (levelId === 'C2') return [
+        { ...TRAJECTORY_OPTIONS[0], isDefault: true }, // pedicle (default)
+        TRAJECTORY_OPTIONS[2],                          // pars
+        TRAJECTORY_OPTIONS[3],                          // translaminar
+    ];
+    if (/^C[3-6]$/.test(levelId)) return [
+        TRAJECTORY_OPTIONS[0],                          // pedicle
+        { ...TRAJECTORY_OPTIONS[1], isDefault: true },  // lateral mass (default)
+    ];
+    if (levelId === 'C7') return [
+        { ...TRAJECTORY_OPTIONS[0], isDefault: true },  // pedicle (default)
+        TRAJECTORY_OPTIONS[1],                          // lateral mass
+    ];
+    if (/^L[1-5]$/.test(levelId)) return [
+        { ...TRAJECTORY_OPTIONS[0], isDefault: true },  // pedicle (default)
+        TRAJECTORY_OPTIONS[4],                           // cortical (CBT)
+    ];
+    return null; // T1-T12, S1+ — always pedicle, no selector needed
+}
+
+/**
+ * Per-level screw trajectory angles (degrees).
+ * transverse: positive = medial convergence, negative = lateral divergence
+ * sagittal: positive = screw tip goes CAUDAD (downward in PA view),
+ *           negative = screw tip goes CEPHALAD (upward in PA view)
+ *
+ * Note: published papers report sagittal as "cephalad tilt of the pedicle axis".
+ * For pedicle screws, this results in a caudad tip direction (positive here).
+ * For lateral mass (Magerl) and CBT, the tip genuinely goes cephalad (negative here).
+ *
+ * Sources:
+ * - Pedicle (cervical): Karaikovic et al. 1997
+ * - Pedicle (thoracic): Chadha et al. 2019 (Eur Spine J, PMC2200778)
+ * - Pedicle (lumbar): Chadha et al. 2019, Zindrick et al. 1987
+ * - Pedicle (C2): Abumi technique; Xu et al.
+ * - Lateral mass: Magerl technique (An et al. 1991)
+ * - CBT: Matsukawa et al. 2013 (J Neurosurg Spine)
+ * - C1 lateral mass: Bunmaprasert et al. 2021 (PMC8255764)
+ * - C2 pars: PMC9910137
+ *
+ * Entry point clock positions on pedicle ellipse (PA view):
+ * - Pedicle (T1-S1): 10 o'clock (left), 2 o'clock (right) — posterior-lateral entry
+ * - CBT (L1-L5): 4:30 (left), 7:30 (right) — inferior-medial entry
+ * - Cervical pedicle/lateral mass: centered (no pedicle ellipse data yet)
+ * - S1: centered (wide sacral pedicle)
+ */
+interface TrajectoryAngle { transverse: number; sagittal: number }
+
+/** Clock hour to angle on ellipse (SVG coords: 0°=right, clockwise positive) */
+function clockToAngle(hour: number): number {
+    return (hour * 30 - 90) * Math.PI / 180;
+}
+
+/** Entry point offset from pedicle centre, as fraction of (pedRx, pedRy) */
+export function getEntryPointOffset(trajectory: string, side: 'left' | 'right'): { fx: number; fy: number } | null {
+    if (trajectory === 'pedicle') {
+        // Posterior-lateral entry: Left 10 o'clock, Right 2 o'clock
+        const hour = side === 'left' ? 10 : 2;
+        const a = clockToAngle(hour);
+        return { fx: Math.cos(a), fy: Math.sin(a) };
+    }
+    if (trajectory === 'cortical') {
+        // Inferior-medial entry (near pars/spinous process base): Left 4:30, Right 7:30
+        const hour = side === 'left' ? 4.5 : 7.5;
+        const a = clockToAngle(hour);
+        return { fx: Math.cos(a), fy: Math.sin(a) };
+    }
+    if (trajectory === 'lateral_mass') {
+        // Lateral mass centre — no pedicle offset (icon stays at lateral mass position)
+        return null;
+    }
+    return null; // cervical pedicle/pars/translaminar: centred (no pedicle ellipse data yet)
+}
+
+const TRAJECTORY_ANGLE_DATA: Record<string, Record<string, TrajectoryAngle>> = {
+    // C1: lateral mass only (Goel-Harms) — no pedicle ellipse data, shank from centre
+    C1:  { lateral_mass: { transverse: 15, sagittal: 0 } },
+    // C2: pedicle (Abumi), pars, translaminar — no pedicle ellipse data, shank from centre
+    C2:  { pedicle: { transverse: 27, sagittal: -22 }, pars: { transverse: 10, sagittal: -45 }, translaminar: { transverse: 0, sagittal: 0 } },
+    // C3-C7: pedicle (Karaikovic) + lateral mass (Magerl) — no pedicle ellipse data
+    C3:  { pedicle: { transverse: 47, sagittal: -9 },  lateral_mass: { transverse: -25, sagittal: -45 } },
+    C4:  { pedicle: { transverse: 49, sagittal: -2 },  lateral_mass: { transverse: -25, sagittal: -45 } },
+    C5:  { pedicle: { transverse: 46, sagittal: 3 },   lateral_mass: { transverse: -25, sagittal: -45 } },
+    C6:  { pedicle: { transverse: 43, sagittal: 5 },   lateral_mass: { transverse: -25, sagittal: -45 } },
+    C7:  { pedicle: { transverse: 37, sagittal: 4 },   lateral_mass: { transverse: -25, sagittal: -45 } },
+    // T1-T12: pedicle only (Chadha et al. 2019) — tip goes caudad (positive sagittal)
+    T1:  { pedicle: { transverse: 28, sagittal: 11 } },
+    T2:  { pedicle: { transverse: 26, sagittal: 19 } },
+    T3:  { pedicle: { transverse: 23, sagittal: 17 } },
+    T4:  { pedicle: { transverse: 23, sagittal: 15 } },
+    T5:  { pedicle: { transverse: 18, sagittal: 18 } },
+    T6:  { pedicle: { transverse: 15, sagittal: 17 } },
+    T7:  { pedicle: { transverse: 13, sagittal: 13 } },
+    T8:  { pedicle: { transverse: 14, sagittal: 14 } },
+    T9:  { pedicle: { transverse: 12, sagittal: 13 } },
+    T10: { pedicle: { transverse: 9, sagittal: 13 } },
+    T11: { pedicle: { transverse: 8, sagittal: 12 } },
+    T12: { pedicle: { transverse: 8, sagittal: 11 } },
+    // L1-L5: pedicle tip caudad (positive), CBT tip cephalad (negative)
+    L1:  { pedicle: { transverse: 8, sagittal: 6 },  cortical: { transverse: -9, sagittal: -26 } },
+    L2:  { pedicle: { transverse: 12, sagittal: 5 }, cortical: { transverse: -9, sagittal: -26 } },
+    L3:  { pedicle: { transverse: 15, sagittal: 5 }, cortical: { transverse: -9, sagittal: -26 } },
+    L4:  { pedicle: { transverse: 19, sagittal: 3 }, cortical: { transverse: -9, sagittal: -26 } },
+    L5:  { pedicle: { transverse: 24, sagittal: 3 }, cortical: { transverse: -9, sagittal: -26 } },
+    // S1: pedicle only — centered entry (wide sacral pedicle)
+    S1:  { pedicle: { transverse: 25, sagittal: 0 } },
+};
+
+/**
+ * Get the trajectory angle for a given level and trajectory type.
+ * Returns null if no angle data available (e.g. occiput, pelvic levels).
+ */
+export function getTrajectoryAngle(levelId: string, trajectory?: string): TrajectoryAngle | null {
+    const levelData = TRAJECTORY_ANGLE_DATA[levelId];
+    if (!levelData) return null;
+    // Use specified trajectory, or determine default
+    const traj = trajectory || (() => {
+        const opts = getTrajectoryOptions(levelId);
+        if (opts) return (opts.find(o => o.isDefault) || opts[0]).id;
+        return 'pedicle';
+    })();
+    return levelData[traj] || levelData.pedicle || null;
+}
+
+/**
+ * Project a screw into the PA (coronal) view.
+ * Returns { dx, dy } in SVG units — the visible displacement from entry to tip.
+ *
+ * @param lengthMm - screw length in mm
+ * @param angles - { transverse, sagittal } in degrees
+ * @param side - 'left' or 'right' (determines medial convergence direction)
+ * @param scale - mm-to-SVG-units scale factor (VERT_SVG_SCALE)
+ */
+export function projectScrewShank(
+    lengthMm: number,
+    angles: TrajectoryAngle,
+    side: 'left' | 'right',
+    scale: number
+): { dx: number; dy: number } {
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+    const θt = toRad(angles.transverse); // positive = medial convergence
+    const θs = toRad(angles.sagittal);   // positive = cephalad tilt of pedicle axis
+    const L = lengthMm * scale;
+    // Sagittal tilt reduces effective length in axial plane: L_axial = L × cos(θs)
+    // Horizontal displacement: dx = L_axial × sin(θt) = L × cos(θs) × sin(θt)
+    // Medial convergence: LEFT side → dx positive (rightward), RIGHT → negative (leftward)
+    const medialSign = side === 'left' ? 1 : -1;
+    const dx = L * Math.cos(θs) * Math.sin(θt) * medialSign;
+    // Sagittal displacement: screw tip ends up caudad to entry (pedicle entry is
+    // posterior-superior, tip goes anteroinferiorly into body). Positive sagittal
+    // angle → positive dy (downward in SVG coordinates).
+    const dy = L * Math.sin(θs);
+    return { dx, dy };
+}
+
+/**
  * Returns the osteotomy type IDs permitted at a given spinal level.
  * - Oc, C1, C2: no osteotomies (complex anatomy, out of scope)
  * - C3-C7: Corpectomy only (anterior). No posterior osteotomies.

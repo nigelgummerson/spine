@@ -146,9 +146,9 @@ export const SpineVertebra = React.memo(({ label, type, height, isCorpectomy, he
                             {g.pedLeftCx && g.pedRx && g.pedRy && g.pedCy && (
                                 <>
                                     <ellipse cx={g.pedLeftCx} cy={g.pedCy} rx={g.pedRx} ry={g.pedRy}
-                                        fill="none" stroke="#94a3b8" strokeWidth="1" />
+                                        fill="none" stroke="#94a3b8" strokeWidth="1" opacity={0.4} />
                                     <ellipse cx={g.pedRightCx} cy={g.pedCy} rx={g.pedRx} ry={g.pedRy}
-                                        fill="none" stroke="#94a3b8" strokeWidth="1" />
+                                        fill="none" stroke="#94a3b8" strokeWidth="1" opacity={0.4} />
                                 </>
                             )}
                         </g>
@@ -194,8 +194,8 @@ export const SpineVertebra = React.memo(({ label, type, height, isCorpectomy, he
                                     transform={ang ? `rotate(${-ang}, ${r}, ${tpBot})` : undefined} />;
                             })()}
                             <path d={bodyPath} {...common} />
-                            <ellipse cx={geom.pedLeftCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth}/>
-                            <ellipse cx={geom.pedRightCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth}/>
+                            <ellipse cx={geom.pedLeftCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth} opacity={0.4}/>
+                            <ellipse cx={geom.pedRightCx} cy={pedCy} rx={geom.pedRx} ry={geom.pedRy} fill="none" stroke={pedStroke} strokeWidth={pedWidth} opacity={0.4}/>
                         </g>
                     );
                 })()}

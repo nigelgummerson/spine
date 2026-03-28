@@ -128,9 +128,20 @@ export const SCREW_DEFAULTS: Record<string, { diameter: string; length: string }
     'SI-J': { diameter: '7.0', length: '45' },
 };
 
-/** Get screw default for a level.
+/** CBT screw defaults — shorter and narrower than traditional pedicle screws.
+ * Sources: Matsukawa et al. 2013 (Spine), Matsukawa et al. 2015 (J Neurosurg Spine), Santoni et al. 2009 (Spine J). */
+export const CBT_SCREW_DEFAULTS: Record<string, { diameter: string; length: string }> = {
+    L1: { diameter: '4.5', length: '25' },
+    L2: { diameter: '4.5', length: '30' },
+    L3: { diameter: '5.0', length: '30' },
+    L4: { diameter: '5.0', length: '35' },
+    L5: { diameter: '5.0', length: '35' },
+};
+
+/** Get screw default for a level and trajectory.
  * Returns null for levels with no safe default (Oc, C1, C2, unknown). */
-export function getScrewDefault(levelId: string): { diameter: string; length: string } | null {
+export function getScrewDefault(levelId: string, trajectory?: string): { diameter: string; length: string } | null {
+    if (trajectory === 'cortical') return CBT_SCREW_DEFAULTS[levelId] || null;
     return SCREW_DEFAULTS[levelId] || null;
 }
 

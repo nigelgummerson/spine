@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { t } from '../../i18n/i18n';
 import { DIAMETER_OPTIONS, LENGTH_OPTIONS, getScrewDefault, checkScrewSize, getSystemCatalogue } from '../../data/implants';
-import { HOOK_TYPES, NO_SIZE_TYPES } from '../../data/clinical';
+import { HOOK_TYPES, NO_SIZE_TYPES, getTrajectoryOptions } from '../../data/clinical';
 import { InstrumentIcon } from '../chart/InstrumentIcon';
 import { IconTrash, IconX } from '../icons';
 import { Portal } from '../Portal';
@@ -69,7 +69,7 @@ export const modalKeyHandler = ({ onSubmit, onClose, onDelete, isEditing }: Moda
 interface ScrewModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onConfirm: (size: string | null, details: { diameter: string; length: string; mode: string; customText: string } | null, type: string, annotation: string, levelId: string, zone: Zone) => void;
+    onConfirm: (size: string | null, details: { diameter: string; length: string; mode: string; customText: string } | null, type: string, annotation: string, levelId: string, zone: Zone, trajectory?: string) => void;
     onConfirmAndNext?: (confirmedLevelId: string, confirmedZone: Zone) => void;
     onDelete?: () => void;
     initialData?: string | null;
@@ -79,6 +79,7 @@ interface ScrewModalProps {
     defaultMode?: string;
     defaultCustomText?: string;
     initialAnnotation?: string;
+    initialTrajectory?: string;
     levelId: string;
     zone: Zone;
     levels: Level[];
@@ -88,7 +89,7 @@ interface ScrewModalProps {
     screwSystem?: string;
 }
 
-export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, levelId, zone, levels, placements, useRegionDefaults, confirmAndNextDefault, screwSystem }: ScrewModalProps) => {
+export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDelete, initialData, initialTool, defaultDiameter, defaultLength, defaultMode, defaultCustomText, initialAnnotation, initialTrajectory, levelId, zone, levels, placements, useRegionDefaults, confirmAndNextDefault, screwSystem }: ScrewModalProps) => {
     if (!isOpen) return null;
     // Compute initial values from props (runs on mount since component unmounts when closed)
     const computeInitial = () => {
@@ -102,7 +103,8 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
         } else if (initialData === null) { mode = 'none'; }
         else if (useRegionDefaults && initialData === undefined) {
             // New placement with region defaults on — use per-level defaults
-            const def = getScrewDefault(levelId);
+            const initTraj = initialTrajectory || (() => { const opts = getTrajectoryOptions(levelId); return opts ? (opts.find(o => o.isDefault) || opts[0]).id : 'pedicle'; })();
+            const def = getScrewDefault(levelId, initTraj);
             if (def) { dia = def.diameter; len = def.length; mode = 'standard'; }
             else { mode = 'none'; }
         }
@@ -117,6 +119,11 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
     const [selectedType, setSelectedType] = useState(initialTool || 'polyaxial');
     const [annotation, setAnnotation] = useState(init.ann);
     const [fixationText, setFixationText] = useState('');
+    const [trajectory, setTrajectory] = useState(() => {
+        if (initialTrajectory) return initialTrajectory;
+        const opts = getTrajectoryOptions(levelId);
+        return opts ? (opts.find(o => o.isDefault) || opts[0]).id : '';
+    });
 
     const [selectedLevel, setSelectedLevel] = useState(levelId);
     const [selectedZone, setSelectedZone] = useState<Zone>(zone);
@@ -135,8 +142,12 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
 
     const handleLevelChange = (newLevel: string) => {
         setSelectedLevel(newLevel);
+        // Reset trajectory to default for the new level
+        const opts = getTrajectoryOptions(newLevel);
+        const newTraj = opts ? (opts.find(o => o.isDefault) || opts[0]).id : 'pedicle';
+        setTrajectory(newTraj);
         if (useRegionDefaults && isScrew) {
-            const def = getScrewDefault(newLevel);
+            const def = getScrewDefault(newLevel, newTraj);
             if (def) { setDiameter(def.diameter); setLength(def.length); setMode('standard'); }
             else { setMode('none'); }
         }
@@ -145,8 +156,18 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
     const handleZoneChange = (newZone: Zone) => {
         setSelectedZone(newZone);
         if (useRegionDefaults && isScrew) {
-            const def = getScrewDefault(selectedLevel);
+            const def = getScrewDefault(selectedLevel, trajectory);
             if (def) { setDiameter(def.diameter); setLength(def.length); setMode('standard'); }
+        }
+    };
+
+    // When trajectory changes, update size defaults
+    const handleTrajectoryChange = (newTraj: string) => {
+        setTrajectory(newTraj);
+        if (useRegionDefaults && isScrew) {
+            const def = getScrewDefault(selectedLevel, newTraj);
+            if (def) { setDiameter(def.diameter); setLength(def.length); setMode('standard'); }
+            else { setMode('none'); }
         }
     };
 
@@ -155,6 +176,7 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
             const v = computeInitial();
             if (initialTool) setSelectedType(initialTool);
             setMode(v.mode); setDiameter(v.dia); setLength(v.len); setCustomText(v.custom); setAnnotation(v.ann);
+            setTrajectory(initialTrajectory || (() => { const opts = getTrajectoryOptions(levelId); return opts ? (opts.find(o => o.isDefault) || opts[0]).id : ''; })());
             setSelectedLevel(levelId);
             setSelectedZone(zone);
         }
@@ -169,13 +191,16 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
 
     const computeDetails = () => (isHookOnly || isFixation) ? null : { diameter, length, mode, customText };
 
+    const trajectoryOptions = getTrajectoryOptions(selectedLevel);
+    const finalTrajectory = (isScrew && trajectoryOptions) ? trajectory : undefined;
+
     const handleSubmit = () => {
-        onConfirm(computeFinalSize(), computeDetails(), selectedType, isPelvic ? '' : annotation, selectedLevel, selectedZone);
+        onConfirm(computeFinalSize(), computeDetails(), selectedType, isPelvic ? '' : annotation, selectedLevel, selectedZone, finalTrajectory);
         onClose();
     };
 
     const handleSubmitAndNext = () => {
-        onConfirm(computeFinalSize(), computeDetails(), selectedType, isPelvic ? '' : annotation, selectedLevel, selectedZone);
+        onConfirm(computeFinalSize(), computeDetails(), selectedType, isPelvic ? '' : annotation, selectedLevel, selectedZone, finalTrajectory);
         // Do NOT call onClose — pass confirmed level/zone so App can compute next
         if (onConfirmAndNext) onConfirmAndNext(selectedLevel, selectedZone);
     };
@@ -251,7 +276,21 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1 mb-0.5">{t('modal.screw.section_bands')}</div>
                         <div className="grid grid-cols-3 gap-0.5">{['band', 'wire', 'cable'].map(typ => (<button key={typ} onClick={() => setSelectedType(typ)} className={`py-1 px-0.5 text-[10px] font-bold uppercase rounded transition-all ${selectedType === typ ? 'bg-white shadow text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}>{t('clinical.fixation.' + typ)}</button>))}</div>
                     </div>
+                    {isScrew && trajectoryOptions && (
+                        <div className="mb-3">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{t('modal.screw.section_trajectory')}</div>
+                            <div className="flex gap-1">
+                                {trajectoryOptions.map(opt => (
+                                    <button key={opt.id} onClick={() => handleTrajectoryChange(opt.id)}
+                                        className={`flex-1 py-1.5 text-[10px] font-bold uppercase rounded border transition-all ${trajectory === opt.id ? 'bg-blue-500 text-white border-blue-600' : 'bg-slate-100 text-slate-500 border-slate-200 hover:border-slate-300'}`}>
+                                        {t(opt.labelKey)}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                     {isScrew && (<>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{t('modal.screw.section_size')}</div>
                         <div className="flex gap-2 mb-4">{['standard','custom','none'].map(m => { const labels: Record<string, string> = { standard: t('modal.screw.mode_standard'), custom: t('modal.screw.mode_custom'), none: t('modal.screw.mode_none') }; const active = mode === m; return <button key={m} onClick={() => setMode(m)} className={`flex-1 py-1 text-xs font-bold rounded border transition-all ${active ? 'bg-amber-500 text-slate-900 border-amber-600' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>{labels[m]}</button>; })}</div>
                         {mode === 'standard' && (() => {
                             const sizeWarning = screwSystem ? checkScrewSize(screwSystem, parseFloat(diameter), parseInt(length, 10)) : null;
@@ -284,7 +323,7 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
                         {mode === 'custom' && <input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} placeholder={t('modal.screw.custom_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg focus:border-amber-500 outline-none" autoFocus />}
                         {mode === 'none' && <div className="text-center py-6 text-slate-400 text-sm italic">{t('modal.screw.icon_only')}</div>}
                         {useRegionDefaults && mode === 'standard' && (() => {
-                            const def = getScrewDefault(selectedLevel);
+                            const def = getScrewDefault(selectedLevel, trajectory);
                             return def
                                 ? <div className="mt-2 text-[10px] text-slate-400 italic">{t('modal.screw.suggested_size', { level: selectedLevel })}</div>
                                 : <div className="mt-2 text-[10px] text-amber-500 italic">{t('modal.screw.no_default_size', { level: selectedLevel })}</div>;

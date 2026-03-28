@@ -1,7 +1,7 @@
 import React from 'react';
 import { t } from '../../i18n/i18n';
-import { getDiscHeight, getLevelHeight, getVertSvgGeometry, DISC_MIN_PX, VERT_PAD } from '../../data/anatomy';
-import { HOOK_TYPES, FORCE_TYPES } from '../../data/clinical';
+import { getDiscHeight, getLevelHeight, getVertSvgGeometry, DISC_MIN_PX, VERT_PAD, VERT_SVG_SCALE } from '../../data/anatomy';
+import { HOOK_TYPES, FORCE_TYPES, getTrajectoryAngle, projectScrewShank, getEntryPointOffset, getTrajectoryOptions } from '../../data/clinical';
 const FIXATION_TYPES = ['band', 'wire', 'cable'];
 import { InstrumentIcon } from './InstrumentIcon';
 import { SpineVertebra } from './SpineVertebra';
@@ -31,12 +31,14 @@ export interface LevelRowProps {
     // Layout props from ChartPaper
     chartWidth: number;
     rowY: number;
+    // Fixed label alignment — outer boundary of widest level in 160-unit SVG coordinates
+    labelBoundary?: { left: number; right: number };
     // Keyboard navigation focus
     focusedZone?: 'left' | 'right' | 'mid';
 }
 
 /** SVG-native level row — renders as a <g> group at a given Y offset */
-export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements, ghostPlacements, onZoneClick, tools, onPlacementClick, onGhostClick, readOnly, showForces, heightScale, onDiscClick, cages, levels, viewMode, forcePlacements, ghostCages, onGhostCageClick, chartWidth, rowY, focusedZone }) => {
+export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements, ghostPlacements, onZoneClick, tools, onPlacementClick, onGhostClick, readOnly, showForces, heightScale, onDiscClick, cages, levels, viewMode, forcePlacements, ghostCages, onGhostCageClick, chartWidth, rowY, labelBoundary, focusedZone }) => {
     const getItems = (z: string) => {
         const src = (forcePlacements && z.startsWith('force')) ? forcePlacements : placements;
         return src.filter(p => p.levelId === level.id && p.zone === z);
@@ -185,6 +187,9 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
         chartOuterLeft = vertX + ((geom.latMassLeftCx - geom.latMassRx) / 160) * scaledWidth;
         chartOuterRight = vertX + ((geom.latMassRightCx + geom.latMassRx) / 160) * scaledWidth;
     }
+    // Fixed label edge — aligned to widest level in the view for consistent label columns
+    const labelEdgeLeft = labelBoundary ? vertX + (labelBoundary.left / 160) * scaledWidth : chartOuterLeft;
+    const labelEdgeRight = labelBoundary ? vertX + (labelBoundary.right / 160) * scaledWidth : chartOuterRight;
 
     /** Render items for a zone (left, right, force_left, force_right) */
     const renderZoneContent = (zone: string, zoneX: number, zoneW: number, align: 'left' | 'right' | 'center') => {
@@ -250,7 +255,7 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
 
             // Position icon: centre on anatomical screw entry point
             let iconX: number;
-            const iconY = zoneCy - iH / 2;
+            let iconY = zoneCy - iH / 2;
             if (align === 'center') {
                 iconX = zoneCx - iW / 2;
             } else if ((zone === 'left' && chartScrewLeftCx !== undefined) || (zone === 'right' && chartScrewRightCx !== undefined)) {
@@ -259,6 +264,51 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
                 iconX = zoneX + zoneW - iW - 4;
             } else {
                 iconX = zoneX + 4;
+            }
+            // Offset screw icon to entry point on pedicle ellipse.
+            // Entry Y positioned so vertical midpoint of shank = pedicle centre.
+            // Entry X at lateral (pedicle) or medial (CBT) edge of ellipse at that Y.
+            // For lateral mass trajectory at C7: reposition to lateral mass centre instead.
+            if (['monoaxial','polyaxial','uniplanar'].includes(p.tool) && geom) {
+                const screwSide = zone === 'left' ? 'left' as const : 'right' as const;
+                const traj = p.trajectory || (() => { const opts = getTrajectoryOptions(level.id); return opts ? (opts.find(o => o.isDefault) || opts[0]).id : 'pedicle'; })();
+                // Lateral mass trajectory: reposition to Magerl entry point (lower medial quadrant)
+                if (traj === 'lateral_mass' && 'latMassLeftCx' in geom) {
+                    const medialOff = geom.latMassRx * 0.3 * (scaledWidth / 160);
+                    const inferiorOff = geom.latMassRy * 0.3 * heightScale;
+                    const lmCx = screwSide === 'left'
+                        ? vertX + (geom.latMassLeftCx / 160) * scaledWidth + medialOff
+                        : vertX + (geom.latMassRightCx / 160) * scaledWidth - medialOff;
+                    iconX = lmCx - iW / 2;
+                    iconY += inferiorOff;
+                }
+                const angles = getTrajectoryAngle(level.id, traj);
+                if (angles && getEntryPointOffset(traj, screwSide) && 'pedRx' in geom && 'pedCy' in geom) {
+                    const g = geom as { pedRx: number; pedRy: number; pedCy: number; pedLeftCx: number; pedRightCx: number };
+                    const pedRxC = g.pedRx * heightScale;
+                    const pedRyC = g.pedRy * heightScale;
+                    const pedCyC = g.pedCy * heightScale;
+                    const pedCxC = screwSide === 'left'
+                        ? vertX + (g.pedLeftCx / 160) * scaledWidth
+                        : vertX + (g.pedRightCx / 160) * scaledWidth;
+                    // Compute shank dy to determine entry Y offset
+                    let lenMm = 0;
+                    if (typeof p.data === 'string' && p.data.includes('x')) {
+                        const parts = p.data.split('x').map(Number);
+                        if (parts.length === 2 && !isNaN(parts[1])) lenMm = parts[1];
+                    }
+                    const { dy } = lenMm ? projectScrewShank(lenMm, angles, screwSide, VERT_SVG_SCALE * heightScale) : { dy: 0 };
+                    // Entry Y: offset from pedCy so midpoint of shank is at pedCy
+                    const yOffFromCentre = -dy / 2;
+                    const clampedY = Math.max(-pedRyC, Math.min(pedRyC, yOffFromCentre));
+                    // Entry X: on ellipse at that Y, lateral side (pedicle) or medial side (CBT)
+                    const ellipseXFrac = Math.sqrt(Math.max(0, 1 - (clampedY / pedRyC) ** 2));
+                    const isMedialEntry = traj === 'cortical';
+                    const lateralSign = screwSide === 'left' ? -1 : 1; // lateral = away from midline
+                    const xOff = (isMedialEntry ? -lateralSign : lateralSign) * ellipseXFrac * pedRxC;
+                    iconX = pedCxC + xOff - iW / 2;
+                    iconY = pedCyC + clampedY - iH / 2;
+                }
             }
 
             // Label text
@@ -272,7 +322,7 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
                 <g key={p.id} cursor={!readOnly ? 'pointer' : 'default'}
                     onClick={(e) => { e.stopPropagation(); !readOnly && onPlacementClick(p); }}>
                     {align === 'left' && (labelText || annText) && (() => {
-                        const labelRight = chartOuterLeft - 2;
+                        const labelRight = labelEdgeLeft - 2;
                         const labelW = labelRight - leftZoneX;
                         return (
                         <foreignObject x={leftZoneX} y={0} width={Math.max(0, labelW)} height={rowHeight} overflow="visible" pointerEvents="none">
@@ -286,9 +336,29 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
                             </div>
                         </foreignObject>);
                     })()}
+                    {/* Screw shank — projected PA view, starts from icon centre (already at entry point) */}
+                    {['monoaxial','polyaxial','uniplanar'].includes(p.tool) && (() => {
+                        const screwSide = zone === 'left' ? 'left' as const : 'right' as const;
+                        const angles = getTrajectoryAngle(level.id, p.trajectory);
+                        if (!angles) return null;
+                        let diamMm = 0, lenMm = 0;
+                        if (typeof p.data === 'string' && p.data.includes('x')) {
+                            const parts = p.data.split('x').map(Number);
+                            if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                                diamMm = parts[0]; lenMm = parts[1];
+                            }
+                        }
+                        if (!lenMm) return null;
+                        const { dx, dy } = projectScrewShank(lenMm, angles, screwSide, VERT_SVG_SCALE * heightScale);
+                        const cx = iconX + iW / 2;
+                        const cy = iconY + iH / 2;
+                        const strokeW = Math.max(1.5, diamMm * VERT_SVG_SCALE * heightScale);
+                        return <line x1={cx} y1={cy} x2={cx + dx} y2={cy + dy}
+                            stroke="#64748b" strokeWidth={strokeW} strokeLinecap="round" opacity={0.6} pointerEvents="none" />;
+                    })()}
                     {renderIcon(tool?.icon || '', iconX, iconY, iW, iH, undefined, zone === 'left' ? 'left' : zone === 'right' ? 'right' : undefined)}
                     {align === 'right' && (labelText || annText) && (() => {
-                        const labelLeft = chartOuterRight + 2;
+                        const labelLeft = labelEdgeRight + 2;
                         const labelW = rightZoneX + sideZoneW - labelLeft;
                         return (
                         <foreignObject x={labelLeft} y={0} width={Math.max(0, labelW)} height={rowHeight} overflow="visible" pointerEvents="none">
@@ -330,7 +400,7 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
             const showData = ghostItem.data && !isHookItem && !isFixation;
 
             let iconX: number;
-            const iconY = zoneCy - iH / 2;
+            let iconY = zoneCy - iH / 2;
             if (align === 'center') {
                 iconX = zoneCx - iW / 2;
             } else if ((zone === 'left' && chartScrewLeftCx !== undefined) || (zone === 'right' && chartScrewRightCx !== undefined)) {
@@ -339,6 +409,44 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
                 iconX = zoneX + zoneW - iW - 4;
             } else {
                 iconX = zoneX + 4;
+            }
+            // Offset ghost screw icon to entry point on pedicle ellipse (same logic as placed screws)
+            if (['monoaxial','polyaxial','uniplanar'].includes(ghostItem.tool) && geom) {
+                const screwSide = zone === 'left' ? 'left' as const : 'right' as const;
+                const traj = ghostItem.trajectory || (() => { const opts = getTrajectoryOptions(level.id); return opts ? (opts.find(o => o.isDefault) || opts[0]).id : 'pedicle'; })();
+                if (traj === 'lateral_mass' && 'latMassLeftCx' in geom) {
+                    const medialOff = geom.latMassRx * 0.3 * (scaledWidth / 160);
+                    const inferiorOff = geom.latMassRy * 0.3 * heightScale;
+                    const lmCx = screwSide === 'left'
+                        ? vertX + (geom.latMassLeftCx / 160) * scaledWidth + medialOff
+                        : vertX + (geom.latMassRightCx / 160) * scaledWidth - medialOff;
+                    iconX = lmCx - iW / 2;
+                    iconY += inferiorOff;
+                }
+                const angles = getTrajectoryAngle(level.id, traj);
+                if (angles && getEntryPointOffset(traj, screwSide) && 'pedRx' in geom && 'pedCy' in geom) {
+                    const g = geom as { pedRx: number; pedRy: number; pedCy: number; pedLeftCx: number; pedRightCx: number };
+                    const pedRxC = g.pedRx * heightScale;
+                    const pedRyC = g.pedRy * heightScale;
+                    const pedCyC = g.pedCy * heightScale;
+                    const pedCxC = screwSide === 'left'
+                        ? vertX + (g.pedLeftCx / 160) * scaledWidth
+                        : vertX + (g.pedRightCx / 160) * scaledWidth;
+                    let lenMm = 0;
+                    if (typeof ghostItem.data === 'string' && ghostItem.data.includes('x')) {
+                        const parts = ghostItem.data.split('x').map(Number);
+                        if (parts.length === 2 && !isNaN(parts[1])) lenMm = parts[1];
+                    }
+                    const { dy } = lenMm ? projectScrewShank(lenMm, angles, screwSide, VERT_SVG_SCALE * heightScale) : { dy: 0 };
+                    const yOffFromCentre = -dy / 2;
+                    const clampedY = Math.max(-pedRyC, Math.min(pedRyC, yOffFromCentre));
+                    const ellipseXFrac = Math.sqrt(Math.max(0, 1 - (clampedY / pedRyC) ** 2));
+                    const isMedialEntry = traj === 'cortical';
+                    const lateralSign = screwSide === 'left' ? -1 : 1;
+                    const xOff = (isMedialEntry ? -lateralSign : lateralSign) * ellipseXFrac * pedRxC;
+                    iconX = pedCxC + xOff - iW / 2;
+                    iconY = pedCyC + clampedY - iH / 2;
+                }
             }
 
             const labelText = showData
@@ -349,7 +457,7 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
                 <g key={'ghost-' + ghostItem.id} opacity={0.75} cursor="pointer"
                     onClick={(e) => { e.stopPropagation(); onGhostClick && onGhostClick(ghostItem); }}>
                     {align === 'left' && labelText && (() => {
-                        const labelRight = chartOuterLeft - 2;
+                        const labelRight = labelEdgeLeft - 2;
                         const labelW = labelRight - leftZoneX;
                         return (
                         <foreignObject x={leftZoneX} y={0} width={Math.max(0, labelW)} height={rowHeight} overflow="visible" pointerEvents="none">
@@ -360,10 +468,30 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
                             </div>
                         </foreignObject>);
                     })()}
+                    {/* Ghost screw shank */}
+                    {['monoaxial','polyaxial','uniplanar'].includes(ghostItem.tool) && (() => {
+                        const screwSide = zone === 'left' ? 'left' as const : 'right' as const;
+                        const angles = getTrajectoryAngle(level.id, ghostItem.trajectory);
+                        if (!angles) return null;
+                        let diamMm = 0, lenMm = 0;
+                        if (typeof ghostItem.data === 'string' && ghostItem.data.includes('x')) {
+                            const parts = ghostItem.data.split('x').map(Number);
+                            if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                                diamMm = parts[0]; lenMm = parts[1];
+                            }
+                        }
+                        if (!lenMm) return null;
+                        const { dx, dy } = projectScrewShank(lenMm, angles, screwSide, VERT_SVG_SCALE * heightScale);
+                        const cx = iconX + iW / 2;
+                        const cy = iconY + iH / 2;
+                        const strokeW = Math.max(1.5, diamMm * VERT_SVG_SCALE * heightScale);
+                        return <line x1={cx} y1={cy} x2={cx + dx} y2={cy + dy}
+                            stroke="#14b8a6" strokeWidth={strokeW} strokeLinecap="round" opacity={0.5} pointerEvents="none" />;
+                    })()}
                     <rect x={iconX} y={iconY} width={iW} height={iH} fill="transparent" pointerEvents="all" />
                     {renderIcon(tool?.icon || '', iconX, iconY, iW, iH, '#14b8a6', zone === 'left' ? 'left' : zone === 'right' ? 'right' : undefined)}
                     {align === 'right' && labelText && (() => {
-                        const labelLeft = chartOuterRight + 2;
+                        const labelLeft = labelEdgeRight + 2;
                         const labelW = rightZoneX + sideZoneW - labelLeft;
                         return (
                         <foreignObject x={labelLeft} y={0} width={Math.max(0, labelW)} height={rowHeight} overflow="visible" pointerEvents="none">

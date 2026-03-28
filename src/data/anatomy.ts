@@ -30,6 +30,7 @@ interface ThoracicAnatomy extends AnatomyBase {
     region: 'thoracic';
     pedW: number;
     pedH: number;
+    pedCTC: number; // pedicle centre-to-centre distance (mm) — Lien 2007 pedW + IPD (Chhabra/Maaly)
     tpW: number;  // transverse process projection per side (mm), Tan et al. 2004
     tpH: number;  // transverse process craniocaudal height (mm)
     tpAngle: number;  // TP caudal angulation from horizontal (degrees)
@@ -39,6 +40,7 @@ interface LumbarAnatomy extends AnatomyBase {
     region: 'lumbar';
     pedW: number;
     pedH: number;
+    pedCTC: number; // pedicle centre-to-centre distance (mm) — Lien 2007 pedW + IPD (Maaly)
     tpW: number;  // transverse process projection per side (mm), Tan et al. 2004
     tpH: number;  // transverse process craniocaudal height (mm)
 }
@@ -95,23 +97,29 @@ export const VERTEBRA_ANATOMY: Record<string, VertAnatomyEntry> = {
     C7:  { region: 'cervical-subaxial', bodyW: 23.2, bodyH: 15.9, latMassW: 12, latMassH: 11, pedW: 5.5, pedH: 7 },
     // tpH: thoracic TP craniocaudal height — T1=10.8mm (thickest), T7=7.9mm (thinnest).
     // Lumbar TPs are thin flat plates ~8-10mm.
-    T1:  { region: 'thoracic', bodyW: 31.0, bodyH: 18.9, pedW: 9.3, pedH:  9.0, tpW: 21.0, tpH: 10.8, tpAngle: 28.9 },
-    T2:  { region: 'thoracic', bodyW: 28.9, bodyH: 20.5, pedW: 7.5, pedH: 10.3, tpW: 18.4, tpH: 10.3, tpAngle: 30.4 },
-    T3:  { region: 'thoracic', bodyW: 27.9, bodyH: 20.6, pedW: 6.0, pedH: 10.4, tpW: 15.4, tpH: 9.6, tpAngle: 36.0 },
-    T4:  { region: 'thoracic', bodyW: 28.6, bodyH: 21.3, pedW: 4.5, pedH: 10.3, tpW: 14.2, tpH: 9.0, tpAngle: 44.5 },
-    T5:  { region: 'thoracic', bodyW: 27.2, bodyH: 22.1, pedW: 5.0, pedH: 10.6, tpW: 14.8, tpH: 8.5, tpAngle: 54.1 },
-    T6:  { region: 'thoracic', bodyW: 28.3, bodyH: 22.9, pedW: 5.5, pedH: 10.2, tpW: 14.5, tpH: 8.1, tpAngle: 59.8 },
-    T7:  { region: 'thoracic', bodyW: 30.6, bodyH: 23.4, pedW: 6.0, pedH: 10.4, tpW: 13.1, tpH: 7.9, tpAngle: 56.4 },
-    T8:  { region: 'thoracic', bodyW: 31.9, bodyH: 24.0, pedW: 6.3, pedH: 10.9, tpW: 11.4, tpH: 8.2, tpAngle: 50.3 },
-    T9:  { region: 'thoracic', bodyW: 33.4, bodyH: 24.3, pedW: 6.3, pedH: 12.0, tpW: 10.7, tpH: 8.5, tpAngle: 43.9 },
-    T10: { region: 'thoracic', bodyW: 36.5, bodyH: 25.7, pedW: 6.5, pedH: 13.7, tpW: 7.7, tpH: 9.0, tpAngle: 35.9 },
-    T11: { region: 'thoracic', bodyW: 40.3, bodyH: 27.5, pedW: 7.8, pedH: 15.0, tpW: 4.4, tpH: 9.5, tpAngle: 23.5 },
-    T12: { region: 'thoracic', bodyW: 41.6, bodyH: 29.0, pedW: 8.3, pedH: 15.0, tpW: 2.6, tpH: 9.5, tpAngle: 13.1 },
-    L1:  { region: 'lumbar', bodyW: 44.8, bodyH: 30.2, pedW: 7.5, pedH: 15.4, tpW: 8.2, tpH: 9.0 },
-    L2:  { region: 'lumbar', bodyW: 47.3, bodyH: 31.1, pedW: 8.2, pedH: 14.9, tpW: 13.1, tpH: 8.5 },
-    L3:  { region: 'lumbar', bodyW: 49.7, bodyH: 29.8, pedW: 9.7, pedH: 14.5, tpW: 16.0, tpH: 8.0 },
-    L4:  { region: 'lumbar', bodyW: 51.8, bodyH: 29.1, pedW: 11.5, pedH: 14.2, tpW: 12.8, tpH: 8.5 },
-    L5:  { region: 'lumbar', bodyW: 49.9, bodyH: 27.0, pedW: 14.6, pedH: 14.7, tpW: 15.8, tpH: 10.0 },
+    // pedCTC: pedicle centre-to-centre distance (mm) = IPD + pedW.
+    //   Thoracic IPD: Chhabra et al. CT study (PMC4857161); Lien et al. 2007 (Eur Spine J, PMC2200778) for pedW.
+    //   Lumbar IPD: Maaly et al. CT study (PMC10540747); Lien et al. 2007 for pedW.
+    //   bodyW: Panjabi 1991/1992 (Caucasian cadaveric) via Tan et al. 2004 methodology.
+    //   pedW/pedH: Lien et al. 2007 (Eur Spine J 16:1215-1222, PMC2200778).
+    //   tpW/tpH: Berry et al. 1987. tpAngle: Masharawi et al. 2004.
+    T1:  { region: 'thoracic', bodyW: 31.0, bodyH: 18.9, pedW: 9.3, pedH:  9.0, pedCTC: 31.9, tpW: 21.0, tpH: 10.8, tpAngle: 28.9 },
+    T2:  { region: 'thoracic', bodyW: 28.9, bodyH: 20.5, pedW: 7.5, pedH: 10.3, pedCTC: 29.5, tpW: 18.4, tpH: 10.3, tpAngle: 30.4 },
+    T3:  { region: 'thoracic', bodyW: 27.9, bodyH: 20.6, pedW: 6.0, pedH: 10.4, pedCTC: 26.4, tpW: 15.4, tpH: 9.6, tpAngle: 36.0 },
+    T4:  { region: 'thoracic', bodyW: 28.6, bodyH: 21.3, pedW: 4.5, pedH: 10.3, pedCTC: 24.9, tpW: 14.2, tpH: 9.0, tpAngle: 44.5 },
+    T5:  { region: 'thoracic', bodyW: 27.2, bodyH: 22.1, pedW: 5.0, pedH: 10.6, pedCTC: 24.9, tpW: 14.8, tpH: 8.5, tpAngle: 54.1 },
+    T6:  { region: 'thoracic', bodyW: 28.3, bodyH: 22.9, pedW: 5.5, pedH: 10.2, pedCTC: 27.1, tpW: 14.5, tpH: 8.1, tpAngle: 59.8 },
+    T7:  { region: 'thoracic', bodyW: 30.6, bodyH: 23.4, pedW: 6.0, pedH: 10.4, pedCTC: 25.6, tpW: 13.1, tpH: 7.9, tpAngle: 56.4 },
+    T8:  { region: 'thoracic', bodyW: 31.9, bodyH: 24.0, pedW: 6.3, pedH: 10.9, pedCTC: 26.1, tpW: 11.4, tpH: 8.2, tpAngle: 50.3 },
+    T9:  { region: 'thoracic', bodyW: 33.4, bodyH: 24.3, pedW: 6.3, pedH: 12.0, pedCTC: 28.4, tpW: 10.7, tpH: 8.5, tpAngle: 43.9 },
+    T10: { region: 'thoracic', bodyW: 36.5, bodyH: 25.7, pedW: 6.5, pedH: 13.7, pedCTC: 26.6, tpW: 7.7, tpH: 9.0, tpAngle: 35.9 },
+    T11: { region: 'thoracic', bodyW: 40.3, bodyH: 27.5, pedW: 7.8, pedH: 15.0, pedCTC: 30.9, tpW: 4.4, tpH: 9.5, tpAngle: 23.5 },
+    T12: { region: 'thoracic', bodyW: 41.6, bodyH: 29.0, pedW: 8.3, pedH: 15.0, pedCTC: 32.0, tpW: 2.6, tpH: 9.5, tpAngle: 13.1 },
+    L1:  { region: 'lumbar', bodyW: 44.8, bodyH: 30.2, pedW: 7.5, pedH: 15.4, pedCTC: 31.3, tpW: 8.2, tpH: 9.0 },
+    L2:  { region: 'lumbar', bodyW: 47.3, bodyH: 31.1, pedW: 8.2, pedH: 14.9, pedCTC: 32.3, tpW: 13.1, tpH: 8.5 },
+    L3:  { region: 'lumbar', bodyW: 49.7, bodyH: 29.8, pedW: 9.7, pedH: 14.5, pedCTC: 35.1, tpW: 16.0, tpH: 8.0 },
+    L4:  { region: 'lumbar', bodyW: 51.8, bodyH: 29.1, pedW: 11.5, pedH: 14.2, pedCTC: 39.2, tpW: 12.8, tpH: 8.5 },
+    L5:  { region: 'lumbar', bodyW: 49.9, bodyH: 27.0, pedW: 14.6, pedH: 14.7, pedCTC: 49.5, tpW: 15.8, tpH: 10.0 },
     S1:  { region: 'sacral', bodyW: 100.0, bodyH: 28.0, pedW: 20.0, pedH: 14.0 }, // includes sacral ala
     S2:  { region: 'sacral', bodyW: 83.0, bodyH: 22.0, pedW: 18.0, pedH: 11.0 },
 };
@@ -125,6 +133,22 @@ export const getLevelHeight = (level: Level): number => {
     if (a) return Math.round(a.bodyH * VERT_SVG_SCALE) + VERT_PAD * 2;
     return REGIONS[level.type].height;
 };
+
+/**
+ * Compute the outer boundary (in 160-unit SVG coordinates) for a level.
+ * Uses getVertSvgGeometry so it matches LevelRow's chartOuterLeft/chartOuterRight.
+ */
+export function getOuterBoundary(levelId: string): { left: number; right: number } {
+    const geom = getVertSvgGeometry(levelId);
+    if (!geom) return { left: 0, right: 160 };
+    if ((geom.region === 'thoracic' || geom.region === 'lumbar') && 'tpLeftX' in geom) {
+        return { left: geom.tpLeftX, right: geom.tpRightX };
+    }
+    if ((geom.region === 'cervical-upper' || geom.region === 'cervical-subaxial') && 'latMassLeftCx' in geom) {
+        return { left: geom.latMassLeftCx - geom.latMassRx, right: geom.latMassRightCx + geom.latMassRx };
+    }
+    return { left: geom.left, right: geom.right };
+}
 
 // Geometry return types — discriminated union matching anatomy regions
 interface GeomBase {
@@ -224,9 +248,11 @@ export const getVertSvgGeometry = (levelId: string): VertSvgGeometry | null => {
     const right = cx + bw / 2;
 
     if (a.region === 'thoracic' || a.region === 'lumbar') {
-        const pedInset = (a.pedW * scale) * 0.5;
-        const pedLeftCx = left + pedInset + 5;
-        const pedRightCx = right - pedInset - 5;
+        // Pedicle centres from published centre-to-centre distance (IPD + pedW)
+        // Sources: Lien et al. 2007 (pedW), Chhabra et al. (thoracic IPD), Maaly et al. (lumbar IPD)
+        const halfCTC = (a.pedCTC * scale) / 2;
+        const pedLeftCx = cx - halfCTC;
+        const pedRightCx = cx + halfCTC;
         const pedRx = Math.max(1.5, (a.pedW * scale / 2));
         const pedRy = Math.max(2, (a.pedH * scale / 2));
         const pedCy = VERT_PAD + pedRy + 5;

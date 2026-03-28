@@ -20,6 +20,7 @@ export interface Placement {
     tool: string;
     data: string | OsteotomyData | null;
     annotation: string;
+    trajectory?: string;
 }
 
 export interface CageData {
@@ -105,7 +106,7 @@ export interface DocumentState {
 
 export type DocumentAction =
     | { type: 'ADD_PLACEMENT'; chart: Chart; placement: Placement }
-    | { type: 'UPDATE_PLACEMENT'; chart: Chart; id: string; tool: string; data: string | OsteotomyData | null; annotation?: string }
+    | { type: 'UPDATE_PLACEMENT'; chart: Chart; id: string; tool: string; data: string | OsteotomyData | null; annotation?: string; trajectory?: string }
     | { type: 'REMOVE_PLACEMENT'; chart: Chart; id: string }
     | { type: 'SET_CAGE'; chart: Chart; cage: Cage }
     | { type: 'REMOVE_CAGE'; chart: Chart; levelId: string }

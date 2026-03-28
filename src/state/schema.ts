@@ -85,6 +85,7 @@ const element = z.object({
     side,
     zone: elementZone,
     annotation: z.string().optional(),
+    trajectory: z.string().optional(),
     screw: screwObj,
     hook: hookObj,
     fixation: fixationObj,

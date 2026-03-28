@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { t } from '../../i18n/i18n';
 import { ALL_LEVELS, VERT_SVG_SCALE, VERT_PAD, getLevelHeight, getDiscHeight,
          calculateAutoScale, yNormToRenderedY, renderedYToYNorm,
-         CHART_CONTENT_HEIGHT, buildHeightMap, DISC_MIN_PX } from '../../data/anatomy';
+         CHART_CONTENT_HEIGHT, buildHeightMap, DISC_MIN_PX, getOuterBoundary } from '../../data/anatomy';
 import { PelvisRegion } from './PelvisRegion';
 import { FORCE_TYPES } from '../../data/clinical';
 import { InstrumentIcon } from './InstrumentIcon';
@@ -92,6 +92,19 @@ export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placem
     const heightMap = useMemo(() => buildHeightMap(levels, heightScale), [levels, heightScale]);
     const contentHeight = heightMap.totalHeight;
     const totalSvgHeight = contentHeight;
+
+    // Fixed label alignment — find widest level's outer boundary for consistent label X positions
+    const labelBoundary = useMemo(() => {
+        let minLeft = 80;
+        let maxRight = 80;
+        for (const lvl of levels) {
+            if (lvl.type === 'pelvic' || lvl.type === 'S') continue; // sacral/pelvic have their own rendering
+            const b = getOuterBoundary(lvl.id);
+            if (b.left < minLeft) minLeft = b.left;
+            if (b.right > maxRight) maxRight = b.right;
+        }
+        return { left: minLeft, right: maxRight };
+    }, [levels]);
 
     // Reconstruction cage labels
     const reconCageLabels = useMemo(() => {
@@ -274,6 +287,7 @@ export const ChartPaper: React.FC<ChartPaperProps> = React.memo(({ title, placem
                         cages={cages} onDiscClick={onDiscClick} levels={levels} viewMode={viewMode}
                         forcePlacements={forcePlacements} ghostCages={ghostCages} onGhostCageClick={onGhostCageClick}
                         chartWidth={chartWidth} rowY={levelYOffsets[lvl.id] || 0}
+                        labelBoundary={labelBoundary}
                         focusedZone={focusedLevelId === lvl.id ? focusedZone : undefined} />
                 ))}
                 {/* Pelvis ghost targets — rendered ON TOP of level rows */}

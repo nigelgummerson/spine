@@ -1,7 +1,7 @@
 import { formatDate } from '../i18n/i18n';
 export { formatDate };
 
-export const CURRENT_VERSION: string = "v2.7.33-beta";
+export const CURRENT_VERSION: string = "v2.7.34-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -13,6 +13,14 @@ interface ChangeLogEntry {
 // Keep entries brief, non-technical, and focused on what the surgeon can do.
 // Detailed technical changelog is in CLAUDE.md for developers/agents.
 export const CHANGE_LOG: ChangeLogEntry[] = [
+    { version: "v2.7.34-beta", date: "2026-03-28", changes: [
+        "Screw trajectory selector — pedicle, lateral mass, pars, translaminar, or cortical bone trajectory (CBT) at appropriate levels.",
+        "Screw shanks shown on the chart — projected PA view with published per-level convergence angles and real foreshortening.",
+        "Pedicle positions corrected to published interpedicular distances (Lien 2007, Chhabra, Maaly).",
+        "CBT screw defaults (Matsukawa 2013): smaller diameter and shorter length than traditional pedicle screws.",
+        "C7 lateral mass screws positioned on lateral mass; pedicle screws on pedicle.",
+        "Size labels aligned to consistent column position per view.",
+    ]},
     { version: "v2.7.33-beta", date: "2026-03-27", changes: [
         "Screw icons placed on anatomical pedicles (thoracolumbar) and lateral mass entry points (C3-C6). C7 uses pedicle positions.",
         "Click zones redesigned — vertebral body width matches anatomy per level, pedicle circles open screw modal, osteotomy click area limited to body.",

@@ -178,6 +178,7 @@ export const ModalOrchestrator = ({
             defaultDiameter={defaultDiameter} defaultLength={defaultLength}
             defaultMode={defaultScrewMode} defaultCustomText={defaultCustomText}
             initialAnnotation={editingAnnotation}
+            initialTrajectory={editingPlacementId ? [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId)?.trajectory : undefined}
             levelId={pendingPlacement?.levelId || (editingPlacementId ? [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId)?.levelId : '') || ''}
             zone={(pendingPlacement?.zone || (editingPlacementId ? [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId)?.zone : 'left') || 'left') as Zone}
             levels={levels}

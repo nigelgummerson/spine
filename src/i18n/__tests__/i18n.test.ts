@@ -109,6 +109,7 @@ const VALUE_ALLOWLIST = new Set<string>(GLOSSARY.allowlist);
 const EXTRA_ALLOWED_VALUES = new Set<string>([
   // Common medical/anatomical terms retained in English
   'Plan',
+  'Cortical',
   'Anterior',
   'Posterior',
   'Lateral',
@@ -121,6 +122,10 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   'Poly',
   'Uni',
   'Osteo',
+  'Pars',
+  'Translaminar',
+  'Pedicle',
+  'Lateral mass',
   'Cages',
   'Band',
   'Alignment',
@@ -188,6 +193,8 @@ const EXTRA_ALLOWED_VALUES = new Set<string>([
   'Iliac Right',
   'SI-J Left',
   'SI-J Right',
+  'Trajectory',
+  'Size',
   'Size Defaults',
   'Preferences',
   'Region Size Defaults',

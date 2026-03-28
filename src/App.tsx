@@ -610,7 +610,7 @@ const App = () => {
         }
     };
 
-    const handleScrewConfirm = (sizeData: string | null, components: ScrewDetails | null, finalType: string, annotation: string, finalLevelId: string, finalZone: Zone) => {
+    const handleScrewConfirm = (sizeData: string | null, components: ScrewDetails | null, finalType: string, annotation: string, finalLevelId: string, finalZone: Zone, trajectory?: string) => {
         if (components) { setDefaultDiameter(components.diameter); setDefaultLength(components.length); setDefaultScrewMode(components.mode); setDefaultCustomText(components.customText || ''); }
         setLastUsedScrewType(finalType);
         if (editingPlacementId) {
@@ -618,13 +618,13 @@ const App = () => {
             const existing = [...plannedPlacements, ...completedPlacements].find(p => p.id === editingPlacementId);
             if (existing && (existing.levelId !== finalLevelId || existing.zone !== finalZone)) {
                 removePlacement(editingPlacementId);
-                addPlacement(finalLevelId, finalZone, finalType, sizeData, annotation);
+                addPlacement(finalLevelId, finalZone, finalType, sizeData, annotation, trajectory);
             } else {
-                updatePlacement(editingPlacementId, finalType, sizeData, annotation);
+                updatePlacement(editingPlacementId, finalType, sizeData, annotation, trajectory);
             }
             setEditingPlacementId(null);
         } else {
-            addPlacement(finalLevelId, finalZone, finalType, sizeData, annotation);
+            addPlacement(finalLevelId, finalZone, finalType, sizeData, annotation, trajectory);
             // Track for rapid Confirm & Next — cleared on next render
             recentPlacementsRef.current.push({ levelId: finalLevelId, zone: finalZone });
             setPendingPlacement(null);
@@ -661,18 +661,18 @@ const App = () => {
         else if (pendingPlacement) { addPlacement(pendingPlacement.levelId, pendingPlacement.zone, 'osteotomy', osteoData); setPendingPlacement(null); }
     };
 
-    const addPlacement = (levelId: string, zone: string, tool: string, data: string | OsteotomyData | null, annotation?: string) => {
+    const addPlacement = (levelId: string, zone: string, tool: string, data: string | OsteotomyData | null, annotation?: string, trajectory?: string) => {
         dispatch({
             type: 'ADD_PLACEMENT',
             chart: activeChart === 'planned' ? 'plan' : 'construct',
-            placement: { id: genId(), levelId, zone: zone as Zone, tool, data, annotation: annotation || '' },
+            placement: { id: genId(), levelId, zone: zone as Zone, tool, data, annotation: annotation || '', trajectory },
         });
     };
-    const updatePlacement = (id: string, tool: string, data: string | OsteotomyData | null, annotation?: string) => {
+    const updatePlacement = (id: string, tool: string, data: string | OsteotomyData | null, annotation?: string, trajectory?: string) => {
         dispatch({
             type: 'UPDATE_PLACEMENT',
             chart: activeChart === 'planned' ? 'plan' : 'construct',
-            id, tool, data, annotation,
+            id, tool, data, annotation, trajectory,
         });
     };
     const removePlacement = (id: string) => {

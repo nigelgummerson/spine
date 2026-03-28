@@ -93,7 +93,7 @@ export function documentReducer(state: DocumentState, action: DocumentAction): D
                 ...state,
                 [key]: (state[key] as Placement[]).map(p =>
                     p.id === action.id
-                        ? { ...p, tool: action.tool, data: action.data, annotation: action.annotation !== undefined ? action.annotation : (p.annotation || '') }
+                        ? { ...p, tool: action.tool, data: action.data, annotation: action.annotation !== undefined ? action.annotation : (p.annotation || ''), trajectory: action.trajectory }
                         : p
                 ),
             };
@@ -318,6 +318,7 @@ interface V4Element {
     cage?: { approach: string; height?: number; width?: number; length?: number; lordosis?: number; expandable?: boolean };
     connector?: { connectorType: string; fraction: number };
     annotation?: string;
+    trajectory?: string;
 }
 
 interface V4Force {
@@ -389,6 +390,7 @@ export function internalToV4Chart(placements: Placement[], cages: Cage[], connec
             }
             const el: V4Element = { id: p.id, type: 'screw', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', zone: p.zone, screw };
             if (p.annotation) el.annotation = p.annotation;
+            if (p.trajectory) el.trajectory = p.trajectory;
             elements.push(el);
         } else if (hookTypes.includes(p.tool)) {
             const hookEl: V4Element = { id: p.id, type: 'hook', level: p.levelId, side: ZONE_TO_SIDE[p.zone] || 'left', zone: p.zone, hook: { hookType: TOOL_TO_V4_HOOK[p.tool] } };
@@ -468,7 +470,7 @@ export function v4ChartToInternal(chartData: V4ChartData, notePositions: Record<
 
         if (el.type === 'screw') {
             const sizeStr = (el.screw?.diameter && el.screw?.length) ? `${el.screw.diameter}x${el.screw.length}` : null;
-            placements.push({ id: el.id, levelId: el.level, zone: resolveZone(el), tool: el.screw?.headType || 'polyaxial', data: sizeStr, annotation: el.annotation || '' });
+            placements.push({ id: el.id, levelId: el.level, zone: resolveZone(el), tool: el.screw?.headType || 'polyaxial', data: sizeStr, annotation: el.annotation || '', trajectory: el.trajectory });
         } else if (el.type === 'hook') {
             const hookType = el.hook?.hookType || '';
             const tool = V4_HOOK_TO_TOOL[hookType] || 'pedicle_hook';
