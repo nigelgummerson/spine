@@ -11,6 +11,7 @@ export const TRAJECTORY_OPTIONS: { id: string; labelKey: string }[] = [
     { id: 'pars', labelKey: 'clinical.trajectory.pars' },
     { id: 'translaminar', labelKey: 'clinical.trajectory.translaminar' },
     { id: 'cortical', labelKey: 'clinical.trajectory.cortical' },
+    { id: 'transarticular', labelKey: 'clinical.trajectory.transarticular' },
 ];
 
 export function getTrajectoryOptions(levelId: string): { id: string; labelKey: string; isDefault?: boolean }[] | null {
@@ -20,6 +21,7 @@ export function getTrajectoryOptions(levelId: string): { id: string; labelKey: s
         { ...TRAJECTORY_OPTIONS[0], isDefault: true }, // pedicle (default)
         TRAJECTORY_OPTIONS[2],                          // pars
         TRAJECTORY_OPTIONS[3],                          // translaminar
+        TRAJECTORY_OPTIONS[5],                          // transarticular (Magerl C2→C1)
     ];
     if (/^C[3-6]$/.test(levelId)) return [
         TRAJECTORY_OPTIONS[0],                          // pedicle
@@ -93,8 +95,9 @@ export function getEntryPointOffset(trajectory: string, side: 'left' | 'right'):
 const TRAJECTORY_ANGLE_DATA: Record<string, Record<string, TrajectoryAngle>> = {
     // C1: lateral mass only (Goel-Harms) — no pedicle ellipse data, shank from centre
     C1:  { lateral_mass: { transverse: 15, sagittal: 0 } },
-    // C2: pedicle (Abumi), pars, translaminar — no pedicle ellipse data, shank from centre
-    C2:  { pedicle: { transverse: 27, sagittal: -22 }, pars: { transverse: 10, sagittal: -45 }, translaminar: { transverse: 0, sagittal: 0 } },
+    // C2: pedicle (Abumi), pars, translaminar, transarticular (Magerl C2→C1) — no pedicle ellipse data
+    C2:  { pedicle: { transverse: 27, sagittal: -22 }, pars: { transverse: 10, sagittal: -45 }, translaminar: { transverse: 0, sagittal: 0 }, transarticular: { transverse: 5, sagittal: -50 } },
+    // Transarticular (Magerl & Seemann 1987): ~0-10° medial, ~45-55° cephalad. Entry at C2 inferior lateral mass.
     // C3-C7: pedicle (Karaikovic) + lateral mass (Magerl) — no pedicle ellipse data
     C3:  { pedicle: { transverse: 47, sagittal: -9 },  lateral_mass: { transverse: -25, sagittal: -45 } },
     C4:  { pedicle: { transverse: 49, sagittal: -2 },  lateral_mass: { transverse: -25, sagittal: -45 } },
