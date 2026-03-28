@@ -79,6 +79,41 @@ const STEPS: StepDef[] = [
         },
         radius: 45,
     },
+    {
+        textKey: 'onboarding.step4',
+        findTarget: () => {
+            // Find the export/save buttons in the sidebar
+            const sidebar = document.querySelector('aside');
+            if (!sidebar) return null;
+            const buttons = sidebar.querySelectorAll('button');
+            for (const btn of buttons) {
+                if (btn.querySelector('[data-icon="save"]') || btn.textContent?.includes('JPG') || btn.title === 'Save') {
+                    return btn.getBoundingClientRect();
+                }
+            }
+            // Fallback: find any button with a save/export icon
+            const saveBtn = sidebar.querySelector('[title="Save"]') || sidebar.querySelector('[title="JPG"]');
+            return saveBtn?.getBoundingClientRect() || null;
+        },
+        radius: 40,
+    },
+    {
+        textKey: 'onboarding.step5',
+        findTarget: () => {
+            // Find the help button in the sidebar
+            const sidebar = document.querySelector('aside');
+            if (!sidebar) return null;
+            const helpText = t('sidebar.help');
+            const buttons = sidebar.querySelectorAll('button');
+            for (const btn of buttons) {
+                if (btn.textContent?.includes(helpText)) {
+                    return btn.getBoundingClientRect();
+                }
+            }
+            return null;
+        },
+        radius: 40,
+    },
 ];
 
 interface OnboardingTourProps {
