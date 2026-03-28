@@ -1,7 +1,7 @@
 import React from 'react';
 import { t } from '../../i18n/i18n';
 import { getDiscHeight, getLevelHeight, getVertSvgGeometry, DISC_MIN_PX, VERT_PAD, VERT_SVG_SCALE } from '../../data/anatomy';
-import { HOOK_TYPES, FORCE_TYPES, getTrajectoryAngle, projectScrewShank, getEntryPointOffset, getTrajectoryOptions } from '../../data/clinical';
+import { HOOK_TYPES, FORCE_TYPES, getTrajectoryAngle, projectScrewShank, getTrajectoryOptions } from '../../data/clinical';
 const FIXATION_TYPES = ['band', 'wire', 'cable'];
 import { InstrumentIcon } from './InstrumentIcon';
 import { SpineVertebra } from './SpineVertebra';
@@ -174,6 +174,56 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
         }
     }
 
+    /** Compute screw icon position adjusted for trajectory entry point.
+     * Returns { x, y } for the icon top-left corner, or null if no adjustment needed. */
+    const computeScrewEntryPosition = (
+        trajectory: string | undefined,
+        side: 'left' | 'right',
+        screwData: string | null | undefined,
+        baseIconX: number,
+        baseIconY: number,
+        iconW: number,
+        iconH: number,
+    ): { x: number; y: number } | null => {
+        if (isSacral) return null;
+        const traj = trajectory || (() => { const opts = getTrajectoryOptions(level.id); return opts ? (opts.find(o => o.isDefault) || opts[0]).id : 'pedicle'; })();
+        // Lateral mass: reposition to Magerl entry point (lower medial quadrant of lateral mass)
+        if (traj === 'lateral_mass' && geom && 'latMassLeftCx' in geom) {
+            const medialOff = geom.latMassRx * 0.3 * (scaledWidth / 160);
+            const lmCx = side === 'left'
+                ? vertX + (geom.latMassLeftCx / 160) * scaledWidth + medialOff
+                : vertX + (geom.latMassRightCx / 160) * scaledWidth - medialOff;
+            const lmCyChart = geom.latMassCy * heightScale;
+            const inferiorOff = geom.latMassRy * 0.3 * heightScale;
+            return { x: lmCx - iconW / 2, y: lmCyChart + inferiorOff - iconH / 2 };
+        }
+        // Pedicle/CBT: dynamic entry on pedicle ellipse so shank midpoint passes through pedicle centre
+        const angles = getTrajectoryAngle(level.id, traj);
+        if (angles && geom && 'pedRx' in geom && 'pedLeftCx' in geom && 'pedRightCx' in geom && 'pedCy' in geom) {
+            const g = geom as { pedRx: number; pedRy: number; pedCy: number; pedLeftCx: number; pedRightCx: number };
+            const pedRxC = g.pedRx * heightScale;
+            const pedRyC = g.pedRy * heightScale;
+            const pedCyC = g.pedCy * heightScale;
+            const pedCxC = side === 'left'
+                ? vertX + (g.pedLeftCx / 160) * scaledWidth
+                : vertX + (g.pedRightCx / 160) * scaledWidth;
+            let lenMm = 0;
+            if (typeof screwData === 'string' && screwData.includes('x')) {
+                const parts = screwData.split('x').map(Number);
+                if (parts.length === 2 && !isNaN(parts[1]) && parts[1] > 0 && parts[1] <= 100) lenMm = parts[1];
+            }
+            const { dy } = lenMm ? projectScrewShank(lenMm, angles, side, VERT_SVG_SCALE * heightScale) : { dy: 0 };
+            const yOffFromCentre = -dy / 2;
+            const clampedY = Math.max(-pedRyC, Math.min(pedRyC, yOffFromCentre));
+            const ellipseXFrac = Math.sqrt(Math.max(0, 1 - (clampedY / pedRyC) ** 2));
+            const isMedialEntry = traj === 'cortical';
+            const lateralSign = side === 'left' ? -1 : 1;
+            const xOff = (isMedialEntry ? -lateralSign : lateralSign) * ellipseXFrac * pedRxC;
+            return { x: pedCxC + xOff - iconW / 2, y: pedCyC + clampedY - iconH / 2 };
+        }
+        return null;
+    };
+
     // Body edges and TP edges in chart coordinates — for zone boundaries and label positioning
     const chartBodyLeft = geom ? vertX + (geom.left / 160) * scaledWidth : vertX;
     const chartBodyRight = geom ? vertX + (geom.right / 160) * scaledWidth : vertX + scaledWidth;
@@ -265,53 +315,11 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
             } else {
                 iconX = zoneX + 4;
             }
-            // Offset screw icon to entry point on pedicle ellipse.
-            // Entry Y positioned so vertical midpoint of shank = pedicle centre.
-            // Entry X at lateral (pedicle) or medial (CBT) edge of ellipse at that Y.
-            // For lateral mass trajectory at C7: reposition to lateral mass centre instead.
-            // Skip for sacral levels — S1/S2 screws align under L5 pedicles, not sacral anatomy.
-            if (['monoaxial','polyaxial','uniplanar'].includes(p.tool) && geom && !isSacral) {
+            // Adjust screw icon to trajectory entry point (pedicle ellipse or lateral mass)
+            if (['monoaxial','polyaxial','uniplanar'].includes(p.tool)) {
                 const screwSide = zone === 'left' ? 'left' as const : 'right' as const;
-                const traj = p.trajectory || (() => { const opts = getTrajectoryOptions(level.id); return opts ? (opts.find(o => o.isDefault) || opts[0]).id : 'pedicle'; })();
-                // Lateral mass trajectory: reposition to Magerl entry point (lower medial quadrant)
-                if (traj === 'lateral_mass' && 'latMassLeftCx' in geom) {
-                    const medialOff = geom.latMassRx * 0.3 * (scaledWidth / 160);
-                    const lmCx = screwSide === 'left'
-                        ? vertX + (geom.latMassLeftCx / 160) * scaledWidth + medialOff
-                        : vertX + (geom.latMassRightCx / 160) * scaledWidth - medialOff;
-                    // Y at lateral mass centre + 30% inferior (lower medial quadrant)
-                    const lmCyChart = geom.latMassCy * heightScale;
-                    const inferiorOff = geom.latMassRy * 0.3 * heightScale;
-                    iconX = lmCx - iW / 2;
-                    iconY = lmCyChart + inferiorOff - iH / 2;
-                }
-                const angles = getTrajectoryAngle(level.id, traj);
-                if (angles && getEntryPointOffset(traj, screwSide) && 'pedRx' in geom && 'pedCy' in geom) {
-                    const g = geom as { pedRx: number; pedRy: number; pedCy: number; pedLeftCx: number; pedRightCx: number };
-                    const pedRxC = g.pedRx * heightScale;
-                    const pedRyC = g.pedRy * heightScale;
-                    const pedCyC = g.pedCy * heightScale;
-                    const pedCxC = screwSide === 'left'
-                        ? vertX + (g.pedLeftCx / 160) * scaledWidth
-                        : vertX + (g.pedRightCx / 160) * scaledWidth;
-                    // Compute shank dy to determine entry Y offset
-                    let lenMm = 0;
-                    if (typeof p.data === 'string' && p.data.includes('x')) {
-                        const parts = p.data.split('x').map(Number);
-                        if (parts.length === 2 && !isNaN(parts[1])) lenMm = parts[1];
-                    }
-                    const { dy } = lenMm ? projectScrewShank(lenMm, angles, screwSide, VERT_SVG_SCALE * heightScale) : { dy: 0 };
-                    // Entry Y: offset from pedCy so midpoint of shank is at pedCy
-                    const yOffFromCentre = -dy / 2;
-                    const clampedY = Math.max(-pedRyC, Math.min(pedRyC, yOffFromCentre));
-                    // Entry X: on ellipse at that Y, lateral side (pedicle) or medial side (CBT)
-                    const ellipseXFrac = Math.sqrt(Math.max(0, 1 - (clampedY / pedRyC) ** 2));
-                    const isMedialEntry = traj === 'cortical';
-                    const lateralSign = screwSide === 'left' ? -1 : 1; // lateral = away from midline
-                    const xOff = (isMedialEntry ? -lateralSign : lateralSign) * ellipseXFrac * pedRxC;
-                    iconX = pedCxC + xOff - iW / 2;
-                    iconY = pedCyC + clampedY - iH / 2;
-                }
+                const pos = computeScrewEntryPosition(p.trajectory, screwSide, typeof p.data === 'string' ? p.data : null, iconX, iconY, iW, iH);
+                if (pos) { iconX = pos.x; iconY = pos.y; }
             }
 
             // Label text
@@ -413,44 +421,11 @@ export const LevelRow: React.FC<LevelRowProps> = React.memo(({ level, placements
             } else {
                 iconX = zoneX + 4;
             }
-            // Offset ghost screw icon to entry point on pedicle ellipse (same logic as placed screws)
-            if (['monoaxial','polyaxial','uniplanar'].includes(ghostItem.tool) && geom && !isSacral) {
+            // Adjust ghost screw icon to trajectory entry point (same utility as placed screws)
+            if (['monoaxial','polyaxial','uniplanar'].includes(ghostItem.tool)) {
                 const screwSide = zone === 'left' ? 'left' as const : 'right' as const;
-                const traj = ghostItem.trajectory || (() => { const opts = getTrajectoryOptions(level.id); return opts ? (opts.find(o => o.isDefault) || opts[0]).id : 'pedicle'; })();
-                if (traj === 'lateral_mass' && 'latMassLeftCx' in geom) {
-                    const medialOff = geom.latMassRx * 0.3 * (scaledWidth / 160);
-                    const lmCx = screwSide === 'left'
-                        ? vertX + (geom.latMassLeftCx / 160) * scaledWidth + medialOff
-                        : vertX + (geom.latMassRightCx / 160) * scaledWidth - medialOff;
-                    const lmCyChart = geom.latMassCy * heightScale;
-                    const inferiorOff = geom.latMassRy * 0.3 * heightScale;
-                    iconX = lmCx - iW / 2;
-                    iconY = lmCyChart + inferiorOff - iH / 2;
-                }
-                const angles = getTrajectoryAngle(level.id, traj);
-                if (angles && getEntryPointOffset(traj, screwSide) && 'pedRx' in geom && 'pedCy' in geom) {
-                    const g = geom as { pedRx: number; pedRy: number; pedCy: number; pedLeftCx: number; pedRightCx: number };
-                    const pedRxC = g.pedRx * heightScale;
-                    const pedRyC = g.pedRy * heightScale;
-                    const pedCyC = g.pedCy * heightScale;
-                    const pedCxC = screwSide === 'left'
-                        ? vertX + (g.pedLeftCx / 160) * scaledWidth
-                        : vertX + (g.pedRightCx / 160) * scaledWidth;
-                    let lenMm = 0;
-                    if (typeof ghostItem.data === 'string' && ghostItem.data.includes('x')) {
-                        const parts = ghostItem.data.split('x').map(Number);
-                        if (parts.length === 2 && !isNaN(parts[1])) lenMm = parts[1];
-                    }
-                    const { dy } = lenMm ? projectScrewShank(lenMm, angles, screwSide, VERT_SVG_SCALE * heightScale) : { dy: 0 };
-                    const yOffFromCentre = -dy / 2;
-                    const clampedY = Math.max(-pedRyC, Math.min(pedRyC, yOffFromCentre));
-                    const ellipseXFrac = Math.sqrt(Math.max(0, 1 - (clampedY / pedRyC) ** 2));
-                    const isMedialEntry = traj === 'cortical';
-                    const lateralSign = screwSide === 'left' ? -1 : 1;
-                    const xOff = (isMedialEntry ? -lateralSign : lateralSign) * ellipseXFrac * pedRxC;
-                    iconX = pedCxC + xOff - iW / 2;
-                    iconY = pedCyC + clampedY - iH / 2;
-                }
+                const pos = computeScrewEntryPosition(ghostItem.trajectory, screwSide, typeof ghostItem.data === 'string' ? ghostItem.data : null, iconX, iconY, iW, iH);
+                if (pos) { iconX = pos.x; iconY = pos.y; }
             }
 
             const labelText = showData

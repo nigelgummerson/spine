@@ -122,7 +122,7 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
     const [trajectory, setTrajectory] = useState(() => {
         if (initialTrajectory) return initialTrajectory;
         const opts = getTrajectoryOptions(levelId);
-        return opts ? (opts.find(o => o.isDefault) || opts[0]).id : '';
+        return opts ? (opts.find(o => o.isDefault) || opts[0]).id : 'pedicle';
     });
 
     const [selectedLevel, setSelectedLevel] = useState(levelId);
@@ -176,7 +176,7 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
             const v = computeInitial();
             if (initialTool) setSelectedType(initialTool);
             setMode(v.mode); setDiameter(v.dia); setLength(v.len); setCustomText(v.custom); setAnnotation(v.ann);
-            setTrajectory(initialTrajectory || (() => { const opts = getTrajectoryOptions(levelId); return opts ? (opts.find(o => o.isDefault) || opts[0]).id : ''; })());
+            setTrajectory(initialTrajectory || (() => { const opts = getTrajectoryOptions(levelId); return opts ? (opts.find(o => o.isDefault) || opts[0]).id : 'pedicle'; })());
             setSelectedLevel(levelId);
             setSelectedZone(zone);
         }
