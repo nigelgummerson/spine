@@ -242,7 +242,7 @@
     "chart.header.right": "Right",
     "chart.header.force": "Force",
     "chart.force_plan_only": "Forces - edit in Plan",
-    "chart.schematic_notice": "Schematic documentation only — verify all placements against patient imaging",
+    "chart.schematic_notice": "Schematic documentation only — verify all placements against patient anatomy",
     "shortcut.delete": "Shortcut: Delete",
     "shortcut.escape": "Shortcut: Esc",
     "shortcut.enter": "Shortcut: Enter",
@@ -328,6 +328,10 @@
     "modal.rod.notes_placeholder": "Additional details...",
     "modal.rod.transition_from": "From diameter",
     "modal.rod.transition_to": "To diameter",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length",
     "rod.material.titanium": "Titanium alloy",
     "rod.material.cobalt_chrome": "Cobalt chrome",
     "rod.material.stainless_steel": "Stainless steel",
@@ -737,7 +741,11 @@
     "alert.size_out_of_range": "{value}mm nicht im {system}-Bereich ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm nicht verfügbar in {system}",
     "alert.size_not_in_diameter": "{value}mm nicht verfügbar bei {diameter}mm {system}-Schrauben",
-    "alert.kit_note": "nicht im {system}-Katalog aufgeführt"
+    "alert.kit_note": "nicht im {system}-Katalog aufgeführt",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "fr": {
     "sidebar.title": "Instrumentation rachidienne",
@@ -1107,7 +1115,11 @@
     "alert.size_out_of_range": "{value}mm hors plage {system} ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm non disponible dans {system}",
     "alert.size_not_in_diameter": "{value}mm non disponible dans les vis {system} de {diameter}mm",
-    "alert.kit_note": "non répertorié dans le catalogue {system}"
+    "alert.kit_note": "non répertorié dans le catalogue {system}",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "es": {
     "sidebar.title": "Instrumentación espinal",
@@ -1477,7 +1489,11 @@
     "alert.size_out_of_range": "{value}mm fuera del rango {system} ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm no disponible en {system}",
     "alert.size_not_in_diameter": "{value}mm no disponible en tornillos {system} de {diameter}mm",
-    "alert.kit_note": "no figura en el catálogo de {system}"
+    "alert.kit_note": "no figura en el catálogo de {system}",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "it": {
     "sidebar.title": "Strumentazione vertebrale",
@@ -1847,7 +1863,11 @@
     "alert.size_out_of_range": "{value}mm fuori intervallo {system} ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm non disponibile in {system}",
     "alert.size_not_in_diameter": "{value}mm non disponibile nelle viti {system} da {diameter}mm",
-    "alert.kit_note": "non presente nel catalogo {system}"
+    "alert.kit_note": "non presente nel catalogo {system}",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "pt": {
     "sidebar.title": "Instrumentação vertebral",
@@ -2217,7 +2237,11 @@
     "alert.size_out_of_range": "{value}mm fora do intervalo {system} ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm não disponível em {system}",
     "alert.size_not_in_diameter": "{value}mm não disponível em parafusos {system} de {diameter}mm",
-    "alert.kit_note": "não consta no catálogo {system}"
+    "alert.kit_note": "não consta no catálogo {system}",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "sv": {
     "sidebar.title": "Spinal instrumentering",
@@ -2587,7 +2611,11 @@
     "alert.size_out_of_range": "{value}mm utanför {system}-intervall ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm ej tillgänglig i {system}",
     "alert.size_not_in_diameter": "{value}mm ej tillgänglig i {diameter}mm {system}-skruvar",
-    "alert.kit_note": "finns ej i {system}-katalogen"
+    "alert.kit_note": "finns ej i {system}-katalogen",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "nb": {
     "sidebar.title": "Spinal instrumentering",
@@ -2957,7 +2985,11 @@
     "alert.size_out_of_range": "{value}mm utenfor {system}-område ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm ikke tilgjengelig i {system}",
     "alert.size_not_in_diameter": "{value}mm ikke tilgjengelig i {diameter}mm {system}-skruer",
-    "alert.kit_note": "ikke oppført i {system}-katalogen"
+    "alert.kit_note": "ikke oppført i {system}-katalogen",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "da": {
     "sidebar.title": "Spinal instrumentering",
@@ -3327,7 +3359,11 @@
     "alert.size_out_of_range": "{value}mm uden for {system}-interval ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm ikke tilgængelig i {system}",
     "alert.size_not_in_diameter": "{value}mm ikke tilgængelig i {diameter}mm {system}-skruer",
-    "alert.kit_note": "ikke opført i {system}-kataloget"
+    "alert.kit_note": "ikke opført i {system}-kataloget",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "fi": {
     "sidebar.title": "Spinaalinen instrumentointi",
@@ -3697,7 +3733,11 @@
     "alert.size_out_of_range": "{value}mm ei {system}-alueella ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm ei saatavilla {system}-järjestelmässä",
     "alert.size_not_in_diameter": "{value}mm ei saatavilla {diameter}mm {system}-ruuveissa",
-    "alert.kit_note": "ei löydy {system}-katalogista"
+    "alert.kit_note": "ei löydy {system}-katalogista",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "nl": {
     "sidebar.title": "Spinale instrumentatie",
@@ -4067,7 +4107,11 @@
     "alert.size_out_of_range": "{value}mm buiten {system}-bereik ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm niet beschikbaar in {system}",
     "alert.size_not_in_diameter": "{value}mm niet beschikbaar in {diameter}mm {system}-schroeven",
-    "alert.kit_note": "niet vermeld in de {system}-catalogus"
+    "alert.kit_note": "niet vermeld in de {system}-catalogus",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "pl": {
     "sidebar.title": "Instrumentacja kręgosłupa",
@@ -4437,7 +4481,11 @@
     "alert.size_out_of_range": "{value}mm poza zakresem {system} ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm niedostępny w {system}",
     "alert.size_not_in_diameter": "{value}mm niedostępny w śrubach {system} o średnicy {diameter}mm",
-    "alert.kit_note": "nie figuruje w katalogu {system}"
+    "alert.kit_note": "nie figuruje w katalogu {system}",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "el": {
     "sidebar.title": "Σπονδυλική οργανοληψία",
@@ -4807,7 +4855,11 @@
     "alert.size_out_of_range": "{value}mm εκτός εύρους {system} ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm μη διαθέσιμο στο {system}",
     "alert.size_not_in_diameter": "{value}mm μη διαθέσιμο στις βίδες {system} των {diameter}mm",
-    "alert.kit_note": "δεν αναφέρεται στον κατάλογο {system}"
+    "alert.kit_note": "δεν αναφέρεται στον κατάλογο {system}",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "tr": {
     "sidebar.title": "Spinal enstrümantasyon",
@@ -5177,7 +5229,11 @@
     "alert.size_out_of_range": "{value}mm {system} aralığı dışında ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm {system} sisteminde mevcut değil",
     "alert.size_not_in_diameter": "{value}mm {diameter}mm {system} vidalarında mevcut değil",
-    "alert.kit_note": "{system} kataloğunda listelenmemiş"
+    "alert.kit_note": "{system} kataloğunda listelenmemiş",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "uk": {
     "sidebar.title": "Спінальна інструментація",
@@ -5547,7 +5603,11 @@
     "alert.size_out_of_range": "{value}мм поза діапазоном {system} ({min}–{max}мм)",
     "alert.size_not_available": "{value}мм недоступний у {system}",
     "alert.size_not_in_diameter": "{value}мм недоступний у гвинтах {system} діаметром {diameter}мм",
-    "alert.kit_note": "відсутній у каталозі {system}"
+    "alert.kit_note": "відсутній у каталозі {system}",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "ru": {
     "sidebar.title": "Спинальная инструментация",
@@ -5917,7 +5977,11 @@
     "alert.size_out_of_range": "{value}мм вне диапазона {system} ({min}–{max}мм)",
     "alert.size_not_available": "{value}мм недоступен в {system}",
     "alert.size_not_in_diameter": "{value}мм недоступен в винтах {system} диаметром {diameter}мм",
-    "alert.kit_note": "отсутствует в каталоге {system}"
+    "alert.kit_note": "отсутствует в каталоге {system}",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "hi": {
     "sidebar.title": "स्पाइनल इंस्ट्रूमेंटेशन",
@@ -6160,7 +6224,7 @@
     "chart.header.right": "दायाँ",
     "chart.header.force": "फ़ोर्स",
     "chart.force_plan_only": "फ़ोर्स - प्लान में संपादित करें",
-    "chart.schematic_notice": "Schematic documentation only — verify all placements against patient imaging",
+    "chart.schematic_notice": "Schematic documentation only — verify all placements against patient anatomy",
     "shortcut.delete": "शॉर्टकट: Delete",
     "shortcut.escape": "शॉर्टकट: Esc",
     "shortcut.enter": "शॉर्टकट: Enter",
@@ -6287,7 +6351,11 @@
     "alert.size_out_of_range": "{value}mm {system} सीमा से बाहर ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm {system} में उपलब्ध नहीं",
     "alert.size_not_in_diameter": "{value}mm {diameter}mm {system} screws में उपलब्ध नहीं",
-    "alert.kit_note": "{system} catalogue में सूचीबद्ध नहीं"
+    "alert.kit_note": "{system} catalogue में सूचीबद्ध नहीं",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "ar": {
     "sidebar.title": "الأجهزة الشوكية",
@@ -6657,7 +6725,11 @@
     "alert.size_out_of_range": "{value}مم خارج نطاق {system} ({min}–{max}مم)",
     "alert.size_not_available": "{value}مم غير متوفر في {system}",
     "alert.size_not_in_diameter": "{value}مم غير متوفر في براغي {system} بقطر {diameter}مم",
-    "alert.kit_note": "غير مدرج في كتالوج {system}"
+    "alert.kit_note": "غير مدرج في كتالوج {system}",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "he": {
     "sidebar.title": "אינסטרומנטציה שדרתית",
@@ -7027,7 +7099,11 @@
     "alert.size_out_of_range": "{value}מ\"מ מחוץ לטווח {system} ({min}–{max}מ\"מ)",
     "alert.size_not_available": "{value}מ\"מ לא זמין ב-{system}",
     "alert.size_not_in_diameter": "{value}מ\"מ לא זמין בברגי {system} בקוטר {diameter}מ\"מ",
-    "alert.kit_note": "לא מופיע בקטלוג {system}"
+    "alert.kit_note": "לא מופיע בקטלוג {system}",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "zh-Hans": {
     "sidebar.title": "脊柱内固定",
@@ -7397,7 +7473,11 @@
     "alert.size_out_of_range": "{value}mm 不在 {system} 范围内 ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm 在 {system} 中不可用",
     "alert.size_not_in_diameter": "{value}mm 在 {diameter}mm {system} 螺钉中不可用",
-    "alert.kit_note": "未列入 {system} 目录"
+    "alert.kit_note": "未列入 {system} 目录",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "ja": {
     "sidebar.title": "脊椎インストゥルメンテーション",
@@ -7767,7 +7847,11 @@
     "alert.size_out_of_range": "{value}mm は {system} の範囲外 ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm は {system} で利用不可",
     "alert.size_not_in_diameter": "{value}mm は {diameter}mm {system} スクリューで利用不可",
-    "alert.kit_note": "{system} カタログに記載なし"
+    "alert.kit_note": "{system} カタログに記載なし",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "ko": {
     "sidebar.title": "척추 기기 삽입술",
@@ -8137,7 +8221,11 @@
     "alert.size_out_of_range": "{value}mm는 {system} 범위 밖 ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm는 {system}에서 사용 불가",
     "alert.size_not_in_diameter": "{value}mm는 {diameter}mm {system} 스크류에서 사용 불가",
-    "alert.kit_note": "{system} 카탈로그에 등재되지 않음"
+    "alert.kit_note": "{system} 카탈로그에 등재되지 않음",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   },
   "en-YK": {
     "sidebar.title": "Spinal Instrumentation",
@@ -8189,7 +8277,7 @@
     "disclaimer.accept": "Aye, Fair Enough",
     "disclaimer.clinical_short": "This is a planning tool, not a medical device. Use tha own judgement.",
     "chart.force_plan_only": "Forces — edit in t'Plan",
-    "chart.schematic_notice": "Schematic documentation only — verify all placements against patient imaging",
+    "chart.schematic_notice": "Schematic documentation only — verify all placements against patient anatomy",
     "credits.app_name": "Spinal Instrumentation Plan & Record",
     "credits.quick_reference": "Quick Reference Guide ({count} languages)",
     "modal.screw.title_new": "New Implant",
@@ -8218,6 +8306,10 @@
     "alert.size_out_of_range": "{value}mm is out o' t' {system} range ({min}–{max}mm)",
     "alert.size_not_available": "{value}mm? They don't mek that in {system}",
     "alert.size_not_in_diameter": "{value}mm? They don't mek that in {diameter}mm {system} screws",
-    "alert.kit_note": "not in t' {system} catalogue"
+    "alert.kit_note": "not in t' {system} catalogue",
+    "modal.rod.apply_both": "Apply to both sides",
+    "modal.rod.copy_to_other": "Copy to other side",
+    "modal.rod.left_length": "Left rod length",
+    "modal.rod.right_length": "Right rod length"
   }
 }
