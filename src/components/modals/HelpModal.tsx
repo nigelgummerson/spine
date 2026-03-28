@@ -18,9 +18,10 @@ const IconCage = () => (
 interface HelpModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onShowDisclaimer?: () => void;
 }
 
-export const HelpModal = ({ isOpen, onClose }: HelpModalProps) => {
+export const HelpModal = ({ isOpen, onClose, onShowDisclaimer }: HelpModalProps) => {
     const contentRef = useRef<HTMLDivElement>(null);
     const [cols, setCols] = useState(window.matchMedia('(orientation: landscape)').matches ? 2 : 1);
 
@@ -97,7 +98,7 @@ export const HelpModal = ({ isOpen, onClose }: HelpModalProps) => {
                     </div>
                     <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
                         <div className="min-w-[40px] pt-1"><span className="text-lg">&#x2696;</span></div>
-                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.disclaimer.title')}</h4><p className="text-xs text-slate-600 leading-relaxed">{t('disclaimer.clinical_short')}</p></div>
+                        <div><h4 className="font-bold text-slate-800 text-sm mb-1">{t('help.disclaimer.title')}</h4><p className="text-xs text-slate-600 leading-relaxed mb-1">{t('disclaimer.clinical_short')}</p>{onShowDisclaimer && <button onClick={() => { onShowDisclaimer(); onClose(); }} className="px-3 py-1 rounded text-xs font-bold bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700">{t('help.show_disclaimer')}</button>}</div>
                     </div>
                     <div className="flex gap-4" style={{ breakInside: 'avoid' }}>
                         <div className="min-w-[40px] pt-1"><span className="text-lg">&#x1F3AC;</span></div>

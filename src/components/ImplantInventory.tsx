@@ -20,7 +20,55 @@ interface ImplantInventoryProps {
     large?: boolean;
 }
 
+// Canonical anatomical order for level range display
+const LEVEL_ORDER: string[] = [
+    'Oc', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7',
+    'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12',
+    'L1', 'L2', 'L3', 'L4', 'L5',
+    'S1', 'S2',
+];
+const PELVIC_IDS = new Set(['S2AI', 'Iliac']);
+const SIJ_ID = 'SI-J';
+
+/** Build a suffix like " — T4-L1 + Pelvis" from placements with implants */
+function buildLevelRange(placements: Placement[], tools: ToolDefinition[]): string {
+    // Only count screws, hooks, fixation (type === 'implant')
+    const implantToolIds = new Set(tools.filter(t => t.type === 'implant').map(t => t.id));
+    const levelIds = new Set<string>();
+    for (const p of placements) {
+        if (implantToolIds.has(p.tool)) levelIds.add(p.levelId);
+    }
+    if (levelIds.size === 0) return '';
+
+    let hasPelvic = false;
+    let hasSIJ = false;
+    let minIdx = Infinity;
+    let maxIdx = -1;
+
+    for (const id of levelIds) {
+        if (PELVIC_IDS.has(id)) { hasPelvic = true; continue; }
+        if (id === SIJ_ID) { hasSIJ = true; continue; }
+        const idx = LEVEL_ORDER.indexOf(id);
+        if (idx === -1) continue;
+        if (idx < minIdx) minIdx = idx;
+        if (idx > maxIdx) maxIdx = idx;
+    }
+
+    const parts: string[] = [];
+    if (minIdx <= maxIdx) {
+        const top = LEVEL_ORDER[minIdx];
+        const bottom = LEVEL_ORDER[maxIdx];
+        parts.push(top === bottom ? top : `${top}\u2013${bottom}`);
+    }
+    if (hasPelvic) parts.push('Pelvis');
+    if (hasSIJ) parts.push('SIJ');
+
+    return parts.length > 0 ? ` \u2014 ${parts.join(' + ')}` : '';
+}
+
 export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, levels, rods, large }: ImplantInventoryProps) => {
+    const levelRange = useMemo(() => buildLevelRange(placements, tools), [placements, tools]);
+
     const grouped = useMemo(() => {
         const counts: Record<string, Record<string, number>> = {};
         placements.forEach(p => {
@@ -61,7 +109,7 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
 
     return (
         <div className={`${large ? 'mt-4' : 'mt-2'} border-t border-slate-200 ${large ? 'pt-3' : 'pt-1'} shrink-0`}>
-            <h3 className={`${sz} font-bold text-slate-900 uppercase tracking-widest ${large ? 'mb-3 pb-2' : 'mb-1 pb-1'} border-b border-slate-100`}>{title}</h3>
+            <h3 className={`${sz} font-bold text-slate-900 uppercase tracking-widest ${large ? 'mb-3 pb-2' : 'mb-1 pb-1'} border-b border-slate-100`}>{title}{levelRange && <span className="normal-case tracking-normal font-semibold text-slate-500">{levelRange}</span>}</h3>
             {!hasImplants && !hasRods && <div className={`${sz} text-slate-400 italic py-1`}>{t('inventory.empty')}</div>}
             <div className={`flex flex-wrap ${gap} ${szSm} text-slate-500 ${large ? 'mb-3' : 'mb-1.5'}`}>
                 {INVENTORY_CATEGORIES.map(cat => {

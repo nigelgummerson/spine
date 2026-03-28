@@ -939,6 +939,7 @@ const App = () => {
         defaultScrewMode={defaultScrewMode} defaultCustomText={defaultCustomText}
         defaultOsteoType={defaultOsteoType} defaultOsteoAngle={defaultOsteoAngle}
         screwSystem={patientData.screwSystem}
+        onShowDisclaimer={() => { resetDisclaimer(); setDisclaimerTick(n => n + 1); }}
     /></ErrorBoundary>;
 
 

@@ -140,6 +140,8 @@ export interface ModalOrchestratorProps {
     defaultOsteoAngle: string;
     screwSystem: string;
 
+    // Disclaimer callback
+    onShowDisclaimer?: () => void;
 }
 
 export const ModalOrchestrator = ({
@@ -168,6 +170,7 @@ export const ModalOrchestrator = ({
     defaultDiameter, defaultLength, defaultScrewMode, defaultCustomText,
     defaultOsteoType, defaultOsteoAngle,
     screwSystem,
+    onShowDisclaimer,
 }: ModalOrchestratorProps) => (
     <React.Fragment>
         <ScrewModal isOpen={openModal === 'screw'} onClose={() => setOpenModal(null)}
@@ -236,7 +239,7 @@ export const ModalOrchestrator = ({
                 </div>
             </Portal>);
         })()}
-        <HelpModal isOpen={openModal === 'help'} onClose={() => setOpenModal(null)} />
+        <HelpModal isOpen={openModal === 'help'} onClose={() => setOpenModal(null)} onShowDisclaimer={onShowDisclaimer} />
         <PreferencesModal isOpen={openModal === 'preferences'} onClose={() => setOpenModal(null)} useRegionDefaults={useRegionDefaults} onToggleRegionDefaults={onToggleRegionDefaults} confirmAndNextDefault={confirmAndNextDefault} onToggleConfirmAndNextDefault={onToggleConfirmAndNextDefault} />
         <ChangeLogModal isOpen={openModal === 'changelog'} onClose={() => setOpenModal(null)} />
         {exportPicker && <Portal><div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4 animate-[fadeIn_0.2s_ease-out]" role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={exportPicker === 'choose'
