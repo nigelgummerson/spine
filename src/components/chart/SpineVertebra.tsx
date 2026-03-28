@@ -121,10 +121,10 @@ export const SpineVertebra = React.memo(({ label, type, height, isCorpectomy, he
                             {/* Anterior lateral mass (faded full rectangle, shifted cranially) */}
                             <rect x={g.latMassLeftCx - g.latMassRx} y={g.latMassCy - g.latMassRy - antShift}
                                 width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
-                                fill="none" stroke="#94a3b8" strokeWidth="0.5" strokeDasharray="2 2" opacity={0.25} />
+                                fill="none" stroke="#94a3b8" strokeWidth="0.75" strokeDasharray="3 2" opacity={0.45} />
                             <rect x={g.latMassRightCx - g.latMassRx} y={g.latMassCy - g.latMassRy - antShift}
                                 width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
-                                fill="none" stroke="#94a3b8" strokeWidth="0.5" strokeDasharray="2 2" opacity={0.25} />
+                                fill="none" stroke="#94a3b8" strokeWidth="0.75" strokeDasharray="3 2" opacity={0.45} />
                             {/* Posterior lateral mass (solid) */}
                             <rect x={g.latMassLeftCx - g.latMassRx} y={g.latMassCy - g.latMassRy}
                                 width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
@@ -152,10 +152,10 @@ export const SpineVertebra = React.memo(({ label, type, height, isCorpectomy, he
                             {/* Anterior lateral mass (faded full rectangle, shifted cranially) */}
                             <rect x={g.latMassLeftCx - g.latMassRx} y={g.latMassCy - g.latMassRy - antShift}
                                 width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
-                                fill="none" stroke="#94a3b8" strokeWidth="0.5" strokeDasharray="2 2" opacity={0.25} />
+                                fill="none" stroke="#94a3b8" strokeWidth="0.75" strokeDasharray="3 2" opacity={0.45} />
                             <rect x={g.latMassRightCx - g.latMassRx} y={g.latMassCy - g.latMassRy - antShift}
                                 width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
-                                fill="none" stroke="#94a3b8" strokeWidth="0.5" strokeDasharray="2 2" opacity={0.25} />
+                                fill="none" stroke="#94a3b8" strokeWidth="0.75" strokeDasharray="3 2" opacity={0.45} />
                             {/* Posterior lateral mass (dashed — C7 also has pedicle) */}
                             <rect x={g.latMassLeftCx - g.latMassRx} y={g.latMassCy - g.latMassRy}
                                 width={g.latMassRx * 2} height={g.latMassRy * 2} rx={4}
