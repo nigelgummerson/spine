@@ -53,9 +53,16 @@ export const SpineVertebra = React.memo(({ label, type, height, isCorpectomy, he
                                 fill="#e8ecf0" stroke="#94a3b8" strokeWidth="1" />
                             <ellipse cx={g.condyleRightCx} cy={ob - g.condyleRy} rx={g.condyleRx} ry={g.condyleRy}
                                 fill="#e8ecf0" stroke="#94a3b8" strokeWidth="1" />
+                            {/* Condyle labels */}
+                            <text x={g.condyleLeftCx} y={ob - g.condyleRy} textAnchor="middle" dominantBaseline="middle"
+                                fontSize="5" fontFamily="Inter, sans-serif" fill="#94a3b8" pointerEvents="none">OC</text>
+                            <text x={g.condyleRightCx} y={ob - g.condyleRy} textAnchor="middle" dominantBaseline="middle"
+                                fontSize="5" fontFamily="Inter, sans-serif" fill="#94a3b8" pointerEvents="none">OC</text>
                             {/* Foramen magnum */}
                             <ellipse cx={g.cx} cy={om} rx={g.foramenRx} ry={g.foramenRy}
                                 fill="white" stroke="#94a3b8" strokeWidth="0.8" strokeDasharray="3 2" />
+                            <text x={g.cx} y={om} textAnchor="middle" dominantBaseline="middle"
+                                fontSize="5" fontFamily="Inter, sans-serif" fill="#b0b8c4" pointerEvents="none">FM</text>
                         </g>
                     );
                 })()}
