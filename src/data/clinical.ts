@@ -95,8 +95,10 @@ export function getEntryPointOffset(trajectory: string, side: 'left' | 'right'):
 const TRAJECTORY_ANGLE_DATA: Record<string, Record<string, TrajectoryAngle>> = {
     // C1: lateral mass only (Goel-Harms) — no pedicle ellipse data, shank from centre
     C1:  { lateral_mass: { transverse: 15, sagittal: 0 } },
-    // C2: pedicle (Abumi), pars, translaminar, transarticular (Magerl C2→C1) — no pedicle ellipse data
-    C2:  { pedicle: { transverse: 27, sagittal: -22 }, pars: { transverse: 10, sagittal: -45 }, translaminar: { transverse: 0, sagittal: 0 }, transarticular: { transverse: 5, sagittal: -50 } },
+    // C2: pedicle (Abumi), pars, translaminar (Wright 2004), transarticular (Magerl C2→C1) — no pedicle ellipse data
+    C2:  { pedicle: { transverse: 27, sagittal: -22 }, pars: { transverse: 10, sagittal: -45 }, translaminar: { transverse: 30, sagittal: -25 }, transarticular: { transverse: 5, sagittal: -50 } },
+    // Translaminar (Wright 2004, Dorward & Wright 2011): ~25-35° medial (crosses midline into contralateral lamina), ~20-30° cephalad.
+    // Entry at ipsilateral spinolaminar junction. Bilateral screws form X pattern. 4.0mm × 26-28mm typical.
     // Transarticular (Magerl & Seemann 1987): ~0-10° medial, ~45-55° cephalad. Entry at C2 inferior lateral mass.
     // C3-C7: pedicle (Karaikovic) + lateral mass (Magerl) — no pedicle ellipse data
     C3:  { pedicle: { transverse: 47, sagittal: -9 },  lateral_mass: { transverse: -25, sagittal: -45 } },

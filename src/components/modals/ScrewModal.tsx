@@ -321,7 +321,12 @@ export const ScrewModal = ({ isOpen, onClose, onConfirm, onConfirmAndNext, onDel
                             </div>);
                         })()}
                         {mode === 'custom' && <input type="text" value={customText} onChange={(e) => setCustomText(e.target.value)} placeholder={t('modal.screw.custom_placeholder')} className="w-full p-2 border border-slate-300 rounded bg-slate-50 text-lg focus:border-amber-500 outline-none" autoFocus />}
-                        {mode === 'none' && <div className="text-center py-6 text-slate-400 text-sm italic">{t('modal.screw.icon_only')}</div>}
+                        {mode === 'none' && <div className="text-center py-6 text-slate-400 text-sm italic">{t('modal.screw.icon_only')}
+                            {/* Show CT hint when no default exists for this level (Oc, C1, C2) */}
+                            {useRegionDefaults && !getScrewDefault(selectedLevel, trajectory) && (
+                                <div className="mt-2 text-[10px] text-amber-500">{t('modal.screw.no_default_size', { level: selectedLevel })}</div>
+                            )}
+                        </div>}
                         {useRegionDefaults && mode === 'standard' && (() => {
                             const def = getScrewDefault(selectedLevel, trajectory);
                             return def

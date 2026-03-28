@@ -77,7 +77,7 @@
     "modal.screw.pelvic_note_hint": "Use the Note tool to annotate pelvic screws",
     "modal.screw.confirm_and_next": "Confirm & Next",
     "modal.screw.suggested_size": "Suggested size for {level} — verify against patient anatomy",
-    "modal.screw.no_default_size": "No default size — anatomy is highly variable at {level}",
+    "modal.screw.no_default_size": "No default size at {level} — verify dimensions against patient CT",
     "modal.screw.zone.left": "Left",
     "modal.screw.zone.right": "Right",
     "sidebar.region_defaults": "Size Defaults",
