@@ -2,6 +2,56 @@
 
 Detailed technical changes by version. For user-facing changes see the in-app changelog (`src/data/changelog.ts`).
 
+## v2.7.34-beta (2026-03-28)
+
+### Screw trajectory system
+- Trajectory selector in ScrewModal: pedicle, lateral mass, pars, translaminar, cortical (CBT) — per-level options from literature
+- C1: lateral mass only. C2: pedicle/pars/translaminar. C3-C6: pedicle/lateral mass (default: lateral mass). C7: pedicle (default)/lateral mass. L1-L5: pedicle (default)/cortical.
+- `trajectory` field on Placement type, serialised to JSON v4 element, Zod-validated
+- 5 trajectory translation keys + 2 section headings (Trajectory, Size) × 22 languages
+- `getTrajectoryOptions(levelId)` with `isDefault` flag and consistent button order (pedicle always first)
+- `handleTrajectoryChange()` updates screw size defaults when trajectory changes
+- CBT screw defaults from Matsukawa 2013/2015: L1 4.5×25, L2 4.5×30, L3 5.0×30, L4 5.0×35, L5 5.0×35
+- `getScrewDefault(levelId, trajectory?)` now trajectory-aware
+
+### Screw shank visualisation (projected PA view)
+- Per-level trajectory angles in `TRAJECTORY_ANGLE_DATA` (clinical.ts):
+  - Pedicle (cervical): Karaikovic et al. 1997
+  - Pedicle (thoracic): Chadha et al. 2019 (Eur Spine J, PMC2200778)
+  - Pedicle (lumbar): Chadha et al. 2019, Zindrick et al. 1987
+  - Lateral mass: Magerl technique (An et al. 1991) — 25° lateral, 45° cephalad
+  - CBT: Matsukawa et al. 2013 — ~9° lateral, 26° cephalad
+  - C1 lateral mass: Bunmaprasert et al. 2021
+  - C2 pedicle/pars: Abumi technique, PMC9910137
+- Sign convention: positive sagittal = tip caudad (pedicle T/L), negative = tip cephalad (lateral mass, CBT)
+- Projection: `dx = L × cos(θs) × sin(θt)`, `dy = L × sin(θs)` — real foreshortening
+- `projectScrewShank()` and `getTrajectoryAngle()` exported from clinical.ts
+- Shank rendered as SVG `<line>` behind icon: stroke-width = screw diameter × VERT_SVG_SCALE × heightScale
+- Placed screws: #64748b at 60% opacity. Ghost screws: #14b8a6 at 50% opacity
+
+### Pedicle entry point positioning
+- Entry point dynamically computed from screw sagittal angle so shank midpoint passes through pedicle centre
+- Entry Y = pedCy − dy/2, clamped to pedicle ellipse. Entry X = ellipse surface at that Y on lateral side
+- `getEntryPointOffset(trajectory, side)` for clock-face positions: pedicle 10/2 o'clock, CBT 4:30/7:30
+- Lateral mass trajectory: Magerl entry point (30% medial + 30% inferior from lateral mass centre), Y relative to `latMassCy`
+- C7 lateral mass screws at lateral mass position; C7 pedicle screws at pedicle position
+- Icons and shanks both start from the computed entry point
+
+### Pedicle positions corrected (interpedicular distance)
+- Added `pedCTC` (pedicle centre-to-centre distance, mm) to T1-L5 anatomy data
+  - Sources: Lien et al. 2007 (Eur Spine J, PMC2200778) for pedW; Chhabra et al. (PMC4857161) for thoracic IPD; Maaly et al. (PMC10540747) for lumbar IPD
+- Replaced arbitrary `left + pedInset + 5` formula with `cx ± halfCTC` — pedicle centres from published data
+- T1-T4 pedicles now correctly lateral to body edge; lumbar pedicles correctly medial
+
+### Size label alignment
+- `getOuterBoundary(levelId)` in anatomy.ts — outer boundary from getVertSvgGeometry
+- ChartPaper computes `labelBoundary` via useMemo: widest non-sacral level's outer boundary
+- LevelRow uses `labelEdgeLeft`/`labelEdgeRight` for consistent label columns (placed + ghost)
+
+### Visual
+- Pedicle ellipse opacity reduced to 0.4 (thoracolumbar and cervical)
+- Schematic notice bar: "Schematic — verify against patient anatomy and imaging" (amber, 22 languages)
+
 ## v2.7.33-beta (2026-03-27)
 
 ### Anatomical screw placement
