@@ -4,7 +4,7 @@
 A web application for pre-operative spinal surgery planning. Deployed as a code-split web build to GitHub Pages for connected hospital computers, with a standalone single-file download for offline use. Generates professional surgical plans with inventory tracking, procedural details, and PDF export. Supports 22 languages (16 European + Hindi + Arabic with RTL + Hebrew with RTL + Chinese Simplified + Japanese + Korean).
 
 ## Current Status
-- **Version:** v2.8.0-beta
+- **Version:** v2.8.1-beta
 - **Last Updated:** 2026-03-28
 - **License:** GNU GPLv3
 - **Language:** TypeScript (strict)
@@ -94,6 +94,7 @@ spine-planner/
 - **All dependencies bundled** — no CDN calls, fully offline
 
 ## Version History (Recent)
+- **v2.8.1-beta** (2026-03-28): Cervical pedicle ellipses (C3-C6 pedW/pedH/pedCTC from Karaikovic 1997, Ebraheim 2008). Lock/unlock sync fix. Ghost rod click opens rod modal. Anterior lateral mass outline more visible. OC/FM labels on occiput.
 - **v2.8.0-beta** (2026-03-28): Screw trajectory system (pedicle/lateral mass/pars/translaminar/transarticular/CBT with published angles). Screw shanks on chart (PA projection with foreshortening). Pedicle positions from published IPD. Rod modal redesign (apply both, copy, default diameter). Retainer inventory. Grouped note presets. Expanded keyboard shortcuts. Export format picker. Spinal level range in inventory. Schematic notice. Onboarding tour 5 steps. Anterior lateral mass outline and occipital labels. 1285 tests across 44 files.
 - **v2.7.34-beta** (2026-03-28): Screw trajectory system — trajectory selector in ScrewModal (pedicle/lateral mass/pars/translaminar/cortical per level from literature). Screw shanks rendered as projected PA view lines with published per-level convergence angles (Karaikovic, Chadha, Matsukawa, Magerl) and real foreshortening. Entry points dynamically positioned on pedicle ellipse so shank midpoint passes through pedicle centre. Pedicle positions corrected to published interpedicular distances (pedCTC from Lien 2007 + IPD data). CBT screw defaults (Matsukawa 2013). C7 lateral mass vs pedicle entry points. Size labels aligned to widest level per view. Pedicle ellipses at 40% opacity. Trajectory stored in Placement, serialised to JSON v4, Zod-validated. 5 trajectory translation keys × 22 languages. 1273 tests.
 - **v2.7.33-beta** (2026-03-27): Anatomical screw placement — icons on pedicles (T1-L5, C7) and lateral mass entry points (C3-C6 lower medial quadrant). Click zones split: vertebral body width for osteotomy, pedicle circles + outer zones for screws. Size labels at TP edge. Quick reference RTL for Arabic/Hebrew. Offline Use help translated into 15 European languages.

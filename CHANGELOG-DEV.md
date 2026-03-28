@@ -2,6 +2,22 @@
 
 Detailed technical changes by version. For user-facing changes see the in-app changelog (`src/data/changelog.ts`).
 
+## v2.8.1-beta (2026-03-28)
+
+### Cervical pedicle ellipses
+- C3-C6 pedW/pedH/pedCTC from Karaikovic 1997, Ebraheim 2008 (PMC2198884), Arab CT (PMC4999373)
+- getVertSvgGeometry uses pedCTC for cervical when available, fallback to inset formula
+
+### Lock sync fix
+- Allow unlock transitions (incoming lockedAt null/undefined passes through)
+
+### Ghost rod modal
+- Ghost rod onClick changed from auto-dispatch to openRodModal
+
+### Visual
+- Anterior lateral mass opacity 0.25→0.45, stroke 0.5→0.75
+- OC/FM SVG text labels on occiput
+
 ## v2.8.0-beta (2026-03-28)
 
 Major version bump. See v2.7.34 for detailed technical changelog of trajectory system, screw shanks, and pedicle positioning. Additional v2.8.0 features: rod modal redesign (apply both sides, copy, default diameter from screw system), retainer/locking cap inventory, grouped note presets (Anatomy/Deformity/Surgical Plan), expanded keyboard shortcuts (I/N/X/U/O tools, F/S/E/R/D/,/? actions), export format picker (PDF or JPG via E key), spinal level range in inventory, schematic documentation notice, onboarding tour expanded to 5 steps with reset, anterior lateral mass outline, occipital condyle/foramen magnum labels.

@@ -1,7 +1,7 @@
 import { formatDate } from '../i18n/i18n';
 export { formatDate };
 
-export const CURRENT_VERSION: string = "v2.8.0-beta";
+export const CURRENT_VERSION: string = "v2.8.1-beta";
 
 interface ChangeLogEntry {
     version: string;
@@ -13,6 +13,13 @@ interface ChangeLogEntry {
 // Keep entries brief, non-technical, and focused on what the surgeon can do.
 // Detailed technical changelog is in CLAUDE.md for developers/agents.
 export const CHANGE_LOG: ChangeLogEntry[] = [
+    { version: "v2.8.1-beta", date: "2026-03-28", changes: [
+        "Cervical pedicle ellipses — C3-C6 pedicle anatomy from published morphometry (Karaikovic 1997, Ebraheim 2008).",
+        "Lock/unlock sync fix — dual-screen unlock transitions no longer cause desync.",
+        "Ghost rod click opens the rod modal for review instead of auto-accepting.",
+        "Anterior lateral mass outline more visible.",
+        "Occipital condyle (OC) and foramen magnum (FM) labels on the diagram.",
+    ]},
     { version: "v2.8.0-beta", date: "2026-03-28", changes: [
         "Screw trajectory system — pedicle, lateral mass, pars, translaminar, transarticular, and cortical (CBT) trajectory options at appropriate levels with published convergence angles.",
         "Screw shanks shown on the chart — projected PA view with real foreshortening from published per-level data.",
