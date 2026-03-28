@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { t } from '../i18n/i18n';
 import { INVENTORY_CATEGORIES, getDiscLabel } from '../data/clinical';
 import { formatScrewSize } from '../utils/formatScrewSize';
-import { formatRodSummary, isRodEmpty } from '../data/implants';
+import { formatRodSummary, isRodEmpty, getRetainerInfo } from '../data/implants';
 import type { Placement, ToolDefinition, Level, OsteotomyData, CageData, RodData } from '../types';
 
 interface Rods {
@@ -18,6 +18,8 @@ interface ImplantInventoryProps {
     levels: Level[];
     rods: Rods;
     large?: boolean;
+    company?: string;
+    screwSystem?: string;
 }
 
 // Canonical anatomical order for level range display
@@ -67,7 +69,7 @@ function buildLevelRange(placements: Placement[], tools: ToolDefinition[]): stri
     return range ? ` \u2014 ${range}${suffix}` : (hasSIJ ? ` \u2014 SIJ fixation` : '');
 }
 
-export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, levels, rods, large }: ImplantInventoryProps) => {
+export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, levels, rods, large, company, screwSystem }: ImplantInventoryProps) => {
     const levelRange = useMemo(() => buildLevelRange(placements, tools), [placements, tools]);
 
     const grouped = useMemo(() => {
@@ -178,6 +180,26 @@ export const ImplantInventory = ({ placements, tools, title, visibleLevelIds, le
                             </div>
                         ),
                     });
+                }
+                // Retainer count (1 per screw for systems that need them)
+                const retainer = company && screwSystem ? getRetainerInfo(company, screwSystem) : getRetainerInfo('', '');
+                if (retainer && retainer.perScrew > 0) {
+                    const screwCount = placements.filter(p => visibleLevelIds.includes(p.levelId) && ['monoaxial','polyaxial','uniplanar'].includes(p.tool)).length;
+                    if (screwCount > 0) {
+                        const retainerCount = screwCount * retainer.perScrew;
+                        catEntries.push({
+                            lines: 2,
+                            node: (
+                                <div key="retainers" className={large ? 'mb-3' : 'mb-1'}>
+                                    <div className={`${szSm} font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 ${large ? 'pb-1 mb-1' : 'pb-0.5 mb-0'}`}>{retainer.name}s</div>
+                                    <div className={`flex justify-between ${sz} leading-tight ${py} border-b border-slate-50`}>
+                                        <span className="text-slate-700 font-medium">{retainer.name} ({t('inventory.one_per_screw')})</span>
+                                        <span className="font-bold text-slate-900 ms-2">{retainerCount}</span>
+                                    </div>
+                                </div>
+                            ),
+                        });
+                    }
                 }
                 if (!useColumns) return <div>{catEntries.map(e => e.node)}</div>;
                 // Balance columns by line count
