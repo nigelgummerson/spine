@@ -202,7 +202,7 @@
         </div>
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-            <div class="progress-text" id="progress-text">0 of 450 items reviewed (0%)</div>
+            <div class="progress-text" id="progress-text">0 of 451 items reviewed (0%)</div>
             <div class="save-hint" id="save-hint"></div>
         </div>
     </div>
@@ -223,7 +223,7 @@
             <a href="#reviewer-panel" class="nav-link-reviewer">Your Details</a>
             <div class="nav-divider"></div>
             <div class="nav-sections">
-                <a href="#section-0" class="nav-link" data-section="0">App Header &amp; Sidebar <span class="nav-count" id="nav-count-0">0/65</span></a>
+                <a href="#section-0" class="nav-link" data-section="0">App Header &amp; Sidebar <span class="nav-count" id="nav-count-0">0/66</span></a>
             <a href="#section-1" class="nav-link" data-section="1">Patient Demographics <span class="nav-count" id="nav-count-1">0/31</span></a>
             <a href="#section-2" class="nav-link" data-section="2">Implant Modal: Screws, Hooks &amp; Bands <span class="nav-count" id="nav-count-2">0/43</span></a>
             <a href="#section-3" class="nav-link" data-section="3">Cage Modal: Interbody Cages <span class="nav-count" id="nav-count-3">0/25</span></a>
@@ -2036,6 +2036,39 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="sidebar.session_privacy" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="sidebar.share_hint" data-section="0" id="item-sidebar.share_hint">
+            <div class="item-header">
+                <code class="key-label">sidebar.share_hint</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Anonymised — no patient name, DOB, or ID</div>
+                </div>
+                <div class="col-translation">
+                    <label>Deutsch</label>
+                    <textarea class="translation-field" data-key="sidebar.share_hint" data-original="Anonymisiert — kein Patientenname, Geburtsdatum oder ID">Anonymisiert — kein Patientenname, Geburtsdatum oder ID</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-sidebar.share_hint" value="correct" data-key="sidebar.share_hint">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-sidebar.share_hint" value="corrected" data-key="sidebar.share_hint">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="sidebar.share_hint" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -15316,7 +15349,7 @@ Das Hochformat gibt jeder Spalte mehr vertikalen Platz und zeigt die gesamte Wir
     (function() {
         const LANG = "de";
         const STORAGE_KEY = "spine_review_" + LANG;
-        const TOTAL = 450;
+        const TOTAL = 451;
 
         // --- Reviewer details ---
 
