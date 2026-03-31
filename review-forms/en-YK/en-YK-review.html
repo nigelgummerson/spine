@@ -190,7 +190,7 @@
         <div class="header-top">
             <div>
                 <h1>Spinal Instrumentation Plan & Record: Translation Review</h1>
-                <span class="lang-badge">en-YK / en-YK (en-YK) — v3.2.01-beta</span>
+                <span class="lang-badge">en-YK / en-YK (en-YK) — v3.2.02-beta</span>
             </div>
             <div class="header-actions">
                 <a href="../guide.html" target="_blank" style="color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: none; padding: 6px 10px;" title="How to use this form">Guide</a>
@@ -202,7 +202,7 @@
         </div>
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-            <div class="progress-text" id="progress-text">0 of 442 items reviewed (0%)</div>
+            <div class="progress-text" id="progress-text">0 of 443 items reviewed (0%)</div>
             <div class="save-hint" id="save-hint"></div>
         </div>
     </div>
@@ -225,7 +225,7 @@
             <div class="nav-sections">
                 <a href="#section-0" class="nav-link" data-section="0">App Header &amp; Sidebar <span class="nav-count" id="nav-count-0">0/60</span></a>
             <a href="#section-1" class="nav-link" data-section="1">Patient Demographics <span class="nav-count" id="nav-count-1">0/31</span></a>
-            <a href="#section-2" class="nav-link" data-section="2">Implant Modal: Screws, Hooks &amp; Bands <span class="nav-count" id="nav-count-2">0/42</span></a>
+            <a href="#section-2" class="nav-link" data-section="2">Implant Modal: Screws, Hooks &amp; Bands <span class="nav-count" id="nav-count-2">0/43</span></a>
             <a href="#section-3" class="nav-link" data-section="3">Cage Modal: Interbody Cages <span class="nav-count" id="nav-count-3">0/25</span></a>
             <a href="#section-4" class="nav-link" data-section="4">Osteotomy Modal <span class="nav-count" id="nav-count-4">0/29</span></a>
             <a href="#section-5" class="nav-link" data-section="5">Force Modal <span class="nav-count" id="nav-count-5">0/7</span></a>
@@ -4327,6 +4327,39 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="modal.screw.population_data" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="modal.screw.same_as_last_level" data-section="2" id="item-modal.screw.same_as_last_level">
+            <div class="item-header">
+                <code class="key-label">modal.screw.same_as_last_level</code>
+                <span class="hint placeholder-hint">Contains {placeholders}: keep braces intact</span>
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Same as last level ({size})</div>
+                </div>
+                <div class="col-translation">
+                    <label>en-YK</label>
+                    <textarea class="translation-field" data-key="modal.screw.same_as_last_level" data-original=""></textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.screw.same_as_last_level" value="correct" data-key="modal.screw.same_as_last_level">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.screw.same_as_last_level" value="corrected" data-key="modal.screw.same_as_last_level">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.screw.same_as_last_level" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -15052,7 +15085,7 @@ Portrait gives each column more room up an&#x27; down, showing t&#x27;whole spin
     (function() {
         const LANG = "en-YK";
         const STORAGE_KEY = "spine_review_" + LANG;
-        const TOTAL = 442;
+        const TOTAL = 443;
 
         // --- Reviewer details ---
 
