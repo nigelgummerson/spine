@@ -190,7 +190,7 @@
         <div class="header-top">
             <div>
                 <h1>Spinal Instrumentation Plan & Record: Translation Review</h1>
-                <span class="lang-badge">Finnish / Suomi (fi) — v3.2.07-beta</span>
+                <span class="lang-badge">Finnish / Suomi (fi) — v3.2.08-beta</span>
             </div>
             <div class="header-actions">
                 <a href="../guide.html" target="_blank" style="color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: none; padding: 6px 10px;" title="How to use this form">Guide</a>
@@ -202,7 +202,7 @@
         </div>
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-            <div class="progress-text" id="progress-text">0 of 463 items reviewed (0%)</div>
+            <div class="progress-text" id="progress-text">0 of 477 items reviewed (0%)</div>
             <div class="save-hint" id="save-hint"></div>
         </div>
     </div>
@@ -237,10 +237,10 @@
             <a href="#section-11" class="nav-link" data-section="11">Export &amp; Column Headers <span class="nav-count" id="nav-count-11">0/8</span></a>
             <a href="#section-12" class="nav-link" data-section="12">Help Modal <span class="nav-count" id="nav-count-12">0/35</span></a>
             <a href="#section-13" class="nav-link" data-section="13">Common Buttons &amp; Shortcuts <span class="nav-count" id="nav-count-13">0/7</span></a>
-            <a href="#section-14" class="nav-link" data-section="14">Alerts &amp; Confirmations <span class="nav-count" id="nav-count-14">0/31</span></a>
+            <a href="#section-14" class="nav-link" data-section="14">Alerts &amp; Confirmations <span class="nav-count" id="nav-count-14">0/33</span></a>
             <a href="#section-15" class="nav-link" data-section="15">Credits &amp; Disclaimer <span class="nav-count" id="nav-count-15">0/13</span></a>
             <a href="#section-16" class="nav-link" data-section="16">Version History Modal <span class="nav-count" id="nav-count-16">0/1</span></a>
-            <a href="#section-17" class="nav-link" data-section="17">Other <span class="nav-count" id="nav-count-17">0/82</span></a>
+            <a href="#section-17" class="nav-link" data-section="17">Other <span class="nav-count" id="nav-count-17">0/94</span></a>
                 <div class="nav-divider"></div>
                 <a href="#section-bugs" class="nav-link nav-link-bugs" data-section="bugs">Bug Reports <span class="nav-count" id="nav-count-bugs">0</span></a>
             </div>
@@ -11971,6 +11971,39 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="alert.max_systems" data-section="14" id="item-alert.max_systems">
+            <div class="item-header">
+                <code class="key-label">alert.max_systems</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Maximum 5 screw systems — remove one before adding another</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="alert.max_systems" data-original="Enintään 5 ruuvijärjestelmää — poista yksi ennen toisen lisäämistä">Enintään 5 ruuvijärjestelmää — poista yksi ennen toisen lisäämistä</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-alert.max_systems" value="correct" data-key="alert.max_systems">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-alert.max_systems" value="corrected" data-key="alert.max_systems">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="alert.max_systems" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="alert.new_patient" data-section="14" id="item-alert.new_patient">
             <div class="item-header">
                 <code class="key-label">alert.new_patient</code>
@@ -12430,6 +12463,39 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="alert.stale_data" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="alert.system_applied" data-section="14" id="item-alert.system_applied">
+            <div class="item-header">
+                <code class="key-label">alert.system_applied</code>
+                <span class="hint placeholder-hint">Contains {placeholders}: keep braces intact</span>
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">{system} applied to {count} screws</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="alert.system_applied" data-original="{system} käytetty {count} ruuviin">{system} käytetty {count} ruuviin</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-alert.system_applied" value="correct" data-key="alert.system_applied">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-alert.system_applied" value="corrected" data-key="alert.system_applied">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="alert.system_applied" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -13180,6 +13246,171 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="dialog.apply_system.apply_all" data-section="17" id="item-dialog.apply_system.apply_all">
+            <div class="item-header">
+                <code class="key-label">dialog.apply_system.apply_all</code>
+                <span class="hint placeholder-hint">Contains {placeholders}: keep braces intact</span>
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Apply {system} to all screws?</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="dialog.apply_system.apply_all" data-original="Käytä {system} kaikkiin ruuveihin?">Käytä {system} kaikkiin ruuveihin?</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-dialog.apply_system.apply_all" value="correct" data-key="dialog.apply_system.apply_all">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-dialog.apply_system.apply_all" value="corrected" data-key="dialog.apply_system.apply_all">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="dialog.apply_system.apply_all" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="dialog.apply_system.apply_cervical" data-section="17" id="item-dialog.apply_system.apply_cervical">
+            <div class="item-header">
+                <code class="key-label">dialog.apply_system.apply_cervical</code>
+                <span class="hint placeholder-hint">Contains {placeholders}: keep braces intact</span>
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Apply {system} to all cervical screws?</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="dialog.apply_system.apply_cervical" data-original="Käytä {system} kaikkiin kaularangan ruuveihin?">Käytä {system} kaikkiin kaularangan ruuveihin?</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-dialog.apply_system.apply_cervical" value="correct" data-key="dialog.apply_system.apply_cervical">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-dialog.apply_system.apply_cervical" value="corrected" data-key="dialog.apply_system.apply_cervical">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="dialog.apply_system.apply_cervical" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="dialog.apply_system.apply_thoracolumbar" data-section="17" id="item-dialog.apply_system.apply_thoracolumbar">
+            <div class="item-header">
+                <code class="key-label">dialog.apply_system.apply_thoracolumbar</code>
+                <span class="hint placeholder-hint">Contains {placeholders}: keep braces intact</span>
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Apply {system} to all thoracolumbar screws?</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="dialog.apply_system.apply_thoracolumbar" data-original="Käytä {system} kaikkiin rintaranka-lannerangan ruuveihin?">Käytä {system} kaikkiin rintaranka-lannerangan ruuveihin?</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-dialog.apply_system.apply_thoracolumbar" value="correct" data-key="dialog.apply_system.apply_thoracolumbar">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-dialog.apply_system.apply_thoracolumbar" value="corrected" data-key="dialog.apply_system.apply_thoracolumbar">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="dialog.apply_system.apply_thoracolumbar" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="dialog.apply_system.description" data-section="17" id="item-dialog.apply_system.description">
+            <div class="item-header">
+                <code class="key-label">dialog.apply_system.description</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Existing screws without a system assigned will be updated.</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="dialog.apply_system.description" data-original="Olemassa olevat ruuvit ilman määritettyä järjestelmää päivitetään.">Olemassa olevat ruuvit ilman määritettyä järjestelmää päivitetään.</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-dialog.apply_system.description" value="correct" data-key="dialog.apply_system.description">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-dialog.apply_system.description" value="corrected" data-key="dialog.apply_system.description">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="dialog.apply_system.description" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="dialog.apply_system.title" data-section="17" id="item-dialog.apply_system.title">
+            <div class="item-header">
+                <code class="key-label">dialog.apply_system.title</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Apply Screw System</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="dialog.apply_system.title" data-original="Käytä ruuvijärjestelmää">Käytä ruuvijärjestelmää</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-dialog.apply_system.title" value="correct" data-key="dialog.apply_system.title">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-dialog.apply_system.title" value="corrected" data-key="dialog.apply_system.title">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="dialog.apply_system.title" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="error.close" data-section="17" id="item-error.close">
             <div class="item-header">
                 <code class="key-label">error.close</code>
@@ -13609,6 +13840,72 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="modal.preferences.show_system_labels" data-section="17" id="item-modal.preferences.show_system_labels">
+            <div class="item-header">
+                <code class="key-label">modal.preferences.show_system_labels</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Show screw system on chart</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="modal.preferences.show_system_labels" data-original="Näytä ruuvijärjestelmä kaaviossa">Näytä ruuvijärjestelmä kaaviossa</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.preferences.show_system_labels" value="correct" data-key="modal.preferences.show_system_labels">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.preferences.show_system_labels" value="corrected" data-key="modal.preferences.show_system_labels">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.preferences.show_system_labels" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="modal.preferences.show_system_labels_desc" data-section="17" id="item-modal.preferences.show_system_labels_desc">
+            <div class="item-header">
+                <code class="key-label">modal.preferences.show_system_labels_desc</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Display system name alongside screws when a single system is in use — always shown with multiple systems</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="modal.preferences.show_system_labels_desc" data-original="Näytä järjestelmän nimi ruuvien vieressä kun käytössä on yksi järjestelmä — näytetään aina useilla järjestelmillä">Näytä järjestelmän nimi ruuvien vieressä kun käytössä on yksi järjestelmä — näytetään aina useilla järjestelmillä</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.preferences.show_system_labels_desc" value="correct" data-key="modal.preferences.show_system_labels_desc">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.preferences.show_system_labels_desc" value="corrected" data-key="modal.preferences.show_system_labels_desc">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.preferences.show_system_labels_desc" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="modal.preferences.title" data-section="17" id="item-modal.preferences.title">
             <div class="item-header">
                 <code class="key-label">modal.preferences.title</code>
@@ -13741,6 +14038,39 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="modal.quickadd.head_type" data-section="17" id="item-modal.quickadd.head_type">
+            <div class="item-header">
+                <code class="key-label">modal.quickadd.head_type</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Head Type</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="modal.quickadd.head_type" data-original="Päätyyppi">Päätyyppi</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.quickadd.head_type" value="correct" data-key="modal.quickadd.head_type">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.quickadd.head_type" value="corrected" data-key="modal.quickadd.head_type">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.quickadd.head_type" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="modal.quickadd.help" data-section="17" id="item-modal.quickadd.help">
             <div class="item-header">
                 <code class="key-label">modal.quickadd.help</code>
@@ -13807,6 +14137,72 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="modal.quickadd.manufacturer" data-section="17" id="item-modal.quickadd.manufacturer">
+            <div class="item-header">
+                <code class="key-label">modal.quickadd.manufacturer</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Manufacturer</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="modal.quickadd.manufacturer" data-original="Valmistaja">Valmistaja</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.quickadd.manufacturer" value="correct" data-key="modal.quickadd.manufacturer">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.quickadd.manufacturer" value="corrected" data-key="modal.quickadd.manufacturer">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.quickadd.manufacturer" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="modal.quickadd.no_system" data-section="17" id="item-modal.quickadd.no_system">
+            <div class="item-header">
+                <code class="key-label">modal.quickadd.no_system</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Not specified</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="modal.quickadd.no_system" data-original="Ei määritetty">Ei määritetty</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.quickadd.no_system" value="correct" data-key="modal.quickadd.no_system">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.quickadd.no_system" value="corrected" data-key="modal.quickadd.no_system">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.quickadd.no_system" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="modal.quickadd.preview" data-section="17" id="item-modal.quickadd.preview">
             <div class="item-header">
                 <code class="key-label">modal.quickadd.preview</code>
@@ -13840,6 +14236,39 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="modal.quickadd.screw_system" data-section="17" id="item-modal.quickadd.screw_system">
+            <div class="item-header">
+                <code class="key-label">modal.quickadd.screw_system</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Screw System</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="modal.quickadd.screw_system" data-original="Ruuvijärjestelmä">Ruuvijärjestelmä</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.quickadd.screw_system" value="correct" data-key="modal.quickadd.screw_system">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.quickadd.screw_system" value="corrected" data-key="modal.quickadd.screw_system">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.quickadd.screw_system" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="modal.quickadd.screw_type" data-section="17" id="item-modal.quickadd.screw_type">
             <div class="item-header">
                 <code class="key-label">modal.quickadd.screw_type</code>
@@ -13870,6 +14299,39 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="modal.quickadd.screw_type" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="modal.quickadd.shank_type" data-section="17" id="item-modal.quickadd.shank_type">
+            <div class="item-header">
+                <code class="key-label">modal.quickadd.shank_type</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Shank Type</div>
+                </div>
+                <div class="col-translation">
+                    <label>Suomi</label>
+                    <textarea class="translation-field" data-key="modal.quickadd.shank_type" data-original="Varsityyppi">Varsityyppi</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.quickadd.shank_type" value="correct" data-key="modal.quickadd.shank_type">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.quickadd.shank_type" value="corrected" data-key="modal.quickadd.shank_type">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.quickadd.shank_type" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -15745,7 +16207,7 @@ Pystyasento antaa jokaiselle sarakkeelle enemmän pystytilaa ja näyttää koko 
     (function() {
         const LANG = "fi";
         const STORAGE_KEY = "spine_review_" + LANG;
-        const TOTAL = 463;
+        const TOTAL = 477;
 
         // --- Reviewer details ---
 
