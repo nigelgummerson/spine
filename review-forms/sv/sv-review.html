@@ -202,7 +202,7 @@
         </div>
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-            <div class="progress-text" id="progress-text">0 of 477 items reviewed (0%)</div>
+            <div class="progress-text" id="progress-text">0 of 481 items reviewed (0%)</div>
             <div class="save-hint" id="save-hint"></div>
         </div>
     </div>
@@ -234,13 +234,13 @@
             <a href="#section-8" class="nav-link" data-section="8">Inventory Panel <span class="nav-count" id="nav-count-8">0/24</span></a>
             <a href="#section-9" class="nav-link" data-section="9">Chart Headers &amp; Diagram Labels <span class="nav-count" id="nav-count-9">0/13</span></a>
             <a href="#section-10" class="nav-link" data-section="10">Linked Screens (Sync) <span class="nav-count" id="nav-count-10">0/2</span></a>
-            <a href="#section-11" class="nav-link" data-section="11">Export &amp; Column Headers <span class="nav-count" id="nav-count-11">0/8</span></a>
+            <a href="#section-11" class="nav-link" data-section="11">Export &amp; Column Headers <span class="nav-count" id="nav-count-11">0/9</span></a>
             <a href="#section-12" class="nav-link" data-section="12">Help Modal <span class="nav-count" id="nav-count-12">0/35</span></a>
             <a href="#section-13" class="nav-link" data-section="13">Common Buttons &amp; Shortcuts <span class="nav-count" id="nav-count-13">0/7</span></a>
             <a href="#section-14" class="nav-link" data-section="14">Alerts &amp; Confirmations <span class="nav-count" id="nav-count-14">0/33</span></a>
             <a href="#section-15" class="nav-link" data-section="15">Credits &amp; Disclaimer <span class="nav-count" id="nav-count-15">0/13</span></a>
             <a href="#section-16" class="nav-link" data-section="16">Version History Modal <span class="nav-count" id="nav-count-16">0/1</span></a>
-            <a href="#section-17" class="nav-link" data-section="17">Other <span class="nav-count" id="nav-count-17">0/94</span></a>
+            <a href="#section-17" class="nav-link" data-section="17">Other <span class="nav-count" id="nav-count-17">0/97</span></a>
                 <div class="nav-divider"></div>
                 <a href="#section-bugs" class="nav-link nav-link-bugs" data-section="bugs">Bug Reports <span class="nav-count" id="nav-count-bugs">0</span></a>
             </div>
@@ -9937,6 +9937,39 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="export.open_case_link" data-section="11" id="item-export.open_case_link">
+            <div class="item-header">
+                <code class="key-label">export.open_case_link</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Open in Spine Planner</div>
+                </div>
+                <div class="col-translation">
+                    <label>Svenska</label>
+                    <textarea class="translation-field" data-key="export.open_case_link" data-original="Öppna i Spine Planner">Öppna i Spine Planner</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-export.open_case_link" value="correct" data-key="export.open_case_link">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-export.open_case_link" value="corrected" data-key="export.open_case_link">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="export.open_case_link" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="export.plan" data-section="11" id="item-export.plan">
             <div class="item-header">
                 <code class="key-label">export.plan</code>
@@ -13782,11 +13815,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Region Size Defaults</div>
+                    <div class="english-text">Population-based screw sizing</div>
                 </div>
                 <div class="col-translation">
                     <label>Svenska</label>
-                    <textarea class="translation-field" data-key="modal.preferences.region_defaults" data-original="Regionala storleksstandard">Regionala storleksstandard</textarea>
+                    <textarea class="translation-field" data-key="modal.preferences.region_defaults" data-original="Populationsbaserad skruvdimensionering">Populationsbaserad skruvdimensionering</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -13815,11 +13848,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Show population-based screw size ranges by level — verify against anatomy and imaging</div>
+                    <div class="english-text">Pre-fill screw sizes from published morphometry data — verify against patient anatomy and imaging</div>
                 </div>
                 <div class="col-translation">
                     <label>Svenska</label>
-                    <textarea class="translation-field" data-key="modal.preferences.region_defaults_desc" data-original="Förfyll skruvstorlekar baserat på kotnivå">Förfyll skruvstorlekar baserat på kotnivå</textarea>
+                    <textarea class="translation-field" data-key="modal.preferences.region_defaults_desc" data-original="Förfyll skruvstorlekar från publicerad morfometridata — verifiera mot patientens anatomi och bilddiagnostik">Förfyll skruvstorlekar från publicerad morfometridata — verifiera mot patientens anatomi och bilddiagnostik</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -13837,6 +13870,105 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="modal.preferences.region_defaults_desc" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="modal.preferences.section_implant" data-section="17" id="item-modal.preferences.section_implant">
+            <div class="item-header">
+                <code class="key-label">modal.preferences.section_implant</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Implant</div>
+                </div>
+                <div class="col-translation">
+                    <label>Svenska</label>
+                    <textarea class="translation-field" data-key="modal.preferences.section_implant" data-original="Implantat">Implantat</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.preferences.section_implant" value="correct" data-key="modal.preferences.section_implant">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.preferences.section_implant" value="corrected" data-key="modal.preferences.section_implant">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.preferences.section_implant" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="modal.preferences.section_privacy" data-section="17" id="item-modal.preferences.section_privacy">
+            <div class="item-header">
+                <code class="key-label">modal.preferences.section_privacy</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Privacy</div>
+                </div>
+                <div class="col-translation">
+                    <label>Svenska</label>
+                    <textarea class="translation-field" data-key="modal.preferences.section_privacy" data-original="Integritet">Integritet</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.preferences.section_privacy" value="correct" data-key="modal.preferences.section_privacy">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.preferences.section_privacy" value="corrected" data-key="modal.preferences.section_privacy">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.preferences.section_privacy" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="modal.preferences.section_research" data-section="17" id="item-modal.preferences.section_research">
+            <div class="item-header">
+                <code class="key-label">modal.preferences.section_research</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Research</div>
+                </div>
+                <div class="col-translation">
+                    <label>Svenska</label>
+                    <textarea class="translation-field" data-key="modal.preferences.section_research" data-original="Forskning">Forskning</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.preferences.section_research" value="correct" data-key="modal.preferences.section_research">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.preferences.section_research" value="corrected" data-key="modal.preferences.section_research">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.preferences.section_research" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -16207,7 +16339,7 @@ Stående läge ger varje kolumn mer vertikalt utrymme och visar hela ryggraden u
     (function() {
         const LANG = "sv";
         const STORAGE_KEY = "spine_review_" + LANG;
-        const TOTAL = 477;
+        const TOTAL = 481;
 
         // --- Reviewer details ---
 
