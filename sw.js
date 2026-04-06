@@ -2,7 +2,7 @@
 // Cache-first strategy: serve from cache, fall back to network, update cache in background.
 // Cache name includes a version hash so old caches are cleaned up on deploy.
 
-const CACHE_NAME = 'spine-planner-v1';
+const CACHE_NAME = 'skeletal-plan-v1';
 const BASE_PATH = '/spine/';
 
 // Assets to pre-cache on install (the app shell)
@@ -22,7 +22,7 @@ self.addEventListener('activate', (event) => {
             .then((keys) =>
                 Promise.all(
                     keys
-                        .filter((key) => key.startsWith('spine-planner-') && key !== CACHE_NAME)
+                        .filter((key) => key.startsWith('skeletal-plan-') && key !== CACHE_NAME)
                         .map((key) => caches.delete(key)),
                 ),
             )
