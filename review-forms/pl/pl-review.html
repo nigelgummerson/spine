@@ -202,7 +202,7 @@
         </div>
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-            <div class="progress-text" id="progress-text">0 of 549 items reviewed (0%)</div>
+            <div class="progress-text" id="progress-text">0 of 550 items reviewed (0%)</div>
             <div class="save-hint" id="save-hint"></div>
         </div>
     </div>
@@ -225,7 +225,7 @@
             <div class="nav-sections">
                 <a href="#section-0" class="nav-link" data-section="0">App Header &amp; Sidebar <span class="nav-count" id="nav-count-0">0/70</span></a>
             <a href="#section-1" class="nav-link" data-section="1">Patient Demographics <span class="nav-count" id="nav-count-1">0/31</span></a>
-            <a href="#section-2" class="nav-link" data-section="2">Implant Modal: Screws, Hooks &amp; Bands <span class="nav-count" id="nav-count-2">0/45</span></a>
+            <a href="#section-2" class="nav-link" data-section="2">Implant Modal: Screws, Hooks &amp; Bands <span class="nav-count" id="nav-count-2">0/46</span></a>
             <a href="#section-3" class="nav-link" data-section="3">Cage Modal: Interbody Cages <span class="nav-count" id="nav-count-3">0/25</span></a>
             <a href="#section-4" class="nav-link" data-section="4">Osteotomy Modal <span class="nav-count" id="nav-count-4">0/29</span></a>
             <a href="#section-5" class="nav-link" data-section="5">Force Modal <span class="nav-count" id="nav-count-5">0/7</span></a>
@@ -4789,6 +4789,39 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="modal.screw.section_hooks" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="modal.screw.section_screw_type" data-section="2" id="item-modal.screw.section_screw_type">
+            <div class="item-header">
+                <code class="key-label">modal.screw.section_screw_type</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Screw Type</div>
+                </div>
+                <div class="col-translation">
+                    <label>Polski</label>
+                    <textarea class="translation-field" data-key="modal.screw.section_screw_type" data-original="Typ śruby">Typ śruby</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.screw.section_screw_type" value="correct" data-key="modal.screw.section_screw_type">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.screw.section_screw_type" value="corrected" data-key="modal.screw.section_screw_type">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.screw.section_screw_type" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -18583,7 +18616,7 @@ Tryb pionowy daje każdej kolumnie więcej miejsca w pionie i wyświetla cały k
     (function() {
         const LANG = "pl";
         const STORAGE_KEY = "spine_review_" + LANG;
-        const TOTAL = 549;
+        const TOTAL = 550;
 
         // --- Reviewer details ---
 
