@@ -68,7 +68,7 @@
                 en: {
                     title: 'Spinal Instrumentation Plan & Record',
                     subtitle: 'Quick Reference',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
 
                     what_title: 'What This App Does',
                     what_p1:
@@ -97,6 +97,7 @@
                     feat_cages:
                         '6 interbody cage types (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — filtered by anatomical level',
                     feat_osteotomies: 'Osteotomies (Schwab 1–6 + Corpectomy) with optional correction angle',
+                    feat_decompression: '13 decompression procedures (laminectomy, foraminotomy, etc.) with Lee zone detail and MRI-style axial diagram',
                     feat_forces: '6 biomechanical force vectors (translate, compress, distract, derotate)',
                     feat_companies: '13 implant manufacturers, 65 screw systems with kit-aware size validation',
                     feat_bonegraft: 'Bone graft recording (6 types + free-text notes)',
@@ -105,7 +106,7 @@
                     feat_clearcon: 'Clear Construct button — reset the surgical record without affecting the plan',
                     feat_inventory: 'Auto-generated implant inventory with summary totals, grouped by screw system',
                     feat_themes: '10 colour themes (5 corporate-branded + 4 dark + default)',
-                    feat_export: 'Export as JPG, PDF (A4 300 DPI), or JSON (v4 schema with UUID and timestamps)',
+                    feat_export: 'Export as JPG, PDF (A4 300 DPI), or JSON (v6 schema with UUID and timestamps)',
                     feat_dualwindow: 'Dual-window sync for theatre displays',
                     feat_ghost: 'Ghost placements — confirm plan items on the construct',
 
@@ -126,8 +127,8 @@
                     key_delete: 'Delete — remove implant',
                     key_views: 'C cervical, L lumbar, T thoracolumbar, W whole, P pelvis',
                     key_tools: 'I implant tool, N note tool, X crosslink, U unstable, O osteotomy',
-                    key_actions: 'F fullscreen, S save, E export, D dark/light, , preferences, ? shortcuts',
-                    key_portrait: 'D demographics, 1–4 switch tab',
+                    key_actions: 'F fullscreen, S save, E export, , preferences, ? shortcuts',
+                    key_portrait: '1–4 switch tab',
 
                     privacy_title: 'Privacy & Data',
                     privacy_1:
@@ -144,6 +145,23 @@
                         'Open the app in two windows of the same browser on a computer with two or more screens. Changes sync automatically — one screen for the Plan, the other for Demographics with live inventory. A green link icon confirms the connection.',
                     dual_p2: 'Privacy mode syncs between windows — both windows match.',
 
+                    sharing_title: 'Sharing & QR Codes',
+                    sharing_1: 'Cases can be shared via QR code or URL link — both use the same compressed encoding',
+                    sharing_2: 'Patient-identifiable data (name, date of birth, ID, sex, surgeon, date, location) is automatically removed before sharing',
+                    sharing_3: 'Shared data is encoded in the URL hash fragment, which is never sent to a server',
+                    sharing_4: 'If a case is too large to share, notes are removed first, then the plan — keeping only the final construct record',
+                    sharing_5: 'If the case is still too large after stripping, sharing is unavailable — save as file instead',
+                    sharing_6: 'For full case sharing with all data preserved, use Save as File (JSON)',
+
+                    compat_title: 'File Format & Compatibility',
+                    compat_1: 'Cases are saved in a structured JSON format (spinal-instrumentation schema)',
+                    compat_2: 'Schema v4 (March 2026) — initial structured format with typed elements and UUID',
+                    compat_3: 'Schema v5 (April 2026) — audit trail with creation and removal timestamps',
+                    compat_4: 'Schema v6 (April 2026) — decompression procedures and motion segment data',
+                    compat_5: 'Files saved in any supported format (v2–v6) are automatically upgraded when opened',
+                    compat_6: 'Schema versions are supported for 12 weeks after their last use in the live app',
+                    compat_7: 'When support for an older format is withdrawn, a standalone version of the app that can open that format remains available for download from GitHub Releases',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3 License',
                     footer_open_app: 'Open App',
@@ -154,7 +172,7 @@
                 ar: {
                     title: 'التثبيت الفقري — الخطة والسجل',
                     subtitle: 'مرجع سريع',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'ماذا يفعل هذا التطبيق',
                     what_p1:
                         'أداة تخطيط جراحي رقمية تحل محل مخططات التثبيت المرسومة يدويًا. توثق الخطة قبل الجراحة والتركيب بعد الجراحة لجراحة العمود الفقري.',
@@ -167,6 +185,7 @@
                     feat_cages:
                         '6 أنواع أقفاص بين الفقرات (ACDF، PLIF، TLIF، XLIF، OLIF، ALIF) — مفلترة حسب المستوى التشريحي',
                     feat_osteotomies: 'قطع عظمي (Schwab 1–6 + استئصال فقرة) مع زاوية تصحيح اختيارية',
+                    feat_decompression: '13 إجراء تخفيف ضغط (استئصال الصفيحة، توسيع الثقبة، إلخ) مع تفاصيل مناطق Lee ورسم محوري بأسلوب التصوير بالرنين المغناطيسي',
                     feat_forces: '6 متجهات قوى بيوميكانيكية (إزاحة، ضغط، تشتيت، تصحيح دوران)',
                     feat_companies: '13 مصنع غرسات، 70+ نظام براغي',
                     feat_bonegraft: 'تسجيل الطعم العظمي (6 أنواع + نص حر)',
@@ -193,7 +212,7 @@
                     key_views: 'C عنقي، L قطني، T صدري قطني، W كامل، P حوض',
                     key_tools: 'I أداة الغرسة، N أداة الملاحظة، X وصلة عرضية، U غير مستقر، O قطع العظم',
                     key_actions: 'F ملء الشاشة, S حفظ, E تصدير (PDF/JPG), , التفضيلات, ? مساعدة, R قضيب',
-                    key_portrait: 'D بيانات, 1–4 تبديل علامة التبويب',
+                    key_portrait: '1–4 تبديل علامة التبويب',
                     privacy_title: 'الخصوصية والبيانات',
                     privacy_1: 'حفظ تلقائي في المتصفح (يمكن تعطيله عبر وضع الخصوصية)',
                     privacy_2: 'وضع خصوصية الجلسة (مؤشر أحمر) — لا يتم تخزين بيانات المريض على الحاسوب',
@@ -201,6 +220,24 @@
                     dual_title: 'وضع النافذتين',
                     dual_p1:
                         'افتح التطبيق في نافذتين من نفس المتصفح على حاسوب بشاشتين أو أكثر. تتزامن التغييرات تلقائيًا — شاشة للخطة والأخرى للبيانات الديموغرافية مع جرد مباشر. أيقونة رابط خضراء تؤكد الاتصال.',
+
+                    sharing_title: 'المشاركة ورموز QR',
+                    sharing_1: 'يمكن مشاركة الحالات عبر رمز QR أو رابط URL — كلاهما يستخدم نفس الترميز المضغوط',
+                    sharing_2: 'تُزال بيانات تعريف المريض (الاسم، تاريخ الميلاد، المعرّف، الجنس، الجراح، التاريخ، الموقع) تلقائيًا قبل المشاركة',
+                    sharing_3: 'تُشفَّر البيانات المشاركة في جزء التجزئة من عنوان URL، ولا تُرسل أبدًا إلى خادم',
+                    sharing_4: 'إذا كانت الحالة كبيرة جدًا للمشاركة، تُزال الملاحظات أولاً، ثم الخطة — مع الاحتفاظ بسجل التركيب النهائي فقط',
+                    sharing_5: 'إذا بقيت الحالة كبيرة جدًا بعد التجريد، تكون المشاركة غير متاحة — احفظ كملف بدلاً من ذلك',
+                    sharing_6: 'لمشاركة الحالة كاملة مع الحفاظ على جميع البيانات، استخدم الحفظ كملف (JSON)',
+
+                    compat_title: 'تنسيق الملفات والتوافق',
+                    compat_1: 'تُحفظ الحالات بتنسيق JSON منظم (مخطط التثبيت الفقري)',
+                    compat_2: 'المخطط v4 (مارس 2026) — التنسيق المنظم الأولي مع عناصر مصنفة ومعرّف UUID',
+                    compat_3: 'المخطط v5 (أبريل 2026) — مسار التدقيق مع طوابع زمنية للإنشاء والإزالة',
+                    compat_4: 'المخطط v6 (أبريل 2026) — إجراءات تخفيف الضغط وبيانات القطاع الحركي',
+                    compat_5: 'الملفات المحفوظة بأي تنسيق مدعوم (v2–v6) تُحدَّث تلقائيًا عند فتحها',
+                    compat_6: 'تُدعم إصدارات المخطط لمدة 12 أسبوعًا بعد آخر استخدام لها في التطبيق',
+                    compat_7: 'عند سحب الدعم عن تنسيق قديم، يبقى إصدار مستقل من التطبيق يمكنه فتح ذلك التنسيق متاحًا للتحميل من إصدارات GitHub',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3 License',
                     footer_open_app: 'فتح التطبيق',
@@ -211,7 +248,7 @@
                 de: {
                     title: 'Spinale Instrumentierung — Plan & Befund',
                     subtitle: 'Kurzanleitung',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'Was diese App macht',
                     what_p1:
                         'Ein digitales OP-Planungstool, das handgezeichnete Instrumentierungsdiagramme ersetzt. Dokumentiert den präoperativen Plan und das postoperative Konstrukt für Wirbelsäulenoperationen.',
@@ -224,6 +261,7 @@
                     feat_cages:
                         '6 interkorporelle Cage-Typen (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — nach anatomischem Level gefiltert',
                     feat_osteotomies: 'Osteotomien (Schwab 1–6 + Korporektomie) mit optionalem Korrekturwinkel',
+                    feat_decompression: '13 Dekompressionsverfahren (Laminektomie, Foraminotomie usw.) mit Lee-Zonen-Detail und MRT-artigem Axialdiagramm',
                     feat_forces: '6 biomechanische Kraftvektoren (Translation, Kompression, Distraktion, Derotation)',
                     feat_companies: '13 Implantathersteller, 70+ Schraubensysteme',
                     feat_bonegraft: 'Knochentransplantat-Erfassung (6 Typen + Freitext)',
@@ -249,7 +287,7 @@
                     key_views: 'C zervikal, L lumbal, T thorakolumbal, W gesamt, P Becken',
                     key_tools: 'I Implantat-Werkzeug, N Notiz-Werkzeug, X Querverbinder, U instabil, O Osteotomie',
                     key_actions: 'F Vollbild, S Speichern, E Export (PDF/JPG), , Einstellungen, ? Hilfe, R Stab',
-                    key_portrait: 'D Demographie, 1–4 Tab wechseln',
+                    key_portrait: '1–4 Tab wechseln',
                     privacy_title: 'Datenschutz',
                     privacy_1: 'Automatisches Speichern im Browser (deaktivierbar über Sitzungsdatenschutz)',
                     privacy_2:
@@ -259,6 +297,24 @@
                     dual_title: 'Zwei-Fenster-Modus',
                     dual_p1:
                         'Öffnen Sie die App in zwei Fenstern desselben Browsers an einem Computer mit zwei oder mehr Bildschirmen. Änderungen synchronisieren sich automatisch — ein Bildschirm für den Plan, der andere für Demografie mit Live-Inventar. Ein grünes Verknüpfungssymbol bestätigt die Verbindung.',
+
+                    sharing_title: 'Teilen & QR-Codes',
+                    sharing_1: 'Fälle können per QR-Code oder URL-Link geteilt werden — beide verwenden die gleiche komprimierte Kodierung',
+                    sharing_2: 'Patientenidentifizierende Daten (Name, Geburtsdatum, ID, Geschlecht, Chirurg, Datum, Standort) werden vor dem Teilen automatisch entfernt',
+                    sharing_3: 'Geteilte Daten werden im URL-Hash-Fragment kodiert, das niemals an einen Server gesendet wird',
+                    sharing_4: 'Ist ein Fall zu groß zum Teilen, werden zuerst die Notizen entfernt, dann der Plan — nur das endgültige Konstrukt wird beibehalten',
+                    sharing_5: 'Ist der Fall nach dem Entfernen immer noch zu groß, ist das Teilen nicht möglich — speichern Sie stattdessen als Datei',
+                    sharing_6: 'Für vollständiges Teilen mit allen Daten verwenden Sie Als Datei speichern (JSON)',
+
+                    compat_title: 'Dateiformat & Kompatibilität',
+                    compat_1: 'Fälle werden in einem strukturierten JSON-Format gespeichert (Spinal-Instrumentations-Schema)',
+                    compat_2: 'Schema v4 (März 2026) — erstes strukturiertes Format mit typisierten Elementen und UUID',
+                    compat_3: 'Schema v5 (April 2026) — Audit-Trail mit Erstellungs- und Entfernungszeitstempeln',
+                    compat_4: 'Schema v6 (April 2026) — Dekompressionsverfahren und Bewegungssegmentdaten',
+                    compat_5: 'In jedem unterstützten Format (v2–v6) gespeicherte Dateien werden beim Öffnen automatisch aktualisiert',
+                    compat_6: 'Schema-Versionen werden 12 Wochen nach ihrer letzten Verwendung in der Live-App unterstützt',
+                    compat_7: 'Wenn die Unterstützung für ein älteres Format eingestellt wird, bleibt eine eigenständige Version der App zum Download über GitHub Releases verfügbar',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3 Lizenz',
                     footer_open_app: 'App öffnen',
@@ -269,7 +325,7 @@
                 fr: {
                     title: 'Instrumentation Rachidienne — Plan & Compte-Rendu',
                     subtitle: 'Guide Rapide',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'À quoi sert cette application',
                     what_p1:
                         "Un outil de planification chirurgicale numérique qui remplace les schémas d'instrumentation dessinés à la main. Documente le plan préopératoire et le montage postopératoire pour la chirurgie du rachis.",
@@ -282,6 +338,7 @@
                     feat_cages:
                         '6 types de cages intersomatiques (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — filtrés par niveau anatomique',
                     feat_osteotomies: 'Ostéotomies (Schwab 1–6 + Corporectomie) avec angle de correction optionnel',
+                    feat_decompression: '13 procédures de décompression (laminectomie, foraminotomie, etc.) avec détail des zones de Lee et diagramme axial de type IRM',
                     feat_forces:
                         '6 vecteurs de force biomécaniques (translation, compression, distraction, dérotation)',
                     feat_companies: "13 fabricants d'implants, 70+ systèmes de vis",
@@ -308,7 +365,7 @@
                     key_views: 'C cervical, L lombaire, T thoraco-lombaire, W complet, P bassin',
                     key_tools: 'I outil implant, N outil note, X connecteur transversal, U instable, O ostéotomie',
                     key_actions: 'F plein écran, S enregistrer, E exporter (PDF/JPG), , préférences, ? aide, R tige',
-                    key_portrait: "D démographie, 1–4 changer d'onglet",
+                    key_portrait: "1–4 changer d'onglet",
                     privacy_title: 'Confidentialité & Données',
                     privacy_1: 'Sauvegarde automatique dans le navigateur (désactivable via le mode Confidentialité)',
                     privacy_2:
@@ -318,6 +375,24 @@
                     dual_title: 'Mode double écran',
                     dual_p1:
                         "Ouvrez l'application dans deux fenêtres du même navigateur sur un ordinateur avec deux écrans ou plus. Les modifications se synchronisent automatiquement — un écran pour le Plan, l'autre pour la Démographie avec inventaire en temps réel. Une icône de lien verte confirme la connexion.",
+
+                    sharing_title: 'Partage & QR Codes',
+                    sharing_1: 'Les cas peuvent être partagés via QR code ou lien URL — les deux utilisent le même encodage compressé',
+                    sharing_2: 'Les données identifiant le patient (nom, date de naissance, identifiant, sexe, chirurgien, date, lieu) sont automatiquement supprimées avant le partage',
+                    sharing_3: "Les données partagées sont encodées dans le fragment de hachage de l'URL, qui n'est jamais envoyé à un serveur",
+                    sharing_4: 'Si un cas est trop volumineux pour être partagé, les notes sont supprimées en premier, puis le plan — seul le montage final est conservé',
+                    sharing_5: "Si le cas reste trop volumineux après suppression, le partage n'est pas disponible — enregistrez comme fichier à la place",
+                    sharing_6: 'Pour un partage complet avec toutes les données préservées, utilisez Enregistrer comme fichier (JSON)',
+
+                    compat_title: 'Format de fichier & Compatibilité',
+                    compat_1: "Les cas sont enregistrés dans un format JSON structuré (schéma d'instrumentation rachidienne)",
+                    compat_2: 'Schéma v4 (mars 2026) — premier format structuré avec éléments typés et UUID',
+                    compat_3: "Schéma v5 (avril 2026) — piste d'audit avec horodatages de création et de suppression",
+                    compat_4: 'Schéma v6 (avril 2026) — procédures de décompression et données de segment mobile',
+                    compat_5: 'Les fichiers enregistrés dans tout format supporté (v2–v6) sont automatiquement mis à jour à l\'ouverture',
+                    compat_6: "Les versions de schéma sont prises en charge pendant 12 semaines après leur dernière utilisation dans l'application",
+                    compat_7: "Lorsque la prise en charge d'un ancien format est retirée, une version autonome de l'application capable d'ouvrir ce format reste disponible en téléchargement depuis GitHub Releases",
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'Licence GNU GPLv3',
                     footer_open_app: "Ouvrir l'appli",
@@ -328,7 +403,7 @@
                 es: {
                     title: 'Instrumentación Espinal — Plan y Registro',
                     subtitle: 'Guía Rápida',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'Qué hace esta aplicación',
                     what_p1:
                         'Una herramienta digital de planificación quirúrgica que reemplaza los diagramas de instrumentación dibujados a mano. Documenta el plan preoperatorio y el montaje postoperatorio para cirugía de columna.',
@@ -341,6 +416,7 @@
                     feat_cages:
                         '6 tipos de cajas intersomáticas (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — filtradas por nivel anatómico',
                     feat_osteotomies: 'Osteotomías (Schwab 1–6 + Corpectomía) con ángulo de corrección opcional',
+                    feat_decompression: '13 procedimientos de descompresión (laminectomía, foraminotomía, etc.) con detalle de zonas de Lee y diagrama axial estilo RM',
                     feat_forces: '6 vectores de fuerza biomecánicos (traslación, compresión, distracción, desrotación)',
                     feat_companies: '13 fabricantes de implantes, 70+ sistemas de tornillos',
                     feat_bonegraft: 'Registro de injerto óseo (6 tipos + texto libre)',
@@ -368,7 +444,7 @@
                         'I herramienta de implante, N herramienta de nota, X conexión cruzada, U inestable, O osteotomía',
                     key_actions:
                         'F pantalla completa, S guardar, E exportar (PDF/JPG), , preferencias, ? ayuda, R barra',
-                    key_portrait: 'D demografía, 1–4 cambiar pestaña',
+                    key_portrait: '1–4 cambiar pestaña',
                     privacy_title: 'Privacidad y datos',
                     privacy_1: 'Guardado automático en el navegador (desactivable mediante el modo Privacidad)',
                     privacy_2: 'Modo Privacidad de sesión (indicador rojo) — ningún dato del paciente almacenado',
@@ -376,6 +452,24 @@
                     dual_title: 'Modo de doble ventana',
                     dual_p1:
                         'Abra la aplicación en dos ventanas del mismo navegador en un ordenador con dos o más pantallas. Los cambios se sincronizan automáticamente — una pantalla para el Plan, la otra para Demografía con inventario en tiempo real. Un icono de enlace verde confirma la conexión.',
+
+                    sharing_title: 'Compartir y códigos QR',
+                    sharing_1: 'Los casos se pueden compartir mediante código QR o enlace URL — ambos usan la misma codificación comprimida',
+                    sharing_2: 'Los datos identificativos del paciente (nombre, fecha de nacimiento, ID, sexo, cirujano, fecha, ubicación) se eliminan automáticamente antes de compartir',
+                    sharing_3: 'Los datos compartidos se codifican en el fragmento hash de la URL, que nunca se envía a un servidor',
+                    sharing_4: 'Si un caso es demasiado grande para compartir, se eliminan primero las notas, luego el plan — conservando solo el registro final del montaje',
+                    sharing_5: 'Si el caso sigue siendo demasiado grande tras la reducción, la función de compartir no está disponible — guarde como archivo en su lugar',
+                    sharing_6: 'Para compartir un caso completo con todos los datos preservados, use Guardar como archivo (JSON)',
+
+                    compat_title: 'Formato de archivo y compatibilidad',
+                    compat_1: 'Los casos se guardan en formato JSON estructurado (esquema de instrumentación espinal)',
+                    compat_2: 'Esquema v4 (marzo 2026) — formato estructurado inicial con elementos tipados y UUID',
+                    compat_3: 'Esquema v5 (abril 2026) — registro de auditoría con marcas de tiempo de creación y eliminación',
+                    compat_4: 'Esquema v6 (abril 2026) — procedimientos de descompresión y datos de segmento móvil',
+                    compat_5: 'Los archivos guardados en cualquier formato compatible (v2–v6) se actualizan automáticamente al abrirlos',
+                    compat_6: 'Las versiones de esquema se admiten durante 12 semanas tras su último uso en la aplicación',
+                    compat_7: 'Cuando se retira el soporte de un formato antiguo, una versión independiente de la aplicación capaz de abrir ese formato permanece disponible para descarga desde GitHub Releases',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'Licencia GNU GPLv3',
                     footer_open_app: 'Abrir app',
@@ -386,7 +480,7 @@
                 he: {
                     title: 'אינסטרומנטציה שדרתית — תוכנית ורישום',
                     subtitle: 'מדריך מהיר',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'מה האפליקציה עושה',
                     what_p1:
                         'כלי תכנון כירורגי דיגיטלי המחליף דיאגרמות אינסטרומנטציה מצוירות ביד. מתעד את התוכנית הטרום-ניתוחית ואת המבנה הפוסט-ניתוחי לניתוחי עמוד שדרה.',
@@ -398,6 +492,7 @@
                     feat_cages:
                         '6 סוגי כלובים בין-חולייתיים (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — מסוננים לפי רמה אנטומית',
                     feat_osteotomies: 'אוסטאוטומיות (Schwab 1–6 + כריתת חוליה) עם זווית תיקון אופציונלית',
+                    feat_decompression: '13 הליכי דקומפרסיה (למינקטומיה, פורמינוטומיה וכו׳) עם פירוט אזורי Lee ודיאגרמה אקסיאלית בסגנון MRI',
                     feat_forces: '6 וקטורי כוח ביומכניים (הזזה, דחיסה, הרחקה, תיקון סיבוב)',
                     feat_companies: '13 יצרני שתלים, 70+ מערכות ברגים',
                     feat_bonegraft: 'רישום השתלת עצם (6 סוגים + טקסט חופשי)',
@@ -424,7 +519,7 @@
                     key_views: 'C צווארי, L מותני, T חזי-מותני, W מלא, P אגן',
                     key_tools: 'I כלי שתל, N כלי הערה, X חיבור צולב, U לא יציב, O אוסטאוטומיה',
                     key_actions: 'F מסך מלא, S שמור, E ייצוא (PDF/JPG), , העדפות, ? עזרה, R מוט',
-                    key_portrait: 'D דמוגרפיה, 1–4 החלף כרטיסייה',
+                    key_portrait: '1–4 החלף כרטיסייה',
                     privacy_title: 'פרטיות ונתונים',
                     privacy_1: 'שמירה אוטומטית בדפדפן (ניתן להשבית דרך מצב פרטיות)',
                     privacy_2: 'מצב פרטיות הפגישה (מחוון אדום) — נתוני המטופל לא נשמרים במחשב',
@@ -432,6 +527,24 @@
                     dual_title: 'מצב חלון כפול',
                     dual_p1:
                         'פתח את האפליקציה בשני חלונות של אותו דפדפן במחשב עם שני מסכים או יותר. השינויים מסתנכרנים אוטומטית — מסך אחד לתוכנית, השני לדמוגרפיה עם מלאי בזמן אמת. סמל קישור ירוק מאשר את החיבור.',
+
+                    sharing_title: 'שיתוף וקודי QR',
+                    sharing_1: 'ניתן לשתף מקרים באמצעות קוד QR או קישור URL — שניהם משתמשים באותו קידוד דחוס',
+                    sharing_2: 'נתונים מזהים של המטופל (שם, תאריך לידה, מזהה, מין, מנתח, תאריך, מיקום) מוסרים אוטומטית לפני השיתוף',
+                    sharing_3: 'הנתונים המשותפים מקודדים בחלק ה-hash של ה-URL, שאינו נשלח לשרת לעולם',
+                    sharing_4: 'אם מקרה גדול מדי לשיתוף, הערות מוסרות תחילה, ואז התוכנית — רק רשומת המבנה הסופית נשמרת',
+                    sharing_5: 'אם המקרה עדיין גדול מדי לאחר הסרה, שיתוף אינו זמין — שמור כקובץ במקום זאת',
+                    sharing_6: 'לשיתוף מלא של מקרה עם שימור כל הנתונים, השתמש בשמירה כקובץ (JSON)',
+
+                    compat_title: 'פורמט קובץ ותאימות',
+                    compat_1: 'מקרים נשמרים בפורמט JSON מובנה (סכמת אינסטרומנטציה שדרתית)',
+                    compat_2: 'סכמה v4 (מרץ 2026) — פורמט מובנה ראשוני עם אלמנטים מסווגים ו-UUID',
+                    compat_3: 'סכמה v5 (אפריל 2026) — מסלול ביקורת עם חותמות זמן ליצירה והסרה',
+                    compat_4: 'סכמה v6 (אפריל 2026) — הליכי דקומפרסיה ונתוני קטע תנועה',
+                    compat_5: 'קבצים שנשמרו בכל פורמט נתמך (v2–v6) משודרגים אוטומטית בפתיחה',
+                    compat_6: 'גרסאות סכמה נתמכות למשך 12 שבועות לאחר השימוש האחרון בהן באפליקציה',
+                    compat_7: 'כאשר תמיכה בפורמט ישן נפסקת, גרסה עצמאית של האפליקציה שיכולה לפתוח פורמט זה נשארת זמינה להורדה מ-GitHub Releases',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3 License',
                     footer_open_app: 'פתח אפליקציה',
@@ -442,7 +555,7 @@
                 hi: {
                     title: 'स्पाइनल इंस्ट्रूमेंटेशन — योजना एवं रिकॉर्ड',
                     subtitle: 'त्वरित संदर्भ',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'यह ऐप क्या करता है',
                     what_p1:
                         'एक डिजिटल सर्जिकल प्लानिंग टूल जो हाथ से बने इंस्ट्रूमेंटेशन डायग्राम की जगह लेता है। स्पाइनल सर्जरी के लिए प्री-ऑपरेटिव प्लान और पोस्ट-ऑपरेटिव कंस्ट्रक्ट का दस्तावेज़ीकरण करता है।',
@@ -455,6 +568,7 @@
                     feat_cages:
                         '6 इंटरबॉडी केज प्रकार (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — एनाटोमिकल लेवल के अनुसार फ़िल्टर',
                     feat_osteotomies: 'ऑस्टियोटॉमी (Schwab 1–6 + कॉर्पेक्टॉमी) वैकल्पिक करेक्शन एंगल के साथ',
+                    feat_decompression: '13 डीकम्प्रेशन प्रक्रियाएँ (लैमिनेक्टॉमी, फ़ोरामिनोटॉमी आदि) Lee ज़ोन विवरण और MRI-शैली अक्षीय आरेख के साथ',
                     feat_forces: '6 बायोमैकेनिकल फ़ोर्स वेक्टर (ट्रांसलेट, कम्प्रेस, डिस्ट्रैक्ट, डीरोटेट)',
                     feat_companies: '13 इम्प्लांट निर्माता, 70+ स्क्रू सिस्टम',
                     feat_bonegraft: 'बोन ग्राफ्ट रिकॉर्डिंग (6 प्रकार + फ्री-टेक्स्ट नोट्स)',
@@ -482,7 +596,7 @@
                     key_views: 'C सर्वाइकल, L लम्बर, T थोरेकोलम्बर, W सम्पूर्ण, P पेल्विस',
                     key_tools: 'I इम्प्लांट टूल, N नोट टूल, X crosslink, U unstable, O osteotomy',
                     key_actions: 'F fullscreen, S save, E export (PDF/JPG), , preferences, ? help, R rod',
-                    key_portrait: 'D demographics, 1–4 switch tab',
+                    key_portrait: '1–4 switch tab',
                     privacy_title: 'गोपनीयता एवं डेटा',
                     privacy_1: 'ब्राउज़र स्टोरेज में स्वतः सहेजें (सत्र गोपनीयता टॉगल द्वारा अक्षम किया जा सकता है)',
                     privacy_2: 'सत्र गोपनीयता मोड (लाल संकेतक) — कंप्यूटर पर कोई रोगी डेटा संग्रहीत नहीं',
@@ -490,6 +604,24 @@
                     dual_title: 'दोहरी-विंडो मोड',
                     dual_p1:
                         'दो या अधिक स्क्रीन वाले कंप्यूटर पर एक ही ब्राउज़र की दो विंडो में ऐप खोलें। परिवर्तन स्वचालित रूप से सिंक होते हैं — एक स्क्रीन प्लान के लिए, दूसरी लाइव इन्वेंटरी के साथ डेमोग्राफिक्स के लिए। एक हरा लिंक आइकन कनेक्शन की पुष्टि करता है।',
+
+                    sharing_title: 'शेयरिंग और QR कोड',
+                    sharing_1: 'केस QR कोड या URL लिंक के माध्यम से साझा किए जा सकते हैं — दोनों समान संपीड़ित एन्कोडिंग का उपयोग करते हैं',
+                    sharing_2: 'रोगी-पहचान योग्य डेटा (नाम, जन्म तिथि, आईडी, लिंग, सर्जन, तिथि, स्थान) साझा करने से पहले स्वचालित रूप से हटा दिया जाता है',
+                    sharing_3: 'साझा किया गया डेटा URL हैश फ्रैगमेंट में एन्कोड किया जाता है, जो कभी भी सर्वर को नहीं भेजा जाता',
+                    sharing_4: 'यदि कोई केस साझा करने के लिए बहुत बड़ा है, तो पहले नोट्स हटाए जाते हैं, फिर प्लान — केवल अंतिम कंस्ट्रक्ट रिकॉर्ड रखा जाता है',
+                    sharing_5: 'यदि स्ट्रिपिंग के बाद भी केस बहुत बड़ा है, तो शेयरिंग उपलब्ध नहीं है — इसके बजाय फ़ाइल के रूप में सहेजें',
+                    sharing_6: 'सभी डेटा संरक्षित रखते हुए पूर्ण केस साझा करने के लिए, फ़ाइल के रूप में सहेजें (JSON) का उपयोग करें',
+
+                    compat_title: 'फ़ाइल प्रारूप और संगतता',
+                    compat_1: 'केस एक संरचित JSON प्रारूप में सहेजे जाते हैं (स्पाइनल-इंस्ट्रूमेंटेशन स्कीमा)',
+                    compat_2: 'स्कीमा v4 (मार्च 2026) — टाइप किए गए तत्वों और UUID के साथ प्रारंभिक संरचित प्रारूप',
+                    compat_3: 'स्कीमा v5 (अप्रैल 2026) — निर्माण और निष्कासन टाइमस्टैम्प के साथ ऑडिट ट्रेल',
+                    compat_4: 'स्कीमा v6 (अप्रैल 2026) — डीकंप्रेशन प्रक्रियाएं और मोशन सेगमेंट डेटा',
+                    compat_5: 'किसी भी समर्थित प्रारूप (v2–v6) में सहेजी गई फ़ाइलें खोलने पर स्वचालित रूप से अपग्रेड हो जाती हैं',
+                    compat_6: 'स्कीमा संस्करण लाइव ऐप में उनके अंतिम उपयोग के बाद 12 सप्ताह तक समर्थित रहते हैं',
+                    compat_7: 'जब किसी पुराने प्रारूप का समर्थन वापस लिया जाता है, तो उस प्रारूप को खोलने में सक्षम ऐप का एक स्टैंडअलोन संस्करण GitHub Releases से डाउनलोड के लिए उपलब्ध रहता है',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3 License',
                     footer_open_app: 'ऐप खोलें',
@@ -500,7 +632,7 @@
                 it: {
                     title: 'Strumentazione Spinale — Piano e Referto',
                     subtitle: 'Guida Rapida',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'Cosa fa questa applicazione',
                     what_p1:
                         'Uno strumento digitale di pianificazione chirurgica che sostituisce i diagrammi di strumentazione disegnati a mano. Documenta il piano preoperatorio e il costrutto postoperatorio per la chirurgia vertebrale.',
@@ -513,6 +645,7 @@
                     feat_cages:
                         '6 tipi di cage intersomatiche (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — filtrate per livello anatomico',
                     feat_osteotomies: 'Osteotomie (Schwab 1–6 + Corpectomia) con angolo di correzione opzionale',
+                    feat_decompression: '13 procedure di decompressione (laminectomia, foraminotomia ecc.) con dettaglio delle zone di Lee e diagramma assiale in stile RM',
                     feat_forces:
                         '6 vettori di forza biomeccanici (traslazione, compressione, distrazione, derotazione)',
                     feat_companies: '13 produttori di impianti, 70+ sistemi di viti',
@@ -540,7 +673,7 @@
                     key_tools:
                         'I strumento impianto, N strumento nota, X collegamento trasversale, U instabile, O osteotomia',
                     key_actions: 'F schermo intero, S salva, E esporta (PDF/JPG), , preferenze, ? aiuto, R barra',
-                    key_portrait: 'D anagrafica, 1–4 cambia scheda',
+                    key_portrait: '1–4 cambia scheda',
                     privacy_title: 'Privacy e Dati',
                     privacy_1: 'Salvataggio automatico nel browser (disattivabile tramite la modalità Privacy)',
                     privacy_2: 'Modalità Privacy di sessione (indicatore rosso) — nessun dato paziente memorizzato',
@@ -548,6 +681,24 @@
                     dual_title: 'Modalità doppio schermo',
                     dual_p1:
                         "Aprire l'app in due finestre dello stesso browser su un computer con due o più schermi. Le modifiche si sincronizzano automaticamente — uno schermo per il Piano, l'altro per la Demografia con inventario in tempo reale. Un'icona di collegamento verde conferma la connessione.",
+
+                    sharing_title: 'Condivisione e codici QR',
+                    sharing_1: 'I casi possono essere condivisi tramite codice QR o link URL — entrambi utilizzano la stessa codifica compressa',
+                    sharing_2: 'I dati identificativi del paziente (nome, data di nascita, ID, sesso, chirurgo, data, sede) vengono automaticamente rimossi prima della condivisione',
+                    sharing_3: "I dati condivisi sono codificati nel frammento hash dell'URL, che non viene mai inviato a un server",
+                    sharing_4: 'Se un caso è troppo grande per la condivisione, vengono prima rimosse le note, poi il piano — conservando solo il costrutto finale',
+                    sharing_5: 'Se il caso è ancora troppo grande dopo la riduzione, la condivisione non è disponibile — salvare come file',
+                    sharing_6: 'Per la condivisione completa con tutti i dati preservati, utilizzare Salva come file (JSON)',
+
+                    compat_title: 'Formato file e compatibilità',
+                    compat_1: 'I casi sono salvati in formato JSON strutturato (schema di strumentazione spinale)',
+                    compat_2: 'Schema v4 (marzo 2026) — formato strutturato iniziale con elementi tipizzati e UUID',
+                    compat_3: 'Schema v5 (aprile 2026) — traccia di audit con timestamp di creazione e rimozione',
+                    compat_4: 'Schema v6 (aprile 2026) — procedure di decompressione e dati del segmento di movimento',
+                    compat_5: 'I file salvati in qualsiasi formato supportato (v2–v6) vengono automaticamente aggiornati all\'apertura',
+                    compat_6: "Le versioni dello schema sono supportate per 12 settimane dopo il loro ultimo utilizzo nell'app",
+                    compat_7: "Quando il supporto per un formato precedente viene ritirato, una versione standalone dell'app in grado di aprire quel formato resta disponibile per il download da GitHub Releases",
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'Licenza GNU GPLv3',
                     footer_open_app: 'Apri app',
@@ -558,7 +709,7 @@
                 ja: {
                     title: '脊椎インスツルメンテーション — 計画と記録',
                     subtitle: 'クイックリファレンス',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'このアプリの機能',
                     what_p1:
                         '手描きのインスツルメンテーション図に代わるデジタル手術計画ツールです。脊椎手術の術前計画と術後コンストラクトを記録します。',
@@ -571,6 +722,7 @@
                     feat_cages:
                         '6種の椎体間ケージ（ACDF、PLIF、TLIF、XLIF、OLIF、ALIF） — 解剖学的レベルでフィルタリング',
                     feat_osteotomies: '骨切り術（Schwab 1–6 + 椎体切除術）オプションの矯正角度付き',
+                    feat_decompression: '13種の減圧術（椎弓切除術、椎間孔拡大術など）Lee ゾーン詳細とMRI様軸位断図付き',
                     feat_forces: '6種のバイオメカニカル力ベクトル（移動、圧迫、牽引、回旋矯正）',
                     feat_companies: '13社のインプラントメーカー、70+のスクリューシステム',
                     feat_bonegraft: '骨移植の記録（6種類 + フリーテキストメモ）',
@@ -598,7 +750,7 @@
                     key_views: 'C 頚椎、L 腰椎、T 胸腰椎、W 全体、P 骨盤',
                     key_tools: 'I インプラントツール、N メモツール、X クロスリンク、U 不安定、O 骨切り術',
                     key_actions: 'F 全画面, S 保存, E エクスポート (PDF/JPG), , 設定, ? ヘルプ, R ロッド',
-                    key_portrait: 'D 患者情報, 1–4 タブ切替',
+                    key_portrait: '1–4 タブ切替',
                     privacy_title: 'プライバシーとデータ',
                     privacy_1: 'ブラウザストレージに自動保存（セッションプライバシー切替で無効化可能）',
                     privacy_2:
@@ -607,6 +759,24 @@
                     dual_title: 'デュアルウィンドウモード',
                     dual_p1:
                         '2台以上のモニターを持つコンピューターで、同じブラウザの2つのウィンドウでアプリを開きます。変更は自動的に同期されます — 一方の画面で計画、もう一方でリアルタイム在庫付きの患者情報。緑のリンクアイコンが接続を確認します。',
+
+                    sharing_title: '共有とQRコード',
+                    sharing_1: '症例はQRコードまたはURLリンクで共有できます — どちらも同じ圧縮エンコーディングを使用',
+                    sharing_2: '患者識別データ（氏名、生年月日、ID、性別、術者、日付、施設）は共有前に自動的に削除されます',
+                    sharing_3: '共有データはURLハッシュフラグメントにエンコードされ、サーバーに送信されることはありません',
+                    sharing_4: '症例が大きすぎて共有できない場合、まずメモが削除され、次に計画が削除されます — 最終コンストラクト記録のみが保持されます',
+                    sharing_5: '削除後も症例が大きすぎる場合、共有は利用できません — 代わりにファイルとして保存してください',
+                    sharing_6: 'すべてのデータを保持した完全な症例共有には、ファイルとして保存（JSON）を使用してください',
+
+                    compat_title: 'ファイル形式と互換性',
+                    compat_1: '症例は構造化されたJSON形式（脊椎インスツルメンテーションスキーマ）で保存されます',
+                    compat_2: 'スキーマv4（2026年3月） — 型付き要素とUUIDを備えた初期構造化形式',
+                    compat_3: 'スキーマv5（2026年4月） — 作成および削除のタイムスタンプを含む監査証跡',
+                    compat_4: 'スキーマv6（2026年4月） — 減圧手術とモーションセグメントデータ',
+                    compat_5: 'サポートされている形式（v2–v6）で保存されたファイルは、開く際に自動的にアップグレードされます',
+                    compat_6: 'スキーマバージョンは、ライブアプリでの最終使用後12週間サポートされます',
+                    compat_7: '古い形式のサポートが終了した場合でも、その形式を開けるスタンドアロン版のアプリがGitHub Releasesからダウンロード可能です',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3 License',
                     footer_open_app: 'アプリを開く',
@@ -617,7 +787,7 @@
                 ko: {
                     title: '척추 기기 삽입 — 계획 및 기록',
                     subtitle: '빠른 참조',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: '이 앱의 기능',
                     what_p1:
                         '수기 기기 삽입 다이어그램을 대체하는 디지털 수술 계획 도구입니다. 척추 수술의 수술 전 계획과 수술 후 구조물을 기록합니다.',
@@ -629,6 +799,7 @@
                         '3종 스크류(모노/폴리/유니플래너), 5종 후크, 밴드/와이어/케이블 — 자유 텍스트 주석 포함',
                     feat_cages: '6종 추체간 케이지(ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — 해부학적 레벨별 필터링',
                     feat_osteotomies: '절골술(Schwab 1–6 + 추체절제술) 선택적 교정 각도 포함',
+                    feat_decompression: '13종 감압술(후궁절제술, 추간공확장술 등) Lee 구역 상세 및 MRI 스타일 축위 도해 포함',
                     feat_forces: '6종 생체역학 힘 벡터(이동, 압축, 신연, 회전 교정)',
                     feat_companies: '13개 임플란트 제조사, 70+ 스크류 시스템',
                     feat_bonegraft: '골이식 기록(6종 + 자유 텍스트 메모)',
@@ -655,7 +826,7 @@
                     key_views: 'C 경추, L 요추, T 흉요추, W 전체, P 골반',
                     key_tools: 'I 삽입물 도구, N 메모 도구, X 크로스링크, U 불안정, O 절골술',
                     key_actions: 'F 전체화면, S 저장, E 내보내기 (PDF/JPG), , 설정, ? 도움말, R 로드',
-                    key_portrait: 'D 인구통계, 1–4 탭 전환',
+                    key_portrait: '1–4 탭 전환',
                     privacy_title: '개인정보 및 데이터',
                     privacy_1: '브라우저 저장소에 자동 저장(세션 개인정보 토글로 비활성화 가능)',
                     privacy_2: '세션 개인정보 모드(빨간 표시기) — 환자 데이터가 컴퓨터에 저장되지 않음',
@@ -663,6 +834,24 @@
                     dual_title: '듀얼 윈도우 모드',
                     dual_p1:
                         '모니터가 2대 이상인 컴퓨터에서 같은 브라우저의 두 창으로 앱을 엽니다. 변경 사항이 자동으로 동기화됩니다 — 한 화면은 계획용, 다른 화면은 실시간 재고가 포함된 인구통계용. 녹색 링크 아이콘이 연결을 확인합니다.',
+
+                    sharing_title: '공유 및 QR 코드',
+                    sharing_1: '케이스는 QR 코드 또는 URL 링크로 공유할 수 있습니다 — 둘 다 동일한 압축 인코딩을 사용합니다',
+                    sharing_2: '환자 식별 데이터(이름, 생년월일, ID, 성별, 집도의, 날짜, 위치)는 공유 전에 자동으로 제거됩니다',
+                    sharing_3: '공유 데이터는 URL 해시 프래그먼트에 인코딩되며, 서버로 전송되지 않습니다',
+                    sharing_4: '케이스가 공유하기에 너무 큰 경우, 먼저 메모가 제거되고 다음으로 계획이 제거됩니다 — 최종 구조물 기록만 유지됩니다',
+                    sharing_5: '제거 후에도 케이스가 너무 큰 경우, 공유가 불가능합니다 — 대신 파일로 저장하십시오',
+                    sharing_6: '모든 데이터가 보존된 완전한 케이스 공유를 위해 파일로 저장(JSON)을 사용하십시오',
+
+                    compat_title: '파일 형식 및 호환성',
+                    compat_1: '케이스는 구조화된 JSON 형식(척추 기기 삽입 스키마)으로 저장됩니다',
+                    compat_2: '스키마 v4(2026년 3월) — 타입 지정 요소와 UUID가 포함된 초기 구조화 형식',
+                    compat_3: '스키마 v5(2026년 4월) — 생성 및 제거 타임스탬프가 포함된 감사 추적',
+                    compat_4: '스키마 v6(2026년 4월) — 감압 시술 및 운동 분절 데이터',
+                    compat_5: '지원되는 형식(v2–v6)으로 저장된 파일은 열 때 자동으로 업그레이드됩니다',
+                    compat_6: '스키마 버전은 라이브 앱에서 마지막 사용 후 12주 동안 지원됩니다',
+                    compat_7: '이전 형식의 지원이 종료되면 해당 형식을 열 수 있는 독립형 앱 버전이 GitHub Releases에서 다운로드할 수 있습니다',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3 License',
                     footer_open_app: '앱 열기',
@@ -673,7 +862,7 @@
                 pt: {
                     title: 'Instrumentação Vertebral — Plano e Registo',
                     subtitle: 'Guia Rápido',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'O que esta aplicação faz',
                     what_p1:
                         'Uma ferramenta digital de planeamento cirúrgico que substitui os diagramas de instrumentação desenhados à mão. Documenta o plano pré-operatório e o constructo pós-operatório para cirurgia da coluna.',
@@ -686,6 +875,7 @@
                     feat_cages:
                         '6 tipos de caixas intersomáticas (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — filtradas por nível anatómico',
                     feat_osteotomies: 'Osteotomias (Schwab 1–6 + Corpectomia) com ângulo de correção opcional',
+                    feat_decompression: '13 procedimentos de descompressão (laminectomia, foraminotomia, etc.) com detalhe das zonas de Lee e diagrama axial estilo RM',
                     feat_forces: '6 vetores de força biomecânicos (translação, compressão, distração, derotação)',
                     feat_companies: '13 fabricantes de implantes, 70+ sistemas de parafusos',
                     feat_bonegraft: 'Registo de enxerto ósseo (6 tipos + texto livre)',
@@ -712,7 +902,7 @@
                     key_tools:
                         'I ferramenta de implante, N ferramenta de nota, X conexão cruzada, U instável, O osteotomia',
                     key_actions: 'F tela cheia, S salvar, E exportar (PDF/JPG), , preferências, ? ajuda, R haste',
-                    key_portrait: 'D dados, 1–4 mudar aba',
+                    key_portrait: '1–4 mudar aba',
                     privacy_title: 'Privacidade e Dados',
                     privacy_1: 'Gravação automática no navegador (desativável pelo modo de Privacidade)',
                     privacy_2:
@@ -721,6 +911,24 @@
                     dual_title: 'Modo de janela dupla',
                     dual_p1:
                         'Abra a aplicação em duas janelas do mesmo navegador num computador com dois ou mais ecrãs. As alterações sincronizam automaticamente — um ecrã para o Plano, o outro para a Demografia com inventário em tempo real. Um ícone de ligação verde confirma a conexão.',
+
+                    sharing_title: 'Partilha e códigos QR',
+                    sharing_1: 'Os casos podem ser partilhados via código QR ou link URL — ambos utilizam a mesma codificação comprimida',
+                    sharing_2: 'Os dados identificativos do paciente (nome, data de nascimento, ID, sexo, cirurgião, data, local) são automaticamente removidos antes da partilha',
+                    sharing_3: 'Os dados partilhados são codificados no fragmento hash do URL, que nunca é enviado a um servidor',
+                    sharing_4: 'Se um caso for demasiado grande para partilhar, as notas são removidas primeiro, depois o plano — mantendo apenas o registo final do constructo',
+                    sharing_5: 'Se o caso continuar demasiado grande após a remoção, a partilha não está disponível — guarde como ficheiro',
+                    sharing_6: 'Para partilha completa com todos os dados preservados, use Guardar como ficheiro (JSON)',
+
+                    compat_title: 'Formato de ficheiro e compatibilidade',
+                    compat_1: 'Os casos são guardados em formato JSON estruturado (esquema de instrumentação vertebral)',
+                    compat_2: 'Esquema v4 (março 2026) — formato estruturado inicial com elementos tipados e UUID',
+                    compat_3: 'Esquema v5 (abril 2026) — registo de auditoria com marcas temporais de criação e remoção',
+                    compat_4: 'Esquema v6 (abril 2026) — procedimentos de descompressão e dados de segmento de movimento',
+                    compat_5: 'Os ficheiros guardados em qualquer formato suportado (v2–v6) são automaticamente atualizados ao abrir',
+                    compat_6: 'As versões do esquema são suportadas durante 12 semanas após a sua última utilização na aplicação',
+                    compat_7: 'Quando o suporte para um formato antigo é retirado, uma versão autónoma da aplicação capaz de abrir esse formato permanece disponível para download no GitHub Releases',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'Licença GNU GPLv3',
                     footer_open_app: 'Abrir app',
@@ -731,7 +939,7 @@
                 sv: {
                     title: 'Spinal Instrumentering — Plan & Journalföring',
                     subtitle: 'Snabbreferens',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'Vad appen gör',
                     what_p1:
                         'Ett digitalt kirurgiskt planeringsverktyg som ersätter handritade instrumenteringsdiagram. Dokumenterar den preoperativa planen och det postoperativa konstruktet för ryggkirurgi.',
@@ -744,6 +952,7 @@
                     feat_cages:
                         '6 typer av interkorporella cages (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — filtrerade efter anatomisk nivå',
                     feat_osteotomies: 'Osteotomier (Schwab 1–6 + Korpektomi) med valfri korrigeringsvinkel',
+                    feat_decompression: '13 dekompressionsförfaranden (laminektomi, foraminotomi m.fl.) med Lee-zondetalj och MRT-liknande axialdiagram',
                     feat_forces: '6 biomekaniska kraftvektorer (translation, kompression, distraktion, derotation)',
                     feat_companies: '13 implantattillverkare, 70+ skruvsystem',
                     feat_bonegraft: 'Registrering av bentransplantat (6 typer + fritext)',
@@ -769,7 +978,7 @@
                     key_views: 'C cervikal, L lumbal, T thorakolumbal, W hela, P bäcken',
                     key_tools: 'I implantatverktyg, N anteckningsverktyg, X tvärförbindelse, U instabil, O osteotomi',
                     key_actions: 'F helskärm, S spara, E exportera (PDF/JPG), , inställningar, ? hjälp, R stång',
-                    key_portrait: 'D demografi, 1–4 byt flik',
+                    key_portrait: '1–4 byt flik',
                     privacy_title: 'Integritet & Data',
                     privacy_1: 'Automatisk sparning i webbläsaren (kan inaktiveras via integritetsläget)',
                     privacy_2: 'Sessionsintegritetsläge (röd indikator) — inga patientdata sparas på datorn',
@@ -777,6 +986,24 @@
                     dual_title: 'Tvåfönsterläge',
                     dual_p1:
                         'Öppna appen i två fönster i samma webbläsare på en dator med två eller fler skärmar. Ändringar synkroniseras automatiskt — en skärm för Planen, den andra för Demografi med realtidsinventering. En grön länkikon bekräftar anslutningen.',
+
+                    sharing_title: 'Delning & QR-koder',
+                    sharing_1: 'Fall kan delas via QR-kod eller URL-länk — båda använder samma komprimerade kodning',
+                    sharing_2: 'Patientidentifierande data (namn, födelsedatum, ID, kön, kirurg, datum, plats) tas automatiskt bort före delning',
+                    sharing_3: 'Delad data kodas i URL-hashfragmentet, som aldrig skickas till en server',
+                    sharing_4: 'Om ett fall är för stort att dela tas anteckningar bort först, sedan planen — bara den slutliga konstruktjournalen behålls',
+                    sharing_5: 'Om fallet fortfarande är för stort efter borttagning är delning inte tillgänglig — spara som fil istället',
+                    sharing_6: 'För fullständig falldelning med alla data bevarade, använd Spara som fil (JSON)',
+
+                    compat_title: 'Filformat & kompatibilitet',
+                    compat_1: 'Fall sparas i ett strukturerat JSON-format (schema för spinal instrumentering)',
+                    compat_2: 'Schema v4 (mars 2026) — initialt strukturerat format med typsatta element och UUID',
+                    compat_3: 'Schema v5 (april 2026) — revisionsspår med tidsstämplar för skapande och borttagning',
+                    compat_4: 'Schema v6 (april 2026) — dekompressionsförfaranden och rörelsesegmentdata',
+                    compat_5: 'Filer sparade i valfritt format som stöds (v2–v6) uppgraderas automatiskt vid öppning',
+                    compat_6: 'Schemaversioner stöds i 12 veckor efter deras senaste användning i appen',
+                    compat_7: 'När stöd för ett äldre format dras in förblir en fristående version av appen som kan öppna det formatet tillgänglig för nedladdning från GitHub Releases',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3-licens',
                     footer_open_app: 'Öppna appen',
@@ -787,7 +1014,7 @@
                 nb: {
                     title: 'Spinal Instrumentering — Plan & Journalføring',
                     subtitle: 'Hurtigreferanse',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'Hva appen gjør',
                     what_p1:
                         'Et digitalt kirurgisk planleggingsverktøy som erstatter håndtegnede instrumenteringsdiagrammer. Dokumenterer den preoperative planen og det postoperative konstruktet for ryggkirurgi.',
@@ -800,6 +1027,7 @@
                     feat_cages:
                         '6 typer interkorporelle cager (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — filtrert etter anatomisk nivå',
                     feat_osteotomies: 'Osteotomier (Schwab 1–6 + Korpektomi) med valgfri korreksjonsvinkel',
+                    feat_decompression: '13 dekompresjonsprosedyrer (laminektomi, foraminotomi osv.) med Lee-sonedetalj og MR-lignende aksialdiagram',
                     feat_forces: '6 biomekaniske kraftvektorer (translasjon, kompresjon, distraksjon, derotasjon)',
                     feat_companies: '13 implantatprodusenter, 70+ skruesystemer',
                     feat_bonegraft: 'Registrering av beintransplantat (6 typer + fritekst)',
@@ -825,7 +1053,7 @@
                     key_views: 'C cervikal, L lumbal, T thorakolumbal, W hele, P bekken',
                     key_tools: 'I implantatverktøy, N notatverktøy, X tverrforbindelse, U ustabil, O osteotomi',
                     key_actions: 'F fullskjerm, S lagre, E eksporter (PDF/JPG), , innstillinger, ? hjelp, R stang',
-                    key_portrait: 'D demografi, 1–4 bytt fane',
+                    key_portrait: '1–4 bytt fane',
                     privacy_title: 'Personvern & Data',
                     privacy_1: 'Automatisk lagring i nettleseren (kan deaktiveres via personvernmodus)',
                     privacy_2: 'Sesjonspersonvernmodus (rød indikator) — ingen pasientdata lagret på datamaskinen',
@@ -833,6 +1061,24 @@
                     dual_title: 'To-vindusmodus',
                     dual_p1:
                         'Åpne appen i to vinduer av samme nettleser på en datamaskin med to eller flere skjermer. Endringer synkroniseres automatisk — én skjerm for Planen, den andre for Demografi med sanntidsinventar. Et grønt lenkikon bekrefter tilkoblingen.',
+
+                    sharing_title: 'Deling og QR-koder',
+                    sharing_1: 'Kasus kan deles via QR-kode eller URL-lenke — begge bruker samme komprimerte koding',
+                    sharing_2: 'Pasientidentifiserbare data (navn, fødselsdato, ID, kjønn, kirurg, dato, sted) fjernes automatisk før deling',
+                    sharing_3: 'Delte data kodes i URL-hashfragmentet, som aldri sendes til en server',
+                    sharing_4: 'Hvis et kasus er for stort til å dele, fjernes notater først, deretter planen — bare det endelige konstruktet beholdes',
+                    sharing_5: 'Hvis kasuset fortsatt er for stort etter fjerning, er deling ikke tilgjengelig — lagre som fil i stedet',
+                    sharing_6: 'For fullstendig kasusdeling med alle data bevart, bruk Lagre som fil (JSON)',
+
+                    compat_title: 'Filformat og kompatibilitet',
+                    compat_1: 'Kasus lagres i et strukturert JSON-format (spinal instrumenteringsskjema)',
+                    compat_2: 'Skjema v4 (mars 2026) — innledende strukturert format med typede elementer og UUID',
+                    compat_3: 'Skjema v5 (april 2026) — revisjonsspor med tidsstempler for opprettelse og fjerning',
+                    compat_4: 'Skjema v6 (april 2026) — dekompresjonsprosedyrer og bevegelsessegmentdata',
+                    compat_5: 'Filer lagret i et støttet format (v2–v6) oppgraderes automatisk ved åpning',
+                    compat_6: 'Skjemaversjoner støttes i 12 uker etter siste bruk i appen',
+                    compat_7: 'Når støtte for et eldre format trekkes tilbake, forblir en frittstående versjon av appen som kan åpne det formatet tilgjengelig for nedlasting fra GitHub Releases',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3-lisens',
                     footer_open_app: 'Åpne appen',
@@ -843,7 +1089,7 @@
                 da: {
                     title: 'Spinal Instrumentering — Plan & Journalføring',
                     subtitle: 'Hurtigreference',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'Hvad appen gør',
                     what_p1:
                         'Et digitalt kirurgisk planlægningsværktøj, der erstatter håndtegnede instrumenteringsdiagrammer. Dokumenterer den præoperative plan og det postoperative konstrukt til rygkirurgi.',
@@ -856,6 +1102,7 @@
                     feat_cages:
                         '6 typer interkorporelle cages (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — filtreret efter anatomisk niveau',
                     feat_osteotomies: 'Osteotomier (Schwab 1–6 + Korpektomi) med valgfri korrektionsvinkel',
+                    feat_decompression: '13 dekompressionsprocedurer (laminektomi, foraminotomi osv.) med Lee-zonedetalje og MR-lignende aksialdiagram',
                     feat_forces: '6 biomekaniske kraftvektorer (translation, kompression, distraktion, derotation)',
                     feat_companies: '13 implantatproducenter, 70+ skruesystemer',
                     feat_bonegraft: 'Registrering af knogletransplantat (6 typer + fritekst)',
@@ -881,7 +1128,7 @@
                     key_views: 'C cervikal, L lumbal, T thorakolumbal, W hele, P bækken',
                     key_tools: 'I implantatværktøj, N notatværktøj, X tværforbindelse, U ustabil, O osteotomi',
                     key_actions: 'F fuld skærm, S gem, E eksportér (PDF/JPG), , præferencer, ? hjælp, R stang',
-                    key_portrait: 'D demografi, 1–4 skift fane',
+                    key_portrait: '1–4 skift fane',
                     privacy_title: 'Privatliv & Data',
                     privacy_1: 'Automatisk lagring i browseren (kan deaktiveres via privatlivstilstand)',
                     privacy_2: 'Sessionsprivatlivstilstand (rød indikator) — ingen patientdata gemt på computeren',
@@ -889,6 +1136,24 @@
                     dual_title: 'To-vindustilstand',
                     dual_p1:
                         'Åbn appen i to vinduer af samme browser på en computer med to eller flere skærme. Ændringer synkroniseres automatisk — én skærm til Planen, den anden til Demografi med realtidsinventar. Et grønt linkikon bekræfter forbindelsen.',
+
+                    sharing_title: 'Deling og QR-koder',
+                    sharing_1: 'Sager kan deles via QR-kode eller URL-link — begge bruger samme komprimerede kodning',
+                    sharing_2: 'Patientidentificerbare data (navn, fødselsdato, ID, køn, kirurg, dato, sted) fjernes automatisk før deling',
+                    sharing_3: 'Delte data kodes i URL-hashfragmentet, som aldrig sendes til en server',
+                    sharing_4: 'Hvis en sag er for stor til at dele, fjernes noter først, derefter planen — kun det endelige konstrukt bevares',
+                    sharing_5: 'Hvis sagen stadig er for stor efter fjernelse, er deling ikke tilgængelig — gem som fil i stedet',
+                    sharing_6: 'For komplet sagdeling med alle data bevaret, brug Gem som fil (JSON)',
+
+                    compat_title: 'Filformat og kompatibilitet',
+                    compat_1: 'Sager gemmes i et struktureret JSON-format (spinal instrumenteringsskema)',
+                    compat_2: 'Skema v4 (marts 2026) — indledende struktureret format med typede elementer og UUID',
+                    compat_3: 'Skema v5 (april 2026) — revisionsspor med tidsstempler for oprettelse og fjernelse',
+                    compat_4: 'Skema v6 (april 2026) — dekompressionsprocedurer og bevægelsessegmentdata',
+                    compat_5: 'Filer gemt i et understøttet format (v2–v6) opgraderes automatisk ved åbning',
+                    compat_6: 'Skemaversioner understøttes i 12 uger efter deres seneste brug i appen',
+                    compat_7: 'Når understøttelse af et ældre format ophører, forbliver en selvstændig version af appen, der kan åbne det format, tilgængelig for download fra GitHub Releases',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3-licens',
                     footer_open_app: 'Åbn appen',
@@ -899,7 +1164,7 @@
                 fi: {
                     title: 'Selkärangan Instrumentointi — Suunnitelma & Kirjaus',
                     subtitle: 'Pikaopas',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'Mitä sovellus tekee',
                     what_p1:
                         'Digitaalinen kirurginen suunnittelutyökalu, joka korvaa käsin piirretyt instrumentointikaaviot. Dokumentoi preoperatiivisen suunnitelman ja postoperatiivisen konstruktin selkäkirurgiaan.',
@@ -912,6 +1177,7 @@
                     feat_cages:
                         '6 välilevyhäkkityyppiä (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — suodatettu anatomisen tason mukaan',
                     feat_osteotomies: 'Osteotomiat (Schwab 1–6 + Korpektomia) valinnaisella korjauskulmalla',
+                    feat_decompression: '13 dekompressiotoimenpidettä (laminektomia, foraminotomia jne.) Lee-vyöhyketiedoilla ja MRI-tyylisellä aksiaalikaaviolla',
                     feat_forces: '6 biomekaanista voimavektoria (translaatio, kompressio, distraktio, derotaatio)',
                     feat_companies: '13 implantaattivalmistajaa, 70+ ruuvijärjestelmää',
                     feat_bonegraft: 'Luusiirteen kirjaus (6 tyyppiä + vapaa teksti)',
@@ -938,7 +1204,7 @@
                     key_tools:
                         'I implantaattityökalu, N muistiinpanotyökalu, X poikkiyhdistäjä, U epävakaa, O osteotomia',
                     key_actions: 'F koko näyttö, S tallenna, E vie (PDF/JPG), , asetukset, ? ohje, R tanko',
-                    key_portrait: 'D tiedot, 1–4 vaihda välilehteä',
+                    key_portrait: '1–4 vaihda välilehteä',
                     privacy_title: 'Tietosuoja & Data',
                     privacy_1: 'Automaattinen tallennus selaimeen (poistettavissa tietosuojatilalla)',
                     privacy_2:
@@ -948,6 +1214,24 @@
                     dual_title: 'Kaksoisikkunatila',
                     dual_p1:
                         'Avaa sovellus kahdessa ikkunassa samassa selaimessa tietokoneella, jossa on kaksi tai useampi näyttö. Muutokset synkronoituvat automaattisesti — yksi näyttö Suunnitelmalle, toinen Demografialle reaaliaikaisella inventaariolla. Vihreä linkkikuvake vahvistaa yhteyden.',
+
+                    sharing_title: 'Jakaminen ja QR-koodit',
+                    sharing_1: 'Tapauksia voidaan jakaa QR-koodilla tai URL-linkillä — molemmat käyttävät samaa pakattua koodausta',
+                    sharing_2: 'Potilaan tunnistettavat tiedot (nimi, syntymäaika, tunniste, sukupuoli, kirurgi, päivämäärä, sijainti) poistetaan automaattisesti ennen jakamista',
+                    sharing_3: 'Jaetut tiedot koodataan URL-hashfragmenttiin, jota ei koskaan lähetetä palvelimelle',
+                    sharing_4: 'Jos tapaus on liian suuri jaettavaksi, muistiinpanot poistetaan ensin, sitten suunnitelma — vain lopullinen konstruktikirjaus säilytetään',
+                    sharing_5: 'Jos tapaus on yhä liian suuri poiston jälkeen, jakaminen ei ole käytettävissä — tallenna sen sijaan tiedostoksi',
+                    sharing_6: 'Täydellistä tapauksen jakamista varten kaikkine tietoineen käytä Tallenna tiedostoksi (JSON)',
+
+                    compat_title: 'Tiedostomuoto ja yhteensopivuus',
+                    compat_1: 'Tapaukset tallennetaan rakenteiseen JSON-muotoon (selkärangan instrumentointiskeema)',
+                    compat_2: 'Skeema v4 (maaliskuu 2026) — ensimmäinen rakenteinen muoto tyypitetyillä elementeillä ja UUID:lla',
+                    compat_3: 'Skeema v5 (huhtikuu 2026) — tarkastuspolku luonti- ja poistamisaikaleimoilla',
+                    compat_4: 'Skeema v6 (huhtikuu 2026) — dekompressiomenettelyt ja liikesegmenttitiedot',
+                    compat_5: 'Missä tahansa tuetussa muodossa (v2–v6) tallennetut tiedostot päivitetään automaattisesti avattaessa',
+                    compat_6: 'Skeemaversioita tuetaan 12 viikkoa niiden viimeisimmän käytön jälkeen sovelluksessa',
+                    compat_7: 'Kun vanhemman muodon tuki päättyy, kyseisen muodon avaamiseen kykenevä itsenäinen sovellusversio pysyy ladattavissa GitHub Releasesin kautta',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3 -lisenssi',
                     footer_open_app: 'Avaa sovellus',
@@ -958,7 +1242,7 @@
                 nl: {
                     title: 'Spinale Instrumentatie — Plan & Verslag',
                     subtitle: 'Snelgids',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'Wat deze app doet',
                     what_p1:
                         'Een digitaal chirurgisch planningsinstrument dat handgetekende instrumentatiediagrammen vervangt. Documenteert het preoperatieve plan en het postoperatieve construct voor wervelkolomchirurgie.',
@@ -971,6 +1255,7 @@
                     feat_cages:
                         '6 typen interkorporele cages (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — gefilterd op anatomisch niveau',
                     feat_osteotomies: 'Osteotomieën (Schwab 1–6 + Corpectomie) met optionele correctiehoek',
+                    feat_decompression: '13 decompressieprocedures (laminectomie, foraminotomie enz.) met Lee-zonedetail en MRI-achtig axiaal diagram',
                     feat_forces: '6 biomechanische krachtvectoren (translatie, compressie, distractie, derotatie)',
                     feat_companies: '13 implantatfabrikanten, 70+ schroefsystemen',
                     feat_bonegraft: 'Bottransplantaatregistratie (6 typen + vrije tekst)',
@@ -997,7 +1282,7 @@
                     key_tools:
                         'I implantaatgereedschap, N notitiegereedschap, X dwarsverbinding, U instabiel, O osteotomie',
                     key_actions: 'F volledig scherm, S opslaan, E exporteren (PDF/JPG), , voorkeuren, ? hulp, R staaf',
-                    key_portrait: 'D demografie, 1–4 wissel tabblad',
+                    key_portrait: '1–4 wissel tabblad',
                     privacy_title: 'Privacy & Data',
                     privacy_1: 'Automatisch opslaan in de browser (uitschakelbaar via privacymodus)',
                     privacy_2: 'Sessieprivacymodus (rode indicator) — geen patiëntgegevens opgeslagen op de computer',
@@ -1006,6 +1291,24 @@
                     dual_title: 'Tweevenstermodus',
                     dual_p1:
                         'Open de app in twee vensters van dezelfde browser op een computer met twee of meer schermen. Wijzigingen synchroniseren automatisch — één scherm voor het Plan, het andere voor Demografie met realtime-inventaris. Een groen koppelingspictogram bevestigt de verbinding.',
+
+                    sharing_title: 'Delen & QR-codes',
+                    sharing_1: 'Casussen kunnen worden gedeeld via QR-code of URL-link — beide gebruiken dezelfde gecomprimeerde codering',
+                    sharing_2: 'Patiëntidentificerende gegevens (naam, geboortedatum, ID, geslacht, chirurg, datum, locatie) worden automatisch verwijderd voor het delen',
+                    sharing_3: 'Gedeelde gegevens worden gecodeerd in het URL-hashfragment, dat nooit naar een server wordt verzonden',
+                    sharing_4: 'Als een casus te groot is om te delen, worden eerst notities verwijderd, dan het plan — alleen het definitieve construct wordt behouden',
+                    sharing_5: 'Als de casus na verwijdering nog steeds te groot is, is delen niet beschikbaar — sla op als bestand',
+                    sharing_6: 'Voor volledige casusdeling met alle gegevens behouden, gebruik Opslaan als bestand (JSON)',
+
+                    compat_title: 'Bestandsformaat & compatibiliteit',
+                    compat_1: 'Casussen worden opgeslagen in een gestructureerd JSON-formaat (spinaal instrumentatieschema)',
+                    compat_2: 'Schema v4 (maart 2026) — eerste gestructureerde formaat met getypeerde elementen en UUID',
+                    compat_3: 'Schema v5 (april 2026) — auditspoor met tijdstempels voor aanmaak en verwijdering',
+                    compat_4: 'Schema v6 (april 2026) — decompressieprocedures en bewegingssegmentgegevens',
+                    compat_5: 'Bestanden opgeslagen in elk ondersteund formaat (v2–v6) worden automatisch bijgewerkt bij het openen',
+                    compat_6: 'Schemaversies worden 12 weken ondersteund na hun laatste gebruik in de app',
+                    compat_7: 'Wanneer ondersteuning voor een ouder formaat wordt ingetrokken, blijft een zelfstandige versie van de app die dat formaat kan openen beschikbaar voor download via GitHub Releases',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3-licentie',
                     footer_open_app: 'Open app',
@@ -1016,7 +1319,7 @@
                 pl: {
                     title: 'Instrumentacja Kręgosłupa — Plan i Zapis',
                     subtitle: 'Skrócona Instrukcja',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'Co robi ta aplikacja',
                     what_p1:
                         'Cyfrowe narzędzie planowania chirurgicznego zastępujące ręcznie rysowane schematy instrumentacji. Dokumentuje plan przedoperacyjny i konstrukt pooperacyjny w chirurgii kręgosłupa.',
@@ -1029,6 +1332,7 @@
                     feat_cages:
                         '6 typów klatek międzytrzonowych (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — filtrowane według poziomu anatomicznego',
                     feat_osteotomies: 'Osteotomie (Schwab 1–6 + Korporektomia) z opcjonalnym kątem korekcji',
+                    feat_decompression: '13 procedur dekompresji (laminektomia, foraminotomia itp.) z detalami stref Lee i diagramem osiowym w stylu MRI',
                     feat_forces: '6 biomechanicznych wektorów siły (translacja, kompresja, dystrakcja, derotacja)',
                     feat_companies: '13 producentów implantów, 70+ systemów śrub',
                     feat_bonegraft: 'Rejestracja przeszczepu kostnego (6 typów + tekst wolny)',
@@ -1055,7 +1359,7 @@
                     key_tools:
                         'I narzędzie implantowe, N narzędzie notatki, X łącznik poprzeczny, U niestabilny, O osteotomia',
                     key_actions: 'F pełny ekran, S zapisz, E eksportuj (PDF/JPG), , ustawienia, ? pomoc, R pręt',
-                    key_portrait: 'D dane, 1–4 zmień kartę',
+                    key_portrait: '1–4 zmień kartę',
                     privacy_title: 'Prywatność i dane',
                     privacy_1: 'Automatyczny zapis w przeglądarce (wyłączalny trybem Prywatności)',
                     privacy_2:
@@ -1064,6 +1368,24 @@
                     dual_title: 'Tryb dwóch okien',
                     dual_p1:
                         'Otwórz aplikację w dwóch oknach tej samej przeglądarki na komputerze z dwoma lub więcej ekranami. Zmiany synchronizują się automatycznie — jeden ekran dla Planu, drugi dla Demografii z inwentarzem w czasie rzeczywistym. Zielona ikona połączenia potwierdza synchronizację.',
+
+                    sharing_title: 'Udostępnianie i kody QR',
+                    sharing_1: 'Przypadki można udostępniać za pomocą kodu QR lub linku URL — oba używają tego samego skompresowanego kodowania',
+                    sharing_2: 'Dane identyfikujące pacjenta (imię, data urodzenia, identyfikator, płeć, chirurg, data, lokalizacja) są automatycznie usuwane przed udostępnieniem',
+                    sharing_3: 'Udostępnione dane są kodowane w fragmencie hash adresu URL, który nigdy nie jest wysyłany na serwer',
+                    sharing_4: 'Jeśli przypadek jest zbyt duży do udostępnienia, najpierw usuwane są notatki, potem plan — zachowywany jest tylko końcowy zapis konstruktu',
+                    sharing_5: 'Jeśli przypadek jest nadal zbyt duży po usunięciu, udostępnianie jest niedostępne — zamiast tego zapisz jako plik',
+                    sharing_6: 'Aby udostępnić pełny przypadek z zachowaniem wszystkich danych, użyj Zapisz jako plik (JSON)',
+
+                    compat_title: 'Format pliku i kompatybilność',
+                    compat_1: 'Przypadki są zapisywane w ustrukturyzowanym formacie JSON (schemat instrumentacji kręgosłupa)',
+                    compat_2: 'Schemat v4 (marzec 2026) — początkowy format strukturalny z typowanymi elementami i UUID',
+                    compat_3: 'Schemat v5 (kwiecień 2026) — ścieżka audytu ze znacznikami czasu tworzenia i usuwania',
+                    compat_4: 'Schemat v6 (kwiecień 2026) — procedury dekompresji i dane segmentu ruchowego',
+                    compat_5: 'Pliki zapisane w dowolnym obsługiwanym formacie (v2–v6) są automatycznie aktualizowane przy otwieraniu',
+                    compat_6: 'Wersje schematów są obsługiwane przez 12 tygodni po ich ostatnim użyciu w aplikacji',
+                    compat_7: 'Po wycofaniu obsługi starszego formatu samodzielna wersja aplikacji zdolna do otwarcia tego formatu pozostaje dostępna do pobrania z GitHub Releases',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'Licencja GNU GPLv3',
                     footer_open_app: 'Otwórz aplikację',
@@ -1074,7 +1396,7 @@
                 el: {
                     title: 'Σπονδυλική Οργανοθεσία — Σχέδιο & Αρχείο',
                     subtitle: 'Σύντομος Οδηγός',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'Τι κάνει αυτή η εφαρμογή',
                     what_p1:
                         'Ένα ψηφιακό εργαλείο χειρουργικού σχεδιασμού που αντικαθιστά τα χειρόγραφα διαγράμματα οργανοθεσίας. Τεκμηριώνει το προεγχειρητικό σχέδιο και το μετεγχειρητικό κατασκεύασμα για χειρουργικές επεμβάσεις σπονδυλικής στήλης.',
@@ -1087,6 +1409,7 @@
                     feat_cages:
                         '6 τύποι μεσοσπονδύλιων κλωβών (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — φιλτραρισμένοι ανά ανατομικό επίπεδο',
                     feat_osteotomies: 'Οστεοτομίες (Schwab 1–6 + Σωματεκτομή) με προαιρετική γωνία διόρθωσης',
+                    feat_decompression: '13 διαδικασίες αποσυμπίεσης (πετάλεκτομή, τρηματοτομία κ.λπ.) με λεπτομέρεια ζωνών Lee και αξονικό διάγραμμα τύπου MRI',
                     feat_forces: '6 βιομηχανικοί δυναμικοί φορείς (μετάθεση, συμπίεση, διάταση, διόρθωση στροφής)',
                     feat_companies: '13 κατασκευαστές εμφυτευμάτων, 70+ συστήματα βιδών',
                     feat_bonegraft: 'Καταγραφή οστικού μοσχεύματος (6 τύποι + ελεύθερο κείμενο)',
@@ -1114,7 +1437,7 @@
                         'I εργαλείο εμφυτεύματος, N εργαλείο σημείωσης, X εγκάρσια σύνδεση, U ασταθές, O οστεοτομία',
                     key_actions:
                         'F πλήρης οθόνη, S αποθήκευση, E εξαγωγή (PDF/JPG), , προτιμήσεις, ? βοήθεια, R ράβδος',
-                    key_portrait: 'D δημογραφικά, 1–4 αλλαγή καρτέλας',
+                    key_portrait: '1–4 αλλαγή καρτέλας',
                     privacy_title: 'Απόρρητο & Δεδομένα',
                     privacy_1:
                         'Αυτόματη αποθήκευση στο πρόγραμμα περιήγησης (απενεργοποιήσιμη μέσω λειτουργίας Απορρήτου)',
@@ -1125,6 +1448,24 @@
                     dual_title: 'Λειτουργία δύο παραθύρων',
                     dual_p1:
                         'Ανοίξτε την εφαρμογή σε δύο παράθυρα του ίδιου προγράμματος περιήγησης σε υπολογιστή με δύο ή περισσότερες οθόνες. Οι αλλαγές συγχρονίζονται αυτόματα — μία οθόνη για το Σχέδιο, η άλλη για τη Δημογραφία με ζωντανό απόθεμα. Ένα πράσινο εικονίδιο σύνδεσης επιβεβαιώνει τη σύνδεση.',
+
+                    sharing_title: 'Κοινή χρήση & κωδικοί QR',
+                    sharing_1: 'Τα περιστατικά μπορούν να κοινοποιηθούν μέσω κωδικού QR ή συνδέσμου URL — και τα δύο χρησιμοποιούν την ίδια συμπιεσμένη κωδικοποίηση',
+                    sharing_2: 'Τα δεδομένα ταυτοποίησης ασθενούς (όνομα, ημερομηνία γέννησης, αναγνωριστικό, φύλο, χειρουργός, ημερομηνία, τοποθεσία) αφαιρούνται αυτόματα πριν την κοινοποίηση',
+                    sharing_3: 'Τα κοινοποιημένα δεδομένα κωδικοποιούνται στο hash fragment του URL, το οποίο δεν αποστέλλεται ποτέ σε διακομιστή',
+                    sharing_4: 'Εάν ένα περιστατικό είναι πολύ μεγάλο για κοινοποίηση, αφαιρούνται πρώτα οι σημειώσεις, μετά το σχέδιο — διατηρείται μόνο το τελικό κατασκεύασμα',
+                    sharing_5: 'Εάν το περιστατικό παραμένει πολύ μεγάλο μετά την αφαίρεση, η κοινοποίηση δεν είναι διαθέσιμη — αποθηκεύστε ως αρχείο',
+                    sharing_6: 'Για πλήρη κοινοποίηση περιστατικού με διατήρηση όλων των δεδομένων, χρησιμοποιήστε Αποθήκευση ως αρχείο (JSON)',
+
+                    compat_title: 'Μορφή αρχείου & Συμβατότητα',
+                    compat_1: 'Τα περιστατικά αποθηκεύονται σε δομημένη μορφή JSON (σχήμα σπονδυλικής οργανοθεσίας)',
+                    compat_2: 'Σχήμα v4 (Μάρτιος 2026) — αρχική δομημένη μορφή με τυποποιημένα στοιχεία και UUID',
+                    compat_3: 'Σχήμα v5 (Απρίλιος 2026) — ιστορικό ελέγχου με χρονοσφραγίδες δημιουργίας και αφαίρεσης',
+                    compat_4: 'Σχήμα v6 (Απρίλιος 2026) — διαδικασίες αποσυμπίεσης και δεδομένα κινητικού τμήματος',
+                    compat_5: 'Τα αρχεία σε οποιαδήποτε υποστηριζόμενη μορφή (v2–v6) αναβαθμίζονται αυτόματα κατά το άνοιγμα',
+                    compat_6: 'Οι εκδόσεις σχήματος υποστηρίζονται για 12 εβδομάδες μετά την τελευταία χρήση τους στην εφαρμογή',
+                    compat_7: 'Όταν η υποστήριξη μιας παλαιότερης μορφής αποσύρεται, μια αυτόνομη έκδοση της εφαρμογής που μπορεί να ανοίξει αυτή τη μορφή παραμένει διαθέσιμη για λήψη από το GitHub Releases',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'Άδεια GNU GPLv3',
                     footer_open_app: 'Άνοιγμα εφαρμογής',
@@ -1135,7 +1476,7 @@
                 tr: {
                     title: 'Spinal Enstrümantasyon — Plan ve Kayıt',
                     subtitle: 'Hızlı Başvuru',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'Bu uygulama ne yapar',
                     what_p1:
                         'Elle çizilen enstrümantasyon diyagramlarının yerini alan dijital bir cerrahi planlama aracı. Omurga cerrahisi için preoperatif planı ve postoperatif yapıyı belgeler.',
@@ -1148,6 +1489,7 @@
                     feat_cages:
                         '6 interkorporel kafes türü (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — anatomik seviyeye göre filtrelenmiş',
                     feat_osteotomies: 'Osteotomiler (Schwab 1–6 + Korpektomi) isteğe bağlı düzeltme açısıyla',
+                    feat_decompression: '13 dekompresyon prosedürü (laminektomi, foraminotomi vb.) Lee bölge detayı ve MRG tarzı aksiyal diyagram ile',
                     feat_forces: '6 biyomekanik kuvvet vektörü (translasyon, kompresyon, distraksiyon, derotasyon)',
                     feat_companies: '13 implant üreticisi, 70+ vida sistemi',
                     feat_bonegraft: 'Kemik grefti kaydı (6 tür + serbest metin)',
@@ -1173,7 +1515,7 @@
                     key_views: 'C servikal, L lomber, T torakolomber, W tümü, P pelvis',
                     key_tools: 'I implant aracı, N not aracı, X çapraz bağlantı, U stabil değil, O osteotomi',
                     key_actions: 'F tam ekran, S kaydet, E dışa aktar (PDF/JPG), , tercihler, ? yardım, R çubuk',
-                    key_portrait: 'D demografi, 1–4 sekme değiştir',
+                    key_portrait: '1–4 sekme değiştir',
                     privacy_title: 'Gizlilik ve Veri',
                     privacy_1: 'Tarayıcıda otomatik kayıt (Gizlilik modu ile devre dışı bırakılabilir)',
                     privacy_2: 'Oturum Gizlilik modu (kırmızı gösterge) — bilgisayarda hasta verisi saklanmaz',
@@ -1181,6 +1523,24 @@
                     dual_title: 'Çift pencere modu',
                     dual_p1:
                         'Uygulamayı iki veya daha fazla ekranı olan bir bilgisayarda aynı tarayıcının iki penceresinde açın. Değişiklikler otomatik olarak senkronize olur — bir ekran Plan için, diğeri gerçek zamanlı envanter ile Demografi için. Yeşil bir bağlantı simgesi bağlantıyı onaylar.',
+
+                    sharing_title: 'Paylaşım ve QR Kodları',
+                    sharing_1: 'Vakalar QR kodu veya URL bağlantısı ile paylaşılabilir — her ikisi de aynı sıkıştırılmış kodlamayı kullanır',
+                    sharing_2: 'Hasta tanımlayıcı veriler (isim, doğum tarihi, kimlik, cinsiyet, cerrah, tarih, konum) paylaşım öncesinde otomatik olarak kaldırılır',
+                    sharing_3: 'Paylaşılan veriler URL hash parçasında kodlanır ve asla bir sunucuya gönderilmez',
+                    sharing_4: 'Bir vaka paylaşmak için çok büyükse, önce notlar kaldırılır, sonra plan — yalnızca nihai yapı kaydı korunur',
+                    sharing_5: 'Kırpma sonrasında vaka hâlâ çok büyükse, paylaşım kullanılamaz — bunun yerine dosya olarak kaydedin',
+                    sharing_6: 'Tüm verilerin korunduğu tam vaka paylaşımı için Dosya olarak kaydet (JSON) kullanın',
+
+                    compat_title: 'Dosya Formatı ve Uyumluluk',
+                    compat_1: 'Vakalar yapılandırılmış bir JSON formatında (spinal enstrümantasyon şeması) kaydedilir',
+                    compat_2: 'Şema v4 (Mart 2026) — tiplenmiş öğeler ve UUID ile ilk yapılandırılmış format',
+                    compat_3: 'Şema v5 (Nisan 2026) — oluşturma ve kaldırma zaman damgalı denetim izi',
+                    compat_4: 'Şema v6 (Nisan 2026) — dekompresyon prosedürleri ve hareket segmenti verileri',
+                    compat_5: 'Desteklenen herhangi bir formatta (v2–v6) kaydedilmiş dosyalar açıldığında otomatik olarak güncellenir',
+                    compat_6: 'Şema sürümleri, uygulamada son kullanımlarından 12 hafta sonrasına kadar desteklenir',
+                    compat_7: 'Eski bir format desteği kaldırıldığında, o formatı açabilen bağımsız bir uygulama sürümü GitHub Releases üzerinden indirilebilir durumda kalır',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3 Lisansı',
                     footer_open_app: 'Uygulamayı aç',
@@ -1190,7 +1550,7 @@
                 ru: {
                     title: 'Спинальная инструментация — план и запись',
                     subtitle: 'Краткое руководство',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'Что делает это приложение',
                     what_p1:
                         'Цифровой инструмент хирургического планирования, заменяющий нарисованные от руки схемы инструментации. Документирует предоперационный план и послеоперационную конструкцию для спинальной хирургии.',
@@ -1203,6 +1563,7 @@
                     feat_cages:
                         '6 типов межтеловых кейджей (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — фильтрация по анатомическому уровню',
                     feat_osteotomies: 'Остеотомии (Schwab 1–6 + корпэктомия) с опциональным углом коррекции',
+                    feat_decompression: '13 процедур декомпрессии (ламинэктомия, фораминотомия и др.) с детализацией зон Lee и осевой диаграммой в стиле МРТ',
                     feat_forces: '6 биомеханических силовых векторов (трансляция, компрессия, дистракция, деротация)',
                     feat_companies: '13 производителей имплантов, 70+ систем винтов',
                     feat_bonegraft: 'Запись костного трансплантата (6 типов + примечания)',
@@ -1229,7 +1590,7 @@
                     key_tools:
                         'I инструмент имплантов, N инструмент заметок, X поперечная связь, U нестабильный, O остеотомия',
                     key_actions: 'F полный экран, S сохранить, E экспорт (PDF/JPG), , настройки, ? справка, R стержень',
-                    key_portrait: 'D демография, 1–4 переключить вкладку',
+                    key_portrait: '1–4 переключить вкладку',
                     privacy_title: 'Конфиденциальность и данные',
                     privacy_1: 'Автосохранение в хранилище браузера (можно отключить через режим конфиденциальности)',
                     privacy_2:
@@ -1239,6 +1600,24 @@
                     dual_title: 'Режим двух окон',
                     dual_p1:
                         'Откройте приложение в двух окнах одного браузера на компьютере с двумя или более экранами. Изменения синхронизируются автоматически — один экран для Плана, другой для Демографии с живым инвентарём. Зелёный значок связи подтверждает соединение.',
+
+                    sharing_title: 'Обмен и QR-коды',
+                    sharing_1: 'Случаи можно передать через QR-код или URL-ссылку — оба используют одинаковое сжатое кодирование',
+                    sharing_2: 'Идентифицирующие данные пациента (имя, дата рождения, ID, пол, хирург, дата, место) автоматически удаляются перед передачей',
+                    sharing_3: 'Передаваемые данные кодируются в hash-фрагменте URL, который никогда не отправляется на сервер',
+                    sharing_4: 'Если случай слишком большой для передачи, сначала удаляются заметки, затем план — сохраняется только итоговая запись конструкции',
+                    sharing_5: 'Если после удаления случай всё ещё слишком велик, передача недоступна — сохраните как файл',
+                    sharing_6: 'Для полной передачи случая с сохранением всех данных используйте Сохранить как файл (JSON)',
+
+                    compat_title: 'Формат файла и совместимость',
+                    compat_1: 'Случаи сохраняются в структурированном JSON-формате (схема спинальной инструментации)',
+                    compat_2: 'Схема v4 (март 2026) — начальный структурированный формат с типизированными элементами и UUID',
+                    compat_3: 'Схема v5 (апрель 2026) — аудиторский след с метками времени создания и удаления',
+                    compat_4: 'Схема v6 (апрель 2026) — процедуры декомпрессии и данные двигательного сегмента',
+                    compat_5: 'Файлы, сохранённые в любом поддерживаемом формате (v2–v6), автоматически обновляются при открытии',
+                    compat_6: 'Версии схемы поддерживаются в течение 12 недель после последнего использования в приложении',
+                    compat_7: 'При прекращении поддержки старого формата автономная версия приложения, способная открыть этот формат, остаётся доступной для загрузки из GitHub Releases',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'Лицензия GNU GPLv3',
                     footer_open_app: 'Открыть приложение',
@@ -1248,7 +1627,7 @@
                 uk: {
                     title: 'Спінальна інструментація — план та запис',
                     subtitle: 'Короткий довідник',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: 'Що робить цей додаток',
                     what_p1:
                         'Цифровий інструмент хірургічного планування, що замінює намальовані від руки схеми інструментації. Документує передопераційний план та післяопераційну конструкцію для спінальної хірургії.',
@@ -1261,6 +1640,7 @@
                     feat_cages:
                         '6 типів міжтілових кейджів (ACDF, PLIF, TLIF, XLIF, OLIF, ALIF) — фільтрація за анатомічним рівнем',
                     feat_osteotomies: 'Остеотомії (Schwab 1–6 + корпектомія) з опціональним кутом корекції',
+                    feat_decompression: '13 процедур декомпресії (ламінектомія, форамінотомія тощо) з деталізацією зон Lee та осьовою діаграмою у стилі МРТ',
                     feat_forces: '6 біомеханічних силових векторів (трансляція, компресія, дистракція, деротація)',
                     feat_companies: '13 виробників імплантів, 70+ систем гвинтів',
                     feat_bonegraft: 'Запис кісткового трансплантата (6 типів + примітки)',
@@ -1288,7 +1668,7 @@
                         "I інструмент імплантів, N інструмент нотаток, X поперечний з'єднувач, U нестабільний, O остеотомія",
                     key_actions:
                         'F повний екран, S зберегти, E експорт (PDF/JPG), , налаштування, ? довідка, R стрижень',
-                    key_portrait: 'D демографія, 1–4 змінити вкладку',
+                    key_portrait: '1–4 змінити вкладку',
                     privacy_title: 'Конфіденційність та дані',
                     privacy_1: 'Автозбереження у сховищі браузера (можна вимкнути через режим конфіденційності)',
                     privacy_2:
@@ -1298,6 +1678,24 @@
                     dual_title: 'Режим двох вікон',
                     dual_p1:
                         "Відкрийте додаток у двох вікнах одного браузера на комп'ютері з двома або більше екранами. Зміни синхронізуються автоматично — один екран для Плану, інший для Демографії з живим інвентарем. Зелений значок зв'язку підтверджує з'єднання.",
+
+                    sharing_title: 'Обмін та QR-коди',
+                    sharing_1: 'Випадки можна передати через QR-код або URL-посилання — обидва використовують однакове стисле кодування',
+                    sharing_2: "Ідентифікаційні дані пацієнта (ім'я, дата народження, ID, стать, хірург, дата, місце) автоматично видаляються перед передачею",
+                    sharing_3: 'Передані дані кодуються в hash-фрагменті URL, який ніколи не надсилається на сервер',
+                    sharing_4: 'Якщо випадок занадто великий для передачі, спочатку видаляються нотатки, потім план — зберігається лише підсумковий запис конструкції',
+                    sharing_5: 'Якщо після видалення випадок все ще занадто великий, передача недоступна — збережіть як файл',
+                    sharing_6: 'Для повної передачі випадку зі збереженням усіх даних використовуйте Зберегти як файл (JSON)',
+
+                    compat_title: 'Формат файлу та сумісність',
+                    compat_1: 'Випадки зберігаються у структурованому JSON-форматі (схема спінальної інструментації)',
+                    compat_2: 'Схема v4 (березень 2026) — початковий структурований формат з типізованими елементами та UUID',
+                    compat_3: 'Схема v5 (квітень 2026) — аудиторський слід з мітками часу створення та видалення',
+                    compat_4: 'Схема v6 (квітень 2026) — процедури декомпресії та дані рухового сегмента',
+                    compat_5: 'Файли, збережені у будь-якому підтримуваному форматі (v2–v6), автоматично оновлюються при відкритті',
+                    compat_6: 'Версії схеми підтримуються протягом 12 тижнів після останнього використання у додатку',
+                    compat_7: 'Коли підтримку старого формату припинено, автономна версія додатку, здатна відкрити цей формат, залишається доступною для завантаження з GitHub Releases',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'Ліцензія GNU GPLv3',
                     footer_open_app: 'Відкрити додаток',
@@ -1308,7 +1706,7 @@
                 'zh-Hans': {
                     title: '脊柱内固定 — 计划与记录',
                     subtitle: '快速参考',
-                    version: 'v3.3.00-beta',
+                    version: 'v3.3.01-beta',
                     what_title: '本应用的功能',
                     what_p1: '一款替代手绘内固定图的数字手术规划工具。记录脊柱手术的术前计划和术后结构。',
                     what_p2:
@@ -1318,6 +1716,7 @@
                     feat_screws: '3种螺钉类型（单轴/多轴/单平面），5种钩，带/线/缆 — 附自由文本注释',
                     feat_cages: '6种椎间融合器类型（ACDF、PLIF、TLIF、XLIF、OLIF、ALIF） — 按解剖层级筛选',
                     feat_osteotomies: '截骨术（Schwab 1–6 + 椎体切除术）可选矫正角度',
+                    feat_decompression: '13种减压术（椎板切除术、椎间孔切开术等）含Lee区域详情及MRI风格轴位图',
                     feat_forces: '6种生物力学力向量（平移、压缩、撑开、去旋转）',
                     feat_companies: '13家内植物制造商，70+螺钉系统',
                     feat_bonegraft: '骨移植记录（6种类型 + 自由文本备注）',
@@ -1344,7 +1743,7 @@
                     key_views: 'C 颈椎、L 腰椎、T 胸腰椎、W 全部、P 骨盆',
                     key_tools: 'I 内植物工具、N 备注工具、X 横连、U 不稳定、O 截骨术',
                     key_actions: 'F 全屏, S 保存, E 导出 (PDF/JPG), , 偏好设置, ? 帮助, R 棒',
-                    key_portrait: 'D 基本信息, 1–4 切换标签',
+                    key_portrait: '1–4 切换标签',
                     privacy_title: '隐私与数据',
                     privacy_1: '自动保存到浏览器存储（可通过会话隐私开关禁用）',
                     privacy_2: '会话隐私模式（红色指示器） — 患者数据不会存储在计算机上',
@@ -1352,6 +1751,24 @@
                     dual_title: '双窗口模式',
                     dual_p1:
                         '在拥有两个或更多显示器的计算机上，在同一浏览器的两个窗口中打开应用。更改自动同步 — 一个屏幕用于计划，另一个用于带实时清单的人口统计信息。绿色链接图标确认连接。',
+
+                    sharing_title: '分享与二维码',
+                    sharing_1: '病例可通过二维码或URL链接分享 — 两者使用相同的压缩编码',
+                    sharing_2: '患者身份数据（姓名、出生日期、ID、性别、术者、日期、地点）在分享前自动移除',
+                    sharing_3: '共享数据编码在URL哈希片段中，永远不会发送到服务器',
+                    sharing_4: '如果病例过大无法分享，首先移除备注，然后移除计划 — 仅保留最终结构记录',
+                    sharing_5: '如果精简后病例仍然过大，则无法分享 — 请改为保存为文件',
+                    sharing_6: '要完整分享病例并保留所有数据，请使用保存为文件（JSON）',
+
+                    compat_title: '文件格式与兼容性',
+                    compat_1: '病例以结构化JSON格式保存（脊柱内固定架构）',
+                    compat_2: '架构v4（2026年3月）— 带类型化元素和UUID的初始结构化格式',
+                    compat_3: '架构v5（2026年4月）— 带创建和移除时间戳的审计追踪',
+                    compat_4: '架构v6（2026年4月）— 减压手术和运动节段数据',
+                    compat_5: '以任何支持格式（v2–v6）保存的文件在打开时自动升级',
+                    compat_6: '架构版本在应用中最后一次使用后支持12周',
+                    compat_7: '当旧格式的支持终止时，能够打开该格式的独立版应用仍可从GitHub Releases下载',
+
                     footer_origin: 'Designed in Leeds \u00b7 Yorkshire \u00b7 England',
                     footer_license: 'GNU GPLv3 License',
                     footer_open_app: '打开应用',
@@ -1432,6 +1849,7 @@
                     'feat_refdata',
                     'feat_cages',
                     'feat_osteotomies',
+                    'feat_decompression',
                     'feat_forces',
                     'feat_companies',
                     'feat_bonegraft',
@@ -1491,6 +1909,35 @@
             <h2 class="text-base font-bold text-[#005EB8] uppercase tracking-wide mb-2">${t('dual_title')}</h2>
             <p class="text-sm text-slate-700 mb-1">${t('dual_p1')}</p>
             ${t('dual_p2') !== 'dual_p2' ? `<p class="text-sm text-slate-700">${t('dual_p2')}</p>` : ''}
+        </section>
+
+        <section class="print-break">
+            <h2 class="text-base font-bold text-[#005EB8] uppercase tracking-wide mb-2">${t('sharing_title')}</h2>
+            <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+                <li>${t('sharing_1')}</li>
+                <li>${t('sharing_2')}</li>
+                <li>${t('sharing_3')}</li>
+                <li>${t('sharing_4')}</li>
+                <li>${t('sharing_5')}</li>
+                <li>${t('sharing_6')}</li>
+            </ul>
+        </section>
+
+        <section class="print-break">
+            <h2 class="text-base font-bold text-[#005EB8] uppercase tracking-wide mb-2">${t('compat_title')}</h2>
+            <p class="text-sm text-slate-700 mb-2">${t('compat_1')}</p>
+            <table class="w-full text-sm mb-2">
+                <tbody>
+                    <tr class="border-b border-slate-100"><td class="py-1 text-slate-700">${t('compat_2')}</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-1 text-slate-700">${t('compat_3')}</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-1 text-slate-700">${t('compat_4')}</td></tr>
+                </tbody>
+            </table>
+            <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+                <li>${t('compat_5')}</li>
+                <li>${t('compat_6')}</li>
+                <li>${t('compat_7')}</li>
+            </ul>
         </section>
 
     </main>
