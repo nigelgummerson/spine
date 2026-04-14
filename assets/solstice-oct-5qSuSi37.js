@@ -1,0 +1,1 @@
+var e={"00190837041052":{s:`Solstice OCT`,t:`screw`,d:3.5,l:16,h:`unclassified`,c:`935-16`}};export{e as default};
