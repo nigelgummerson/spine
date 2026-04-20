@@ -202,7 +202,7 @@
         </div>
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-            <div class="progress-text" id="progress-text">0 of 677 items reviewed (0%)</div>
+            <div class="progress-text" id="progress-text">0 of 678 items reviewed (0%)</div>
             <div class="save-hint" id="save-hint"></div>
         </div>
     </div>
@@ -223,7 +223,7 @@
             <a href="#reviewer-panel" class="nav-link-reviewer">Your Details</a>
             <div class="nav-divider"></div>
             <div class="nav-sections">
-                <a href="#section-0" class="nav-link" data-section="0">App Header &amp; Sidebar <span class="nav-count" id="nav-count-0">0/73</span></a>
+                <a href="#section-0" class="nav-link" data-section="0">App Header &amp; Sidebar <span class="nav-count" id="nav-count-0">0/74</span></a>
             <a href="#section-1" class="nav-link" data-section="1">Patient Demographics <span class="nav-count" id="nav-count-1">0/31</span></a>
             <a href="#section-2" class="nav-link" data-section="2">Implant Modal: Screws, Hooks &amp; Bands <span class="nav-count" id="nav-count-2">0/46</span></a>
             <a href="#section-3" class="nav-link" data-section="3">Cage Modal: Interbody Cages <span class="nav-count" id="nav-count-3">0/25</span></a>
@@ -290,6 +290,39 @@
         <h2 class="section-title">App Header &amp; Sidebar</h2>
         <div class="section-guidance">These strings appear in the left sidebar (landscape) or top toolbar (portrait/tablet mode). The sidebar contains: language selector, region view buttons (Cervical, Thoracolumbar, Lumbar, Whole Spine), Plan/Construct editing toggle, tool palette (Implants, Annotations, Tools), action buttons (Copy Plan, Confirm Plan, Load, Save, JPG, PDF, Help, New Patient), session privacy toggle, and theme colour swatches. In portrait mode, the sidebar becomes a compact horizontal toolbar with Demographics/Plan/Construct tabs.</div>
         <div class="section-items">
+        <div class="review-item" data-key="portrait.more_actions" data-section="0" id="item-portrait.more_actions">
+            <div class="item-header">
+                <code class="key-label">portrait.more_actions</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">More actions</div>
+                </div>
+                <div class="col-translation">
+                    <label>Русский</label>
+                    <textarea class="translation-field" data-key="portrait.more_actions" data-original="Ещё">Ещё</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-portrait.more_actions" value="correct" data-key="portrait.more_actions">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-portrait.more_actions" value="corrected" data-key="portrait.more_actions">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="portrait.more_actions" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="portrait.tab.construct" data-section="0" id="item-portrait.tab.construct">
             <div class="item-header">
                 <code class="key-label">portrait.tab.construct</code>
@@ -22807,7 +22840,7 @@ Portrait mode gives each column more vertical space, showing the full spine with
     (function() {
         const LANG = "ru";
         const STORAGE_KEY = "spine_review_" + LANG;
-        const TOTAL = 677;
+        const TOTAL = 678;
 
         // --- Reviewer details ---
 
