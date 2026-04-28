@@ -190,7 +190,7 @@
         <div class="header-top">
             <div>
                 <h1>Spinal Instrumentation Plan & Record: Translation Review</h1>
-                <span class="lang-badge">he / he (he) — v3.23.01-beta</span>
+                <span class="lang-badge">he / he (he) — v3.24.00-beta</span>
             </div>
             <div class="header-actions">
                 <a href="../guide.html" target="_blank" style="color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: none; padding: 6px 10px;" title="How to use this form">Guide</a>
@@ -202,7 +202,7 @@
         </div>
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-            <div class="progress-text" id="progress-text">0 of 832 items reviewed (0%)</div>
+            <div class="progress-text" id="progress-text">0 of 833 items reviewed (0%)</div>
             <div class="save-hint" id="save-hint"></div>
         </div>
     </div>
@@ -225,7 +225,7 @@
             <div class="nav-sections">
                 <a href="#section-0" class="nav-link" data-section="0">App Header &amp; Sidebar <span class="nav-count" id="nav-count-0">0/74</span></a>
             <a href="#section-1" class="nav-link" data-section="1">Patient Demographics <span class="nav-count" id="nav-count-1">0/31</span></a>
-            <a href="#section-2" class="nav-link" data-section="2">Implant Modal: Screws, Hooks &amp; Bands <span class="nav-count" id="nav-count-2">0/48</span></a>
+            <a href="#section-2" class="nav-link" data-section="2">Implant Modal: Screws, Hooks &amp; Bands <span class="nav-count" id="nav-count-2">0/49</span></a>
             <a href="#section-3" class="nav-link" data-section="3">Cage Modal: Interbody Cages <span class="nav-count" id="nav-count-3">0/53</span></a>
             <a href="#section-4" class="nav-link" data-section="4">Osteotomy Modal <span class="nav-count" id="nav-count-4">0/31</span></a>
             <a href="#section-5" class="nav-link" data-section="5">Force Modal <span class="nav-count" id="nav-count-5">0/7</span></a>
@@ -4239,11 +4239,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">e.g. fenestrated, cortical, revision</div>
+                    <div class="english-text">e.g. fenestrated, revision</div>
                 </div>
                 <div class="col-translation">
                     <label>he</label>
-                    <textarea class="translation-field" data-key="modal.screw.annotation_placeholder" data-original="לדוגמה: מחורר, קורטיקלי, רוויזיה">לדוגמה: מחורר, קורטיקלי, רוויזיה</textarea>
+                    <textarea class="translation-field" data-key="modal.screw.annotation_placeholder" data-original="לדוגמה: מחורר, רוויזיה">לדוגמה: מחורר, רוויזיה</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -5218,6 +5218,39 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="modal.screw.suggested_size" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="modal.screw.system_empty" data-section="2" id="item-modal.screw.system_empty">
+            <div class="item-header">
+                <code class="key-label">modal.screw.system_empty</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">No system in inventory</div>
+                </div>
+                <div class="col-translation">
+                    <label>he</label>
+                    <textarea class="translation-field" data-key="modal.screw.system_empty" data-original="No system in inventory">No system in inventory</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.screw.system_empty" value="correct" data-key="modal.screw.system_empty">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.screw.system_empty" value="corrected" data-key="modal.screw.system_empty">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.screw.system_empty" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -27922,7 +27955,7 @@ Portrait mode gives each column more vertical space, showing the full spine with
     (function() {
         const LANG = "he";
         const STORAGE_KEY = "spine_review_" + LANG;
-        const TOTAL = 832;
+        const TOTAL = 833;
 
         // --- Reviewer details ---
 
