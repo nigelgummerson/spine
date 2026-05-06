@@ -2,7 +2,7 @@
 // Cache-first strategy: serve from cache, fall back to network, update cache in background.
 // Cache name includes a version hash so old caches are cleaned up on deploy.
 
-const CACHE_NAME = 'skeletal-plan-v3.33.00-beta';
+const CACHE_NAME = 'skeletal-plan-v3.33.01-beta';
 const BASE_PATH = '/spine/';
 
 // Assets to pre-cache on install (the app shell)
@@ -39,6 +39,17 @@ self.addEventListener('fetch', (event) => {
 
     // Skip chrome-extension and other non-http(s) schemes
     if (!request.url.startsWith('http')) return;
+
+    // version.json is the freshness probe used by useVersionCheck. If the SW
+    // cached it stale-while-revalidate, the running app would see its own
+    // cached version and decide it is current, the UpdateBanner would never
+    // fire, and the surgeon would stay on stale code forever. Always go to
+    // network for this URL; only fall back to cache when offline so a
+    // disconnected surgeon does not lose the rest of the app.
+    if (request.url.endsWith('/version.json')) {
+        event.respondWith(fetch(request).catch(() => caches.open(CACHE_NAME).then((c) => c.match(request))));
+        return;
+    }
 
     event.respondWith(
         caches.open(CACHE_NAME).then(async (cache) => {
