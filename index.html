@@ -4,6 +4,14 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; script-src 'self' 'unsafe-inline'; connect-src 'self' ws:; worker-src 'self' blob:; frame-ancestors 'none'; object-src 'none'; base-uri 'self';" />
+        <!-- Privacy posture for ?data= case links -->
+        <!-- The PDF export embeds case URLs as `?data=...#data=...` so Acrobat (which strips fragments) -->
+        <!-- can still open them. The query-string copy is logged by the server; these meta tags reduce -->
+        <!-- the residual exposure: no-referrer prevents the URL leaking onward via Referer headers, and -->
+        <!-- no-store discourages local browser caching of the loaded page. Server-side logs are not -->
+        <!-- mitigated — see docs/clinical-safety/dpia.md for the documented residual risk. -->
+        <meta name="referrer" content="no-referrer" />
+        <meta http-equiv="Cache-Control" content="no-store" />
         <title>Skeletal Plan | Spinal Instrumentation Plan &amp; Record</title>
         <meta
             name="description"
@@ -30,10 +38,10 @@
         <link rel="icon" type="image/svg+xml" href="favicon.svg" />
         <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
         <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-      <script type="module" crossorigin src="/spine/assets/index-maV1E7pV.js"></script>
+      <script type="module" crossorigin src="/spine/assets/index-C4klXlEf.js"></script>
       <link rel="modulepreload" crossorigin href="/spine/assets/chunk-B3K2TuZy.js">
       <link rel="modulepreload" crossorigin href="/spine/assets/typeof-DmQ5kzpc.js">
-      <link rel="stylesheet" crossorigin href="/spine/assets/index-Dbl9e98s.css">
+      <link rel="stylesheet" crossorigin href="/spine/assets/index-CFE6DsZR.css">
     </head>
     <body class="text-slate-800">
         <div id="root" class="h-screen w-screen flex flex-col"></div>
