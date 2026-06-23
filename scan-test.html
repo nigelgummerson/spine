@@ -201,6 +201,42 @@
             <td class="px-3 py-2 font-mono text-xs">00889095015041</td>
             <td class="px-3 py-2">Unclassified</td>
           </tr>
+          <!-- DePuy Synthes -->
+          <tr class="bg-blue-50">
+            <td class="px-3 py-2 font-medium text-blue-800">DePuy Synthes</td>
+            <td class="px-3 py-2">EXPEDIUM</td>
+            <td class="px-3 py-2 font-mono">Rod 5.5×120 mm</td>
+            <td class="px-3 py-2 font-mono text-xs">10705034566450</td>
+            <td class="px-3 py-2">Rod</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 text-blue-800"></td>
+            <td class="px-3 py-2">VIPER 2</td>
+            <td class="px-3 py-2 font-mono">Rod 5.5×120 mm</td>
+            <td class="px-3 py-2 font-mono text-xs">10705034182537</td>
+            <td class="px-3 py-2">Rod</td>
+          </tr>
+          <tr class="bg-slate-50">
+            <td class="px-3 py-2 text-blue-800"></td>
+            <td class="px-3 py-2">TriALTIS</td>
+            <td class="px-3 py-2 font-mono">6.5×35</td>
+            <td class="px-3 py-2 font-mono text-xs">10705034643816</td>
+            <td class="px-3 py-2">Screw</td>
+          </tr>
+          <tr>
+            <td class="px-3 py-2 text-blue-800"></td>
+            <td class="px-3 py-2">MATRIX</td>
+            <td class="px-3 py-2 font-mono">6.0 mm</td>
+            <td class="px-3 py-2 font-mono text-xs">10705034747965</td>
+            <td class="px-3 py-2">Screw</td>
+          </tr>
+          <tr class="bg-slate-50">
+            <td class="px-3 py-2 text-blue-800"></td>
+            <td class="px-3 py-2">Mountaineer</td>
+            <td class="px-3 py-2 font-mono">Rod 4.75×600 mm</td>
+            <td class="px-3 py-2 font-mono text-xs">10705034290324</td>
+            <td class="px-3 py-2">Rod</td>
+          </tr>
           <!-- Not-found -->
           <tr class="bg-red-50">
             <td class="px-3 py-2 font-medium text-red-700">Not-found test</td>
@@ -222,11 +258,11 @@
     </div>
 
     <h3 class="text-base font-semibold text-slate-700 mb-3">Solera — GS1 DataMatrix (GTIN + lot + expiry)</h3>
-    <div id="solera-gtins" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"></div>
+    <div id="solera-gtins" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-10 mb-6"></div>
 
     <h3 class="text-base font-semibold text-slate-700 mb-2">ModuLeX — modular trio (shank / head / set screw)</h3>
     <p class="text-sm text-slate-500 mb-3">Scan all three into the same screw slot in the ModuLeX modal. Each is a separate trade item with its own lot and expiry.</p>
-    <div id="modulex-trio" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-3"></div>
+    <div id="modulex-trio" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-10 mb-3"></div>
 
     <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800 mb-6">
       <strong>Cross-system block test:</strong> scan the ModuLeX Head GTIN (<code class="font-mono">20763000608105</code>) while a <em>Xia 3</em> modal is open. The app must display a "Component not compatible" dialog — not silently switch systems.
@@ -241,18 +277,18 @@
     </div>
 
     <h3 class="text-base font-semibold text-slate-700 mb-3">Xia 3 — GS1 DataMatrix</h3>
-    <div id="xia3-gtins" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"></div>
+    <div id="xia3-gtins" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-10 mb-6"></div>
 
     <h3 class="text-base font-semibold text-slate-700 mb-2">Xia 3 — HIBC two-part (primary + secondary)</h3>
     <p class="text-sm text-slate-500 mb-3">Scan the <strong>primary</strong> first (product identity), then the <strong>secondary</strong> (lot + expiry) within 5 seconds. The app merges them into one UdiRecord.</p>
-    <div id="xia3-hibc" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6"></div>
+    <div id="xia3-hibc" class="grid grid-cols-1 sm:grid-cols-2 gap-10 mb-6"></div>
 
     <h3 class="text-base font-semibold text-slate-700 mb-2">ES2 — three-path test (all resolve to the same implant)</h3>
     <p class="text-sm text-slate-500 mb-3">HIBC primary, EU sterile GTIN, and US non-sterile GTIN all identify the same ES2 polyaxial Ø8.5×50 mm cannulated screw. The US GTIN additionally resolves <code>bladeLength = long</code>.</p>
-    <div id="es2-paths" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"></div>
+    <div id="es2-paths" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-10 mb-6"></div>
 
     <h3 class="text-base font-semibold text-slate-700 mb-3">MESA 2 (K2M, now Stryker) — GS1 DataMatrix</h3>
-    <div id="mesa2-gtins" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"></div>
+    <div id="mesa2-gtins" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-10 mb-6"></div>
   </section>
 
   <!-- Globus Medical section -->
@@ -262,7 +298,17 @@
       <h2 class="text-xl font-bold text-slate-900">Globus Medical</h2>
     </div>
     <h3 class="text-base font-semibold text-slate-700 mb-3">CREO — GS1 DataMatrix</h3>
-    <div id="creo-gtins" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"></div>
+    <div id="creo-gtins" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-10 mb-6"></div>
+  </section>
+
+  <!-- DePuy Synthes section -->
+  <section class="mb-10">
+    <div class="flex items-center gap-2 mb-4">
+      <div class="w-3 h-3 rounded-full bg-blue-600"></div>
+      <h2 class="text-xl font-bold text-slate-900">DePuy Synthes</h2>
+    </div>
+    <h3 class="text-base font-semibold text-slate-700 mb-3">EXPEDIUM / VIPER 2 / TriALTIS / MATRIX / Mountaineer — GS1 DataMatrix</h3>
+    <div id="depuy-gtins" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-10 mb-6"></div>
   </section>
 
   <!-- Not-found test section -->
@@ -272,7 +318,7 @@
       <h2 class="text-xl font-bold text-slate-900">Not-found test</h2>
     </div>
     <p class="text-sm text-slate-600 mb-3">Fake GTIN — should trigger a "not found" message in the scan modal (no catalogue record exists).</p>
-    <div id="not-found" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6"></div>
+    <div id="not-found" class="grid grid-cols-1 sm:grid-cols-2 gap-10 mb-6"></div>
   </section>
 
   <footer class="text-xs text-slate-400 border-t border-slate-200 pt-4 mt-6">
@@ -311,7 +357,7 @@ function makeGtinCard(containerId, opts) {
   if (!container) return;
 
   const card = document.createElement('div');
-  card.className = 'bg-white rounded-lg border border-slate-200 p-4 flex flex-col gap-2';
+  card.className = 'bg-white rounded-lg border border-slate-200 p-6 flex flex-col gap-2';
 
   // Label
   const labelEl = document.createElement('div');
@@ -343,7 +389,7 @@ function makeGtinCard(containerId, opts) {
   const canvasId = 'dm-' + opts.gtin + '-' + containerId;
   const canvas = document.createElement('canvas');
   canvas.id = canvasId;
-  canvas.className = 'w-full border border-slate-100 rounded';
+  canvas.className = 'mx-auto block border border-slate-100 rounded my-3';
   card.appendChild(canvas);
 
   // Raw string
@@ -366,7 +412,7 @@ function makeGtinCard(containerId, opts) {
     bwipjs.toCanvas(canvasId, {
       bcid: 'datamatrix',
       text: buildDmPayload(opts.gtin, opts.lot, opts.expiry),
-      scale: 4,
+      scale: 3,
       parsefnc: true,
     });
   } catch (e) {
@@ -385,7 +431,7 @@ function makeHibcCard(containerId, opts) {
   if (!container) return;
 
   const card = document.createElement('div');
-  card.className = 'bg-white rounded-lg border border-slate-200 p-4 flex flex-col gap-2';
+  card.className = 'bg-white rounded-lg border border-slate-200 p-6 flex flex-col gap-2';
 
   // Header row: label + kind badge
   const headerRow = document.createElement('div');
@@ -427,7 +473,7 @@ function makeHibcCard(containerId, opts) {
   const canvasId = 'hibc-' + opts.hibc.replace(/[^a-z0-9]/gi, '') + '-' + containerId;
   const canvas = document.createElement('canvas');
   canvas.id = canvasId;
-  canvas.className = 'w-full border border-slate-100 rounded';
+  canvas.className = 'mx-auto block border border-slate-100 rounded my-3';
   card.appendChild(canvas);
 
   // Raw string
@@ -452,7 +498,7 @@ function makeHibcCard(containerId, opts) {
     bwipjs.toCanvas(canvasId, {
       bcid: 'code128',
       text: opts.hibc,
-      scale: 3,
+      scale: 2,
       height: 20,
       includetext: true,
       textxalign: 'center',
@@ -474,7 +520,7 @@ function makeGs1128Card(containerId, opts) {
   if (!container) return;
 
   const card = document.createElement('div');
-  card.className = 'bg-white rounded-lg border border-slate-200 p-4 flex flex-col gap-2';
+  card.className = 'bg-white rounded-lg border border-slate-200 p-6 flex flex-col gap-2';
 
   const headerRow = document.createElement('div');
   headerRow.className = 'flex items-start justify-between gap-2';
@@ -507,7 +553,7 @@ function makeGs1128Card(containerId, opts) {
   const canvasId = 'gs1-' + (opts.gtin || '').replace(/[^0-9]/g, '') + '-' + containerId + '-' + Math.random().toString(36).slice(2,6);
   const canvas = document.createElement('canvas');
   canvas.id = canvasId;
-  canvas.className = 'w-full border border-slate-100 rounded';
+  canvas.className = 'mx-auto block border border-slate-100 rounded my-3';
   card.appendChild(canvas);
 
   const raw = document.createElement('p');
@@ -640,6 +686,15 @@ makeGs1128Card('es2-paths', {
   { label: 'CREO Uniplanar 8.5×95', gtin: '00889095119084', lot: 'LOT-8A3DRL', expiry: '270630' },
   { label: 'CREO AMP 4.0×50',       gtin: '00889095015041', lot: 'LOT-YLA4OV', expiry: '270630' },
 ].forEach(function(d) { makeGtinCard('creo-gtins', d); });
+
+// DePuy Synthes — GS1 DataMatrix
+[
+  { label: 'EXPEDIUM Rod 5.5×120 mm',    gtin: '10705034566450', lot: 'LOT-EXP001', expiry: '270630' },
+  { label: 'VIPER 2 Rod 5.5×120 mm',     gtin: '10705034182537', lot: 'LOT-VP2001', expiry: '270630' },
+  { label: 'TriALTIS Screw 6.5×35',      gtin: '10705034643816', lot: 'LOT-TRI001', expiry: '270630' },
+  { label: 'MATRIX Screw 6.0 mm',        gtin: '10705034747965', lot: 'LOT-MTX001', expiry: '270630' },
+  { label: 'Mountaineer Rod 4.75×600 mm', gtin: '10705034290324', lot: 'LOT-MTN001', expiry: '270630' },
+].forEach(function(d) { makeGtinCard('depuy-gtins', d); });
 
 // Not-found test
 makeGtinCard('not-found', {
