@@ -1,4 +1,5 @@
 {
+    "nav_home": "Hjem",
     "hero_h1": "Planlegg og dokumenter spinal instrumenteringskirurgi",
     "intro_p1": "Det mest datrike øyeblikket i en spinaloperasjon etterlater den minst varige journalen. Når såret er lukket, er det vanskelig å gjenfinne detaljene om hva som ble implantert: produsent, system, størrelser, nivåer og UDI. Kirurger ender opp med å stirre på gamle røntgenbilder, eller legge ut et bilde av et skruehode på et forum for å identifisere sin egen pasients implantat.",
     "intro_p2": "Skeletal Plan er et deterministisk, regelbasert verktøy bygget av en ryggkirurg. Alle spesifikasjoner er sporbare til GUDID eller publiserte produsentdata. Det fungerer på tvers av de viktigste produsentene, kjører offline i alle nettlesere, støtter 22 språk, og fremsetter ingen kliniske påstander og bruker ingen KI.",
@@ -6,7 +7,7 @@
     "cta_plan": "Planlegg ditt neste kasus",
     "cta_demo": "Åpne et demokasus (under to minutter)",
     "plan_title": "Planlegg konstruksjonen",
-    "plan_p1": "Design konstruksjonen nivå for nivå: skruer og trajektorier, stenger, interkorporelle og rekonstruksjons-cager, plater, osteotomier og korreksjonskrefter. Planlegg for normal eller variant anatomi, på én enkelt skjerm eller et to-vindus operasjonsdisplay.",
+    "plan_p1": "Design konstruksjonen nivå for nivå: skruer og trajektorier, stenger, interkorporelle og rekonstruksjons-cager, plater, osteotomier og korreksjonskrefter. Planlegg for normal eller variant anatomi, på én enkelt skjerm eller et to-vindus operasjonsdisplay. Skeletal Plan markerer den valgte osteotomien og registrerer den tiltenkte korreksjonen. Den måler ikke deformiteten og beregner ikke korreksjonsvinkler; bruk dedikert programvare for deformitetsplanlegging til det.",
     "scan_title": "Skann implantatene",
     "scan_p1": "Registrer implantatene du brukte. Skann UDI-strekkoden (GS1 DataMatrix, GS1-128 eller HIBC) for å fylle ut system, størrelse, lot og utløpsdato automatisk, eller angi størrelser manuelt når skruer ankommer på et ikke-sterilt brett uten emballasje å skanne. En skannepool for kasuset samler alt som er brukt og lar deg tildele det til nivåer.",
     "keep_title": "Behold journalen",
@@ -97,7 +98,7 @@
     "faq_q5": "Bruker det KI eller gir det kliniske anbefalinger?",
     "faq_a5": "Nei. Det er et deterministisk, regelbasert dokumentasjonshjelpemiddel. Det fremsetter ingen kliniske påstander og bruker ingen KI eller maskinlæring på pasientdata.",
     "faq_q6": "Hva kan jeg gjøre med journalen?",
-    "faq_a6": "Eksporter en PDF for pasientjournalen, et implantatlager for beholdning og kostnad, lot- og utløpssporbarhet for kvalitetskontroll, og strukturerte data for forskning.",
+    "faq_a6": "Eksporter en PDF for pasientjournalen, et implantatlager for beholdning og kostnad, lot- og utløpssporbarhet for kvalitetskontroll, og strukturerte data for forskning. Hver PDF inneholder også en lenke som gjenåpner den fulle konstruksjonen i appen for gjennomgang eller overlevering, gjenoppbygd fra selve PDF-en. Pasientdetaljer utelates fra lenken, så den er trygg å dele.",
     "faq_q7": "Sendes pasientdata noen steder?",
     "faq_a7": "Nei. Planlegging og journaler forblir på enheten din. Deling er frivillig via en anonymisert lenke eller QR-kode.",
     "footer_origin": "Designet i Leeds · Yorkshire · England",

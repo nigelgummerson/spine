@@ -1,4 +1,5 @@
 {
+    "nav_home": "Strona główna",
     "hero_h1": "Planuj i rejestruj zabiegi instrumentacji kręgosłupa",
     "intro_p1": "Najbogatszy w dane moment operacji kręgosłupa pozostawia najmniej trwały zapis. Po zamknięciu rany trudno odtworzyć szczegóły dotyczące użytych implantów: producenta, systemu, rozmiarów, poziomów i UDI. Chirurdzy muszą wertować stare zdjęcia lub zamieszczać na forach fotografie głowicy śruby, aby zidentyfikować implant własnego pacjenta.",
     "intro_p2": "Skeletal Plan to deterministyczne, oparte na regułach narzędzie opracowane przez chirurga kręgosłupa. Każda specyfikacja jest weryfikowana w rejestrze GUDID lub w opublikowanych danych producenta. Działa z głównymi producentami, uruchamia się w trybie offline w dowolnej przeglądarce, obsługuje 22 języki i nie składa żadnych twierdzeń klinicznych ani nie korzysta ze sztucznej inteligencji.",
@@ -6,7 +7,7 @@
     "cta_plan": "Zaplanuj następny przypadek",
     "cta_demo": "Otwórz przypadek demonstracyjny (mniej niż dwie minuty)",
     "plan_title": "Zaplanuj konstrukcję",
-    "plan_p1": "Projektuj konstrukcję poziom po poziomie: śruby i trajektorie, pręty, cage'e międzytrzonowe i rekonstrukcyjne, płyty, osteotomie i siły korekcyjne. Planuj w prawidłowej lub wariantowej anatomii, na jednym ekranie lub dwuokienkowym wyświetlaczu sali operacyjnej.",
+    "plan_p1": "Projektuj konstrukcję poziom po poziomie: śruby i trajektorie, pręty, cage'e międzytrzonowe i rekonstrukcyjne, płyty, osteotomie i siły korekcyjne. Planuj w prawidłowej lub wariantowej anatomii, na jednym ekranie lub dwuokienkowym wyświetlaczu sali operacyjnej. Skeletal Plan zaznacza wybraną osteotomię i rejestruje zamierzoną korekcję. Nie mierzy deformacji ani nie oblicza kątów korekcji; do tego należy użyć dedykowanego oprogramowania do planowania deformacji.",
     "scan_title": "Skanuj implanty",
     "scan_p1": "Rejestruj użyte implanty. Skanuj kod kreskowy UDI (GS1 DataMatrix, GS1-128 lub HIBC), aby automatycznie uzupełnić system, rozmiar, numer partii i datę ważności, lub wprowadzaj rozmiary ręcznie, gdy śruby przychodzą na niesterylnej tacy bez opakowania do skanowania. Pula skanów przypadku zbiera wszystko, co zostało użyte, i umożliwia przypisanie do poziomów.",
     "keep_title": "Zachowaj zapis",
@@ -97,7 +98,7 @@
     "faq_q5": "Czy korzysta ze sztucznej inteligencji lub wydaje zalecenia kliniczne?",
     "faq_a5": "Nie. Jest to deterministyczne, oparte na regułach narzędzie dokumentacyjne. Nie składa żadnych twierdzeń klinicznych i nie korzysta ze sztucznej inteligencji ani uczenia maszynowego na danych pacjenta.",
     "faq_q6": "Co mogę zrobić z zapisem?",
-    "faq_a6": "Eksportuj PDF do dokumentacji pacjenta, inwentarz implantów na potrzeby magazynu i kosztów, identyfikowalność numerów partii i dat ważności na potrzeby audytu oraz dane ustrukturyzowane do badań naukowych.",
+    "faq_a6": "Eksportuj PDF do dokumentacji pacjenta, inwentarz implantów na potrzeby magazynu i kosztów, identyfikowalność numerów partii i dat ważności na potrzeby audytu oraz dane ustrukturyzowane do badań naukowych. Każdy PDF zawiera również link, który ponownie otwiera pełną konstrukcję w aplikacji do przeglądu lub przekazania, odtworzoną z samego pliku PDF. Dane pacjenta są pomijane w linku, więc można go bezpiecznie udostępniać.",
     "faq_q7": "Czy dane pacjenta są gdzieś wysyłane?",
     "faq_a7": "Nie. Plany i zapisy pozostają na Twoim urządzeniu. Udostępnianie jest opcjonalne przez anonimowy link lub kod QR.",
     "footer_origin": "Zaprojektowano w Leeds · Yorkshire · Anglia",

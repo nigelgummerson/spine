@@ -1,4 +1,5 @@
 {
+    "nav_home": "Accueil",
     "hero_h1": "Planifiez et documentez la chirurgie d'instrumentation rachidienne",
     "intro_p1": "Le moment le plus riche en informations d'une chirurgie rachidienne laisse la trace la moins durable. Une fois la plaie fermée, il est difficile de retrouver le détail de ce qui a été implanté : le fabricant, le système, les tailles, les niveaux et l'UDI. Les chirurgiens se retrouvent à scruter de vieilles radios, ou à poster une photo d'une tête de vis sur un forum pour identifier l'implant de leur propre patient.",
     "intro_p2": "Skeletal Plan est un outil déterministe, basé sur des règles, conçu par un chirurgien rachidien. Chaque spécification est tracée à partir de GUDID ou des données publiées par les fabricants. Il fonctionne avec les principaux fabricants, s'utilise hors ligne dans n'importe quel navigateur, prend en charge 22 langues, ne formule aucune recommandation clinique et n'utilise aucune intelligence artificielle.",
@@ -6,7 +7,7 @@
     "cta_plan": "Planifiez votre prochain dossier",
     "cta_demo": "Ouvrir un cas de démonstration (en moins de deux minutes)",
     "plan_title": "Planifier le montage",
-    "plan_p1": "Concevez le montage niveau par niveau : vis et trajectoires, tiges, cages intersomatiques et de reconstruction, plaques, ostéotomies et forces de correction. Planifiez sur une anatomie normale ou variante, sur un seul écran ou sur un affichage double fenêtre en salle d'opération.",
+    "plan_p1": "Concevez le montage niveau par niveau : vis et trajectoires, tiges, cages intersomatiques et de reconstruction, plaques, ostéotomies et forces de correction. Planifiez sur une anatomie normale ou variante, sur un seul écran ou sur un affichage double fenêtre en salle d'opération. Skeletal Plan marque l'ostéotomie choisie et enregistre la correction prévue. Il ne mesure pas la déformation ni ne calcule les angles de correction ; utilisez pour cela un logiciel dédié de planification des déformations.",
     "scan_title": "Scanner les implants",
     "scan_p1": "Enregistrez les implants utilisés. Scannez le code-barres UDI (GS1 DataMatrix, GS1-128 ou HIBC) pour remplir automatiquement le système, la taille, le lot et la date de péremption, ou saisissez les tailles manuellement lorsque les vis arrivent sur un plateau non stérile sans emballage à scanner. Un pool de scan du dossier collecte tout ce qui a été utilisé et vous permet de l'allouer aux niveaux.",
     "keep_title": "Conserver le dossier",
@@ -97,7 +98,7 @@
     "faq_q5": "Utilise-t-il l'IA ou formule-t-il des recommandations cliniques ?",
     "faq_a5": "Non. Il s'agit d'un outil d'aide à la documentation déterministe, basé sur des règles. Il ne formule aucune recommandation clinique et n'utilise aucune intelligence artificielle ni apprentissage automatique sur les données patients.",
     "faq_q6": "Que puis-je faire avec le dossier ?",
-    "faq_a6": "Exporter un PDF pour le dossier patient, un inventaire des implants pour le stock et les coûts, la traçabilité des lots et dates de péremption pour l'audit, et des données structurées pour la recherche.",
+    "faq_a6": "Exporter un PDF pour le dossier patient, un inventaire des implants pour le stock et les coûts, la traçabilité des lots et dates de péremption pour l'audit, et des données structurées pour la recherche. Chaque PDF comporte aussi un lien qui rouvre le montage complet dans l'application pour révision ou transmission, reconstruit à partir du PDF lui-même. Les données patient sont exclues du lien, son partage est donc sans risque.",
     "faq_q7": "Les données patient sont-elles transmises quelque part ?",
     "faq_a7": "Non. La planification et les dossiers restent sur votre appareil. Le partage est optionnel via un lien anonymisé ou un code QR.",
     "footer_origin": "Designed in Leeds · Yorkshire · England",

@@ -1,4 +1,5 @@
 {
+    "nav_home": "Forside",
     "hero_h1": "Planlæg og dokumentér spinal instrumenteringskirurgi",
     "intro_p1": "Det datamæssigt mest indholdrige øjeblik i en rygoperation efterlader det mindst holdbare dokument. Når såret er lukket, er det svært at genskabe detaljerne om, hvad der blev implanteret, producenten, systemet, størrelserne, niveauerne og UDI. Kirurger ender med at studere gamle røntgenbilleder eller sende et foto af et skruehoved til et forum for at identificere deres egen patients implantat.",
     "intro_p2": "Skeletal Plan er et deterministisk, regelbaseret værktøj udviklet af en rygkirurg. Alle specifikationer er traceret til GUDID eller publicerede producentdata. Det fungerer på tværs af de store producenter, kører offline i enhver browser, understøtter 22 sprog og fremsætter ingen kliniske påstande og anvender ingen AI.",
@@ -6,7 +7,7 @@
     "cta_plan": "Planlæg din næste operation",
     "cta_demo": "Åbn en demosag (under to minutter)",
     "plan_title": "Planlæg konstruktionen",
-    "plan_p1": "Design konstruktionen niveau for niveau: skruer og baner, stænger, interkorporelle og rekonstruktionscages, plader, osteotomier og korrektionskræfter. Planlæg på normal eller variant anatomi, på én skærm eller et dual-vindue-operationsdisplay.",
+    "plan_p1": "Design konstruktionen niveau for niveau: skruer og baner, stænger, interkorporelle og rekonstruktionscages, plader, osteotomier og korrektionskræfter. Planlæg på normal eller variant anatomi, på én skærm eller et dual-vindue-operationsdisplay. Skeletal Plan markerer den valgte osteotomi og registrerer den tilsigtede korrektion. Den måler ikke deformiteten og beregner ikke korrektionsvinkler; brug dedikeret software til deformitetsplanlægning til det.",
     "scan_title": "Scan implantaterne",
     "scan_p1": "Registrér de implantater, du brugte. Scan UDI-stregkoden (GS1 DataMatrix, GS1-128 eller HIBC) for automatisk at udfylde system, størrelse, lot og udløb, eller indtast størrelser manuelt, når skruer leveres på en ikke-steril bakke uden emballage at scanne. En sagsscanningspulje samler alt brugt materiale og lader dig tildele det til niveauer.",
     "keep_title": "Bevar journalen",
@@ -97,7 +98,7 @@
     "faq_q5": "Anvender det AI eller fremsætter det kliniske anbefalinger?",
     "faq_a5": "Nej. Det er et deterministisk, regelbaseret dokumentationshjælpemiddel. Det fremsætter ingen kliniske påstande og anvender ingen AI eller maskinlæring på patientdata.",
     "faq_q6": "Hvad kan jeg gøre med journalen?",
-    "faq_a6": "Eksporter en PDF til patientjournalen, et implantatinventar til lagerstyring og omkostninger, lot- og udløbssporing til audit og strukturerede data til forskning.",
+    "faq_a6": "Eksporter en PDF til patientjournalen, et implantatinventar til lagerstyring og omkostninger, lot- og udløbssporing til audit og strukturerede data til forskning. Hver PDF indeholder også et link, der genåbner den fulde konstruktion i appen til gennemgang eller overdragelse, genskabt ud fra selve PDF'en. Patientoplysninger udelades fra linket, så det er sikkert at dele.",
     "faq_q7": "Sendes patientdata nogen steder hen?",
     "faq_a7": "Nej. Planlægning og journaler forbliver på din enhed. Deling er tilvalg via et anonymiseret link eller QR-kode.",
     "footer_origin": "Designed in Leeds · Yorkshire · England",

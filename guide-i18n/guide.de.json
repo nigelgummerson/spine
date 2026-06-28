@@ -1,4 +1,5 @@
 {
+    "nav_home": "Startseite",
     "hero_h1": "Planung und Dokumentation der Wirbelsäuleninstrumentierung",
     "intro_p1": "Der informationsreichste Moment eines Wirbelsäuleneingriffs hinterlässt den flüchtigsten Befund. Sobald die Wunde geschlossen ist, sind die Details des implantierten Materials - Hersteller, System, Größen, Segmente und UDI - kaum noch zu rekonstruieren. Chirurgen müssen alte Röntgenbilder entziffern oder ein Foto eines Schraubenkopfes in einem Forum posten, um das Implantat ihres eigenen Patienten zu identifizieren.",
     "intro_p2": "Skeletal Plan ist ein deterministisches, regelbasiertes Werkzeug, entwickelt von einem Wirbelsäulenchirurgen. Jede Spezifikation wird aus GUDID oder veröffentlichten Herstellerdaten abgeleitet. Es funktioniert herstellerübergreifend, läuft offline in jedem Browser, unterstützt 22 Sprachen, erhebt keine klinischen Ansprüche und verwendet keine KI.",
@@ -6,7 +7,7 @@
     "cta_plan": "Ihren nächsten Fall planen",
     "cta_demo": "Demo-Fall öffnen (unter zwei Minuten)",
     "plan_title": "Das Konstrukt planen",
-    "plan_p1": "Entwerfen Sie das Konstrukt Segment für Segment: Schrauben und Trajektorien, Stäbe, interkorporelle und Rekonstruktions-Cages, Platten, Osteotomien und Korrektionskräfte. Planen Sie bei normaler oder varianter Anatomie, auf einem einzelnen Bildschirm oder einem Zwei-Bildschirm-Operationsdisplay.",
+    "plan_p1": "Entwerfen Sie das Konstrukt Segment für Segment: Schrauben und Trajektorien, Stäbe, interkorporelle und Rekonstruktions-Cages, Platten, Osteotomien und Korrektionskräfte. Planen Sie bei normaler oder varianter Anatomie, auf einem einzelnen Bildschirm oder einem Zwei-Bildschirm-Operationsdisplay. Skeletal Plan markiert die gewählte Osteotomie und erfasst die beabsichtigte Korrektion. Es misst nicht die Deformität und berechnet keine Korrektionswinkel; verwenden Sie dafür eine spezielle Software zur Deformitätenplanung.",
     "scan_title": "Die Implantate scannen",
     "scan_p1": "Erfassen Sie die verwendeten Implantate. Scannen Sie den UDI-Barcode (GS1 DataMatrix, GS1-128 oder HIBC), um System, Größe, Charge und Verfallsdatum automatisch auszufüllen, oder geben Sie Größen manuell ein, wenn Schrauben auf einem nicht-sterilen Tablett ohne Verpackung angeliefert werden. Ein Fall-Scan-Pool sammelt alles Verwendete und ermöglicht die Zuordnung zu Segmenten.",
     "keep_title": "Den Bericht aufbewahren",
@@ -97,7 +98,7 @@
     "faq_q5": "Verwendet es KI oder gibt es klinische Empfehlungen?",
     "faq_a5": "Nein. Es ist ein deterministisches, regelbasiertes Dokumentationshilfsmittel. Es erhebt keine klinischen Ansprüche und verwendet keine KI oder maschinelles Lernen für Patientendaten.",
     "faq_q6": "Was kann ich mit dem Bericht machen?",
-    "faq_a6": "Ein PDF für die Patientenakte exportieren, ein Implantatinventar für Lager und Kosten, Chargen- und Verfallsdatum-Rückverfolgbarkeit für Audit sowie strukturierte Daten für die Forschung.",
+    "faq_a6": "Ein PDF für die Patientenakte exportieren, ein Implantatinventar für Lager und Kosten, Chargen- und Verfallsdatum-Rückverfolgbarkeit für Audit sowie strukturierte Daten für die Forschung. Jedes PDF enthält außerdem einen Link, der das vollständige Konstrukt zur Überprüfung oder Übergabe wieder in der App öffnet, neu aufgebaut aus dem PDF selbst. Patientendaten werden im Link weggelassen, sodass es sicher geteilt werden kann.",
     "faq_q7": "Werden Patientendaten übermittelt?",
     "faq_a7": "Nein. Planung und Berichte verbleiben auf Ihrem Gerät. Die Freigabe erfolgt optional über einen anonymisierten Link oder QR-Code.",
     "footer_origin": "Designed in Leeds · Yorkshire · England",

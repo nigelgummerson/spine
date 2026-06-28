@@ -1,4 +1,5 @@
 {
+    "nav_home": "Home",
     "hero_h1": "Pianifica e registra la chirurgia di strumentazione vertebrale",
     "intro_p1": "Il momento con la maggior quantità di dati in un caso vertebrale lascia il registro meno durevole. Una volta chiusa la ferita, i dettagli di quanto impiantato &ndash; produttore, sistema, dimensioni, livelli e UDI &ndash; sono difficili da recuperare. I chirurghi finiscono per scrutare vecchie radiografie, o postare la foto di una testa di vite su un forum per identificare l'impianto del proprio paziente.",
     "intro_p2": "Skeletal Plan è uno strumento deterministico, basato su regole, sviluppato da un chirurgo vertebrale. Ogni specifica è tracciabile a GUDID o a dati di produttori pubblicati. Funziona con i principali produttori, opera offline in qualsiasi browser, supporta 22 lingue, e non formula affermazioni cliniche né fa uso dell'intelligenza artificiale.",
@@ -6,7 +7,7 @@
     "cta_plan": "Pianifica il tuo prossimo caso",
     "cta_demo": "Apri un caso dimostrativo (meno di due minuti)",
     "plan_title": "Pianifica il costrutto",
-    "plan_p1": "Progetta il costrutto livello per livello: viti e traiettorie, barre, cage intersomatici e di ricostruzione, placche, osteotomie e forze di correzione. Pianifica su anatomia normale o variante, su un singolo schermo o su un display a doppia finestra per sala operatoria.",
+    "plan_p1": "Progetta il costrutto livello per livello: viti e traiettorie, barre, cage intersomatici e di ricostruzione, placche, osteotomie e forze di correzione. Pianifica su anatomia normale o variante, su un singolo schermo o su un display a doppia finestra per sala operatoria. Skeletal Plan segna l'osteotomia scelta e registra la correzione prevista. Non misura la deformità né calcola gli angoli di correzione; per questo, utilizza un software dedicato alla pianificazione delle deformità.",
     "scan_title": "Scansiona gli impianti",
     "scan_p1": "Registra gli impianti utilizzati. Scansiona il codice a barre UDI (GS1 DataMatrix, GS1-128 o HIBC) per compilare automaticamente sistema, dimensione, lotto e scadenza, oppure inserisci le dimensioni a mano quando le viti arrivano su un vassoio non sterile senza confezione da scansionare. Un pool di scansioni del caso raccoglie tutto il materiale utilizzato e consente di allocarlo ai livelli.",
     "keep_title": "Conserva il registro",
@@ -97,7 +98,7 @@
     "faq_q5": "Utilizza l'intelligenza artificiale o formula raccomandazioni cliniche?",
     "faq_a5": "No. È un ausilio per la documentazione deterministico, basato su regole. Non formula affermazioni cliniche e non utilizza l'intelligenza artificiale né il machine learning sui dati del paziente.",
     "faq_q6": "Cosa posso fare con il registro?",
-    "faq_a6": "Esporta un PDF per la cartella del paziente, un inventario degli impianti per scorte e costi, la tracciabilità di lotto e scadenza per l'audit, e dati strutturati per la ricerca.",
+    "faq_a6": "Esporta un PDF per la cartella del paziente, un inventario degli impianti per scorte e costi, la tracciabilità di lotto e scadenza per l'audit, e dati strutturati per la ricerca. Ogni PDF contiene anche un link che riapre il costrutto completo nell'app per revisione o passaggio di consegne, ricostruito dal PDF stesso. I dati del paziente sono esclusi dal link, quindi è sicuro condividerlo.",
     "faq_q7": "I dati del paziente vengono inviati da qualche parte?",
     "faq_a7": "No. Piano e registri rimangono sul dispositivo. La condivisione è opt-in tramite link anonimizzato o codice QR.",
     "footer_origin": "Progettato a Leeds · Yorkshire · Inghilterra",

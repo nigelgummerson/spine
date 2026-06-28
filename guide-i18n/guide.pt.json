@@ -1,4 +1,5 @@
 {
+    "nav_home": "Início",
     "hero_h1": "Planeie e registe a cirurgia de instrumentação vertebral",
     "intro_p1": "O momento mais rico em dados de um caso vertebral deixa o registo menos duradouro. Uma vez encerrada a ferida, os detalhes do que foi implantado, o fabricante, o sistema, os tamanhos, os níveis e o UDI são difíceis de recuperar. Os cirurgiões ficam a tentar identificar implantes em radiografias antigas, ou a publicar fotografias de cabeças de parafusos em fóruns para identificar o implante dos seus próprios doentes.",
     "intro_p2": "Skeletal Plan é uma ferramenta determinista e baseada em regras, desenvolvida por um cirurgião vertebral. Todas as especificações são rastreáveis ao GUDID ou a dados publicados pelo fabricante. Funciona com os principais fabricantes, corre offline em qualquer browser, suporta 22 idiomas e não faz afirmações clínicas nem utiliza inteligência artificial.",
@@ -6,7 +7,7 @@
     "cta_plan": "Planeie o seu próximo caso",
     "cta_demo": "Abrir um caso de demonstração (menos de dois minutos)",
     "plan_title": "Planeie a montagem",
-    "plan_p1": "Desenhe a montagem nível a nível: parafusos e trajetórias, hastes, cages intersomáticos e de reconstrução, placas, osteotomias e forças de correção. Planeie com anatomia normal ou variante, num único ecrã ou num display duplo de bloco operatório.",
+    "plan_p1": "Desenhe a montagem nível a nível: parafusos e trajetórias, hastes, cages intersomáticos e de reconstrução, placas, osteotomias e forças de correção. Planeie com anatomia normal ou variante, num único ecrã ou num display duplo de bloco operatório. O Skeletal Plan marca a osteotomia escolhida e regista a correção pretendida. Não mede a deformidade nem calcula os ângulos de correção; para isso, utilize software dedicado de planeamento de deformidades.",
     "scan_title": "Leia os implantes",
     "scan_p1": "Registe os implantes utilizados. Leia o código de barras UDI (GS1 DataMatrix, GS1-128 ou HIBC) para preencher automaticamente o sistema, o tamanho, o lote e a validade, ou introduza os tamanhos manualmente quando os parafusos chegam em tabuleiro não estéril sem embalagem para leitura. Uma lista de leituras do caso recolhe tudo o que foi utilizado e permite alocá-lo a níveis.",
     "keep_title": "Guarde o registo",
@@ -97,7 +98,7 @@
     "faq_q5": "Usa inteligência artificial ou faz recomendações clínicas?",
     "faq_a5": "Não. É uma ferramenta de documentação determinista e baseada em regras. Não faz afirmações clínicas e não usa inteligência artificial ou aprendizagem automática em dados de doentes.",
     "faq_q6": "O que posso fazer com o registo?",
-    "faq_a6": "Exportar um PDF para o processo clínico do doente, um inventário de implantes para stock e custo, rastreabilidade de lote e validade para auditoria, e dados estruturados para investigação.",
+    "faq_a6": "Exportar um PDF para o processo clínico do doente, um inventário de implantes para stock e custo, rastreabilidade de lote e validade para auditoria, e dados estruturados para investigação. Cada PDF inclui também uma ligação que reabre a montagem completa na aplicação para revisão ou transferência de caso, reconstruída a partir do próprio PDF. Os dados do doente ficam fora da ligação, pelo que é seguro partilhá-la.",
     "faq_q7": "Os dados do doente são enviados para algum lado?",
     "faq_a7": "Não. O planeamento e os registos permanecem no seu dispositivo. A partilha é opcional via ligação anonimizada ou código QR.",
     "footer_origin": "Desenvolvido em Leeds · Yorkshire · Inglaterra",

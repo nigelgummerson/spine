@@ -1,4 +1,5 @@
 {
+    "nav_home": "Inicio",
     "hero_h1": "Planifique y registre la cirugía de instrumentación espinal",
     "intro_p1": "El momento más rico en datos de un caso espinal deja el registro menos duradero. Una vez cerrada la herida, es difícil recuperar los detalles de lo que se implantó: el fabricante, el sistema, los tamaños, los niveles y el UDI. Los cirujanos acaban mirando con esfuerzo radiografías antiguas o publicando la foto de una cabeza de tornillo en un foro para identificar el implante de su propio paciente.",
     "intro_p2": "Skeletal Plan es una herramienta determinista y basada en reglas, desarrollada por un cirujano de columna. Cada especificación tiene como fuente GUDID o los datos publicados por el fabricante. Funciona con los principales fabricantes, opera sin conexión en cualquier navegador, admite 22 idiomas y no realiza declaraciones clínicas ni hace uso de IA.",
@@ -6,7 +7,7 @@
     "cta_plan": "Planifique su próximo caso",
     "cta_demo": "Abrir un caso de demostración (menos de dos minutos)",
     "plan_title": "Planifique el constructo",
-    "plan_p1": "Diseñe el constructo nivel por nivel: tornillos y trayectorias, barras, cajas intersomáticas y de reconstrucción, placas, osteotomías y fuerzas de corrección. Planifique con anatomía normal o variante, en una sola pantalla o en una pantalla dual de quirófano.",
+    "plan_p1": "Diseñe el constructo nivel por nivel: tornillos y trayectorias, barras, cajas intersomáticas y de reconstrucción, placas, osteotomías y fuerzas de corrección. Planifique con anatomía normal o variante, en una sola pantalla o en una pantalla dual de quirófano. Skeletal Plan marca la osteotomía elegida y registra la corrección prevista. No mide la deformidad ni calcula los ángulos de corrección; para ello, utilice un software específico de planificación de deformidades.",
     "scan_title": "Escanee los implantes",
     "scan_p1": "Registre los implantes utilizados. Escanee el código de barras UDI (GS1 DataMatrix, GS1-128 o HIBC) para rellenar automáticamente el sistema, el tamaño, el lote y la caducidad, o introduzca los tamaños a mano cuando los tornillos lleguen en una bandeja no estéril sin envase que escanear. Un conjunto de escaneo del caso recoge todo lo utilizado y permite asignarlo a niveles.",
     "keep_title": "Conserve el registro",
@@ -97,7 +98,7 @@
     "faq_q5": "¿Utiliza IA o realiza recomendaciones clínicas?",
     "faq_a5": "No. Es una ayuda documental determinista y basada en reglas. No realiza declaraciones clínicas ni utiliza IA ni aprendizaje automático con datos de pacientes.",
     "faq_q6": "¿Qué puedo hacer con el registro?",
-    "faq_a6": "Exporte un PDF para el historial del paciente, un inventario de implantes para el stock y el coste, trazabilidad de lote y caducidad para auditoría, y datos estructurados para la investigación.",
+    "faq_a6": "Exporte un PDF para el historial del paciente, un inventario de implantes para el stock y el coste, trazabilidad de lote y caducidad para auditoría, y datos estructurados para la investigación. Cada PDF incluye además un enlace que reabre el constructo completo en la aplicación para revisión o traspaso, reconstruido a partir del propio PDF. Los datos del paciente quedan fuera del enlace, por lo que es seguro compartirlo.",
     "faq_q7": "¿Se envían los datos del paciente a algún lugar?",
     "faq_a7": "No. La planificación y los registros permanecen en su dispositivo. Compartir es opcional mediante un enlace anonimizado o un código QR.",
     "footer_origin": "Diseñado en Leeds &middot; Yorkshire &middot; Inglaterra",

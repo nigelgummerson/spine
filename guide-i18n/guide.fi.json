@@ -1,4 +1,5 @@
 {
+    "nav_home": "Etusivu",
     "hero_h1": "Suunnittele ja tallenna selkärangan instrumentaatioleikkaus",
     "intro_p1": "Selkärankaleikkauksessa tietorikkain hetki jättää kestämättömimmän dokumentin. Kun haava on suljettu, yksityiskohdat implanteista, valmistajasta, järjestelmästä, ko'oista, tasoista ja UDI:sta on vaikea palauttaa mieleen. Kirurgit päätyvät tuijottamaan vanhoja kuvia tai lähettämään ruuvin pään valokuvan foorumille tunnistaakseen oman potilaansa implantin.",
     "intro_p2": "Skeletal Plan on deterministinen, sääntöpohjainen työkalu, jonka on kehittänyt selkärangakirurgi. Jokainen spesifikaatio jäljittyy GUDID-rekisteriin tai julkaistuihin valmistajatietoihin. Se toimii suurimpien valmistajien implanteilla, toimii offline-tilassa missä tahansa selaimessa, tukee 22 kieltä eikä tee kliinisiä väitteitä tai käytä tekoälyä.",
@@ -6,7 +7,7 @@
     "cta_plan": "Suunnittele seuraava tapaus",
     "cta_demo": "Avaa demotapaus (alle kaksi minuuttia)",
     "plan_title": "Suunnittele konstrukti",
-    "plan_p1": "Suunnittele konstrukti taso kerrallaan: ruuvit ja lähestymistavat, tangot, interkorporeaaliset ja rekonstruktiocaget, levyt, osteotomiat ja korjausvoimat. Suunnittele normaalin tai poikkeavan anatomian mukaan yhdellä näytöllä tai kaksoisikkunanäkymässä leikkaussalissa.",
+    "plan_p1": "Suunnittele konstrukti taso kerrallaan: ruuvit ja lähestymistavat, tangot, interkorporeaaliset ja rekonstruktiocaget, levyt, osteotomiat ja korjausvoimat. Suunnittele normaalin tai poikkeavan anatomian mukaan yhdellä näytöllä tai kaksoisikkunanäkymässä leikkaussalissa. Skeletal Plan merkitsee valitun osteotomian ja kirjaa aiotun korjauksen. Se ei mittaa deformiteettia eikä laske korjauskulmia; käytä siihen erillistä deformiteetin suunnitteluun tarkoitettua ohjelmistoa.",
     "scan_title": "Skannaa implantit",
     "scan_p1": "Tallenna käyttämäsi implantit. Skannaa UDI-viivakoodi (GS1 DataMatrix, GS1-128 tai HIBC) täyttääksesi automaattisesti järjestelmän, koon, erän ja viimeisen käyttöpäivän, tai syötä koot käsin, kun ruuvit saapuvat ei-steriilillä tarjottimella ilman skannattavaa pakkausta. Tapauksen skannauspooli kerää kaiken käytetyn ja antaa kohdistaa sen tasoille.",
     "keep_title": "Säilytä tietue",
@@ -97,7 +98,7 @@
     "faq_q5": "Käyttääkö se tekoälyä tai tekeekö se kliinisiä suosituksia?",
     "faq_a5": "Ei. Se on deterministinen, sääntöpohjainen dokumentointiapuväline. Se ei tee kliinisiä väitteitä eikä käytä tekoälyä tai koneoppimista potilastiedoissa.",
     "faq_q6": "Mitä voin tehdä tietueella?",
-    "faq_a6": "Vie PDF potilasasiakirjaan, implantti-inventaario varastolle ja kustannuksille, erä- ja käyttöpäiväjäljitettävyys auditointia varten sekä jäsennelty data tutkimusta varten.",
+    "faq_a6": "Vie PDF potilasasiakirjaan, implantti-inventaario varastolle ja kustannuksille, erä- ja käyttöpäiväjäljitettävyys auditointia varten sekä jäsennelty data tutkimusta varten. Jokainen PDF sisältää myös linkin, joka avaa koko konstruktin uudelleen sovelluksessa tarkistusta tai luovutusta varten, rakennettuna uudelleen itse PDF:stä. Potilastiedot jätetään pois linkistä, joten sen voi jakaa turvallisesti.",
     "faq_q7": "Lähetetäänkö potilastietoja minnekään?",
     "faq_a7": "Ei. Suunnittelu ja tietueet pysyvät laitteellasi. Jakaminen on valinnainen anonymisoidun linkin tai QR-koodin kautta.",
     "footer_origin": "Suunniteltu Leedsissa · Yorkshire · Englanti",

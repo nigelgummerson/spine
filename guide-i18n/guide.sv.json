@@ -1,4 +1,5 @@
 {
+    "nav_home": "Start",
     "hero_h1": "Planera och dokumentera spinal instrumenteringskirurgi",
     "intro_p1": "Det datarikaste ögonblicket i ett ryggfall lämnar det minst beständiga dokumentet. När såret är slutet är det svårt att återfå detaljerna om vad som implanterades: tillverkaren, systemet, storlekarna, nivåerna och UDI:n. Kirurger hamnar i situationen att försöka tyda gamla röntgenbilder, eller lägga upp ett foto av ett skruvhuvud på ett forum för att identifiera sin egen patients implantat.",
     "intro_p2": "Skeletal Plan är ett deterministiskt, regelbaserat verktyg byggt av en ryggkirurg. Varje specifikation spåras till GUDID eller publicerade tillverkardata. Det fungerar med alla stora tillverkare, körs offline i valfri webbläsare, stöder 22 språk och gör inga kliniska påståenden och använder inte AI.",
@@ -6,7 +7,7 @@
     "cta_plan": "Planera ditt nästa fall",
     "cta_demo": "Öppna ett demofall (under två minuter)",
     "plan_title": "Planera konstruktionen",
-    "plan_p1": "Designa konstruktionen nivå för nivå: skruvar och banor, stavar, interkorporella och rekonstruktionscages, plattor, osteotomier och korrigeringskrafter. Planera på normal eller variant anatomi, på en enskild skärm eller ett dubbelskärmssystem i operationssalen.",
+    "plan_p1": "Designa konstruktionen nivå för nivå: skruvar och banor, stavar, interkorporella och rekonstruktionscages, plattor, osteotomier och korrigeringskrafter. Planera på normal eller variant anatomi, på en enskild skärm eller ett dubbelskärmssystem i operationssalen. Skeletal Plan markerar den valda osteotomin och registrerar den avsedda korrigeringen. Den mäter inte deformiteten och beräknar inga korrigeringsvinklar; använd dedikerad programvara för deformitetsplanering för det.",
     "scan_title": "Skanna implantaten",
     "scan_p1": "Registrera de implantat du använde. Skanna UDI-streckkoden (GS1 DataMatrix, GS1-128 eller HIBC) för att automatiskt fylla i system, storlek, parti och utgångsdatum, eller ange storlekar manuellt när skruvar levereras på en icke-steril bricka utan förpackning att skanna. En fall-skanningspool samlar allt som använts och låter dig tilldela det till nivåer.",
     "keep_title": "Bevara journalen",
@@ -97,7 +98,7 @@
     "faq_q5": "Använder det AI eller ger det kliniska rekommendationer?",
     "faq_a5": "Nej. Det är ett deterministiskt, regelbaserat dokumentationshjälpmedel. Det gör inga kliniska påståenden och använder inte AI eller maskininlärning på patientdata.",
     "faq_q6": "Vad kan jag göra med journalen?",
-    "faq_a6": "Exportera en PDF för patientjournalen, ett implantatinventarium för lager och kostnad, spårbarhet för parti och utgångsdatum för revision, och strukturerad data för forskning.",
+    "faq_a6": "Exportera en PDF för patientjournalen, ett implantatinventarium för lager och kostnad, spårbarhet för parti och utgångsdatum för revision, och strukturerad data för forskning. Varje PDF innehåller även en länk som återöppnar hela konstruktionen i appen för granskning eller överlämning, återskapad från själva PDF:en. Patientuppgifter utelämnas från länken, så den är säker att dela.",
     "faq_q7": "Skickas patientdata någonstans?",
     "faq_a7": "Nej. Planering och journaler stannar på din enhet. Delning är frivilligt via en anonymiserad länk eller QR-kod.",
     "footer_origin": "Designed in Leeds · Yorkshire · England",

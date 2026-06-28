@@ -1,4 +1,5 @@
 {
+    "nav_home": "Ana sayfa",
     "hero_h1": "Spinal enstrümantasyon cerrahisini planlayın ve kaydedin",
     "intro_p1": "Spinal bir vakada en çok veri içeren an, en kalıcısız kaydı bırakır. Yara kapatıldıktan sonra ne implante edildiğinin, üreticinin, sistemin, boyutların, seviyelerin ve UDI'nın ayrıntılarını geri kazanmak güçleşir. Cerrahlar ya eski filmleri inceleyerek ya da kendi hastasının implantını tanımlamak için bir vida başının fotoğrafını bir foruma göndererek uğraşır.",
     "intro_p2": "Skeletal Plan, bir omurga cerrahı tarafından geliştirilmiş, belirlenimci ve kural tabanlı bir araçtır. Her özellik GUDID'e veya yayınlanmış üretici verilerine kadar izlenebilir. Başlıca üreticilerle uyumlu çalışır, herhangi bir tarayıcıda çevrimdışı çalışır, 22 dili destekler; klinik iddiada bulunmaz ve yapay zeka kullanmaz.",
@@ -6,7 +7,7 @@
     "cta_plan": "Sonraki vakanızı planlayın",
     "cta_demo": "Demo vaka açın (iki dakikadan az)",
     "plan_title": "Yapıyı planlayın",
-    "plan_p1": "Yapıyı seviye seviye tasarlayın: vidalar ve yörüngeler, rodlar, interbody ve rekonstrüksiyon cage'leri, plaklar, osteotomiler ve düzeltici kuvvetler. Normal veya varyant anatomide, tek ekranda ya da çift pencereli ameliyathane ekranında planlayın.",
+    "plan_p1": "Yapıyı seviye seviye tasarlayın: vidalar ve yörüngeler, rodlar, interbody ve rekonstrüksiyon cage'leri, plaklar, osteotomiler ve düzeltici kuvvetler. Normal veya varyant anatomide, tek ekranda ya da çift pencereli ameliyathane ekranında planlayın. Skeletal Plan, seçilen osteotomiyi işaretler ve amaçlanan düzeltmeyi kaydeder. Deformiteyi ölçmez veya düzeltme açılarını hesaplamaz; bunun için özel deformite planlama yazılımı kullanın.",
     "scan_title": "İmplantları tarayın",
     "scan_p1": "Kullandığınız implantları kaydedin. Sistemi, boyutu, parti numarasını ve son kullanma tarihini otomatik doldurmak için UDI barkodunu (GS1 DataMatrix, GS1-128 veya HIBC) tarayın; vidalar taranacak ambalajsız steril olmayan bir tepsiye geldiğinde boyutları elle girin. Bir vaka tarama havuzu kullanılan her şeyi toplar ve bunları seviyelere atamanıza olanak tanır.",
     "keep_title": "Kaydı tutun",
@@ -97,7 +98,7 @@
     "faq_q5": "Yapay zeka kullanıyor mu veya klinik öneriler sunuyor mu?",
     "faq_a5": "Hayır. Belirlenimci, kural tabanlı bir belgeleme yardımcısıdır. Klinik iddiada bulunmaz ve hasta verilerinde yapay zeka veya makine öğrenimi kullanmaz.",
     "faq_q6": "Kayıtla ne yapabilirim?",
-    "faq_a6": "Hasta kaydı için PDF, stok ve maliyet için implant envanteri, denetim için parti ve son kullanma tarihi izlenebilirliği ve araştırma için yapılandırılmış veriler dışa aktarın.",
+    "faq_a6": "Hasta kaydı için PDF, stok ve maliyet için implant envanteri, denetim için parti ve son kullanma tarihi izlenebilirliği ve araştırma için yapılandırılmış veriler dışa aktarın. Ayrıca her PDF, tam yapıyı inceleme veya devir için uygulamada yeniden açan, PDF'nin kendisinden yeniden oluşturulan bir bağlantı taşır. Hasta bilgileri bağlantıya dahil edilmediğinden güvenle paylaşılabilir.",
     "faq_q7": "Hasta verileri herhangi bir yere gönderilir mi?",
     "faq_a7": "Hayır. Planlama ve kayıtlar cihazınızda kalır. Paylaşım, anonimleştirilmiş bağlantı veya QR kodu ile isteğe bağlıdır.",
     "footer_origin": "Leeds'te tasarlandı · Yorkshire · England",

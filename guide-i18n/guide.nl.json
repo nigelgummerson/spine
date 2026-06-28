@@ -1,4 +1,5 @@
 {
+    "nav_home": "Home",
     "hero_h1": "Spinale instrumentatiechirurgie plannen en documenteren",
     "intro_p1": "Het meest informatierijke moment in een wervelkolomoperatie levert het minst duurzame dossier op. Zodra de wond is gesloten, zijn de details over wat er is geïmplanteerd - de fabrikant, het systeem, de maten, de niveaus en de UDI - moeilijk te achterhalen. Chirurgen moeten dan oude opnamen bekijken, of een foto van een schroefkop posten op een forum om het implantaat van hun eigen patiënt te identificeren.",
     "intro_p2": "Skeletal Plan is een deterministisch, regelgebaseerd hulpmiddel, ontwikkeld door een wervelkolomchirurg. Elke specificatie is terug te voeren op GUDID of gepubliceerde fabrikantgegevens. Het werkt met alle grote fabrikanten, werkt offline in elke browser, ondersteunt 22 talen, doet geen klinische uitspraken en maakt geen gebruik van AI.",
@@ -6,7 +7,7 @@
     "cta_plan": "Plan uw volgende casus",
     "cta_demo": "Open een democasus (in minder dan twee minuten)",
     "plan_title": "Plan de constructie",
-    "plan_p1": "Ontwerp de constructie niveau voor niveau: schroeven en trajecten, staven, interkorporele en reconstructie-cages, platen, osteotomieën en correctiekrachten. Plan op basis van normale of variante anatomie, op één scherm of een dual-window theaterscherm.",
+    "plan_p1": "Ontwerp de constructie niveau voor niveau: schroeven en trajecten, staven, interkorporele en reconstructie-cages, platen, osteotomieën en correctiekrachten. Plan op basis van normale of variante anatomie, op één scherm of een dual-window theaterscherm. Skeletal Plan markeert de gekozen osteotomie en legt de beoogde correctie vast. Het meet de deformiteit niet en berekent geen correctiehoeken; gebruik daarvoor speciale software voor deformiteitsplanning.",
     "scan_title": "Scan de implantaten",
     "scan_p1": "Registreer de gebruikte implantaten. Scan de UDI-streepjescode (GS1 DataMatrix, GS1-128 of HIBC) om het systeem, de maat, het lotnummer en de vervaldatum automatisch in te vullen, of voer maten handmatig in wanneer schroeven aankomen op een niet-steriel dienblad zonder verpakking om te scannen. Een case-scanpool verzamelt alles wat is gebruikt en stelt u in staat dit toe te wijzen aan niveaus.",
     "keep_title": "Bewaar het verslag",
@@ -97,7 +98,7 @@
     "faq_q5": "Maakt het gebruik van AI of doet het klinische aanbevelingen?",
     "faq_a5": "Nee. Het is een deterministisch, regelgebaseerd documentatiehulpmiddel. Het doet geen klinische uitspraken en maakt geen gebruik van AI of machine learning op patiëntgegevens.",
     "faq_q6": "Wat kan ik met het verslag doen?",
-    "faq_a6": "Exporteer een PDF voor het patiëntendossier, een implantaatinventaris voor voorraad en kosten, lot- en vervaldatumtracering voor audit, en gestructureerde data voor onderzoek.",
+    "faq_a6": "Exporteer een PDF voor het patiëntendossier, een implantaatinventaris voor voorraad en kosten, lot- en vervaldatumtracering voor audit, en gestructureerde data voor onderzoek. Elke PDF bevat ook een link die de volledige constructie opnieuw opent in de app voor beoordeling of overdracht, opnieuw opgebouwd vanuit de PDF zelf. Patiëntgegevens worden weggelaten uit de link, zodat deze veilig kan worden gedeeld.",
     "faq_q7": "Wordt patiëntdata ergens naartoe verzonden?",
     "faq_a7": "Nee. Planning en verslagen blijven op uw apparaat. Delen is optioneel via een geanonimiseerde link of QR-code.",
     "footer_origin": "Ontworpen in Leeds · Yorkshire · Engeland",
