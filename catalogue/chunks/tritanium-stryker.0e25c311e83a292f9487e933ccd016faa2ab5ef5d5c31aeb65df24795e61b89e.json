@@ -448,7 +448,8 @@
     "ap": "PLIF",
     "c": "48950066",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 6mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 6mm height",
+    "clo": 6
   },
   "07613327117363": {
     "s": "TRITANIUM",
@@ -459,7 +460,8 @@
     "ap": "PLIF",
     "c": "48950070",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 7mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 7mm height",
+    "clo": 0
   },
   "07613327117288": {
     "s": "TRITANIUM",
@@ -470,7 +472,8 @@
     "ap": "PLIF",
     "c": "48950076",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 7mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 7mm height",
+    "clo": 6
   },
   "07613327117332": {
     "s": "TRITANIUM",
@@ -481,7 +484,8 @@
     "ap": "PLIF",
     "c": "48950080",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 8mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 8mm height",
+    "clo": 0
   },
   "07613327117349": {
     "s": "TRITANIUM",
@@ -492,7 +496,8 @@
     "ap": "PLIF",
     "c": "48950086",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 8mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 8mm height",
+    "clo": 6
   },
   "07613327117301": {
     "s": "TRITANIUM",
@@ -503,7 +508,8 @@
     "ap": "PLIF",
     "c": "48950090",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 9mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 9mm height",
+    "clo": 0
   },
   "07613327295009": {
     "s": "TRITANIUM",
@@ -525,7 +531,8 @@
     "ap": "PLIF",
     "c": "48950096",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 9mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 9mm height",
+    "clo": 6
   },
   "07613327117295": {
     "s": "TRITANIUM",
@@ -536,7 +543,8 @@
     "ap": "PLIF",
     "c": "48950100",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 10mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 10mm height",
+    "clo": 0
   },
   "07613327295023": {
     "s": "TRITANIUM",
@@ -558,7 +566,8 @@
     "ap": "PLIF",
     "c": "48950106",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 10mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 10mm height",
+    "clo": 6
   },
   "07613327117370": {
     "s": "TRITANIUM",
@@ -569,7 +578,8 @@
     "ap": "PLIF",
     "c": "48950110",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 11mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 11mm height",
+    "clo": 0
   },
   "07613327295016": {
     "s": "TRITANIUM",
@@ -591,7 +601,8 @@
     "ap": "PLIF",
     "c": "48950116",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 11mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 11mm height",
+    "clo": 6
   },
   "07613327117394": {
     "s": "TRITANIUM",
@@ -602,7 +613,8 @@
     "ap": "PLIF",
     "c": "48950120",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 12mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 12mm height",
+    "clo": 0
   },
   "07613327295115": {
     "s": "TRITANIUM",
@@ -624,7 +636,8 @@
     "ap": "PLIF",
     "c": "48950126",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 12mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 12mm height",
+    "clo": 6
   },
   "07613327117387": {
     "s": "TRITANIUM",
@@ -635,7 +648,8 @@
     "ap": "PLIF",
     "c": "48950130",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 13mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 13mm height",
+    "clo": 0
   },
   "07613327295030": {
     "s": "TRITANIUM",
@@ -657,7 +671,8 @@
     "ap": "PLIF",
     "c": "48950136",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 13mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 13mm height",
+    "clo": 6
   },
   "07613327117431": {
     "s": "TRITANIUM",
@@ -668,7 +683,8 @@
     "ap": "PLIF",
     "c": "48950140",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 14mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 14mm height",
+    "clo": 0
   },
   "07613327295122": {
     "s": "TRITANIUM",
@@ -690,7 +706,8 @@
     "ap": "PLIF",
     "c": "48950146",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 14mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 9mm width X 14mm height",
+    "clo": 6
   },
   "07613327117516": {
     "s": "TRITANIUM",
@@ -701,7 +718,8 @@
     "ap": "PLIF",
     "c": "48951070",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 7mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 7mm height",
+    "clo": 0
   },
   "07613327117523": {
     "s": "TRITANIUM",
@@ -712,7 +730,8 @@
     "ap": "PLIF",
     "c": "48951076",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 7mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 7mm height",
+    "clo": 6
   },
   "07613327117530": {
     "s": "TRITANIUM",
@@ -723,7 +742,8 @@
     "ap": "PLIF",
     "c": "48951080",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 8mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 8mm height",
+    "clo": 0
   },
   "07613327117547": {
     "s": "TRITANIUM",
@@ -734,7 +754,8 @@
     "ap": "PLIF",
     "c": "48951086",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 8mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 8mm height",
+    "clo": 6
   },
   "07613327117554": {
     "s": "TRITANIUM",
@@ -745,7 +766,8 @@
     "ap": "PLIF",
     "c": "48951090",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 9mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 9mm height",
+    "clo": 0
   },
   "07613327295047": {
     "s": "TRITANIUM",
@@ -767,7 +789,8 @@
     "ap": "PLIF",
     "c": "48951096",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 9mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 9mm height",
+    "clo": 6
   },
   "07613327117578": {
     "s": "TRITANIUM",
@@ -778,7 +801,8 @@
     "ap": "PLIF",
     "c": "48951100",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 10mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 10mm height",
+    "clo": 0
   },
   "07613327295108": {
     "s": "TRITANIUM",
@@ -800,7 +824,8 @@
     "ap": "PLIF",
     "c": "48951106",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 10mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 10mm height",
+    "clo": 6
   },
   "07613327117592": {
     "s": "TRITANIUM",
@@ -811,7 +836,8 @@
     "ap": "PLIF",
     "c": "48951110",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 11mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 11mm height",
+    "clo": 0
   },
   "07613327295061": {
     "s": "TRITANIUM",
@@ -833,7 +859,8 @@
     "ap": "PLIF",
     "c": "48951116",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 11mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 11mm height",
+    "clo": 6
   },
   "07613327117615": {
     "s": "TRITANIUM",
@@ -844,7 +871,8 @@
     "ap": "PLIF",
     "c": "48951120",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 12mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 12mm height",
+    "clo": 0
   },
   "07613327295092": {
     "s": "TRITANIUM",
@@ -866,7 +894,8 @@
     "ap": "PLIF",
     "c": "48951126",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 12mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 12mm height",
+    "clo": 6
   },
   "07613327117639": {
     "s": "TRITANIUM",
@@ -877,7 +906,8 @@
     "ap": "PLIF",
     "c": "48951130",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 13mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 13mm height",
+    "clo": 0
   },
   "07613327295344": {
     "s": "TRITANIUM",
@@ -899,7 +929,8 @@
     "ap": "PLIF",
     "c": "48951136",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 13mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 13mm height",
+    "clo": 6
   },
   "07613327117653": {
     "s": "TRITANIUM",
@@ -910,7 +941,8 @@
     "ap": "PLIF",
     "c": "48951140",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 14mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 14mm height",
+    "clo": 0
   },
   "07613327295078": {
     "s": "TRITANIUM",
@@ -932,7 +964,8 @@
     "ap": "PLIF",
     "c": "48951146",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 14mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 23mm length X 11mm width X 14mm height",
+    "clo": 6
   },
   "07613327117721": {
     "s": "TRITANIUM",
@@ -943,7 +976,8 @@
     "ap": "TLIF",
     "c": "48952070",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 7mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 7mm height",
+    "clo": 0
   },
   "07613327117738": {
     "s": "TRITANIUM",
@@ -954,7 +988,8 @@
     "ap": "TLIF",
     "c": "48952080",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 8mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 8mm height",
+    "clo": 0
   },
   "07613327117745": {
     "s": "TRITANIUM",
@@ -965,7 +1000,8 @@
     "ap": "TLIF",
     "c": "48952090",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 9mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 9mm height",
+    "clo": 0
   },
   "07613327295795": {
     "s": "TRITANIUM",
@@ -987,7 +1023,8 @@
     "ap": "TLIF",
     "c": "48952100",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 10mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 10mm height",
+    "clo": 0
   },
   "07613327117769": {
     "s": "TRITANIUM",
@@ -998,7 +1035,8 @@
     "ap": "TLIF",
     "c": "48952110",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 11mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 11mm height",
+    "clo": 0
   },
   "07613327295740": {
     "s": "TRITANIUM",
@@ -1020,7 +1058,8 @@
     "ap": "TLIF",
     "c": "48952120",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 12mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 12mm height",
+    "clo": 0
   },
   "07613327117783": {
     "s": "TRITANIUM",
@@ -1031,7 +1070,8 @@
     "ap": "TLIF",
     "c": "48952130",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 13mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 13mm height",
+    "clo": 0
   },
   "07613327295764": {
     "s": "TRITANIUM",
@@ -1053,7 +1093,8 @@
     "ap": "TLIF",
     "c": "48952140",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 14mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 14mm height",
+    "clo": 0
   },
   "07613327117837": {
     "s": "TRITANIUM",
@@ -1064,7 +1105,8 @@
     "ap": "TLIF",
     "c": "48953070",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 7mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 7mm height",
+    "clo": 0
   },
   "07613327117844": {
     "s": "TRITANIUM",
@@ -1075,7 +1117,8 @@
     "ap": "TLIF",
     "c": "48953080",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 8mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 8mm height",
+    "clo": 0
   },
   "07613327117851": {
     "s": "TRITANIUM",
@@ -1086,7 +1129,8 @@
     "ap": "TLIF",
     "c": "48953090",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 9mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 9mm height",
+    "clo": 0
   },
   "07613327295856": {
     "s": "TRITANIUM",
@@ -1108,7 +1152,8 @@
     "ap": "TLIF",
     "c": "48953100",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 10mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 10mm height",
+    "clo": 0
   },
   "07613327295887": {
     "s": "TRITANIUM",
@@ -1130,7 +1175,8 @@
     "ap": "TLIF",
     "c": "48953110",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 11mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 11mm height",
+    "clo": 0
   },
   "07613327295825": {
     "s": "TRITANIUM",
@@ -1152,7 +1198,8 @@
     "ap": "TLIF",
     "c": "48953120",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 12mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 12mm height",
+    "clo": 0
   },
   "07613327295894": {
     "s": "TRITANIUM",
@@ -1174,7 +1221,8 @@
     "ap": "TLIF",
     "c": "48953130",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 13mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 13mm height",
+    "clo": 0
   },
   "07613327295832": {
     "s": "TRITANIUM",
@@ -1196,7 +1244,8 @@
     "ap": "TLIF",
     "c": "48953140",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 14mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 14mm height",
+    "clo": 0
   },
   "07613327295900": {
     "s": "TRITANIUM",
@@ -1218,7 +1267,8 @@
     "ap": "TLIF",
     "c": "48954066",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 6mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 6mm height",
+    "clo": 6
   },
   "07613327117943": {
     "s": "TRITANIUM",
@@ -1229,7 +1279,8 @@
     "ap": "TLIF",
     "c": "48954076",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 7mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 7mm height",
+    "clo": 6
   },
   "07613327117950": {
     "s": "TRITANIUM",
@@ -1240,7 +1291,8 @@
     "ap": "TLIF",
     "c": "48954086",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 8mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 8mm height",
+    "clo": 6
   },
   "07613327117967": {
     "s": "TRITANIUM",
@@ -1251,7 +1303,8 @@
     "ap": "TLIF",
     "c": "48954096",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 9mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 9mm height",
+    "clo": 6
   },
   "07613327117974": {
     "s": "TRITANIUM",
@@ -1262,7 +1315,8 @@
     "ap": "TLIF",
     "c": "48954106",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 10mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 10mm height",
+    "clo": 6
   },
   "07613327117981": {
     "s": "TRITANIUM",
@@ -1273,7 +1327,8 @@
     "ap": "TLIF",
     "c": "48954116",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 11mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 11mm height",
+    "clo": 6
   },
   "07613327117998": {
     "s": "TRITANIUM",
@@ -1284,7 +1339,8 @@
     "ap": "TLIF",
     "c": "48954126",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 12mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 12mm height",
+    "clo": 6
   },
   "07613327118001": {
     "s": "TRITANIUM",
@@ -1295,7 +1351,8 @@
     "ap": "TLIF",
     "c": "48954136",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 13mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 13mm height",
+    "clo": 6
   },
   "07613327118018": {
     "s": "TRITANIUM",
@@ -1306,7 +1363,8 @@
     "ap": "TLIF",
     "c": "48954146",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 14mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 9mm width X 14mm height",
+    "clo": 6
   },
   "07613327118056": {
     "s": "TRITANIUM",
@@ -1317,7 +1375,8 @@
     "ap": "TLIF",
     "c": "48955076",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 7mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 7mm height",
+    "clo": 6
   },
   "07613327118063": {
     "s": "TRITANIUM",
@@ -1328,7 +1387,8 @@
     "ap": "TLIF",
     "c": "48955086",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 8mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 8mm height",
+    "clo": 6
   },
   "07613327118070": {
     "s": "TRITANIUM",
@@ -1339,7 +1399,8 @@
     "ap": "TLIF",
     "c": "48955096",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 9mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 9mm height",
+    "clo": 6
   },
   "07613327118087": {
     "s": "TRITANIUM",
@@ -1350,7 +1411,8 @@
     "ap": "TLIF",
     "c": "48955106",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 10mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 10mm height",
+    "clo": 6
   },
   "07613327118094": {
     "s": "TRITANIUM",
@@ -1361,7 +1423,8 @@
     "ap": "TLIF",
     "c": "48955116",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 11mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 11mm height",
+    "clo": 6
   },
   "07613327118100": {
     "s": "TRITANIUM",
@@ -1372,7 +1435,8 @@
     "ap": "TLIF",
     "c": "48955126",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 12mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 12mm height",
+    "clo": 6
   },
   "07613327118117": {
     "s": "TRITANIUM",
@@ -1383,7 +1447,8 @@
     "ap": "TLIF",
     "c": "48955136",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 13mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 13mm height",
+    "clo": 6
   },
   "07613327118124": {
     "s": "TRITANIUM",
@@ -1394,7 +1459,8 @@
     "ap": "TLIF",
     "c": "48955146",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 14mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 28mm length X 11mm width X 14mm height",
+    "clo": 6
   },
   "07613327295139": {
     "s": "TRITANIUM",
@@ -1404,7 +1470,8 @@
     "ap": "TLIF",
     "c": "48956076",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 7mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 7mm height",
+    "clo": 6
   },
   "07613327295184": {
     "s": "TRITANIUM",
@@ -1414,7 +1481,8 @@
     "ap": "TLIF",
     "c": "48956086",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 8mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 8mm height",
+    "clo": 6
   },
   "07613327295559": {
     "s": "TRITANIUM",
@@ -1434,7 +1502,8 @@
     "ap": "TLIF",
     "c": "48956096",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 9mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 9mm height",
+    "clo": 6
   },
   "07613327295603": {
     "s": "TRITANIUM",
@@ -1454,7 +1523,8 @@
     "ap": "TLIF",
     "c": "48956106",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 10mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 10mm height",
+    "clo": 6
   },
   "07613327295610": {
     "s": "TRITANIUM",
@@ -1474,7 +1544,8 @@
     "ap": "TLIF",
     "c": "48956116",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 11mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 11mm height",
+    "clo": 6
   },
   "07613327295580": {
     "s": "TRITANIUM",
@@ -1494,7 +1565,8 @@
     "ap": "TLIF",
     "c": "48956126",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 12mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 12mm height",
+    "clo": 6
   },
   "07613327295757": {
     "s": "TRITANIUM",
@@ -1514,7 +1586,8 @@
     "ap": "TLIF",
     "c": "48956136",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 13mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 13mm height",
+    "clo": 6
   },
   "07613327295535": {
     "s": "TRITANIUM",
@@ -1524,7 +1597,8 @@
     "ap": "TLIF",
     "c": "48956140",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 14mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 14mm height",
+    "clo": 0
   },
   "07613327295634": {
     "s": "TRITANIUM",
@@ -1544,7 +1618,8 @@
     "ap": "TLIF",
     "c": "48956146",
     "n": "Howmedica Osteonics Corp",
-    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 14mm height"
+    "z": "Tritanium PL Posterior Lumbar Cage (EA), 32mm length X 14mm height",
+    "clo": 6
   },
   "07613327295627": {
     "s": "TRITANIUM",
