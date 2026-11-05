@@ -191,7 +191,7 @@
         <div class="header-top">
             <div>
                 <h1>Spinal Instrumentation Plan & Record: Translation Review</h1>
-                <span class="lang-badge">Russian / Русский (ru) — v3.63.03-beta</span>
+                <span class="lang-badge">Russian / Русский (ru) — v3.63.04-beta</span>
             </div>
             <div class="header-actions">
                 <a href="../guide.html" target="_blank" style="color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: none; padding: 6px 10px;" title="How to use this form">Guide</a>
@@ -203,7 +203,7 @@
         </div>
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-            <div class="progress-text" id="progress-text">0 of 1178 items reviewed (0%)</div>
+            <div class="progress-text" id="progress-text">0 of 1189 items reviewed (0%)</div>
             <div class="save-hint" id="save-hint"></div>
         </div>
     </div>
@@ -232,10 +232,10 @@
             <a href="#section-5" class="nav-link" data-section="5">Force Modal <span class="nav-count" id="nav-count-5">0/7</span></a>
             <a href="#section-6" class="nav-link" data-section="6">Note Modal <span class="nav-count" id="nav-count-6">0/22</span></a>
             <a href="#section-7" class="nav-link" data-section="7">Tool Palette Labels <span class="nav-count" id="nav-count-7">0/27</span></a>
-            <a href="#section-8" class="nav-link" data-section="8">Inventory Panel <span class="nav-count" id="nav-count-8">0/51</span></a>
+            <a href="#section-8" class="nav-link" data-section="8">Inventory Panel <span class="nav-count" id="nav-count-8">0/55</span></a>
             <a href="#section-9" class="nav-link" data-section="9">Chart Headers &amp; Diagram Labels <span class="nav-count" id="nav-count-9">0/20</span></a>
             <a href="#section-10" class="nav-link" data-section="10">Linked Screens (Sync) <span class="nav-count" id="nav-count-10">0/2</span></a>
-            <a href="#section-11" class="nav-link" data-section="11">Export &amp; Column Headers <span class="nav-count" id="nav-count-11">0/9</span></a>
+            <a href="#section-11" class="nav-link" data-section="11">Export &amp; Column Headers <span class="nav-count" id="nav-count-11">0/16</span></a>
             <a href="#section-12" class="nav-link" data-section="12">Help Modal <span class="nav-count" id="nav-count-12">0/110</span></a>
             <a href="#section-13" class="nav-link" data-section="13">Common Buttons &amp; Shortcuts <span class="nav-count" id="nav-count-13">0/13</span></a>
             <a href="#section-14" class="nav-link" data-section="14">Alerts &amp; Confirmations <span class="nav-count" id="nav-count-14">0/48</span></a>
@@ -289,7 +289,7 @@
             
     <div class="section" id="section-0">
         <h2 class="section-title">App Header &amp; Sidebar</h2>
-        <div class="section-guidance">These strings appear in the left sidebar (landscape) or top toolbar (portrait/tablet mode). The sidebar contains: language selector, region view buttons (Cervical, Thoracolumbar, Lumbar, Whole Spine), Plan/Construct editing toggle, tool palette (Implants, Annotations, Tools), action buttons (Copy Plan, Confirm Plan, Load, Save, JPG, PDF, Help, New Patient), session privacy toggle, and theme colour swatches. In portrait mode, the sidebar becomes a compact horizontal toolbar with Demographics/Plan/Construct tabs.</div>
+        <div class="section-guidance">These strings appear in the left sidebar (landscape) or top toolbar (portrait/tablet mode). The sidebar contains: language selector, region view buttons (Cervical, Thoracolumbar, Lumbar, Whole Spine), Plan/Construct editing toggle, tool palette (Implants, Annotations, Tools), action buttons (Copy Plan, Confirm Plan, Load, Save, PDF, Help, New Patient), session privacy toggle, and theme colour swatches. In portrait mode, the sidebar becomes a compact horizontal toolbar with Demographics/Plan/Construct tabs.</div>
         <div class="section-items">
         <div class="review-item" data-key="portrait.more_actions" data-section="0" id="item-portrait.more_actions">
             <div class="item-header">
@@ -12788,6 +12788,39 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="inventory.gs1_generated" data-section="8" id="item-inventory.gs1_generated">
+            <div class="item-header">
+                <code class="key-label">inventory.gs1_generated</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Generated from scanned data</div>
+                </div>
+                <div class="col-translation">
+                    <label>Русский</label>
+                    <textarea class="translation-field" data-key="inventory.gs1_generated" data-original="Создано из отсканированных данных">Создано из отсканированных данных</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-inventory.gs1_generated" value="correct" data-key="inventory.gs1_generated">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-inventory.gs1_generated" value="corrected" data-key="inventory.gs1_generated">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="inventory.gs1_generated" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="inventory.hooks" data-section="8" id="item-inventory.hooks">
             <div class="item-header">
                 <code class="key-label">inventory.hooks</code>
@@ -12818,6 +12851,105 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="inventory.hooks" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="inventory.identifiers_page" data-section="8" id="item-inventory.identifiers_page">
+            <div class="item-header">
+                <code class="key-label">inventory.identifiers_page</code>
+                <span class="hint placeholder-hint">Contains {placeholders}: keep braces intact</span>
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Implant identifiers: page {page}</div>
+                </div>
+                <div class="col-translation">
+                    <label>Русский</label>
+                    <textarea class="translation-field" data-key="inventory.identifiers_page" data-original="Идентификаторы имплантов: страница {page}">Идентификаторы имплантов: страница {page}</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-inventory.identifiers_page" value="correct" data-key="inventory.identifiers_page">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-inventory.identifiers_page" value="corrected" data-key="inventory.identifiers_page">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="inventory.identifiers_page" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="inventory.implants_scanned" data-section="8" id="item-inventory.implants_scanned">
+            <div class="item-header">
+                <code class="key-label">inventory.implants_scanned</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Implants scanned</div>
+                </div>
+                <div class="col-translation">
+                    <label>Русский</label>
+                    <textarea class="translation-field" data-key="inventory.implants_scanned" data-original="Импланты отсканированы">Импланты отсканированы</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-inventory.implants_scanned" value="correct" data-key="inventory.implants_scanned">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-inventory.implants_scanned" value="corrected" data-key="inventory.implants_scanned">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="inventory.implants_scanned" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="inventory.list_continued_page" data-section="8" id="item-inventory.list_continued_page">
+            <div class="item-header">
+                <code class="key-label">inventory.list_continued_page</code>
+                <span class="hint placeholder-hint">Contains {placeholders}: keep braces intact</span>
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Full implant list: page {page}</div>
+                </div>
+                <div class="col-translation">
+                    <label>Русский</label>
+                    <textarea class="translation-field" data-key="inventory.list_continued_page" data-original="Полный список имплантов: страница {page}">Полный список имплантов: страница {page}</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-inventory.list_continued_page" value="correct" data-key="inventory.list_continued_page">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-inventory.list_continued_page" value="corrected" data-key="inventory.list_continued_page">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="inventory.list_continued_page" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -14556,7 +14688,7 @@
 
     <div class="section" id="section-11">
         <h2 class="section-title">Export &amp; Column Headers</h2>
-        <div class="section-guidance">These appear at the top of the exported PDF/JPG image. The three columns are: patient info (left), Plan (middle), and Final Surgical Construct (right). An export picker lets you choose Plan or Final Record before JPG/PDF export. Export timestamp appears in the footer.</div>
+        <div class="section-guidance">These appear at the top of the exported PDF. The three columns are: patient info (left), Plan (middle), and Final Surgical Construct (right). An export picker lets you choose Plan or Final Record before PDF export. Export timestamp appears in the footer.</div>
         <div class="section-items">
         <div class="review-item" data-key="export.construct" data-section="11" id="item-export.construct">
             <div class="item-header">
@@ -14690,6 +14822,204 @@
                 </div>
             </div>
         </div>
+        <div class="review-item" data-key="export.identifiers_title" data-section="11" id="item-export.identifiers_title">
+            <div class="item-header">
+                <code class="key-label">export.identifiers_title</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Implant identifiers</div>
+                </div>
+                <div class="col-translation">
+                    <label>Русский</label>
+                    <textarea class="translation-field" data-key="export.identifiers_title" data-original="Идентификаторы имплантов">Идентификаторы имплантов</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-export.identifiers_title" value="correct" data-key="export.identifiers_title">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-export.identifiers_title" value="corrected" data-key="export.identifiers_title">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="export.identifiers_title" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="export.inventory_overflow" data-section="11" id="item-export.inventory_overflow">
+            <div class="item-header">
+                <code class="key-label">export.inventory_overflow</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">The PDF was not made: the implant list could not be fitted to the pages without cutting it off. Please report this case.</div>
+                </div>
+                <div class="col-translation">
+                    <label>Русский</label>
+                    <textarea class="translation-field" data-key="export.inventory_overflow" data-original="PDF не создан: список имплантов не удалось разместить на страницах без обрезки. Пожалуйста, сообщите об этом случае.">PDF не создан: список имплантов не удалось разместить на страницах без обрезки. Пожалуйста, сообщите об этом случае.</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-export.inventory_overflow" value="correct" data-key="export.inventory_overflow">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-export.inventory_overflow" value="corrected" data-key="export.inventory_overflow">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="export.inventory_overflow" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="export.link_status.final_only" data-section="11" id="item-export.link_status.final_only">
+            <div class="item-header">
+                <code class="key-label">export.link_status.final_only</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Link holds the final record only. The full case is attached to this PDF.</div>
+                </div>
+                <div class="col-translation">
+                    <label>Русский</label>
+                    <textarea class="translation-field" data-key="export.link_status.final_only" data-original="Ссылка содержит только итоговую запись. Полный случай приложен к этому PDF.">Ссылка содержит только итоговую запись. Полный случай приложен к этому PDF.</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-export.link_status.final_only" value="correct" data-key="export.link_status.final_only">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-export.link_status.final_only" value="corrected" data-key="export.link_status.final_only">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="export.link_status.final_only" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="export.link_status.full" data-section="11" id="item-export.link_status.full">
+            <div class="item-header">
+                <code class="key-label">export.link_status.full</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Link holds the whole case except patient details and scan times.</div>
+                </div>
+                <div class="col-translation">
+                    <label>Русский</label>
+                    <textarea class="translation-field" data-key="export.link_status.full" data-original="Ссылка содержит весь случай, кроме данных пациента и времени сканирования.">Ссылка содержит весь случай, кроме данных пациента и времени сканирования.</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-export.link_status.full" value="correct" data-key="export.link_status.full">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-export.link_status.full" value="corrected" data-key="export.link_status.full">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="export.link_status.full" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="export.link_status.no_notes" data-section="11" id="item-export.link_status.no_notes">
+            <div class="item-header">
+                <code class="key-label">export.link_status.no_notes</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Link leaves out notes. The full case is attached to this PDF.</div>
+                </div>
+                <div class="col-translation">
+                    <label>Русский</label>
+                    <textarea class="translation-field" data-key="export.link_status.no_notes" data-original="Ссылка не содержит заметок. Полный случай приложен к этому PDF.">Ссылка не содержит заметок. Полный случай приложен к этому PDF.</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-export.link_status.no_notes" value="correct" data-key="export.link_status.no_notes">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-export.link_status.no_notes" value="corrected" data-key="export.link_status.no_notes">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="export.link_status.no_notes" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="export.link_status.none" data-section="11" id="item-export.link_status.none">
+            <div class="item-header">
+                <code class="key-label">export.link_status.none</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Case too large for a link. The full case is attached to this PDF.</div>
+                </div>
+                <div class="col-translation">
+                    <label>Русский</label>
+                    <textarea class="translation-field" data-key="export.link_status.none" data-original="Случай слишком велик для ссылки. Полный случай приложен к этому PDF.">Случай слишком велик для ссылки. Полный случай приложен к этому PDF.</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-export.link_status.none" value="correct" data-key="export.link_status.none">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-export.link_status.none" value="corrected" data-key="export.link_status.none">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="export.link_status.none" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
         <div class="review-item" data-key="export.open_case_link" data-section="11" id="item-export.open_case_link">
             <div class="item-header">
                 <code class="key-label">export.open_case_link</code>
@@ -14720,6 +15050,39 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="export.open_case_link" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="export.page_of" data-section="11" id="item-export.page_of">
+            <div class="item-header">
+                <code class="key-label">export.page_of</code>
+                <span class="hint placeholder-hint">Contains {placeholders}: keep braces intact</span>
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Page {page} of {total}</div>
+                </div>
+                <div class="col-translation">
+                    <label>Русский</label>
+                    <textarea class="translation-field" data-key="export.page_of" data-original="Страница {page} из {total}">Страница {page} из {total}</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-export.page_of" value="correct" data-key="export.page_of">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-export.page_of" value="corrected" data-key="export.page_of">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="export.page_of" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -15596,11 +15959,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Export the case as &lt;strong&gt;JPG&lt;/strong&gt; (chart image), &lt;strong&gt;PDF&lt;/strong&gt; (A4 with a clickable case link in the demographics column and the complete case attached, so choosing the PDF with &lt;strong&gt;Open File&lt;/strong&gt; reloads it), or &lt;strong&gt;JSON&lt;/strong&gt; (structured schema, exports v10 — reloadable). All exports include a translation disclaimer footer when the language is not English. The patient name in the filename can be toggled in Preferences.</div>
+                    <div class="english-text">Export the case as &lt;strong&gt;PDF&lt;/strong&gt; (A4 with a clickable case link in the demographics column and the complete case attached, so choosing the PDF with &lt;strong&gt;Open File&lt;/strong&gt; reloads it; when the case has scanned implants, their identifiers follow on extra pages) or &lt;strong&gt;JSON&lt;/strong&gt; (structured schema, exports v10, reloadable). All exports include a translation disclaimer footer when the language is not English. The patient name in the filename can be toggled in Preferences.</div>
                 </div>
                 <div class="col-translation">
                     <label>Русский</label>
-                    <textarea class="translation-field" data-key="help.export_formats.body" data-original="Экспортируйте случай в формате &lt;strong&gt;JPG&lt;/strong&gt; (изображение диаграммы), &lt;strong&gt;PDF&lt;/strong&gt; (A4 с кликабельной ссылкой на случай в колонке демографии и полным случаем во вложении, поэтому при выборе PDF через &lt;strong&gt;Открыть файл&lt;/strong&gt; случай загружается повторно) или &lt;strong&gt;JSON&lt;/strong&gt; (структурированная схема, экспортируется в v10 — может быть загружена обратно). Все экспорты содержат сноску с предупреждением о переводе, если язык не английский. Имя пациента в имени файла можно включить или отключить в Настройках.">Экспортируйте случай в формате &lt;strong&gt;JPG&lt;/strong&gt; (изображение диаграммы), &lt;strong&gt;PDF&lt;/strong&gt; (A4 с кликабельной ссылкой на случай в колонке демографии и полным случаем во вложении, поэтому при выборе PDF через &lt;strong&gt;Открыть файл&lt;/strong&gt; случай загружается повторно) или &lt;strong&gt;JSON&lt;/strong&gt; (структурированная схема, экспортируется в v10 — может быть загружена обратно). Все экспорты содержат сноску с предупреждением о переводе, если язык не английский. Имя пациента в имени файла можно включить или отключить в Настройках.</textarea>
+                    <textarea class="translation-field" data-key="help.export_formats.body" data-original="Экспортируйте случай в формате &lt;strong&gt;PDF&lt;/strong&gt; (A4 с кликабельной ссылкой на случай в колонке демографии и полным случаем во вложении, поэтому при выборе PDF через &lt;strong&gt;Открыть файл&lt;/strong&gt; случай загружается повторно; если в случае есть отсканированные импланты, их идентификаторы приводятся на дополнительных страницах) или &lt;strong&gt;JSON&lt;/strong&gt; (структурированная схема, экспортируется в v10, может быть загружена обратно). Все экспорты содержат сноску с предупреждением о переводе, если язык не английский. Имя пациента в имени файла можно включить или отключить в Настройках.">Экспортируйте случай в формате &lt;strong&gt;PDF&lt;/strong&gt; (A4 с кликабельной ссылкой на случай в колонке демографии и полным случаем во вложении, поэтому при выборе PDF через &lt;strong&gt;Открыть файл&lt;/strong&gt; случай загружается повторно; если в случае есть отсканированные импланты, их идентификаторы приводятся на дополнительных страницах) или &lt;strong&gt;JSON&lt;/strong&gt; (структурированная схема, экспортируется в v10, может быть загружена обратно). Все экспорты содержат сноску с предупреждением о переводе, если язык не английский. Имя пациента в имени файла можно включить или отключить в Настройках.</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -16355,11 +16718,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Use the &lt;strong&gt;QR Image&lt;/strong&gt; button in the sidebar to download a standalone PNG of the case as a QR code, or &lt;strong&gt;Show QR&lt;/strong&gt; to display it on screen for someone to scan with a phone camera. PDF exports embed a clickable case link instead of a QR; JPG exports are image-only — neither file format carries a QR.</div>
+                    <div class="english-text">Use the &lt;strong&gt;QR Image&lt;/strong&gt; button in the sidebar to download a standalone PNG of the case as a QR code, or &lt;strong&gt;Show QR&lt;/strong&gt; to display it on screen for someone to scan with a phone camera. PDF exports embed a clickable case link instead of a QR code.</div>
                 </div>
                 <div class="col-translation">
                     <label>Русский</label>
-                    <textarea class="translation-field" data-key="help.qr.body" data-original="Используйте кнопку &lt;strong&gt;QR-изображение&lt;/strong&gt; на боковой панели, чтобы скачать отдельный PNG случая в виде QR-кода, или &lt;strong&gt;Показать QR&lt;/strong&gt;, чтобы вывести его на экран для сканирования камерой телефона. PDF-экспорты содержат кликабельную ссылку на случай вместо QR; JPG-экспорты содержат только изображение — ни один из этих форматов не несёт QR.">Используйте кнопку &lt;strong&gt;QR-изображение&lt;/strong&gt; на боковой панели, чтобы скачать отдельный PNG случая в виде QR-кода, или &lt;strong&gt;Показать QR&lt;/strong&gt;, чтобы вывести его на экран для сканирования камерой телефона. PDF-экспорты содержат кликабельную ссылку на случай вместо QR; JPG-экспорты содержат только изображение — ни один из этих форматов не несёт QR.</textarea>
+                    <textarea class="translation-field" data-key="help.qr.body" data-original="Используйте кнопку &lt;strong&gt;QR-изображение&lt;/strong&gt; на боковой панели, чтобы скачать отдельный PNG случая в виде QR-кода, или &lt;strong&gt;Показать QR&lt;/strong&gt;, чтобы вывести его на экран для сканирования камерой телефона. PDF-экспорты содержат кликабельную ссылку на случай вместо QR-кода.">Используйте кнопку &lt;strong&gt;QR-изображение&lt;/strong&gt; на боковой панели, чтобы скачать отдельный PNG случая в виде QR-кода, или &lt;strong&gt;Показать QR&lt;/strong&gt;, чтобы вывести его на экран для сканирования камерой телефона. PDF-экспорты содержат кликабельную ссылку на случай вместо QR-кода.</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -16883,11 +17246,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Save exports a .json project file that can be reloaded later. JPG and PDF export the visible chart for clinical records. The left panel records implant supplier, screw system, bone graft, and auto-generated inventory.</div>
+                    <div class="english-text">Save exports a .json project file that can be reloaded later. PDF export produces the clinical record of the visible chart. The left panel records implant supplier, screw system, bone graft, and auto-generated inventory.</div>
                 </div>
                 <div class="col-translation">
                     <label>Русский</label>
-                    <textarea class="translation-field" data-key="help.save_load.body" data-original="Сохранить экспортирует .json файл проекта для последующей загрузки. JPG и PDF экспортируют видимую схему для клинических записей. Левая панель отображает поставщика имплантов, систему винтов, костный трансплантат и автоматический инвентарь.">Сохранить экспортирует .json файл проекта для последующей загрузки. JPG и PDF экспортируют видимую схему для клинических записей. Левая панель отображает поставщика имплантов, систему винтов, костный трансплантат и автоматический инвентарь.</textarea>
+                    <textarea class="translation-field" data-key="help.save_load.body" data-original="Сохранить экспортирует .json файл проекта для последующей загрузки. Экспорт в PDF формирует клиническую запись видимой схемы. Левая панель отображает поставщика имплантов, систему винтов, костный трансплантат и автоматический инвентарь.">Сохранить экспортирует .json файл проекта для последующей загрузки. Экспорт в PDF формирует клиническую запись видимой схемы. Левая панель отображает поставщика имплантов, систему винтов, костный трансплантат и автоматический инвентарь.</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -39341,7 +39704,7 @@ Portrait mode gives each column more vertical space, showing the full spine with
     (function() {
         const LANG = "ru";
         const STORAGE_KEY = "spine_review_" + LANG;
-        const TOTAL = 1178;
+        const TOTAL = 1189;
 
         // --- Reviewer details ---
 
