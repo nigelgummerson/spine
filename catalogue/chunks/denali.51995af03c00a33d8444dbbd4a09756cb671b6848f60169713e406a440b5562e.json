@@ -2152,32 +2152,5 @@
     "c": "101-10001",
     "n": "VB Spine LLC",
     "z": "Set Screw ATR™"
-  },
-  "10888857011274": {
-    "s": "DENALI",
-    "t": "set_screw",
-    "ht": "polyaxial",
-    "sf": "solid",
-    "c": "101-90319",
-    "n": "VB Spine LLC",
-    "z": "Set Screw Removal Wrench"
-  },
-  "10888857555662": {
-    "s": "DENALI",
-    "t": "set_screw",
-    "ht": "polyaxial",
-    "sf": "solid",
-    "c": "PRO-1260",
-    "n": "VB Spine LLC",
-    "z": "Set Screw Removal Wrench"
-  },
-  "10888857010437": {
-    "s": "DENALI",
-    "t": "set_screw",
-    "ht": "polyaxial",
-    "sf": "solid",
-    "c": "101-90187",
-    "n": "VB Spine LLC",
-    "z": "Set Screw Removal Wrench"
   }
 }

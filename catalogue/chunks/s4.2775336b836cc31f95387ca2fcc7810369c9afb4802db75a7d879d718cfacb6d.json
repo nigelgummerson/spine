@@ -2651,15 +2651,6 @@
     "n": "Aesculap AG",
     "z": "S4C SET SCREW NEW VERSION"
   },
-  "04046963172015": {
-    "s": "S4",
-    "t": "set_screw",
-    "ht": "polyaxial",
-    "sf": "solid",
-    "c": "FW103R",
-    "n": "Aesculap AG",
-    "z": "S4C OCCIPUT TORQUE WRENCH F/SET SCREW"
-  },
   "04038653455256": {
     "s": "S4",
     "t": "set_screw",
