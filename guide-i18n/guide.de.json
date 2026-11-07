@@ -67,7 +67,7 @@
     "privacy_title": "Datenschutz & Daten",
     "privacy_1": "Der Fall bleibt ausschließlich in diesem Browser. Steht „Auf diesem Gerät speichern“ auf Ein (Standard), wird der Fall hier verschlüsselt gespeichert und nach 24 Stunden Inaktivität automatisch gelöscht. Auf Aus (rot) wird auf diesem Gerät nichts gespeichert, und bereits Gespeichertes wird gelöscht.",
     "privacy_2": "Die Verschlüsselung erfolgt automatisch: ein 256-Bit-AES-GCM-Schlüssel wird einmal pro Browserprofil generiert und in IndexedDB als nicht-exportierbar gespeichert. Es gibt keine Passphrase. Das Löschen der Websitedaten oder ein Wechsel des Browserprofils löscht den Schlüssel dauerhaft.",
-    "privacy_3": "Es werden keine Daten über ein Netzwerk übertragen: vollständig lokal, keine Analytik, keine Telemetrie, keine externen Verbindungen",
+    "privacy_3": "Es werden keine Patientendaten über ein Netzwerk übertragen: Sie bleiben auf dem Gerät, ohne Analytik und ohne Telemetrie",
     "privacy_4": "Der Patientenname wird standardmäßig aus exportierten Dateinamen ausgeschlossen (in Einstellungen umschaltbar) und ist unter keiner Einstellung in einem Freigabe-Link oder QR-Code enthalten.",
     "dual_title": "Zwei-Bildschirm-Modus",
     "dual_p1": "Öffnen Sie die App in zwei Fenstern desselben Browsers auf einem Computer mit zwei oder mehr Bildschirmen. Änderungen werden automatisch via BroadcastChannel synchronisiert: Zustand, Farbschema, Sprache, Ansicht und der Schalter „Auf diesem Gerät speichern“ stimmen fensterübergreifend überein. Ein grünes Verknüpfungssymbol bestätigt die Verbindung.",

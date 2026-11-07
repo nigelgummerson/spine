@@ -67,7 +67,7 @@
     "privacy_title": "Privacidad y datos",
     "privacy_1": "El caso se conserva solo en este navegador. Con «Guardar en este dispositivo» activado (opción predeterminada), el caso se guarda aquí, cifrado, y se borra automáticamente tras 24 horas de inactividad. Desactivado (rojo): no se guarda nada en este dispositivo y se borra lo que ya estuviera guardado.",
     "privacy_2": "El cifrado es automático: se genera una clave AES-GCM de 256 bits una vez por perfil de navegador y se almacena en IndexedDB como no extraíble. No hay contraseña. Borrar los datos del sitio o cambiar de perfil de navegador elimina permanentemente la clave.",
-    "privacy_3": "No se transmite ningún dato por ninguna red: completamente local, sin analítica, sin telemetría, sin llamadas externas",
+    "privacy_3": "Ningún dato del paciente se envía por ninguna red: permanece en el dispositivo, sin analítica y sin telemetría",
     "privacy_4": "El nombre del paciente se excluye de los nombres de archivo exportados por defecto (configurable en Preferencias), y nunca se incluye en un enlace para compartir ni en un código QR bajo ninguna configuración.",
     "dual_title": "Modo de dos ventanas",
     "dual_p1": "Abra la aplicación en dos ventanas del mismo navegador en un ordenador con dos o más pantallas. Los cambios se sincronizan automáticamente mediante BroadcastChannel: el estado, el tema, el idioma, la vista y el interruptor «Guardar en este dispositivo» coinciden entre las ventanas. Un icono de enlace verde confirma la conexión.",

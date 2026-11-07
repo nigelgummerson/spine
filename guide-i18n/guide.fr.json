@@ -67,7 +67,7 @@
     "privacy_title": "Confidentialité et données",
     "privacy_1": "Le dossier n'est conservé que dans ce navigateur. Avec « Enregistrer sur cet appareil » activé (réglage par défaut), le dossier est enregistré ici, chiffré, et supprimé automatiquement après 24 heures d'inactivité. Désactivé (rouge) : rien n'est conservé sur cet appareil, et ce qui était déjà stocké est effacé.",
     "privacy_2": "Le chiffrement est automatique : une clé AES-GCM 256 bits est générée une fois par profil de navigateur et stockée dans IndexedDB comme non extractible. Il n'y a pas de phrase de passe. La suppression des données du site ou le changement de profil de navigateur efface définitivement la clé.",
-    "privacy_3": "Aucune donnée n'est transmise sur un réseau : entièrement local, sans analyse, sans télémétrie, sans appels externes",
+    "privacy_3": "Aucune donnée patient n'est transmise sur un réseau : elles restent sur l'appareil, sans analyse ni télémétrie",
     "privacy_4": "Le nom du patient est exclu par défaut des noms de fichiers exportés (modifiable dans les Préférences) et n'est jamais inclus dans un lien de partage ou un code QR, quelle que soit la configuration.",
     "dual_title": "Mode double fenêtre",
     "dual_p1": "Ouvrez l'application dans deux fenêtres du même navigateur sur un ordinateur avec deux écrans ou plus. Les modifications se synchronisent automatiquement via BroadcastChannel : état, thème, langue, vue et l'interrupteur « Enregistrer sur cet appareil » concordent entre les fenêtres. Une icône de lien verte confirme la connexion.",

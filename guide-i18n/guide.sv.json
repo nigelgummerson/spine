@@ -67,7 +67,7 @@
     "privacy_title": "Integritet och data",
     "privacy_1": "Fallet finns bara i den här webbläsaren. När ”Spara på den här enheten” är På (standard) sparas fallet här, krypterat, och raderas automatiskt efter 24 timmars inaktivitet. När det är Av (rött) sparas inget på den här enheten, och det som redan finns sparat rensas.",
     "privacy_2": "Kryptering är automatisk: en 256-bitars AES-GCM-nyckel genereras en gång per webbläsarprofil och lagras i IndexedDB som icke-extraherbar. Det finns inget lösenord. Radering av webbplatsdata eller byte av webbläsarprofil tar permanent bort nyckeln.",
-    "privacy_3": "Ingen data överförs via något nätverk: helt lokalt, ingen analys, ingen telemetri, inga externa anrop",
+    "privacy_3": "Inga patientdata skickas via något nätverk: de stannar på enheten, utan analys och utan telemetri",
     "privacy_4": "Patientnamnet utesluts från exporterade filnamn som standard (kan ändras i Inställningar) och ingår aldrig i en delelänk eller QR-kod oavsett inställning.",
     "dual_title": "Dubbelskärmsläge",
     "dual_p1": "Öppna appen i två fönster i samma webbläsare på en dator med två eller flera skärmar. Ändringar synkroniseras automatiskt via BroadcastChannel: tillstånd, tema, språk, vy och reglaget ”Spara på den här enheten” matchar alla fönster. En grön länkikon bekräftar anslutningen.",

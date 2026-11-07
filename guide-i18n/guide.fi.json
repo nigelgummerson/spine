@@ -67,7 +67,7 @@
     "privacy_title": "Tietosuoja ja tiedot",
     "privacy_1": "Tapaus säilyy vain tässä selaimessa. Kun Tallenna tälle laitteelle on Päällä (oletus), tapaus tallennetaan tänne salattuna ja poistetaan automaattisesti 24 tunnin käyttämättömyyden jälkeen. Kun se on Pois (punainen), tälle laitteelle ei säilytetä mitään, ja jo tallennettu tyhjennetään.",
     "privacy_2": "Salaus on automaattinen: 256-bittinen AES-GCM-avain luodaan kerran selainprofiilia kohden ja tallennetaan IndexedDB:hen ei-purettavana. Salasanaa ei ole. Sivuston tietojen tyhjentäminen tai selainprofiilin vaihtaminen poistaa avaimen pysyvästi.",
-    "privacy_3": "Tietoja ei siirretä minkään verkon kautta: täysin paikallinen, ei analytiikkaa, ei telemetriaa, ei ulkoisia kutsuja",
+    "privacy_3": "Potilastietoja ei lähetetä minkään verkon kautta: ne pysyvät laitteessa, ei analytiikkaa eikä telemetriaa",
     "privacy_4": "Potilaan nimi on oletuksena poissa vietyjen tiedostojen nimistä (vaihdettavissa Asetuksissa) eikä se sisälly koskaan jakamislinkkiin tai QR-koodiin missään asetuksessa.",
     "dual_title": "Kaksoisikkunatila",
     "dual_p1": "Avaa sovellus kahdessa saman selaimen ikkunassa tietokoneessa, jossa on kaksi tai useampi näyttö. Muutokset synkronoituvat automaattisesti BroadcastChannelin kautta: tila, teema, kieli, näkymä ja Tallenna tälle laitteelle -kytkin vastaavat toisiaan ikkunoiden välillä. Vihreä linkki-kuvake vahvistaa yhteyden.",

@@ -67,7 +67,7 @@
     "privacy_title": "Privacy en gegevens",
     "privacy_1": "De casus blijft alleen in deze browser. Met ‘Opslaan op dit apparaat’ op Aan (standaard) wordt de casus hier versleuteld opgeslagen en na 24 uur inactiviteit automatisch verwijderd. Op Uit (rood) wordt er niets op dit apparaat bewaard en wordt wat al was opgeslagen gewist.",
     "privacy_2": "Versleuteling is automatisch: een 256-bit AES-GCM-sleutel wordt eenmaal gegenereerd per browserprofiel en als niet-uitleesbaar opgeslagen in IndexedDB. Er is geen wachtwoord. Het wissen van sitedata of het wisselen van browserprofiel verwijdert de sleutel permanent.",
-    "privacy_3": "Er worden geen gegevens via een netwerk verzonden: volledig lokaal, geen analyse, geen telemetrie, geen externe aanroepen",
+    "privacy_3": "Er worden geen patiëntgegevens via een netwerk verzonden: ze blijven op het apparaat, zonder analyse en zonder telemetrie",
     "privacy_4": "De naam van de patiënt wordt standaard uitgesloten van geëxporteerde bestandsnamen (in- of uitschakelbaar via Voorkeuren) en wordt onder geen enkele instelling opgenomen in een deellink of QR-code.",
     "dual_title": "Dual-windowmodus",
     "dual_p1": "Open de app in twee vensters van dezelfde browser op een computer met twee of meer schermen. Wijzigingen worden automatisch gesynchroniseerd via BroadcastChannel: toestand, thema, taal, weergave en de schakelaar ‘Opslaan op dit apparaat’ worden allemaal gesynchroniseerd tussen vensters. Een groen koppelingsicoon bevestigt de verbinding.",

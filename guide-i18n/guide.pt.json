@@ -67,7 +67,7 @@
     "privacy_title": "Privacidade e Dados",
     "privacy_1": "O caso fica apenas neste browser. Com «Guardar neste dispositivo» Ligado (predefinição), o caso é guardado aqui, encriptado, e apagado automaticamente após 24 horas de inatividade. Desligado (vermelho): nada fica guardado neste dispositivo e o que já estava guardado é apagado.",
     "privacy_2": "A encriptação é automática: uma chave AES-GCM de 256 bits é gerada uma vez por perfil de browser e armazenada no IndexedDB como não extraível. Não existe senha. Limpar os dados do site ou mudar de perfil de browser elimina permanentemente a chave.",
-    "privacy_3": "Nenhum dado é transmitido por qualquer rede: totalmente local, sem análise, sem telemetria, sem chamadas externas",
+    "privacy_3": "Nenhum dado do doente é transmitido por qualquer rede: permanece no dispositivo, sem análise e sem telemetria",
     "privacy_4": "O nome do doente é excluído dos nomes de ficheiros exportados por padrão (configurável em Preferências) e nunca é incluído numa ligação de partilha ou código QR em qualquer configuração.",
     "dual_title": "Modo de Janela Dupla",
     "dual_p1": "Abra a aplicação em duas janelas do mesmo browser num computador com dois ou mais ecrãs. As alterações sincronizam automaticamente via BroadcastChannel: estado, tema, idioma, vista e o interruptor «Guardar neste dispositivo» correspondem entre janelas. Um ícone de ligação verde confirma a ligação.",

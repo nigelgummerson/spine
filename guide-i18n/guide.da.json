@@ -67,7 +67,7 @@
     "privacy_title": "Privatliv og data",
     "privacy_1": "Sagen gemmes kun i denne browser. Når »Gem på denne enhed« er slået Til (standard), gemmes sagen her, krypteret, og slettes automatisk efter 24 timers inaktivitet. Når den er Fra (rød), gemmes intet på denne enhed, og det, der allerede er gemt, ryddes.",
     "privacy_2": "Kryptering er automatisk: en 256-bit AES-GCM-nøgle genereres én gang per browserprofil og gemmes i IndexedDB som ikke-udtrækkelig. Der er ingen kodeord. Rydning af webstedsdata eller skift af browserprofil sletter nøglen permanent.",
-    "privacy_3": "Ingen data overføres over noget netværk: fuldt lokalt, ingen analyser, ingen telemetri, ingen eksterne kald",
+    "privacy_3": "Ingen patientdata sendes over noget netværk: de bliver på enheden, uden analyser og uden telemetri",
     "privacy_4": "Patientens navn er som standard udelukket fra eksporterede filnavne (kan slås til/fra i Præferencer) og medtages aldrig i et del-link eller QR-kode under nogen indstilling.",
     "dual_title": "Dual-vindue-tilstand",
     "dual_p1": "Åbn appen i to vinduer i den samme browser på en computer med to eller flere skærme. Ændringer synkroniseres automatisk via BroadcastChannel: tilstand, tema, sprog, visning og kontakten »Gem på denne enhed« matcher alle på tværs af vinduer. Et grønt linkikon bekræfter forbindelsen.",

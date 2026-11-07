@@ -67,7 +67,7 @@
     "privacy_title": "Prywatność i dane",
     "privacy_1": "Przypadek jest przechowywany tylko w tej przeglądarce. Gdy przełącznik „Zapisuj na tym urządzeniu” jest włączony (domyślnie), przypadek jest zapisywany tutaj, zaszyfrowany, i usuwany automatycznie po 24 godzinach bezczynności. Gdy jest wyłączony (czerwony), nic nie jest przechowywane na tym urządzeniu, a to, co już zapisano, zostaje usunięte.",
     "privacy_2": "Szyfrowanie jest automatyczne: klucz AES-GCM 256-bitowy generowany jest raz na profil przeglądarki i przechowywany w IndexedDB jako niewyodrębnialny. Brak hasła. Wyczyszczenie danych witryny lub zmiana profilu przeglądarki trwale usuwa klucz.",
-    "privacy_3": "Żadne dane nie są przesyłane przez żadną sieć: w pełni lokalne, bez analityki, bez telemetrii, bez zewnętrznych połączeń",
+    "privacy_3": "Żadne dane pacjenta nie są przesyłane przez żadną sieć: pozostają na urządzeniu, bez analityki i bez telemetrii",
     "privacy_4": "Imię i nazwisko pacjenta jest domyślnie wykluczone z eksportowanych nazw plików (można zmienić w Preferencjach) i nigdy nie jest uwzględniane w linku udostępniania ani kodzie QR przy żadnym ustawieniu.",
     "dual_title": "Tryb dwuokienkowy",
     "dual_p1": "Otwórz aplikację w dwóch oknach tej samej przeglądarki na komputerze z dwoma lub więcej ekranami. Zmiany synchronizują się automatycznie przez BroadcastChannel: stan, motyw, język, widok i przełącznik „Zapisuj na tym urządzeniu” odpowiadają sobie we wszystkich oknach. Zielona ikona łącza potwierdza połączenie.",

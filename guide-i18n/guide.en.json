@@ -67,7 +67,7 @@
     "privacy_title": "Privacy & Data",
     "privacy_1": "The case is kept only in this browser. With Save on this device On (the default), the case is saved here, encrypted, and deleted automatically after 24 hours of inactivity. Off (red): nothing is kept on this device, and anything already stored is cleared.",
     "privacy_2": "Encryption is automatic: a 256-bit AES-GCM key is generated once per browser profile and stored in IndexedDB as non-extractable. There is no passphrase. Clearing site data or switching browser profiles permanently deletes the key.",
-    "privacy_3": "No data is transmitted over any network: fully local, no analytics, no telemetry, no external calls",
+    "privacy_3": "No patient data is sent over any network: it stays on the device, with no analytics and no telemetry",
     "privacy_4": "Patient name is excluded from exported filenames by default (toggleable in Preferences), and is never included in a share link or QR code under any setting.",
     "dual_title": "Dual-Window Mode",
     "dual_p1": "Open the app in two windows of the same browser on a computer with two or more screens. Changes sync automatically via BroadcastChannel: state, theme, language, view, and the Save on this device switch all match across windows. A green link icon confirms the connection.",

@@ -67,7 +67,7 @@
     "privacy_title": "Gizlilik ve Veriler",
     "privacy_1": "Vaka yalnızca bu tarayıcıda bulunur. \"Bu cihaza kaydet\" Açık olduğunda (varsayılan) vaka burada şifreli olarak kaydedilir ve 24 saat işlem yapılmazsa otomatik olarak silinir. Kapalı olduğunda (kırmızı) bu cihazda hiçbir şey saklanmaz ve önceden kaydedilenler temizlenir.",
     "privacy_2": "Şifreleme otomatiktir: 256 bit AES-GCM anahtarı tarayıcı profili başına bir kez oluşturulur ve IndexedDB'de ayıklanamaz olarak saklanır. Parola yoktur. Site verilerinin temizlenmesi veya tarayıcı profilleri arasında geçiş yapmak anahtarı kalıcı olarak siler.",
-    "privacy_3": "Hiçbir veri herhangi bir ağ üzerinden iletilmez: tamamen yerel, analitik yok, telemetri yok, harici çağrı yok",
+    "privacy_3": "Hiçbir hasta verisi herhangi bir ağ üzerinden gönderilmez: veriler cihazda kalır, analitik ve telemetri yoktur",
     "privacy_4": "Hasta adı varsayılan olarak dışa aktarılan dosya adlarından hariç tutulur (Tercihler'den değiştirilebilir) ve hiçbir ayarda paylaşım bağlantısına veya QR koduna dahil edilmez.",
     "dual_title": "Çift Pencere Modu",
     "dual_p1": "Uygulamayı iki veya daha fazla ekrana sahip bir bilgisayarda aynı tarayıcının iki penceresinde açın. Değişiklikler BroadcastChannel aracılığıyla otomatik olarak senkronize edilir: durum, tema, dil, görünüm ve \"Bu cihaza kaydet\" anahtarı tüm pencereler arasında eşleşir. Yeşil bağlantı simgesi bağlantıyı doğrular.",

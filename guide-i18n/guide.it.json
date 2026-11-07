@@ -67,7 +67,7 @@
     "privacy_title": "Privacy e dati",
     "privacy_1": "Il caso resta solo in questo browser. Con «Salva su questo dispositivo» attivo (impostazione predefinita), il caso viene salvato qui, cifrato, ed eliminato automaticamente dopo 24 ore di inattività. Disattivo (rosso): su questo dispositivo non viene conservato nulla e quanto già salvato viene cancellato.",
     "privacy_2": "La crittografia è automatica: una chiave AES-GCM a 256 bit viene generata una sola volta per profilo browser e memorizzata in IndexedDB come non estraibile. Non è richiesta alcuna passphrase. La cancellazione dei dati del sito o il cambio del profilo browser elimina permanentemente la chiave.",
-    "privacy_3": "Nessun dato viene trasmesso su alcuna rete: completamente locale, nessuna analisi, nessuna telemetria, nessuna chiamata esterna",
+    "privacy_3": "Nessun dato del paziente viene trasmesso su alcuna rete: resta sul dispositivo, senza analisi né telemetria",
     "privacy_4": "Il nome del paziente è escluso dai nomi dei file esportati per default (modificabile nelle Preferenze), e non è mai incluso in un link condivisibile o codice QR in nessuna impostazione.",
     "dual_title": "Modalità a doppia finestra",
     "dual_p1": "Apri l'app in due finestre dello stesso browser su un computer con due o più schermi. Le modifiche si sincronizzano automaticamente tramite BroadcastChannel: stato, tema, lingua, vista e l'interruttore «Salva su questo dispositivo» corrispondono tra le finestre. Un'icona verde di collegamento conferma la connessione.",

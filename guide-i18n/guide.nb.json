@@ -67,7 +67,7 @@
     "privacy_title": "Personvern og data",
     "privacy_1": "Saken finnes kun i denne nettleseren. Når «Lagre på denne enheten» er På (standard), lagres saken her, kryptert, og slettes automatisk etter 24 timer uten aktivitet. Når den er Av (rød), lagres ingenting på denne enheten, og det som allerede er lagret, slettes.",
     "privacy_2": "Kryptering er automatisk: en 256-biters AES-GCM-nøkkel genereres én gang per nettleserprofil og lagres i IndexedDB som ikke-uttrekkbar. Det finnes ingen passord. Sletting av nettstedsdata eller bytte av nettleserprofil sletter nøkkelen permanent.",
-    "privacy_3": "Ingen data overføres over noe nettverk: fullstendig lokalt, ingen analyse, ingen telemetri, ingen eksterne anrop",
+    "privacy_3": "Ingen pasientdata sendes over noe nettverk: de blir på enheten, uten analyse og uten telemetri",
     "privacy_4": "Pasientnavn er ekskludert fra eksporterte filnavn som standard (kan slås av/på i Innstillinger), og inkluderes aldri i en delelenke eller QR-kode under noen innstilling.",
     "dual_title": "To-vindu-modus",
     "dual_p1": "Åpne appen i to vinduer av samme nettleser på en datamaskin med to eller flere skjermer. Endringer synkroniseres automatisk via BroadcastChannel: tilstand, tema, språk, visning og bryteren «Lagre på denne enheten» samsvarer mellom vinduer. Et grønt koblingsikon bekrefter tilkoblingen.",
