@@ -191,7 +191,7 @@
         <div class="header-top">
             <div>
                 <h1>Spinal Instrumentation Plan & Record: Translation Review</h1>
-                <span class="lang-badge">ja / ja (ja) — v3.65.00-beta</span>
+                <span class="lang-badge">ja / ja (ja) — v3.65.01-beta</span>
             </div>
             <div class="header-actions">
                 <a href="../guide.html" target="_blank" style="color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: none; padding: 6px 10px;" title="How to use this form">Guide</a>
@@ -203,7 +203,7 @@
         </div>
         <div class="progress-bar">
             <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-            <div class="progress-text" id="progress-text">0 of 1468 items reviewed (0%)</div>
+            <div class="progress-text" id="progress-text">0 of 1470 items reviewed (0%)</div>
             <div class="save-hint" id="save-hint"></div>
         </div>
     </div>
@@ -225,7 +225,7 @@
             <div class="nav-divider"></div>
             <div class="nav-sections">
                 <a href="#section-0" class="nav-link" data-section="0">App Header &amp; Sidebar <span class="nav-count" id="nav-count-0">0/93</span></a>
-            <a href="#section-1" class="nav-link" data-section="1">Patient Demographics <span class="nav-count" id="nav-count-1">0/32</span></a>
+            <a href="#section-1" class="nav-link" data-section="1">Patient Demographics <span class="nav-count" id="nav-count-1">0/33</span></a>
             <a href="#section-2" class="nav-link" data-section="2">Implant Modal: Screws, Hooks &amp; Bands <span class="nav-count" id="nav-count-2">0/102</span></a>
             <a href="#section-3" class="nav-link" data-section="3">Cage Modal: Interbody Cages <span class="nav-count" id="nav-count-3">0/59</span></a>
             <a href="#section-4" class="nav-link" data-section="4">Osteotomy Modal <span class="nav-count" id="nav-count-4">0/32</span></a>
@@ -241,7 +241,7 @@
             <a href="#section-14" class="nav-link" data-section="14">Alerts &amp; Confirmations <span class="nav-count" id="nav-count-14">0/50</span></a>
             <a href="#section-15" class="nav-link" data-section="15">Credits &amp; Disclaimer <span class="nav-count" id="nav-count-15">0/19</span></a>
             <a href="#section-16" class="nav-link" data-section="16">Version History Modal <span class="nav-count" id="nav-count-16">0/1</span></a>
-            <a href="#section-17" class="nav-link" data-section="17">Other <span class="nav-count" id="nav-count-17">0/786</span></a>
+            <a href="#section-17" class="nav-link" data-section="17">Other <span class="nav-count" id="nav-count-17">0/787</span></a>
                 <div class="nav-divider"></div>
                 <a href="#section-bugs" class="nav-link nav-link-bugs" data-section="bugs">Bug Reports <span class="nav-count" id="nav-count-bugs">0</span></a>
             </div>
@@ -3925,6 +3925,39 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="patient.name" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="patient.not_currently_marketed" data-section="1" id="item-patient.not_currently_marketed">
+            <div class="item-header">
+                <code class="key-label">patient.not_currently_marketed</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">Not currently marketed</div>
+                </div>
+                <div class="col-translation">
+                    <label>ja</label>
+                    <textarea class="translation-field" data-key="patient.not_currently_marketed" data-original="現在販売されていません">現在販売されていません</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-patient.not_currently_marketed" value="correct" data-key="patient.not_currently_marketed">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-patient.not_currently_marketed" value="corrected" data-key="patient.not_currently_marketed">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="patient.not_currently_marketed" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -17807,11 +17840,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Place bilateral pedicle screws across a range of levels in one step. Select your &lt;strong&gt;Upper Instrumented Vertebra (UIV)&lt;/strong&gt; and &lt;strong&gt;Lower Instrumented Vertebra (LIV)&lt;/strong&gt;, choose a screw type, and confirm. Sizes, trajectories, and individual adjustments are made in the Plan view. Press &lt;strong&gt;Q&lt;/strong&gt; to open.</div>
+                    <div class="english-text">Place bilateral pedicle screws across a range of levels in one step. Select your &lt;strong&gt;Upper Instrumented Vertebra (UIV)&lt;/strong&gt; and &lt;strong&gt;Lower Instrumented Vertebra (LIV)&lt;/strong&gt;, choose a screw type, and confirm. Choose one size for every screw, or leave them unsized and choose sizes in the Plan view or at surgery. A level whose system does not make that size gets an unsized screw. Trajectories and individual adjustments are made in the Plan view. Press &lt;strong&gt;Q&lt;/strong&gt; to open.</div>
                 </div>
                 <div class="col-translation">
                     <label>ja</label>
-                    <textarea class="translation-field" data-key="help.quickadd.body" data-original="複数レベルにわたって両側椎弓根スクリューを一度に配置します。&lt;strong&gt;上位固定椎 (UIV)&lt;/strong&gt;と&lt;strong&gt;下位固定椎 (LIV)&lt;/strong&gt;を選択し、スクリュータイプを選んで確定します。サイズ、軌道、個別の調整は計画ビューで行います。&lt;strong&gt;Q&lt;/strong&gt;を押して開きます。">複数レベルにわたって両側椎弓根スクリューを一度に配置します。&lt;strong&gt;上位固定椎 (UIV)&lt;/strong&gt;と&lt;strong&gt;下位固定椎 (LIV)&lt;/strong&gt;を選択し、スクリュータイプを選んで確定します。サイズ、軌道、個別の調整は計画ビューで行います。&lt;strong&gt;Q&lt;/strong&gt;を押して開きます。</textarea>
+                    <textarea class="translation-field" data-key="help.quickadd.body" data-original="複数レベルにわたって両側椎弓根スクリューを一度に配置します。&lt;strong&gt;上位固定椎 (UIV)&lt;/strong&gt;と&lt;strong&gt;下位固定椎 (LIV)&lt;/strong&gt;を選択し、スクリュータイプを選んで確定します。すべてのスクリューに1つのサイズを選択するか、サイズなしのままにして計画ビューまたは手術時にサイズを選択してください。システムにそのサイズがない椎間には、サイズなしのスクリューが設置されます。軌道と個別の調整は計画ビューで行います。&lt;strong&gt;Q&lt;/strong&gt;を押して開きます。">複数レベルにわたって両側椎弓根スクリューを一度に配置します。&lt;strong&gt;上位固定椎 (UIV)&lt;/strong&gt;と&lt;strong&gt;下位固定椎 (LIV)&lt;/strong&gt;を選択し、スクリュータイプを選んで確定します。すべてのスクリューに1つのサイズを選択するか、サイズなしのままにして計画ビューまたは手術時にサイズを選択してください。システムにそのサイズがない椎間には、サイズなしのスクリューが設置されます。軌道と個別の調整は計画ビューで行います。&lt;strong&gt;Q&lt;/strong&gt;を押して開きます。</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -19259,11 +19292,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">&lt;strong&gt;Drag size&lt;/strong&gt; is for quickly laying down screws. The size is always your choice: the app never picks one. Press &lt;strong&gt;Drag size&lt;/strong&gt;, beside Quick Add, to turn it on, then choose a head type. &lt;strong&gt;Click&lt;/strong&gt; an empty pedicle to add a screw at the last size you placed for that kind of screw (lateral mass, other neck screws, pedicle or pelvic), or unsized if you have not placed one yet; until then, a drag starts from the smallest size. &lt;strong&gt;Press and drag&lt;/strong&gt; to set its size: sideways for diameter, up or down for length, in the sizes the system makes. Let go to add it. Drag an existing screw to change its size. Drag below the shortest length to remove it (the readout turns red and reads Remove), or back up to keep it; Undo brings a removed screw back. Click an existing screw to open its dialog. &lt;strong&gt;Bilateral&lt;/strong&gt; works on both sides of a level together. On a phone or tablet, hold for a moment before dragging; a quick swipe still moves the chart. On the final record, a quick tap on a planned screw offers Placed as planned, Edit placement or Not placed; hold and drag to record it at another size. Scanned screws keep their scanned size. Each press is one undo step. Press &lt;strong&gt;Done&lt;/strong&gt;, or Escape on a keyboard, to leave. Outside Drag size, a plain click on a pedicle opens the full screw dialog. Use it for what Drag size does not offer: shank and shaft variants, dual diameters, specialist head types (such as reduction, biased-angle or dual-rod heads), the trajectory and annotations.</div>
+                    <div class="english-text">&lt;strong&gt;Drag size&lt;/strong&gt; is for quickly laying down screws. The size is always your choice: the app never picks one. Press &lt;strong&gt;Drag size&lt;/strong&gt;, beside Quick Add, to turn it on, then choose a head type. &lt;strong&gt;Click&lt;/strong&gt; an empty pedicle to add a screw at the last size you placed for that kind of screw (lateral mass, other neck screws, pedicle or pelvic), or unsized if you have not placed one yet; until then, a drag starts from the smallest size. &lt;strong&gt;Press and drag&lt;/strong&gt; to set its size: sideways for diameter, up or down for length, in the sizes the system makes. Hold at the edge of the screen to keep stepping the size that way. Let go to add it. Drag an existing screw to change its size. Drag below the shortest length to remove it (the readout turns red and reads Remove), or back up to keep it; Undo brings a removed screw back. Click an existing screw to open its dialog. &lt;strong&gt;Bilateral&lt;/strong&gt; works on both sides of a level together. On a phone or tablet, hold for a moment before dragging; a quick swipe still moves the chart. On the final record, a quick tap on a planned screw offers Placed as planned, Edit placement or Not placed; hold and drag to record it at another size. Scanned screws keep their scanned size. Each press is one undo step. Press &lt;strong&gt;Done&lt;/strong&gt;, or Escape on a keyboard, to leave. Outside Drag size, a plain click on a pedicle opens the full screw dialog. Use it for what Drag size does not offer: shank and shaft variants, dual diameters, specialist head types (such as reduction, biased-angle or dual-rod heads), the trajectory and annotations.</div>
                 </div>
                 <div class="col-translation">
                     <label>ja</label>
-                    <textarea class="translation-field" data-key="help.size_stamp.body" data-original="&lt;strong&gt;ドラッグでサイズ&lt;/strong&gt;は、スクリューを素早く配置するための機能です。サイズは常にあなたが選びます。アプリがサイズを選ぶことはありません。「クイック追加」の横の&lt;strong&gt;ドラッグでサイズ&lt;/strong&gt;を押してオンにし、ヘッドタイプを選びます。空いている椎弓根を&lt;strong&gt;クリック&lt;/strong&gt;すると、その種類のスクリュー（外側塊、その他の頸椎スクリュー、椎弓根、骨盤）で最後に設置したサイズでスクリューを追加します。まだ設置していない場合はサイズなしになり、ドラッグは最小サイズから始まります。&lt;strong&gt;押したままドラッグ&lt;/strong&gt;してサイズを設定します。横で径、上下で長さが、システムが製造するサイズで変わります。指を離すと追加されます。既存のスクリューをドラッグするとサイズを変更できます。最短の長さより下までドラッグすると削除され（表示が赤くなり「削除」と出ます）、上に戻すと保持されます。「元に戻す」で削除したスクリューが戻ります。既存のスクリューをクリックするとそのダイアログが開きます。&lt;strong&gt;両側&lt;/strong&gt;はレベルの両側に同時に作用します。スマートフォンやタブレットでは、ドラッグする前に少し長押ししてください。素早いスワイプでは引き続きチャートが移動します。最終記録では、計画したスクリューを軽くタップすると「計画どおり設置」「設置を編集」「未設置」が表示されます。長押ししてドラッグすると別のサイズで記録できます。スキャンしたスクリューはスキャンしたサイズを保持します。1回の押下が1回の元に戻す操作になります。終了するには&lt;strong&gt;完了&lt;/strong&gt;を押すか、キーボードの Esc を押します。ドラッグでサイズ以外では、椎弓根を普通にクリックすると完全なスクリューダイアログが開きます。ドラッグでサイズにない設定はそこで行います：シャンクとシャフトのバリエーション、二重径、特殊なヘッドタイプ（整復用、角度付き、デュアルロッドなど）、刺入経路、注釈。">&lt;strong&gt;ドラッグでサイズ&lt;/strong&gt;は、スクリューを素早く配置するための機能です。サイズは常にあなたが選びます。アプリがサイズを選ぶことはありません。「クイック追加」の横の&lt;strong&gt;ドラッグでサイズ&lt;/strong&gt;を押してオンにし、ヘッドタイプを選びます。空いている椎弓根を&lt;strong&gt;クリック&lt;/strong&gt;すると、その種類のスクリュー（外側塊、その他の頸椎スクリュー、椎弓根、骨盤）で最後に設置したサイズでスクリューを追加します。まだ設置していない場合はサイズなしになり、ドラッグは最小サイズから始まります。&lt;strong&gt;押したままドラッグ&lt;/strong&gt;してサイズを設定します。横で径、上下で長さが、システムが製造するサイズで変わります。指を離すと追加されます。既存のスクリューをドラッグするとサイズを変更できます。最短の長さより下までドラッグすると削除され（表示が赤くなり「削除」と出ます）、上に戻すと保持されます。「元に戻す」で削除したスクリューが戻ります。既存のスクリューをクリックするとそのダイアログが開きます。&lt;strong&gt;両側&lt;/strong&gt;はレベルの両側に同時に作用します。スマートフォンやタブレットでは、ドラッグする前に少し長押ししてください。素早いスワイプでは引き続きチャートが移動します。最終記録では、計画したスクリューを軽くタップすると「計画どおり設置」「設置を編集」「未設置」が表示されます。長押ししてドラッグすると別のサイズで記録できます。スキャンしたスクリューはスキャンしたサイズを保持します。1回の押下が1回の元に戻す操作になります。終了するには&lt;strong&gt;完了&lt;/strong&gt;を押すか、キーボードの Esc を押します。ドラッグでサイズ以外では、椎弓根を普通にクリックすると完全なスクリューダイアログが開きます。ドラッグでサイズにない設定はそこで行います：シャンクとシャフトのバリエーション、二重径、特殊なヘッドタイプ（整復用、角度付き、デュアルロッドなど）、刺入経路、注釈。</textarea>
+                    <textarea class="translation-field" data-key="help.size_stamp.body" data-original="&lt;strong&gt;ドラッグでサイズ&lt;/strong&gt;は、スクリューを素早く配置するための機能です。サイズは常にあなたが選びます。アプリがサイズを選ぶことはありません。「クイック追加」の横の&lt;strong&gt;ドラッグでサイズ&lt;/strong&gt;を押してオンにし、ヘッドタイプを選びます。空いている椎弓根を&lt;strong&gt;クリック&lt;/strong&gt;すると、その種類のスクリュー（外側塊、その他の頸椎スクリュー、椎弓根、骨盤）で最後に設置したサイズでスクリューを追加します。まだ設置していない場合はサイズなしになり、ドラッグは最小サイズから始まります。&lt;strong&gt;押したままドラッグ&lt;/strong&gt;してサイズを設定します。横で径、上下で長さが、システムが製造するサイズで変わります。画面の端で止めると、その方向にサイズが続けて変わります。指を離すと追加されます。既存のスクリューをドラッグするとサイズを変更できます。最短の長さより下までドラッグすると削除され（表示が赤くなり「削除」と出ます）、上に戻すと保持されます。「元に戻す」で削除したスクリューが戻ります。既存のスクリューをクリックするとそのダイアログが開きます。&lt;strong&gt;両側&lt;/strong&gt;はレベルの両側に同時に作用します。スマートフォンやタブレットでは、ドラッグする前に少し長押ししてください。素早いスワイプでは引き続きチャートが移動します。最終記録では、計画したスクリューを軽くタップすると「計画どおり設置」「設置を編集」「未設置」が表示されます。長押ししてドラッグすると別のサイズで記録できます。スキャンしたスクリューはスキャンしたサイズを保持します。1回の押下が1回の元に戻す操作になります。終了するには&lt;strong&gt;完了&lt;/strong&gt;を押すか、キーボードの Esc を押します。ドラッグでサイズ以外では、椎弓根を普通にクリックすると完全なスクリューダイアログが開きます。ドラッグでサイズにない設定はそこで行います：シャンクとシャフトのバリエーション、二重径、特殊なヘッドタイプ（整復用、角度付き、デュアルロッドなど）、刺入経路、注釈。">&lt;strong&gt;ドラッグでサイズ&lt;/strong&gt;は、スクリューを素早く配置するための機能です。サイズは常にあなたが選びます。アプリがサイズを選ぶことはありません。「クイック追加」の横の&lt;strong&gt;ドラッグでサイズ&lt;/strong&gt;を押してオンにし、ヘッドタイプを選びます。空いている椎弓根を&lt;strong&gt;クリック&lt;/strong&gt;すると、その種類のスクリュー（外側塊、その他の頸椎スクリュー、椎弓根、骨盤）で最後に設置したサイズでスクリューを追加します。まだ設置していない場合はサイズなしになり、ドラッグは最小サイズから始まります。&lt;strong&gt;押したままドラッグ&lt;/strong&gt;してサイズを設定します。横で径、上下で長さが、システムが製造するサイズで変わります。画面の端で止めると、その方向にサイズが続けて変わります。指を離すと追加されます。既存のスクリューをドラッグするとサイズを変更できます。最短の長さより下までドラッグすると削除され（表示が赤くなり「削除」と出ます）、上に戻すと保持されます。「元に戻す」で削除したスクリューが戻ります。既存のスクリューをクリックするとそのダイアログが開きます。&lt;strong&gt;両側&lt;/strong&gt;はレベルの両側に同時に作用します。スマートフォンやタブレットでは、ドラッグする前に少し長押ししてください。素早いスワイプでは引き続きチャートが移動します。最終記録では、計画したスクリューを軽くタップすると「計画どおり設置」「設置を編集」「未設置」が表示されます。長押ししてドラッグすると別のサイズで記録できます。スキャンしたスクリューはスキャンしたサイズを保持します。1回の押下が1回の元に戻す操作になります。終了するには&lt;strong&gt;完了&lt;/strong&gt;を押すか、キーボードの Esc を押します。ドラッグでサイズ以外では、椎弓根を普通にクリックすると完全なスクリューダイアログが開きます。ドラッグでサイズにない設定はそこで行います：シャンクとシャフトのバリエーション、二重径、特殊なヘッドタイプ（整復用、角度付き、デュアルロッドなど）、刺入経路、注釈。</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -35662,11 +35695,11 @@
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Quick Add places bilateral pedicle screws at every level between your UIV and LIV. No sizes are set: choose sizes in the Plan view or at surgery. To adjust individual levels (remove screws, change type or trajectory, add hooks), use the Plan view. Craniocervical (Oc–C2) and pelvic levels are not included: add these individually.</div>
+                    <div class="english-text">Quick Add places bilateral pedicle screws at every level between your UIV and LIV. Choose one size for every screw, or leave them unsized and choose sizes in the Plan view or at surgery. A level whose system does not make that size gets an unsized screw. To adjust individual levels (remove screws, change type or trajectory, add hooks), use the Plan view. Craniocervical (Oc–C2) and pelvic levels are not included: add these individually.</div>
                 </div>
                 <div class="col-translation">
                     <label>ja</label>
-                    <textarea class="translation-field" data-key="modal.quickadd.help" data-original="クイック追加は、UIVとLIVの間のすべての椎間に両側椎弓根スクリューを設置します。サイズは設定されません - 計画ビューまたは手術時に選択してください。個々の椎間を調整する場合（スクリューの削除、タイプや刺入方向の変更、フックの追加）は計画ビューを使用してください。頭蓋頚椎移行部 (Oc–C2) と骨盤の椎間は含まれません - これらは個別に追加してください。">クイック追加は、UIVとLIVの間のすべての椎間に両側椎弓根スクリューを設置します。サイズは設定されません - 計画ビューまたは手術時に選択してください。個々の椎間を調整する場合（スクリューの削除、タイプや刺入方向の変更、フックの追加）は計画ビューを使用してください。頭蓋頚椎移行部 (Oc–C2) と骨盤の椎間は含まれません - これらは個別に追加してください。</textarea>
+                    <textarea class="translation-field" data-key="modal.quickadd.help" data-original="クイック追加は、UIVとLIVの間のすべての椎間に両側椎弓根スクリューを設置します。すべてのスクリューに1つのサイズを選択するか、サイズなしのままにして計画ビューまたは手術時にサイズを選択してください。システムにそのサイズがない椎間には、サイズなしのスクリューが設置されます。個々の椎間を調整する場合（スクリューの削除、タイプや刺入方向の変更、フックの追加）は計画ビューを使用してください。頭蓋頚椎移行部 (Oc–C2) と骨盤の椎間は含まれません - これらは個別に追加してください。">クイック追加は、UIVとLIVの間のすべての椎間に両側椎弓根スクリューを設置します。すべてのスクリューに1つのサイズを選択するか、サイズなしのままにして計画ビューまたは手術時にサイズを選択してください。システムにそのサイズがない椎間には、サイズなしのスクリューが設置されます。個々の椎間を調整する場合（スクリューの削除、タイプや刺入方向の変更、フックの追加）は計画ビューを使用してください。頭蓋頚椎移行部 (Oc–C2) と骨盤の椎間は含まれません - これらは個別に追加してください。</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -35915,6 +35948,39 @@
                 <div class="col-comment">
                     <label>Comment <span class="optional">(optional)</span></label>
                     <input type="text" class="comment-field" data-key="modal.quickadd.shank_type" placeholder="Any notes for the developer...">
+                </div>
+            </div>
+        </div>
+        <div class="review-item" data-key="modal.quickadd.size_modular" data-section="17" id="item-modal.quickadd.size_modular">
+            <div class="item-header">
+                <code class="key-label">modal.quickadd.size_modular</code>
+                
+            </div>
+            <div class="item-grid">
+                <div class="col-english">
+                    <label>English</label>
+                    <div class="english-text">This system has modular shanks: set sizes in the screw dialog.</div>
+                </div>
+                <div class="col-translation">
+                    <label>ja</label>
+                    <textarea class="translation-field" data-key="modal.quickadd.size_modular" data-original="このシステムはモジュラーシャンクです。サイズはスクリューのダイアログで設定してください。">このシステムはモジュラーシャンクです。サイズはスクリューのダイアログで設定してください。</textarea>
+                </div>
+                <div class="col-status">
+                    <label>Status</label>
+                    <div class="status-radios">
+                        <label class="radio-label correct-label">
+                            <input type="radio" name="status-modal.quickadd.size_modular" value="correct" data-key="modal.quickadd.size_modular">
+                            <span>Correct</span>
+                        </label>
+                        <label class="radio-label corrected-label">
+                            <input type="radio" name="status-modal.quickadd.size_modular" value="corrected" data-key="modal.quickadd.size_modular">
+                            <span>Corrected</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-comment">
+                    <label>Comment <span class="optional">(optional)</span></label>
+                    <input type="text" class="comment-field" data-key="modal.quickadd.size_modular" placeholder="Any notes for the developer...">
                 </div>
             </div>
         </div>
@@ -47719,11 +47785,11 @@ Portrait mode gives each column more vertical space, showing the full spine with
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Hospital reference</div>
+                    <div class="english-text">Order reference</div>
                 </div>
                 <div class="col-translation">
                     <label>ja</label>
-                    <textarea class="translation-field" data-key="usage.header.hospital_reference" data-original="病院管理番号">病院管理番号</textarea>
+                    <textarea class="translation-field" data-key="usage.header.hospital_reference" data-original="注文番号">注文番号</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -48214,11 +48280,11 @@ Portrait mode gives each column more vertical space, showing the full spine with
             <div class="item-grid">
                 <div class="col-english">
                     <label>English</label>
-                    <div class="english-text">Your own reference. Do not enter patient details.</div>
+                    <div class="english-text">For a purchase order or stock reference. Do not enter patient details.</div>
                 </div>
                 <div class="col-translation">
                     <label>ja</label>
-                    <textarea class="translation-field" data-key="usage.reference_hint" data-original="独自の管理番号。患者情報は入力しないでください。">独自の管理番号。患者情報は入力しないでください。</textarea>
+                    <textarea class="translation-field" data-key="usage.reference_hint" data-original="発注書または在庫の管理番号用です。患者情報は入力しないでください。">発注書または在庫の管理番号用です。患者情報は入力しないでください。</textarea>
                 </div>
                 <div class="col-status">
                     <label>Status</label>
@@ -48911,7 +48977,7 @@ Portrait mode gives each column more vertical space, showing the full spine with
     (function() {
         const LANG = "ja";
         const STORAGE_KEY = "spine_review_" + LANG;
-        const TOTAL = 1468;
+        const TOTAL = 1470;
 
         // --- Reviewer details ---
 

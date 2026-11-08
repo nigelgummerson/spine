@@ -1,1 +1,0 @@
-var e={"04046964989728":{s:`Ennovate`,t:`set_screw`,c:`SY001TS`,n:`Aesculap AG`,z:`ENNOVATE SET SCREW STERILE`}};export{e as default};
